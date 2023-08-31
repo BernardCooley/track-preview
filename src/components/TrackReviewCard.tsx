@@ -180,7 +180,7 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
                         </Stack>
                     </CardBody>
                 </Card>
-            ) : <Center>No tracks te review</Center>}
+            ) : <Center>No tracks to review</Center>}
         </>
     );
 };
