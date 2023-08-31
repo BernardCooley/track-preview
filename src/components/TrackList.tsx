@@ -106,7 +106,7 @@ const TrackList = ({ tracks }: Props) => {
                                         h="full"
                                         colorScheme="black"
                                         aria-label="Call Segun"
-                                        fontSize="50px"
+                                        fontSize={["3xl", "4xl", "5xl"]}
                                         icon={<StopIcon fontSize="inherit" />}
                                     />
                                 )}
