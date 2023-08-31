@@ -40,6 +40,18 @@ const TrackList = ({ tracks }: Props) => {
             overflowY="scroll"
             divider={<StackDivider />}
             spacing="4"
+            css={{
+                '&::-webkit-scrollbar': {
+                  width: '4px',
+                },
+                '&::-webkit-scrollbar-track': {
+                  width: '6px',
+                },
+                '&::-webkit-scrollbar-thumb': {
+                  background: 'lightgray',
+                  borderRadius: '24px',
+                },
+              }}
         >
             {tracks.map((track) => (
                 <Card

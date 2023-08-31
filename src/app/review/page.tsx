@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, Center, Collapse, Flex, Stack } from "@chakra-ui/react";
+import { Box, Center, Flex, Slide, Stack } from "@chakra-ui/react";
 import TrackReviewCard from "@/components/TrackReviewCard";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { ITrack } from "../../../types";
@@ -16,7 +16,7 @@ export default function Home() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const pathname = usePathname();
-    const { currentlyPlaying } = useTrackContext();
+    const { currentlyPlaying, updateCurrentlyPlaying } = useTrackContext();
     const audioElement = useRef<HTMLAudioElement>(null);
     const [buyTracks, setBuyTracks] = useState<ITrack[]>([]);
     const [currentStep, setCurrentStep] = useState<number>(1);
@@ -29,7 +29,12 @@ export default function Home() {
     }, []);
 
     useEffect(() => {
+        updateCurrentlyPlaying(undefined);
+    }, [currentStep]);
+
+    useEffect(() => {
         const reviewStep = searchParams.get("reviewStep");
+
         if (reviewStep) {
             setCurrentStep(parseInt(reviewStep));
         }
@@ -69,16 +74,6 @@ export default function Home() {
         <Box m={0} px={[0, 4, 8]}>
             <Center>
                 <Flex direction="column" w="full">
-                    <Collapse in={currentStep === 4} animateOpacity>
-                        <Box
-                            p={4}
-                            mt="4"
-                            rounded="md"
-                            shadow="md"
-                        >
-                            <AudioPlayer ref={audioElement} />
-                        </Box>
-                    </Collapse>
                     <Stack
                         spacing="4"
                         w="full"
@@ -98,6 +93,19 @@ export default function Home() {
                             <TrackList tracks={buyTracks} />
                         )}
                     </Stack>
+                    <Slide
+                        direction="bottom"
+                        in={
+                            currentStep === 4 &&
+                            currentlyPlaying !== undefined &&
+                            currentlyPlaying.length > 0
+                        }
+                        style={{ zIndex: 10 }}
+                    >
+                        <Box p={4} mt="4" rounded="md" shadow="md">
+                            <AudioPlayer ref={audioElement} />
+                        </Box>
+                    </Slide>
                 </Flex>
             </Center>
         </Box>
