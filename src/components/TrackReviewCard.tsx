@@ -141,7 +141,7 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
                                     h="full"
                                     colorScheme="black"
                                     aria-label="Call Segun"
-                                    fontSize="200px"
+                                    fontSize={["100px", "200px"]}
                                     icon={<PlayArrowIcon fontSize="inherit" />}
                                 />
                             )}
