@@ -29,7 +29,7 @@ const TrackList = ({ tracks }: Props) => {
 
     return (
         <Stack
-            p={8}
+            p={[2, 4, 8]}
             h="65vh"
             overflowY="scroll"
             divider={<StackDivider />}
