@@ -1,20 +1,21 @@
 import React, { forwardRef } from "react";
 import { useTrackContext } from "../../context/TrackContext";
+import { Box } from "@chakra-ui/react";
 
 const AudioPlayer = forwardRef<HTMLAudioElement>((props, ref) => {
     const { currentlyPlaying } = useTrackContext();
 
     return (
-        <audio
-            ref={ref}
-            style={{
-                width: "100%",
-                position: "absolute",
-                top: "0px",
-            }}
-            src={currentlyPlaying}
-            controls
-        />
+        <Box w="full">
+            <audio
+                ref={ref}
+                style={{
+                    width: "100%",
+                }}
+                src={currentlyPlaying}
+                controls
+            />
+        </Box>
     );
 });
 

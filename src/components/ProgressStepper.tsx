@@ -32,18 +32,20 @@ const ProgressStepper = ({ onStepChange, currentStep }: Props) => {
             index={currentStep}
             size={["sm", "md", "lg"]}
             px={[4, 0, 0]}
-            pt={[4, 0, 0]}
+            pt={4}
         >
             {steps.map((step, index) => (
                 <Step key={index}>
                     <Button
+                        py={4}
+                        h='auto'
                         variant="ghost"
                         onClick={() => {
                             onStepChange(index + 1);
                         }}
                         isActive={currentStep === index + 1}
                     >
-                        <StepIndicator>
+                        <StepIndicator fontSize='sm' >
                             <StepStatus
                                 complete={<StepIcon />}
                                 incomplete={<StepNumber />}

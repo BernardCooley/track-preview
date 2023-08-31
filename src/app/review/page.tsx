@@ -1,10 +1,6 @@
 "use client";
 
-import {
-    Box,
-    Center,
-    Stack,
-} from "@chakra-ui/react";
+import { Box, Center, Collapse, Flex, Stack } from "@chakra-ui/react";
 import TrackReviewCard from "@/components/TrackReviewCard";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { ITrack } from "../../../types";
@@ -14,7 +10,7 @@ import ProgressStepper from "@/components/ProgressStepper";
 import { useTrackContext } from "../../../context/TrackContext";
 import TrackList from "@/components/TrackList";
 import AudioPlayer from "@/components/AudioPlayer";
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 export default function Home() {
     const router = useRouter();
@@ -24,18 +20,18 @@ export default function Home() {
     const audioElement = useRef<HTMLAudioElement>(null);
     const [buyTracks, setBuyTracks] = useState<ITrack[]>([]);
     const [currentStep, setCurrentStep] = useState<number>(1);
-    
+
     useEffect(() => {
-        const reviewStep = searchParams.get('reviewStep');
-        if(!reviewStep) {
+        const reviewStep = searchParams.get("reviewStep");
+        if (!reviewStep) {
             router.push(`${pathname}?reviewStep=1`);
         }
     }, []);
 
     useEffect(() => {
-        const reviewStep = searchParams.get('reviewStep');
-        if(reviewStep) {
-            setCurrentStep(parseInt(reviewStep))
+        const reviewStep = searchParams.get("reviewStep");
+        if (reviewStep) {
+            setCurrentStep(parseInt(reviewStep));
         }
     }, [searchParams]);
 
@@ -70,21 +66,39 @@ export default function Home() {
     }, [currentStep]);
 
     return (
-        <Box m={0} p={[0, 4, 8]}>
+        <Box m={0} px={[0, 4, 8]}>
             <Center>
-                <Stack spacing="4" w="full" position='relative' top={currentStep === 4 ? 20 : 0} >
-                    <ProgressStepper currentStep={currentStep} onStepChange={(step) => {
-                        router.push(`${pathname}?reviewStep=${step}`);
-                    }} />
-                    {currentStep <= 3 ? (
-                        <TrackReviewCard reviewStep={currentStep} />
-                    ) : (
-                        <TrackList tracks={buyTracks} />
-                    )}
-                </Stack>
-                {currentStep === 4 && (
-                    <AudioPlayer ref={audioElement} />
-                )}
+                <Flex direction="column" w="full">
+                    <Collapse in={currentStep === 4} animateOpacity>
+                        <Box
+                            p={4}
+                            mt="4"
+                            rounded="md"
+                            shadow="md"
+                        >
+                            <AudioPlayer ref={audioElement} />
+                        </Box>
+                    </Collapse>
+                    <Stack
+                        spacing="4"
+                        w="full"
+                        position="relative"
+                        transition="ease-in-out"
+                        transitionDuration="200"
+                    >
+                        <ProgressStepper
+                            currentStep={currentStep}
+                            onStepChange={(step) => {
+                                router.push(`${pathname}?reviewStep=${step}`);
+                            }}
+                        />
+                        {currentStep <= 3 ? (
+                            <TrackReviewCard reviewStep={currentStep} />
+                        ) : (
+                            <TrackList tracks={buyTracks} />
+                        )}
+                    </Stack>
+                </Flex>
             </Center>
         </Box>
     );
