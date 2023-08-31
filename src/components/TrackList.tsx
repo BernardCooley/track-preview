@@ -36,7 +36,7 @@ const TrackList = ({ tracks }: Props) => {
     return (
         <Stack
             p={[2, 4, 8]}
-            h="65vh"
+            h='full'
             overflowY="scroll"
             divider={<StackDivider />}
             spacing="4"

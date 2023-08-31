@@ -14,6 +14,6 @@ export default function RootLayout({
     children: React.ReactNode;
 }) {
     return (
-        <div className={inter.className}>{children}</div>
+        <div style={{height: '100vh'}} className={inter.className}>{children}</div>
     );
 }

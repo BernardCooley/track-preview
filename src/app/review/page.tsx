@@ -71,12 +71,13 @@ export default function Home() {
     }, [currentStep]);
 
     return (
-        <Box m={0} px={[0, 4, 8]}>
-            <Center>
-                <Flex direction="column" w="full">
+        <Box m={0} px={[0, 4, 8]} h='full'>
+            <Center h='full'>
+                <Flex direction="column" w="full" h='full'>
                     <Stack
                         spacing="4"
                         w="full"
+                        h='95vh'
                         position="relative"
                         transition="ease-in-out"
                         transitionDuration="200"
