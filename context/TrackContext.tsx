@@ -5,8 +5,6 @@ import React, { createContext, ReactNode, useContext, useState } from "react";
 interface TrackContextProps {
     currentlyPlaying: string | undefined;
     updateCurrentlyPlaying: (trackId: string | undefined) => void;
-    currentStep: number;
-    updateCurrentStep: (step: number) => void;
 }
 
 export const TrackContext = createContext<TrackContextProps | null>(null);
@@ -28,12 +26,6 @@ export const TrackContextProvider = ({
 }: {
     children: ReactNode;
 }) => {
-    const [currentStep, setCurrentlStep] = useState<number>(1);
-
-    const updateCurrentStep = (step: number) => {
-        setCurrentlStep(step);
-    };
-
     const[currentlyPlaying, setCurrentlyPlaying] = useState<string>("");
 
     const updateCurrentlyPlaying = (trackId: string | undefined) => {
@@ -44,8 +36,6 @@ export const TrackContextProvider = ({
     return (
         <TrackContext.Provider
             value={{
-                currentStep,
-                updateCurrentStep,
                 currentlyPlaying,
                 updateCurrentlyPlaying
             }}

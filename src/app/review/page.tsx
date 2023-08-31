@@ -14,11 +14,30 @@ import ProgressStepper from "@/components/ProgressStepper";
 import { useTrackContext } from "../../../context/TrackContext";
 import TrackList from "@/components/TrackList";
 import AudioPlayer from "@/components/AudioPlayer";
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 
 export default function Home() {
-    const { currentStep, currentlyPlaying } = useTrackContext();
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const pathname = usePathname();
+    const { currentlyPlaying } = useTrackContext();
     const audioElement = useRef<HTMLAudioElement>(null);
     const [buyTracks, setBuyTracks] = useState<ITrack[]>([]);
+    const [currentStep, setCurrentStep] = useState<number>(1);
+    
+    useEffect(() => {
+        const reviewStep = searchParams.get('reviewStep');
+        if(!reviewStep) {
+            router.push(`${pathname}?reviewStep=1`);
+        }
+    }, []);
+
+    useEffect(() => {
+        const reviewStep = searchParams.get('reviewStep');
+        if(reviewStep) {
+            setCurrentStep(parseInt(reviewStep))
+        }
+    }, [searchParams]);
 
     useEffect(() => {
         if (currentlyPlaying !== undefined) {
@@ -54,7 +73,9 @@ export default function Home() {
         <Box m={0} p={[0, 4, 8]}>
             <Center>
                 <Stack spacing="4" w="full">
-                    <ProgressStepper />
+                    <ProgressStepper currentStep={currentStep} onStepChange={(step) => {
+                        router.push(`${pathname}?reviewStep=${step}`);
+                    }} />
                     {currentStep <= 3 ? (
                         <TrackReviewCard reviewStep={currentStep} />
                     ) : (

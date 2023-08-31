@@ -1,6 +1,17 @@
-import { Box, Button, Step, StepDescription, StepIcon, StepIndicator, StepNumber, StepSeparator, StepStatus, StepTitle, Stepper } from "@chakra-ui/react";
+import {
+    Box,
+    Button,
+    Step,
+    StepDescription,
+    StepIcon,
+    StepIndicator,
+    StepNumber,
+    StepSeparator,
+    StepStatus,
+    StepTitle,
+    Stepper,
+} from "@chakra-ui/react";
 import React from "react";
-import { useTrackContext } from "../../context/TrackContext";
 
 const steps = [
     { title: "First", description: "Review" },
@@ -9,8 +20,12 @@ const steps = [
     { title: "Buy", description: "" },
 ];
 
-const ProgressStepper = () => {
-    const { currentStep, updateCurrentStep } = useTrackContext();
+interface Props {
+    onStepChange: (step: number) => void;
+    currentStep: number;
+}
+
+const ProgressStepper = ({ onStepChange, currentStep }: Props) => {
 
     return (
         <Stepper
@@ -23,7 +38,9 @@ const ProgressStepper = () => {
                 <Step key={index}>
                     <Button
                         variant="ghost"
-                        onClick={() => updateCurrentStep(index + 1)}
+                        onClick={() => {
+                            onStepChange(index + 1);
+                        }}
                         isActive={currentStep === index + 1}
                     >
                         <StepIndicator>
