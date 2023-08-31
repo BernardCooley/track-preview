@@ -10,6 +10,7 @@ import {
     IconButton,
     Switch,
     Stack,
+    Center,
 } from "@chakra-ui/react";
 import React, { useEffect, useRef, useState } from "react";
 import { ITrack } from "../../types";
@@ -88,7 +89,7 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
 
     return (
         <>
-            {track && (
+            {track ? (
                 <Card size="md">
                     <CardHeader>
                         <Heading size="md">
@@ -179,7 +180,7 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
                         </Stack>
                     </CardBody>
                 </Card>
-            )}
+            ) : <Center>No tracks te review</Center>}
         </>
     );
 };
