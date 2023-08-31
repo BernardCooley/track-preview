@@ -15,6 +15,8 @@ import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import StopIcon from "@mui/icons-material/Stop";
 import { ITrack } from "../../types";
 import { useTrackContext } from "../../context/TrackContext";
+import { db } from "../../firebase/firebaseInit";
+import { doc, updateDoc } from "firebase/firestore";
 
 interface Props {
     tracks: ITrack[];
@@ -24,7 +26,11 @@ const TrackList = ({ tracks }: Props) => {
     const { currentlyPlaying, updateCurrentlyPlaying } = useTrackContext();
 
     const deleteTrack = async (id: string) => {
-        // await db.collection("tracks").doc(id).delete();
+        const trackRef = doc(db, "tracks", id);
+            await updateDoc(trackRef, {
+                reviewStep: 0,
+            });
+        updateCurrentlyPlaying(undefined);
     };
 
     return (
@@ -66,9 +72,6 @@ const TrackList = ({ tracks }: Props) => {
                                     }
                                 />
                                 <IconButton
-                                    onClick={() =>
-                                        updateCurrentlyPlaying(track.previewUrl)
-                                    }
                                     variant="ghost"
                                     w="full"
                                     h="full"
