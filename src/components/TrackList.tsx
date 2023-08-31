@@ -45,12 +45,12 @@ const TrackList = ({ tracks }: Props) => {
                     }
                 >
                     <CardBody>
-                        <Flex gap={8} justifyContent="space-between">
+                        <Flex gap={8} justifyContent={['center', "space-between"]} direction={['column', 'row']} >
                             <Box>
-                                <Text fontSize="3xl" fontWeight="bold">
+                                <Text fontSize={["2xl", "xl", "3xl"]} fontWeight="bold">
                                     {track.artist}
                                 </Text>
-                                <Text fontSize="xl">{track.title}</Text>
+                                <Text fontSize={["xl", "md", "xl"]}>{track.title}</Text>
                             </Box>
                             <Flex gap={2}>
                                 <IconButton
@@ -60,7 +60,7 @@ const TrackList = ({ tracks }: Props) => {
                                     h="full"
                                     colorScheme="red"
                                     aria-label="Call Segun"
-                                    fontSize="50px"
+                                    fontSize={["3xl", "4xl", "5xl"]}
                                     icon={
                                         <DeleteForeverIcon fontSize="inherit" />
                                     }
@@ -74,7 +74,7 @@ const TrackList = ({ tracks }: Props) => {
                                     h="full"
                                     colorScheme="green"
                                     aria-label="Call Segun"
-                                    fontSize="50px"
+                                    fontSize={["3xl", "4xl", "5xl"]}
                                     icon={
                                         <ShoppingCartIcon fontSize="inherit" />
                                     }
@@ -91,7 +91,7 @@ const TrackList = ({ tracks }: Props) => {
                                         h="full"
                                         colorScheme="black"
                                         aria-label="Call Segun"
-                                        fontSize="50px"
+                                        fontSize={["3xl", "4xl", "5xl"]}
                                         icon={
                                             <PlayArrowIcon fontSize="inherit" />
                                         }

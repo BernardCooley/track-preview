@@ -72,7 +72,7 @@ export default function Home() {
     return (
         <Box m={0} p={[0, 4, 8]}>
             <Center>
-                <Stack spacing="4" w="full">
+                <Stack spacing="4" w="full" position='relative' top={currentStep === 4 ? 20 : 0} >
                     <ProgressStepper currentStep={currentStep} onStepChange={(step) => {
                         router.push(`${pathname}?reviewStep=${step}`);
                     }} />
