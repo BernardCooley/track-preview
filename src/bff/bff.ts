@@ -31,21 +31,6 @@ export const handleFetchErrors = (response: Response) => {
     }
 };
 
-const getRequestInitWithAuth = (
-    method: "GET" | "POST",
-    authorization: string
-): RequestInit => {
-    const requestInit: RequestInit = {
-        method: method,
-        headers: {
-            Accept: "application/json",
-            Authorization: authorization,
-            "Content-Type": "application/json",
-        },
-    };
-    return requestInit;
-};
-
 export const fetchWithErrorHandling = async <T>(
     endpoint: RequestInfo,
     method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH",
