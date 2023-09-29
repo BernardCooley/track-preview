@@ -1,5 +1,6 @@
 import { Discojs } from "discojs";
 import { NextResponse } from "next/server";
+import { ExtendedGetRelease } from "../../../../types";
 
 export async function POST(req: Request) {
     const { releaseId } = await req.json();
@@ -9,13 +10,15 @@ export async function POST(req: Request) {
     });
 
     try {
-        const release = await client.getRelease(releaseId);
+        const release = (await client.getRelease(
+            releaseId
+        )) as ExtendedGetRelease;
 
-        if (release?.artists && release?.tracklist) {
+        if (release?.artists_sort && release?.tracklist) {
             const response = NextResponse.json(
                 release?.tracklist.map((track, i) => {
                     return {
-                        artist: release.artists[i].name,
+                        artist: release.artists_sort,
                         title: track.title,
                         releaseId: release.id,
                     };

@@ -86,9 +86,10 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
     const getSpotifyTrack = async () => {
         if (searchTracks && searchTracks.length > 0) {
             const spotifyTrack = await fetchSpotifyTrack({
-                trackToSearch: searchTracks[1],
+                // figure out a way to randomise which track is selected
+                trackToSearch: searchTracks[0],
                 genre: selectedGenre,
-                discogsReleaseId: searchTracks[1].releaseId,
+                discogsReleaseId: searchTracks[0].releaseId,
             });
 
             if (spotifyTrack) {

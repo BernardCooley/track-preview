@@ -1,3 +1,5 @@
+import { CommunityStatusesEnum, DataQualityEnum } from "discojs";
+
 export interface ReleaseTrack {
     artist: string;
     title: string;
@@ -156,3 +158,137 @@ export interface IReleaseResponse {
     pagination: IPagination;
     results: IRelease[];
 }
+
+export type GetRelease = {
+    resource_url: string;
+} & {
+    extraartists?:
+        | ({
+              resource_url: string;
+          } & {
+              id: number;
+              name: string;
+              anv: string;
+              join: string;
+              role: string;
+              tracks: string;
+          })[]
+        | undefined;
+    genres?: string[] | undefined;
+    styles?: string[] | undefined;
+    country?: string | undefined;
+    notes?: string | undefined;
+    released?: string | undefined;
+    released_formatted?: string | undefined;
+    tracklist?:
+        | {
+              type_: string;
+              title: string;
+              position: string;
+              duration: string;
+          }[]
+        | undefined;
+    master_id?: number | undefined;
+    master_url?: string | undefined;
+    estimated_weight?: number | undefined;
+    images?:
+        | ({
+              resource_url: string;
+          } & {
+              type: "primary" | "secondary";
+              width: number;
+              height: number;
+              uri: string;
+              uri150: string;
+          })[]
+        | undefined;
+    videos?:
+        | {
+              title: string;
+              description: string;
+              duration: number;
+              embed: boolean;
+              uri: string;
+          }[]
+        | undefined;
+} & {
+    id: number;
+    title: string;
+    artists: ({
+        resource_url: string;
+    } & {
+        id: number;
+        name: string;
+        anv: string;
+        join: string;
+        role: string;
+        tracks: string;
+    })[];
+    formats: {
+        name: string;
+        qty: string;
+    }[];
+    year: number;
+    format_quantity: number;
+    identifiers: {
+        type: string;
+        value: string;
+    }[];
+    labels: ({
+        resource_url: string;
+    } & {
+        id: number;
+        name: string;
+        entity_type: string;
+        entity_type_name: string;
+        catno: string;
+    })[];
+    companies: ({
+        resource_url: string;
+    } & {
+        id: number;
+        name: string;
+        entity_type: string;
+        entity_type_name: string;
+        catno: string;
+    })[];
+    series: ({
+        resource_url: string;
+    } & {
+        id: number;
+        name: string;
+        entity_type: string;
+        entity_type_name: string;
+        catno: string;
+    })[];
+    thumb: string;
+    lowest_price: number | null;
+    num_for_sale: number;
+    date_added: string;
+    date_changed: string;
+    data_quality: DataQualityEnum;
+    status: CommunityStatusesEnum.ACCEPTED;
+    community: {
+        have: number;
+        want: number;
+        rating: {
+            count: number;
+            average: number;
+        };
+        submitter: {
+            resource_url: string;
+        } & {
+            username: string;
+        };
+        contributors: ({
+            resource_url: string;
+        } & {
+            username: string;
+        })[];
+        data_quality: DataQualityEnum;
+        status: CommunityStatusesEnum.ACCEPTED;
+    };
+    uri: string;
+};
+
+export type ExtendedGetRelease = GetRelease & { artists_sort: string };
