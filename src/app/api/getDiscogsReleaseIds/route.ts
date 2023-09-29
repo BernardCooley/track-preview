@@ -36,7 +36,7 @@ export async function POST(req: Request) {
         console.log(error);
 
         return NextResponse.json(
-            { error: "Failed to get data" },
+            { error },
             {
                 status: 500,
             }
