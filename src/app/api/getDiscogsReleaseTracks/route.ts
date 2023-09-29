@@ -11,11 +11,11 @@ export async function POST(req: Request) {
     try {
         const release = await client.getRelease(releaseId);
 
-        if (release?.artists_sort && release?.tracklist) {
+        if (release.artists && release?.tracklist) {
             const response = NextResponse.json(
-                release?.tracklist.map((track) => {
+                release?.tracklist.map((track, i) => {
                     return {
-                        artist: release.artists_sort,
+                        artist: release.artists[i].name,
                         title: track.title,
                         releaseId: release.id,
                     };
