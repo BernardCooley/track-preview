@@ -1,16 +1,20 @@
-export interface IRelease {
+export interface ReleaseTrack {
+    artist: string;
     title: string;
-    url: string;
+    releaseId: number;
 }
 
 export interface ITrack {
     artist: string;
     title: string;
-    release: IRelease;
     previewUrl: string;
-    listened: boolean;
-    liked: boolean;
     id: string;
+    thumbnail: string;
+    release: {
+        url: string;
+        discogsReleaseId: number;
+    };
+    genre: string;
 }
 
 export interface IArtist {
@@ -134,4 +138,21 @@ export interface IRelease {
     uri: string;
     videos: IVideo[];
     year: number;
+    artists_sort: string;
+}
+
+export interface IPagination {
+    page: number;
+    pages: number;
+    per_page: number;
+    items: number;
+    urls: {
+        last: string;
+        next: string;
+    };
+}
+
+export interface IReleaseResponse {
+    pagination: IPagination;
+    results: IRelease[];
 }

@@ -1,16 +1,11 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { Button } from "@chakra-ui/react";
 
 export default function Home() {
-    const router = useRouter();
-
-    useEffect(() => {
-        router.push("/review");
-    }, []);
-
     return (
-        <main></main>
+        <main>
+            <Button>Spotify</Button>
+        </main>
     );
 }

@@ -22,7 +22,7 @@ export default function Home() {
     const [currentStep, setCurrentStep] = useState<number>(1);
 
     useEffect(() => {
-        const reviewStep = searchParams.get("reviewStep");
+        const reviewStep = searchParams?.get("reviewStep");
         if (!reviewStep) {
             router.push(`${pathname}?reviewStep=1`);
         }
@@ -33,7 +33,7 @@ export default function Home() {
     }, [currentStep]);
 
     useEffect(() => {
-        const reviewStep = searchParams.get("reviewStep");
+        const reviewStep = searchParams?.get("reviewStep");
 
         if (reviewStep) {
             setCurrentStep(parseInt(reviewStep));
