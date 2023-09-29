@@ -28,30 +28,37 @@ export async function POST(req: Request) {
             `artist:${trackToSearch.artist} track:${trackToSearch.title}`
         );
 
-        if (trackResponse.body.tracks.total > 0) {
+        if (
+            trackResponse.body.tracks !== undefined &&
+            trackResponse.body.tracks.total > 0
+        ) {
             const randomNumber = Math.floor(
                 Math.random() * trackResponse.body.tracks.items.length
             );
             const tracks = trackResponse.body.tracks.items[randomNumber];
 
-            const track: ITrack = {
-                artist: tracks.artists[0].name,
-                title: tracks.name,
-                previewUrl: tracks.preview_url,
-                id: tracks.id,
-                thumbnail: tracks.album.images[0].url,
-                release: {
-                    url: tracks.album.uri,
-                    discogsReleaseId: discogsReleaseId,
-                },
-                genre: genre,
-            };
+            if (tracks.preview_url) {
+                const track: ITrack = {
+                    artist: tracks.artists[0].name,
+                    title: tracks.name,
+                    previewUrl: tracks.preview_url,
+                    id: tracks.id,
+                    thumbnail: tracks.album.images[0].url,
+                    release: {
+                        url: tracks.album.uri,
+                        discogsReleaseId: discogsReleaseId,
+                    },
+                    genre: genre,
+                };
 
-            const response = NextResponse.json(track, {
-                status: 200,
-            });
+                const response = NextResponse.json(track, {
+                    status: 200,
+                });
 
-            return response;
+                return response;
+            } else {
+                console.log("Spotify track doesnt exist");
+            }
         } else {
             console.log("Spotify track doesnt exist");
         }
