@@ -11,7 +11,7 @@ export async function POST(req: Request) {
     try {
         const release = await client.getRelease(releaseId);
 
-        if (release.artists && release?.tracklist) {
+        if (release?.artists && release?.tracklist) {
             const response = NextResponse.json(
                 release?.tracklist.map((track, i) => {
                     return {
