@@ -20,7 +20,9 @@ import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import { styles } from "../../data/genres";
 import {
+    getUserData,
     saveNewDocument,
+    updateDocument,
     updateNestedArray,
 } from "../../firebase/firebaseRequests";
 import {
@@ -47,10 +49,12 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
     const [autoPlay, setAutoPlay] = useState<boolean>(false);
     const [listened, setListened] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
-    const [selectedGenre, setSelectedGenre] = useState<string>("Techno");
+    const [selectedGenre, setSelectedGenre] = useState<string | null>(null);
+    const genreDropdownRef = useRef<HTMLSelectElement>(null);
 
     useEffect(() => {
         fetchReleaseIds();
+        getPreferredGenre();
     }, []);
 
     useEffect(() => {
@@ -85,17 +89,17 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
                 searchTracks.length;
             const spotifyTrack = await fetchSpotifyTrack({
                 trackToSearch: searchTracks[randomTrackNumber],
-                genre: selectedGenre,
+                genre: selectedGenre || "N/A",
                 discogsReleaseId: searchTracks[0].releaseId,
             });
 
             if (spotifyTrack) {
                 setLoading(false);
-                await saveNewDocument(
-                    "spotifyTracks",
-                    spotifyTrack.id.toString(),
-                    spotifyTrack
-                );
+                await saveNewDocument({
+                    collection: "spotifyTracks",
+                    docId: spotifyTrack.id.toString(),
+                    data: spotifyTrack,
+                });
                 setTrack(spotifyTrack);
             } else {
                 setReleaseNumber(releaseNumber + 1);
@@ -117,15 +121,13 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
     };
 
     const fetchReleaseIds = async () => {
-        if (selectedGenre) {
-            setLoading(true);
-            const randomPage = Math.floor(Math.random() * 200);
-            const ids = await fetchDiscogsReleaseIds({
-                selectedGenre: selectedGenre,
-                pageNumber: randomPage,
-            });
-            setReleaseIds(ids);
-        }
+        setLoading(true);
+        const randomPage = Math.floor(Math.random() * 200);
+        const ids = await fetchDiscogsReleaseIds({
+            selectedGenre: selectedGenre,
+            pageNumber: randomPage,
+        });
+        setReleaseIds(ids);
     };
 
     const play = () => {
@@ -134,18 +136,38 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
 
     const likeDislike = async (like: boolean) => {
         if (track) {
-            await updateNestedArray(
-                "users",
-                "bernard_cooley",
-                like
+            await updateNestedArray({
+                collection: "users",
+                docId: "bernard_cooley",
+                field: like
                     ? reviewStepMap[reviewStep as keyof typeof reviewStepMap]
                           .liked
                     : reviewStepMap[reviewStep as keyof typeof reviewStepMap]
                           .disliked,
-                track.id
-            );
+                data: track.id,
+            });
 
             fetchReleaseIds();
+        }
+    };
+
+    const updateGenre = async (genre: string) => {
+        setSelectedGenre(genre);
+        await updateDocument({
+            collection: "users",
+            docId: "bernard_cooley",
+            field: "preferredGenre",
+            data: genre,
+        });
+    };
+
+    const getPreferredGenre = async () => {
+        const user = await getUserData({ userId: "bernard_cooley" });
+        if (!user) return;
+
+        if (user.preferredGenre) {
+            setSelectedGenre(user.preferredGenre);
+            genreDropdownRef.current!.value = user.preferredGenre;
         }
     };
 
@@ -166,11 +188,12 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
                 />
             )}
             <ReviewTracksFilters
-                onGenreSelect={(e) => setSelectedGenre(e)}
+                onGenreSelect={(genre) => updateGenre(genre)}
                 selectedGenre={selectedGenre}
                 genres={styles}
                 autoPlay={autoPlay}
-                onAutoPlayChange={(e) => setAutoPlay(e)}
+                onAutoPlayChange={(value) => setAutoPlay(value)}
+                ref={genreDropdownRef}
             />
             {track ? (
                 <Card size="md" h="full" opacity={loading ? "0.4" : "1"}>

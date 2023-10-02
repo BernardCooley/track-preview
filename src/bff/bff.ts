@@ -80,7 +80,7 @@ export const fetchWithErrorHandling = async <T>(
 };
 
 interface FetchDiscogsReleaseIdsProps {
-    selectedGenre: string;
+    selectedGenre: string | null;
     pageNumber: number;
 }
 
@@ -92,7 +92,7 @@ export const fetchDiscogsReleaseIds = async ({
         "/api/getDiscogsReleaseIds",
         "POST",
         {
-            selectedGenre: selectedGenre,
+            ...(selectedGenre && { selectedGenre: selectedGenre }),
             pageNumber: pageNumber,
         }
     );
