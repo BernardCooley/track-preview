@@ -114,6 +114,7 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
                 releaseId: releaseIds[releaseNumber],
             });
             if (releaseTracks) {
+                setLoading(false);
                 setSearchTracks(releaseTracks);
             } else {
                 setReleaseNumber(releaseNumber + 1);
@@ -136,6 +137,7 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
     };
 
     const likeDislike = async (like: boolean) => {
+        setLoading(true);
         if (track) {
             await updateNestedArray({
                 collection: "users",
@@ -148,7 +150,13 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
                 data: track.id,
             });
 
-            fetchReleaseIds();
+            if (releaseNumber < releaseIds!.length - 1) {
+                setReleaseNumber(releaseNumber + 1);
+            } else {
+                setReleaseNumber(0);
+                setReleaseIds([]);
+                fetchReleaseIds();
+            }
         }
     };
 
