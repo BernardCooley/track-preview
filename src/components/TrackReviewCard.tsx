@@ -9,11 +9,8 @@ import {
     Heading,
     Text,
     IconButton,
-    Switch,
     Box,
     Spinner,
-    Select,
-    Collapse,
 } from "@chakra-ui/react";
 import React, { useEffect, useRef, useState } from "react";
 import { ITrack, ReleaseTrack } from "../../types";
@@ -21,7 +18,6 @@ import { Link } from "@chakra-ui/react";
 import ThumbDownIcon from "@mui/icons-material/ThumbDown";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
-import { Discojs } from "discojs";
 import { styles } from "../../data/genres";
 import {
     saveNewDocument,
@@ -32,17 +28,13 @@ import {
     fetchDiscogsReleaseTracks,
     fetchSpotifyTrack,
 } from "@/bff/bff";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import ReviewTracksFilters from "./ReviewTracksFilters";
 
 interface Props {
     reviewStep: number;
 }
 
 const TrackReviewCard = ({ reviewStep }: Props) => {
-    const client = new Discojs({
-        userToken: process.env.NEXT_PUBLIC_DISCOGS_API_TOKEN,
-    });
-
     const [releaseIds, setReleaseIds] = useState<number[] | null>([]);
     const [releaseNumber, setReleaseNumber] = useState<number>(0);
     const [searchTracks, setSearchTracks] = useState<ReleaseTrack[] | null>(
@@ -55,7 +47,6 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
     const [listened, setListened] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
     const [selectedGenre, setSelectedGenre] = useState<string>("Techno");
-    const [filtersOpen, setFiltersOpen] = useState<boolean>(false);
 
     useEffect(() => {
         fetchReleaseIds();
@@ -186,55 +177,13 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
                     size="xl"
                 />
             )}
-            <Flex alignItems="center" position="relative" direction="column">
-                <Collapse in={filtersOpen}>
-                    <Flex
-                        gap={10}
-                        mb={4}
-                        zIndex="100"
-                        justifyContent="space-between"
-                        mx={4}
-                        alignItems="center"
-                    >
-                        <Flex alignItems="center" gap={4}>
-                            <Select
-                                variant="outline"
-                                placeholder="Select option"
-                                onChange={(e) =>
-                                    setSelectedGenre(e.target.value)
-                                }
-                                defaultValue={selectedGenre}
-                            >
-                                {styles.map((style) => (
-                                    <option key={style} value={style}>
-                                        {style}
-                                    </option>
-                                ))}
-                            </Select>
-                        </Flex>
-                        <Flex direction="row" gap={4}>
-                            <Text>Autoplay </Text>
-                            <Switch
-                                isChecked={autoPlay}
-                                onChange={(e) => {
-                                    setAutoPlay(e.target.checked);
-                                }}
-                                colorScheme="teal"
-                                size="lg"
-                            />
-                        </Flex>
-                    </Flex>
-                </Collapse>
-                <Flex w="full" justifyContent="center">
-                    <KeyboardArrowDownIcon
-                        fontSize="large"
-                        onClick={() => setFiltersOpen((prev) => !prev)}
-                        sx={{
-                            transform: filtersOpen ? "rotate(180deg)" : "",
-                        }}
-                    />
-                </Flex>
-            </Flex>
+            <ReviewTracksFilters
+                onGenreSelect={(e) => setSelectedGenre(e)}
+                selectedGenre={selectedGenre}
+                genres={styles}
+                autoPlay={autoPlay}
+                onAutoPlayChange={(e) => setAutoPlay(e)}
+            />
             {track ? (
                 <Card size="md" h="full" opacity={loading ? "0.4" : "1"}>
                     <CardHeader>
