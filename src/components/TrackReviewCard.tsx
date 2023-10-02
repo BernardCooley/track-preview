@@ -39,7 +39,7 @@ interface Props {
 }
 
 const TrackReviewCard = ({ reviewStep }: Props) => {
-    const [releaseIds, setReleaseIds] = useState<number[] | null>([]);
+    const [releaseIds, setReleaseIds] = useState<number[]>([]);
     const [releaseNumber, setReleaseNumber] = useState<number>(0);
     const [searchTracks, setSearchTracks] = useState<ReleaseTrack[] | null>(
         null
@@ -106,6 +106,7 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
                 setReleaseNumber(releaseNumber + 1);
             }
         }
+        setLoading(false);
     };
 
     const fetchReleaseTracks = async () => {
@@ -114,7 +115,6 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
                 releaseId: releaseIds[releaseNumber],
             });
             if (releaseTracks) {
-                setLoading(false);
                 setSearchTracks(releaseTracks);
             } else {
                 setReleaseNumber(releaseNumber + 1);
@@ -129,7 +129,7 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
             selectedGenre: selectedGenre,
             pageNumber: randomPage,
         });
-        setReleaseIds(ids);
+        setReleaseIds(ids || []);
     };
 
     const play = () => {
@@ -150,7 +150,7 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
                 data: track.id,
             });
 
-            if (releaseNumber < releaseIds!.length - 1) {
+            if (releaseNumber < releaseIds.length - 1) {
                 setReleaseNumber(releaseNumber + 1);
             } else {
                 setReleaseNumber(0);
