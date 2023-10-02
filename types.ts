@@ -292,3 +292,16 @@ export type GetRelease = {
 };
 
 export type ExtendedGetRelease = GetRelease & { artists_sort: string };
+
+export interface UserData {
+    email: string;
+    name: string;
+    preferredGenre: string;
+    step2ReviewTracks: string[];
+    step3ReviewTracks: string[];
+    step4ReviewTracks: string[];
+    step1DislikedTracks: string[];
+    step2DislikedTracks: string[];
+    step3DislikedTracks: string[];
+    tracksInteractedWith: string[];
+}

@@ -13,13 +13,14 @@ import {
     Spinner,
 } from "@chakra-ui/react";
 import React, { useEffect, useRef, useState } from "react";
-import { ITrack, ReleaseTrack } from "../../types";
+import { ITrack, ReleaseTrack, UserData } from "../../types";
 import { Link } from "@chakra-ui/react";
 import ThumbDownIcon from "@mui/icons-material/ThumbDown";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import { styles } from "../../data/genres";
 import {
+    getUnseenTrackReleaseIds,
     getUserData,
     saveNewDocument,
     updateDocument,
@@ -52,11 +53,16 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
     const [loading, setLoading] = useState<boolean>(false);
     const [selectedGenre, setSelectedGenre] = useState<string | null>(null);
     const genreDropdownRef = useRef<HTMLSelectElement>(null);
+    const [userData, setUserData] = useState<UserData | null>(null);
 
     useEffect(() => {
-        fetchReleaseIds();
-        getPreferredGenre();
+        fetchUserData("bernard_cooley");
     }, []);
+
+    useEffect(() => {
+        getPreferredGenre();
+        fetchUninteractedTracks();
+    }, [userData]);
 
     useEffect(() => {
         setIsPlaying(false);
@@ -72,7 +78,7 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
 
     useEffect(() => {
         setReleaseIds([]);
-        fetchReleaseIds();
+        fetchUninteractedTracks();
     }, [reviewStep, selectedGenre]);
 
     useEffect(() => {
@@ -82,6 +88,22 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
     useEffect(() => {
         getSpotifyTrack();
     }, [searchTracks]);
+
+    const fetchUninteractedTracks = async () => {
+        if (userData?.tracksInteractedWith) {
+            const uninteractedTracks = await getUnseenTrackReleaseIds(
+                userData.tracksInteractedWith || []
+            );
+
+            if (uninteractedTracks) {
+                setReleaseIds(uninteractedTracks as number[]);
+            } else {
+                fetchReleaseIds();
+            }
+        } else {
+            fetchReleaseIds();
+        }
+    };
 
     const getSpotifyTrack = async () => {
         if (searchTracks && searchTracks.length > 0) {
@@ -94,13 +116,19 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
                 discogsReleaseId: searchTracks[0].releaseId,
             });
 
-            if (spotifyTrack) {
+            console.log(
+                "🚀 ~ file: TrackReviewCard.tsx:124 ~ getSpotifyTrack ~ spotifyTrack:",
+                spotifyTrack
+            );
+            if (spotifyTrack?.id) {
                 setLoading(false);
+
                 await saveNewDocument({
                     collection: "spotifyTracks",
                     docId: spotifyTrack.id.toString(),
                     data: spotifyTrack,
                 });
+
                 setTrack(spotifyTrack);
             } else {
                 setReleaseNumber(releaseNumber + 1);
@@ -150,12 +178,18 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
                 data: track.id,
             });
 
+            await updateNestedArray({
+                collection: "users",
+                docId: "bernard_cooley",
+                field: "tracksInteractedWith",
+                data: track.id,
+            });
+
             if (releaseNumber < releaseIds.length - 1) {
                 setReleaseNumber(releaseNumber + 1);
             } else {
                 setReleaseNumber(0);
                 setReleaseIds([]);
-                fetchReleaseIds();
             }
         }
     };
@@ -171,13 +205,19 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
     };
 
     const getPreferredGenre = async () => {
-        const user = await getUserData({ userId: "bernard_cooley" });
+        if (userData?.preferredGenre) {
+            setSelectedGenre(userData.preferredGenre);
+            genreDropdownRef.current!.value = userData.preferredGenre;
+        } else {
+            setSelectedGenre(null);
+        }
+    };
+
+    const fetchUserData = async (userId: string) => {
+        const user = await getUserData({ userId: userId });
         if (!user) return;
 
-        if (user.preferredGenre) {
-            setSelectedGenre(user.preferredGenre);
-            genreDropdownRef.current!.value = user.preferredGenre;
-        }
+        setUserData(user);
     };
 
     return (

@@ -1,12 +1,16 @@
 import {
-    DocumentData,
     arrayUnion,
+    collection,
     doc,
     getDoc,
+    getDocs,
+    query,
     setDoc,
     updateDoc,
+    where,
 } from "firebase/firestore";
 import { db } from "./firebaseInit";
+import { UserData } from "../types";
 
 interface SaveNewDocumentProps {
     collection: string;
@@ -20,7 +24,12 @@ export const saveNewDocument = async ({
     data,
 }: SaveNewDocumentProps) => {
     const docRef = doc(db, collection, docId);
-    return await setDoc(docRef, data);
+
+    try {
+        return await setDoc(docRef, data);
+    } catch (error) {
+        return null;
+    }
 };
 
 interface UpdateDocumentProps {
@@ -38,9 +47,13 @@ export const updateNestedArray = async ({
 }: UpdateDocumentProps) => {
     const docRef = doc(db, collection, docId);
 
-    return await updateDoc(docRef, {
-        [field]: arrayUnion(data),
-    });
+    try {
+        return await updateDoc(docRef, {
+            [field]: arrayUnion(data),
+        });
+    } catch (error) {
+        return null;
+    }
 };
 
 interface UpdateDocumentProps {
@@ -57,9 +70,13 @@ export const updateDocument = async ({
 }: UpdateDocumentProps) => {
     const docRef = doc(db, collection, docId);
 
-    return await updateDoc(docRef, {
-        [field]: data,
-    });
+    try {
+        return await updateDoc(docRef, {
+            [field]: data,
+        });
+    } catch (error) {
+        return null;
+    }
 };
 
 interface GetUserDataProps {
@@ -68,13 +85,43 @@ interface GetUserDataProps {
 
 export const getUserData = async ({
     userId,
-}: GetUserDataProps): Promise<DocumentData | null> => {
+}: GetUserDataProps): Promise<UserData | null> => {
     const docRef = doc(db, "users", userId);
-    const docSnap = await getDoc(docRef);
 
-    if (docSnap.exists()) {
-        return docSnap.data();
-    } else {
+    try {
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            return docSnap.data() as UserData;
+        }
+    } catch (error) {
         return null;
     }
+    return null;
+};
+
+export const getUnseenTrackReleaseIds = async (
+    tracksInteractedWith: string[]
+): Promise<number[] | null> => {
+    const releaseIds: number[] = [];
+
+    const collectionRef = collection(db, "spotifyTracks");
+    const condition = where("id", "not-in", tracksInteractedWith);
+    const q = query(collectionRef, condition);
+
+    try {
+        const querySnapshot = await getDocs(q);
+
+        querySnapshot.forEach((doc) => {
+            releaseIds.push(Number(doc.data().release.discogsReleaseId));
+        });
+
+        if (releaseIds.length > 0) {
+            return releaseIds;
+        }
+    } catch (error) {
+        return null;
+    }
+
+    return null;
 };
