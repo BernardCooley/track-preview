@@ -32,6 +32,7 @@ import {
 } from "@/bff/bff";
 import ReviewTracksFilters from "./ReviewTracksFilters";
 import { reviewStepMap } from "../../const";
+import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 
 interface Props {
     reviewStep: number;
@@ -200,11 +201,18 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
                     <CardHeader>
                         <Heading size="md">
                             <Link href={track.release.url} isExternal>
-                                <Flex alignItems="center" direction="column">
+                                <Flex
+                                    alignItems="center"
+                                    direction="column"
+                                    position="relative"
+                                >
                                     <Text fontSize="3xl" fontWeight="bold">
                                         {track.artist}
                                     </Text>
-                                    <Text fontSize="xl">{track.title}</Text>
+                                    <Flex gap={1}>
+                                        <Text fontSize="xl">{track.title}</Text>
+                                        <OpenInNewIcon />
+                                    </Flex>
                                 </Flex>
                             </Link>
                         </Heading>
