@@ -199,7 +199,7 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
                 <Card size="md" h="full" opacity={loading ? "0.4" : "1"}>
                     <CardHeader>
                         <Heading size="md">
-                            <Link href={track.previewUrl} isExternal>
+                            <Link href={track.release.url} isExternal>
                                 <Flex alignItems="center" direction="column">
                                     <Text fontSize="3xl" fontWeight="bold">
                                         {track.artist}
