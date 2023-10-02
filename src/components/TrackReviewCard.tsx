@@ -29,6 +29,7 @@ import {
     fetchSpotifyTrack,
 } from "@/bff/bff";
 import ReviewTracksFilters from "./ReviewTracksFilters";
+import { reviewStepMap } from "../../const";
 
 interface Props {
     reviewStep: number;
@@ -79,9 +80,11 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
 
     const getSpotifyTrack = async () => {
         if (searchTracks && searchTracks.length > 0) {
+            const randomTrackNumber =
+                Math.floor(Math.random() * searchTracks.length) *
+                searchTracks.length;
             const spotifyTrack = await fetchSpotifyTrack({
-                // figure out a way to randomise which track is selected
-                trackToSearch: searchTracks[0],
+                trackToSearch: searchTracks[randomTrackNumber],
                 genre: selectedGenre,
                 discogsReleaseId: searchTracks[0].releaseId,
             });
@@ -130,21 +133,6 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
     };
 
     const likeDislike = async (like: boolean) => {
-        const reviewStepMap = {
-            1: {
-                liked: "step2ReviewTracks",
-                disliked: "step1DislikedTracks",
-            },
-            2: {
-                liked: "step3ReviewTracks",
-                disliked: "step2DislikedTracks",
-            },
-            3: {
-                liked: "step4ReviewTracks",
-                disliked: "step3DislikedTracks",
-            },
-        };
-
         if (track) {
             await updateNestedArray(
                 "users",
