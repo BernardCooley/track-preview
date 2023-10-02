@@ -13,6 +13,7 @@ import {
     Box,
     Spinner,
     Select,
+    Collapse,
 } from "@chakra-ui/react";
 import React, { useEffect, useRef, useState } from "react";
 import { ITrack, ReleaseTrack } from "../../types";
@@ -31,6 +32,7 @@ import {
     fetchDiscogsReleaseTracks,
     fetchSpotifyTrack,
 } from "@/bff/bff";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 
 interface Props {
     reviewStep: number;
@@ -53,6 +55,7 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
     const [listened, setListened] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
     const [selectedGenre, setSelectedGenre] = useState<string>("Techno");
+    const [filtersOpen, setFiltersOpen] = useState<boolean>(false);
 
     useEffect(() => {
         fetchReleaseIds();
@@ -183,39 +186,52 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
                     size="xl"
                 />
             )}
-            <Flex
-                gap={10}
-                mb={4}
-                position="relative"
-                zIndex="100"
-                justifyContent="space-between"
-                mx={4}
-                alignItems="center"
-            >
-                <Flex alignItems="center" gap={4}>
-                    <Text>Style:</Text>
-                    <Select
-                        variant="outline"
-                        placeholder="Select option"
-                        onChange={(e) => setSelectedGenre(e.target.value)}
-                        defaultValue={selectedGenre}
+            <Flex alignItems="center" position="relative" direction="column">
+                <Collapse in={filtersOpen}>
+                    <Flex
+                        gap={10}
+                        mb={4}
+                        zIndex="100"
+                        justifyContent="space-between"
+                        mx={4}
+                        alignItems="center"
                     >
-                        {styles.map((style) => (
-                            <option key={style} value={style}>
-                                {style}
-                            </option>
-                        ))}
-                    </Select>
-                </Flex>
-                <Flex direction="row" mt={4} gap={4}>
-                    <Text>Autoplay </Text>
-                    <Switch
-                        isChecked={autoPlay}
-                        onChange={(e) => {
-                            setAutoPlay(e.target.checked);
+                        <Flex alignItems="center" gap={4}>
+                            <Select
+                                variant="outline"
+                                placeholder="Select option"
+                                onChange={(e) =>
+                                    setSelectedGenre(e.target.value)
+                                }
+                                defaultValue={selectedGenre}
+                            >
+                                {styles.map((style) => (
+                                    <option key={style} value={style}>
+                                        {style}
+                                    </option>
+                                ))}
+                            </Select>
+                        </Flex>
+                        <Flex direction="row" gap={4}>
+                            <Text>Autoplay </Text>
+                            <Switch
+                                isChecked={autoPlay}
+                                onChange={(e) => {
+                                    setAutoPlay(e.target.checked);
+                                }}
+                                colorScheme="teal"
+                                size="lg"
+                            />
+                        </Flex>
+                    </Flex>
+                </Collapse>
+                <Flex w="full" justifyContent="center">
+                    <KeyboardArrowDownIcon
+                        fontSize="large"
+                        onClick={() => setFiltersOpen((prev) => !prev)}
+                        sx={{
+                            transform: filtersOpen ? "rotate(180deg)" : "",
                         }}
-                        colorScheme="teal"
-                        size="lg"
                     />
                 </Flex>
             </Flex>
