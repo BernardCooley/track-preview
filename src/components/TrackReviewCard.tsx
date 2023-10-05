@@ -150,13 +150,12 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
         if (userTracks) {
             updateTracks(userTracks.tracks);
             setUserLastDoc(userTracks.lastDoc);
-            setLoading(false);
         } else {
-            setLoading(false);
             updateTracks(null);
             setTrack(null);
             updateUserData(await fetchUserData({ userId: userId }));
         }
+        setLoading(false);
     };
 
     const refetchStoredSpotifyTracks = async (lastDoc?: DocumentData) => {
@@ -173,17 +172,16 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
             updateTracks(spTracks.tracks);
             setSpotifyLastDoc(spTracks.lastDoc);
 
-            setLoading(false);
             if (spTracks.tracks.length === 0) {
                 refetchStoredSpotifyTracks(spTracks.lastDoc);
             }
         } else {
-            setLoading(false);
             updateTracks(null);
             setTrack(null);
             updateUserData(await fetchUserData({ userId: userId }));
             // Get discogs release ids here to search for more tracks
         }
+        setLoading(false);
     };
 
     // useEffect(() => {
