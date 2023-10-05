@@ -156,6 +156,8 @@ export const likeDislike = async ({
                 onNoMoreTracks();
                 return null;
             }
+        } else {
+            onNoMoreTracks();
         }
     }
 

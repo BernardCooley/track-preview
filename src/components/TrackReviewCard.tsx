@@ -70,6 +70,7 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
     );
     const [userLastDoc, setUserLastDoc] = useState<DocumentData | null>(null);
     const [availableGenres, setAvailableGenres] = useState<string[]>([]);
+    const [searchingDiscogs, setSearchingDiscogs] = useState<boolean>(false);
 
     useEffect(() => {
         getAvailableGrnres();
@@ -173,6 +174,7 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
     };
 
     const refetchUserTracks = async (lastDoc?: DocumentData) => {
+        setSearchingDiscogs(false);
         const userTracks = await getReviewStepTracks({
             userId,
             reviewStep,
@@ -202,6 +204,7 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
         });
 
         if (spTracks) {
+            setSearchingDiscogs(false);
             updateTracks(spTracks.tracks);
             setSpotifyLastDoc(spTracks.lastDoc);
 
@@ -212,6 +215,7 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
             updateTracks(null);
             setTrack(null);
             updateUserData(await fetchUserData({ userId: userId }));
+            setSearchingDiscogs(true);
             triggerDiscogsSearch();
         }
         setLoading(false);
@@ -241,7 +245,11 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
             onMoreTracks: (val: ITrack[]) => updateTracks(val),
             onNoMoreTracks: () => {
                 if (reviewStep === 1) {
-                    refetchStoredSpotifyTracks(spotifyLastDoc || undefined);
+                    if (searchingDiscogs) {
+                        setReleaseNumber(releaseNumber + 1);
+                    } else {
+                        refetchStoredSpotifyTracks(spotifyLastDoc || undefined);
+                    }
                 } else {
                     refetchUserTracks(userLastDoc || undefined);
                 }
