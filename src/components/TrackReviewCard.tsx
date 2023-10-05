@@ -96,10 +96,19 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
         }
     }, [track]);
 
-    const getPreferredGenre = async (userData: UserData) => {
+    const getPreferredGenre = async (
+        availableGenres: string[],
+        userData: UserData
+    ) => {
         if (userData?.preferredGenre) {
-            setSelectedGenre(userData.preferredGenre);
-            genreRef.current!.value = userData.preferredGenre;
+            const currentGenre = availableGenres.includes(
+                userData.preferredGenre
+            )
+                ? userData.preferredGenre
+                : availableGenres[0];
+
+            setSelectedGenre(currentGenre);
+            genreRef.current!.value = currentGenre;
         } else {
             setSelectedGenre("N/A");
         }
@@ -110,7 +119,7 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
         if (uData) {
             if (reviewStep === 1) {
                 setAvailableGenres(styles);
-                getPreferredGenre(uData);
+                getPreferredGenre(styles, uData);
             } else {
                 const allGenres =
                     uData.tracks
@@ -120,7 +129,7 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
                         .map((t) => t.genre) || [];
                 if (allGenres) {
                     setAvailableGenres(removeDuplicates(allGenres));
-                    getPreferredGenre(uData);
+                    getPreferredGenre(removeDuplicates(allGenres), uData);
                 }
             }
         }
