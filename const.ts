@@ -1,4 +1,6 @@
-export const reviewStepMap = {
+import { ReviewStepMap } from "./types";
+
+export const reviewStepMap: ReviewStepMap = {
     1: {
         liked: "step2ReviewTracks",
         disliked: "step1DislikedTracks",

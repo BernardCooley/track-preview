@@ -305,3 +305,18 @@ export interface UserData {
     step3DislikedTracks: string[];
     tracksInteractedWith: string[];
 }
+
+export interface ReviewStepMap {
+    1: {
+        liked: string;
+        disliked: string;
+    };
+    2: {
+        liked: string;
+        disliked: string;
+    };
+    3: {
+        liked: string;
+        disliked: string;
+    };
+}

@@ -19,27 +19,24 @@ import ThumbDownIcon from "@mui/icons-material/ThumbDown";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import { styles } from "../../data/genres";
-import {
-    getUnseenTrackReleaseIds,
-    getUserData,
-    saveNewDocument,
-    updateDocument,
-    updateNestedArray,
-} from "../../firebase/firebaseRequests";
-import {
-    fetchDiscogsReleaseIds,
-    fetchDiscogsReleaseTracks,
-    fetchSpotifyTrack,
-} from "@/bff/bff";
 import ReviewTracksFilters from "./ReviewTracksFilters";
 import { reviewStepMap } from "../../const";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+import { LikeDislikeProps, likeDislike } from "../../functions";
+import {
+    fetchStoredSpotifyTracks,
+    fetchUserData,
+    updateDocument,
+} from "../../firebase/firebaseRequests";
+import { DocumentData } from "firebase/firestore";
+import { useAuthContext } from "../../Contexts/AuthContext";
 
 interface Props {
     reviewStep: number;
 }
 
 const TrackReviewCard = ({ reviewStep }: Props) => {
+    const { userData, updateUserData, userId } = useAuthContext();
     const [releaseIds, setReleaseIds] = useState<number[]>([]);
     const [releaseNumber, setReleaseNumber] = useState<number>(0);
     const [searchTracks, setSearchTracks] = useState<ReleaseTrack[] | null>(
@@ -53,171 +50,134 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
     const [loading, setLoading] = useState<boolean>(false);
     const [selectedGenre, setSelectedGenre] = useState<string | null>(null);
     const genreDropdownRef = useRef<HTMLSelectElement>(null);
-    const [userData, setUserData] = useState<UserData | null>(null);
+    const [spotifyNotFoundTracks, setSpotifyNotFoundTracks] = useState<
+        ReleaseTrack[] | null
+    >(null);
+    const [storedSpotifyTracks, setStoredSpotifyTracks] = useState<
+        ITrack[] | null
+    >([]);
+    const storedTracksLimit = 3;
+    const [interactedWith, setInteractedWith] = useState<string[] | null>(null);
+    const [spotifyLastDoc, setSpotifyLastDoc] = useState<DocumentData | null>(
+        null
+    );
 
     useEffect(() => {
-        fetchUserData("bernard_cooley");
-    }, []);
+        (async () => {
+            if (userData) {
+                getPreferredGenre();
+                setInteractedWith(userData.tracksInteractedWith);
+            }
 
-    useEffect(() => {
-        getPreferredGenre();
-        fetchUninteractedTracks();
+            // setReleaseIds(
+            //     (await getUninteractedTracks({
+            //         userData: userData,
+            //         onTracksNotFound: () =>
+            //             getDiscogsReleaseIds({
+            //                 onSearchStart: () => setLoading(true),
+            //                 selectedGenre: genre || "N/A",
+            //             }),
+            //     })) || []
+            // );
+        })();
     }, [userData]);
+
+    useEffect(() => {
+        refetchSpotify();
+    }, [reviewStep, selectedGenre]);
+
+    useEffect(() => {
+        if (storedSpotifyTracks) {
+            setTrack(storedSpotifyTracks[0]);
+        }
+    }, [storedSpotifyTracks]);
 
     useEffect(() => {
         setIsPlaying(false);
 
         if (track) {
+            setLoading(false);
             setListened(false);
         }
 
         if (autoPlay && track) {
-            audioElement.current?.play();
+            play();
         }
     }, [track]);
 
-    useEffect(() => {
-        setReleaseIds([]);
-        fetchUninteractedTracks();
-    }, [reviewStep, selectedGenre]);
+    const refetchSpotify = async (lastDoc?: DocumentData) => {
+        console.log("===========");
+        const spTracks = await fetchStoredSpotifyTracks({
+            lim: storedTracksLimit,
+            genre: selectedGenre || "N/A",
+            interactedWith: interactedWith || [],
+            lastDoc: lastDoc || null,
+        });
 
-    useEffect(() => {
-        fetchReleaseTracks();
-    }, [releaseNumber, releaseIds]);
+        if (spTracks) {
+            setStoredSpotifyTracks(spTracks.tracks);
+            setSpotifyLastDoc(spTracks.lastDoc);
 
-    useEffect(() => {
-        getSpotifyTrack();
-    }, [searchTracks]);
-
-    const fetchUninteractedTracks = async () => {
-        if (userData?.tracksInteractedWith) {
-            const uninteractedTracks = await getUnseenTrackReleaseIds(
-                userData.tracksInteractedWith || []
-            );
-
-            if (uninteractedTracks) {
-                setReleaseIds(uninteractedTracks as number[]);
-            } else {
-                fetchReleaseIds();
+            if (spTracks.tracks.length === 0) {
+                refetchSpotify(spTracks.lastDoc);
             }
         } else {
-            fetchReleaseIds();
+            setStoredSpotifyTracks(null);
+            setTrack(null);
+            updateUserData(await fetchUserData({ userId: userId }));
+            // Get discogs release ids here to search for more tracks
         }
     };
 
-    const getSpotifyTrack = async () => {
-        if (searchTracks && searchTracks.length > 0) {
-            const randomTrackNumber =
-                Math.floor(Math.random() * searchTracks.length) *
-                searchTracks.length;
-            const spotifyTrack = await fetchSpotifyTrack({
-                trackToSearch: searchTracks[randomTrackNumber],
-                genre: selectedGenre || "N/A",
-                discogsReleaseId: searchTracks[0].releaseId,
-            });
+    // useEffect(() => {
+    //     getReleaseTracks({
+    //         releaseIds,
+    //         releaseNumber,
+    //         onSuccess: (val) => setSearchTracks(val),
+    //         onFail: (val) => setReleaseNumber(val + 1),
+    //     });
+    // }, [releaseNumber, releaseIds]);
 
-            console.log(
-                "🚀 ~ file: TrackReviewCard.tsx:124 ~ getSpotifyTrack ~ spotifyTrack:",
-                spotifyTrack
-            );
-            if (spotifyTrack?.id) {
-                setLoading(false);
-
-                await saveNewDocument({
-                    collection: "spotifyTracks",
-                    docId: spotifyTrack.id.toString(),
-                    data: spotifyTrack,
-                });
-
-                setTrack(spotifyTrack);
-            } else {
-                setReleaseNumber(releaseNumber + 1);
-            }
-        }
-        setLoading(false);
-    };
-
-    const fetchReleaseTracks = async () => {
-        if (releaseIds && releaseIds.length > 0) {
-            const releaseTracks = await fetchDiscogsReleaseTracks({
-                releaseId: releaseIds[releaseNumber],
-            });
-            if (releaseTracks) {
-                setSearchTracks(releaseTracks);
-            } else {
-                setReleaseNumber(releaseNumber + 1);
-            }
-        }
-    };
-
-    const fetchReleaseIds = async () => {
-        setLoading(true);
-        const randomPage = Math.floor(Math.random() * 200);
-        const ids = await fetchDiscogsReleaseIds({
-            selectedGenre: selectedGenre,
-            pageNumber: randomPage,
-        });
-        setReleaseIds(ids || []);
-    };
+    // useEffect(() => {
+    //     (async () => {
+    //         setTrack(
+    //             await getSpotifyTrack({
+    //                 trackToSearch: searchTracks,
+    //                 spotifyNotFoundTracks,
+    //                 selectedGenre: selectedGenre || "N/A",
+    //                 onTrackNotFound: () => setReleaseNumber(releaseNumber + 1),
+    //                 onTrackFound: () => setLoading(false),
+    //                 onStartSearch: () => setLoading(true),
+    //             })
+    //         );
+    //     })();
+    // }, [searchTracks]);
 
     const play = () => {
         audioElement.current?.play();
     };
 
-    const likeDislike = async (like: boolean) => {
-        setLoading(true);
-        if (track) {
-            await updateNestedArray({
-                collection: "users",
-                docId: "bernard_cooley",
-                field: like
-                    ? reviewStepMap[reviewStep as keyof typeof reviewStepMap]
-                          .liked
-                    : reviewStepMap[reviewStep as keyof typeof reviewStepMap]
-                          .disliked,
-                data: track.id,
-            });
-
-            await updateNestedArray({
-                collection: "users",
-                docId: "bernard_cooley",
-                field: "tracksInteractedWith",
-                data: track.id,
-            });
-
-            if (releaseNumber < releaseIds.length - 1) {
-                setReleaseNumber(releaseNumber + 1);
-            } else {
-                setReleaseNumber(0);
-                setReleaseIds([]);
-            }
-        }
-    };
-
-    const updateGenre = async (genre: string) => {
-        setSelectedGenre(genre);
-        await updateDocument({
-            collection: "users",
-            docId: "bernard_cooley",
-            field: "preferredGenre",
-            data: genre,
-        });
-    };
-
-    const getPreferredGenre = async () => {
+    const getPreferredGenre = () => {
         if (userData?.preferredGenre) {
             setSelectedGenre(userData.preferredGenre);
             genreDropdownRef.current!.value = userData.preferredGenre;
         } else {
-            setSelectedGenre(null);
+            setSelectedGenre("N/A");
         }
     };
 
-    const fetchUserData = async (userId: string) => {
-        const user = await getUserData({ userId: userId });
-        if (!user) return;
-
-        setUserData(user);
+    const getLikeDislikeProps = (likeOrDislike: boolean): LikeDislikeProps => {
+        return {
+            userId,
+            track: track || null,
+            like: likeOrDislike,
+            reviewStepMap,
+            reviewStep,
+            storedSpotifyTracks,
+            onMoreStoredTracks: (val: ITrack[]) => setStoredSpotifyTracks(val),
+            onNoMoreStoredTracks: () =>
+                refetchSpotify(spotifyLastDoc || undefined),
+        };
     };
 
     return (
@@ -237,7 +197,17 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
                 />
             )}
             <ReviewTracksFilters
-                onGenreSelect={(genre) => updateGenre(genre)}
+                onGenreSelect={async (genre) => {
+                    setSelectedGenre(genre);
+                    if (userId) {
+                        await updateDocument({
+                            collection: "users",
+                            docId: userId,
+                            field: "preferredGenre",
+                            data: genre,
+                        });
+                    }
+                }}
                 selectedGenre={selectedGenre}
                 genres={styles}
                 autoPlay={autoPlay}
@@ -281,7 +251,11 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
                                     <>
                                         <IconButton
                                             isDisabled={!listened}
-                                            onClick={() => likeDislike(false)}
+                                            onClick={() =>
+                                                likeDislike(
+                                                    getLikeDislikeProps(true)
+                                                )
+                                            }
                                             variant="ghost"
                                             w="full"
                                             h="full"
@@ -294,7 +268,11 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
                                         />
                                         <IconButton
                                             isDisabled={!listened}
-                                            onClick={() => likeDislike(true)}
+                                            onClick={() =>
+                                                likeDislike(
+                                                    getLikeDislikeProps(false)
+                                                )
+                                            }
                                             variant="ghost"
                                             w="full"
                                             h="full"
@@ -326,16 +304,7 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
                                 <Flex w="full">
                                     <audio
                                         onPlay={() => setIsPlaying(true)}
-                                        onTimeUpdate={(e) => {
-                                            if (
-                                                (e.currentTarget.currentTime /
-                                                    e.currentTarget.duration) *
-                                                    100 >
-                                                70
-                                            ) {
-                                                setListened(true);
-                                            }
-                                        }}
+                                        onTimeUpdate={() => setListened(true)}
                                         ref={audioElement}
                                         style={{ width: "100%" }}
                                         src={track.previewUrl}
