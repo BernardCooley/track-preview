@@ -1,6 +1,5 @@
-import React, { LegacyRef, forwardRef, useState } from "react";
-import { Collapse, Flex, Select, Switch, Text } from "@chakra-ui/react";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import React, { LegacyRef, forwardRef } from "react";
+import { Flex, Select, Switch, Text } from "@chakra-ui/react";
 
 interface Props {
     onGenreSelect: (genre: string) => void;
@@ -21,55 +20,50 @@ const ReviewTracksFilters = forwardRef(
         }: Props,
         ref: LegacyRef<HTMLSelectElement>
     ) => {
-        const [filtersOpen, setFiltersOpen] = useState<boolean>(false);
-
         return (
-            <Flex alignItems="center" position="relative" direction="column">
-                <Collapse in={filtersOpen}>
-                    <Flex
-                        gap={10}
-                        mb={4}
-                        zIndex="100"
-                        justifyContent="space-between"
-                        mx={4}
-                        alignItems="center"
-                    >
-                        <Flex alignItems="center" gap={4}>
-                            <Select
-                                ref={ref}
-                                variant="outline"
-                                placeholder="Select option"
-                                onChange={(e) => onGenreSelect(e.target.value)}
-                                defaultValue={selectedGenre || ""}
-                            >
-                                {genres.map((style) => (
-                                    <option key={style} value={style}>
-                                        {style}
-                                    </option>
-                                ))}
-                            </Select>
-                        </Flex>
-                        <Flex direction="row" gap={4}>
-                            <Text>Autoplay </Text>
-                            <Switch
-                                isChecked={autoPlay}
-                                onChange={(e) => {
-                                    onAutoPlayChange(e.target.checked);
-                                }}
-                                colorScheme="teal"
-                                size="lg"
-                            />
-                        </Flex>
+            <Flex
+                alignItems="center"
+                position="absolute"
+                direction="column"
+                zIndex={150}
+                w="full"
+                top="-10px"
+            >
+                <Flex
+                    gap={10}
+                    zIndex="100"
+                    justifyContent="space-between"
+                    mx={4}
+                    alignItems="center"
+                    w="full"
+                    px={4}
+                >
+                    <Flex alignItems="center" gap={4}>
+                        <Select
+                            ref={ref}
+                            variant="outline"
+                            placeholder="Select option"
+                            onChange={(e) => onGenreSelect(e.target.value)}
+                            defaultValue={selectedGenre || ""}
+                        >
+                            {genres.sort().map((style) => (
+                                <option key={style} value={style}>
+                                    {style}
+                                </option>
+                            ))}
+                        </Select>
                     </Flex>
-                </Collapse>
-                <Flex w="full" justifyContent="center">
-                    <KeyboardArrowDownIcon
-                        fontSize="large"
-                        onClick={() => setFiltersOpen((prev) => !prev)}
-                        sx={{
-                            transform: filtersOpen ? "rotate(180deg)" : "",
-                        }}
-                    />
+                    <Flex direction="row" gap={4}>
+                        <Text>Autoplay </Text>
+                        <Switch
+                            isChecked={autoPlay}
+                            onChange={(e) => {
+                                onAutoPlayChange(e.target.checked);
+                            }}
+                            colorScheme="teal"
+                            size="lg"
+                        />
+                    </Flex>
                 </Flex>
             </Flex>
         );

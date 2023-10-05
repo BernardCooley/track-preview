@@ -56,7 +56,7 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
     const [storedSpotifyTracks, setStoredSpotifyTracks] = useState<
         ITrack[] | null
     >([]);
-    const storedTracksLimit = 3;
+    const storedTracksLimit = 50;
     const [interactedWith, setInteractedWith] = useState<string[] | null>(null);
     const [spotifyLastDoc, setSpotifyLastDoc] = useState<DocumentData | null>(
         null
@@ -83,7 +83,10 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
     }, [userData]);
 
     useEffect(() => {
-        refetchSpotify();
+        setLoading(true);
+        if (selectedGenre) {
+            refetchStoredSpotifyTracks();
+        }
     }, [reviewStep, selectedGenre]);
 
     useEffect(() => {
@@ -105,8 +108,8 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
         }
     }, [track]);
 
-    const refetchSpotify = async (lastDoc?: DocumentData) => {
-        console.log("===========");
+    const refetchStoredSpotifyTracks = async (lastDoc?: DocumentData) => {
+        setLoading(true);
         const spTracks = await fetchStoredSpotifyTracks({
             lim: storedTracksLimit,
             genre: selectedGenre || "N/A",
@@ -118,10 +121,12 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
             setStoredSpotifyTracks(spTracks.tracks);
             setSpotifyLastDoc(spTracks.lastDoc);
 
+            setLoading(false);
             if (spTracks.tracks.length === 0) {
-                refetchSpotify(spTracks.lastDoc);
+                refetchStoredSpotifyTracks(spTracks.lastDoc);
             }
         } else {
+            setLoading(false);
             setStoredSpotifyTracks(null);
             setTrack(null);
             updateUserData(await fetchUserData({ userId: userId }));
@@ -176,7 +181,7 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
             storedSpotifyTracks,
             onMoreStoredTracks: (val: ITrack[]) => setStoredSpotifyTracks(val),
             onNoMoreStoredTracks: () =>
-                refetchSpotify(spotifyLastDoc || undefined),
+                refetchStoredSpotifyTracks(spotifyLastDoc || undefined),
         };
     };
 
@@ -215,7 +220,12 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
                 ref={genreDropdownRef}
             />
             {track ? (
-                <Card size="md" h="full" opacity={loading ? "0.4" : "1"}>
+                <Card
+                    size="md"
+                    h="full"
+                    opacity={loading ? "0.4" : "1"}
+                    mt="35px"
+                >
                     <CardHeader>
                         <Heading size="md">
                             <Link href={track.release.url} isExternal>

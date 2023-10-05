@@ -51,8 +51,6 @@ export const updateNestedArray = async ({
 
     updateDoc(docRef, {
         [field]: arrayUnion(data),
-    }).then(() => {
-        console.log("Document successfully updated!");
     });
 };
 
@@ -72,8 +70,6 @@ export const updateDocument = async ({
 
     updateDoc(docRef, {
         [field]: data,
-    }).then(() => {
-        console.log("Document successfully updated!");
     });
 };
 
