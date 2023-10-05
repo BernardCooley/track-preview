@@ -314,7 +314,13 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
                                 <Flex w="full">
                                     <audio
                                         onPlay={() => setIsPlaying(true)}
-                                        onTimeUpdate={() => setListened(true)}
+                                        onTimeUpdate={(e) => {
+                                            if (
+                                                e.currentTarget.currentTime > 2
+                                            ) {
+                                                setListened(true);
+                                            }
+                                        }}
                                         ref={audioElement}
                                         style={{ width: "100%" }}
                                         src={track.previewUrl}
