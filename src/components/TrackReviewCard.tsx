@@ -13,7 +13,7 @@ import {
     Spinner,
 } from "@chakra-ui/react";
 import React, { useEffect, useRef, useState } from "react";
-import { ITrack, ReleaseTrack } from "../../types";
+import { ITrack, ReleaseTrack, UserTrack } from "../../types";
 import { Link } from "@chakra-ui/react";
 import ThumbDownIcon from "@mui/icons-material/ThumbDown";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
@@ -30,6 +30,7 @@ import {
 } from "../../firebase/firebaseRequests";
 import { DocumentData } from "firebase/firestore";
 import { useAuthContext } from "../../Contexts/AuthContext";
+import { removeDuplicates } from "../../utils";
 
 interface Props {
     reviewStep: number;
@@ -59,25 +60,11 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
         null
     );
     const [userLastDoc, setUserLastDoc] = useState<DocumentData | null>(null);
+    const [availableGenres, setAvailableGenres] = useState<string[]>([]);
 
     useEffect(() => {
-        (async () => {
-            if (userData) {
-                getPreferredGenre();
-            }
-
-            // setReleaseIds(
-            //     (await getUninteractedTracks({
-            //         userData: userData,
-            //         onTracksNotFound: () =>
-            //             getDiscogsReleaseIds({
-            //                 onSearchStart: () => setLoading(true),
-            //                 selectedGenre: genre || "N/A",
-            //             }),
-            //     })) || []
-            // );
-        })();
-    }, [userData]);
+        getAvailableGrnres();
+    }, [userData, reviewStep]);
 
     useEffect(() => {
         setLoading(true);
@@ -108,6 +95,25 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
             play();
         }
     }, [track]);
+
+    const getAvailableGrnres = () => {
+        if (userData) {
+            if (reviewStep === 1) {
+                setAvailableGenres(styles);
+            } else {
+                const allGenres =
+                    userData.tracks
+                        ?.filter(
+                            (track: UserTrack) => track.step === reviewStep
+                        )
+                        .map((t) => t.genre) || [];
+                if (allGenres) {
+                    setAvailableGenres(removeDuplicates(allGenres));
+                }
+            }
+        }
+        getPreferredGenre();
+    };
 
     const refetchUserTracks = async (lastDoc?: DocumentData) => {
         const userTracks = await getReviewStepTracks({
@@ -184,10 +190,11 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
         audioElement.current?.play();
     };
 
-    const getPreferredGenre = () => {
-        if (userData?.preferredGenre) {
-            setSelectedGenre(userData.preferredGenre);
-            genreRef.current!.value = userData.preferredGenre;
+    const getPreferredGenre = async () => {
+        const uData = await fetchUserData({ userId: userId });
+        if (uData?.preferredGenre) {
+            setSelectedGenre(uData.preferredGenre);
+            genreRef.current!.value = uData.preferredGenre;
         } else {
             setSelectedGenre("N/A");
         }
@@ -240,7 +247,7 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
                     }
                 }}
                 selectedGenre={selectedGenre}
-                genres={styles}
+                genres={availableGenres}
                 autoPlay={autoPlay}
                 onAutoPlayChange={(value) => setAutoPlay(value)}
                 ref={genreRef}

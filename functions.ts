@@ -156,6 +156,7 @@ export const likeDislike = async ({
                         id: track.id,
                         step: like ? reviewStep + 1 : 0,
                         furthestStep: like ? reviewStep + 1 : reviewStep,
+                        genre: track.genre,
                     },
                 });
             } else {
@@ -166,6 +167,7 @@ export const likeDislike = async ({
                             id: t.id,
                             step: like ? reviewStep + 1 : 0,
                             furthestStep: like ? reviewStep + 1 : reviewStep,
+                            genre: track.genre,
                         };
                     }
                     return t;

@@ -301,6 +301,7 @@ export interface UserData {
         id: string;
         step: number;
         furthestStep: number;
+        genre: string;
     }[];
 }
 
@@ -308,4 +309,5 @@ export interface UserTrack {
     id: string;
     step: number;
     furthestStep: number;
+    genre: string;
 }

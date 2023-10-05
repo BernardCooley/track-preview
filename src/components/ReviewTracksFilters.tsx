@@ -40,6 +40,9 @@ const ReviewTracksFilters = forwardRef(
                 >
                     <Flex alignItems="center" gap={4}>
                         <Select
+                            _focusVisible={{
+                                boxShadow: "none",
+                            }}
                             ref={ref}
                             variant="outline"
                             placeholder="Select option"
