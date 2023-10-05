@@ -10,7 +10,7 @@ import {
     updateDocument,
     updateNestedArray,
 } from "./firebase/firebaseRequests";
-import { ITrack, ReleaseTrack, UserData } from "./types";
+import { ITrack, ReleaseTrack } from "./types";
 
 interface GetSpotifyTrackProps {
     trackToSearch: ReleaseTrack[] | null;
@@ -131,9 +131,9 @@ export interface LikeDislikeProps {
     track: ITrack | null;
     like: boolean;
     reviewStep: number;
-    storedSpotifyTracks: ITrack[] | null;
-    onMoreStoredTracks: (tracks: ITrack[]) => void;
-    onNoMoreStoredTracks: () => void;
+    tracks: ITrack[] | null;
+    onMoreTracks: (tracks: ITrack[]) => void;
+    onNoMoreTracks: () => void;
 }
 
 export const likeDislike = async ({
@@ -141,9 +141,9 @@ export const likeDislike = async ({
     track,
     like,
     reviewStep,
-    storedSpotifyTracks,
-    onMoreStoredTracks,
-    onNoMoreStoredTracks,
+    tracks,
+    onMoreTracks,
+    onNoMoreTracks,
 }: LikeDislikeProps): Promise<ITrack[] | null> => {
     if (track) {
         if (userId) {
@@ -180,11 +180,11 @@ export const likeDislike = async ({
             }
         }
 
-        if (storedSpotifyTracks) {
-            if (storedSpotifyTracks.length > 1) {
-                onMoreStoredTracks(storedSpotifyTracks.splice(1));
+        if (tracks) {
+            if (tracks.length > 1) {
+                onMoreTracks(tracks.splice(1));
             } else {
-                onNoMoreStoredTracks();
+                onNoMoreTracks();
                 return null;
             }
         }

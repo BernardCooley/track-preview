@@ -169,7 +169,7 @@ export const fetchStoredSpotifyTracks = async ({
     if (userId) {
         const userDataNew = await fetchUserData({ userId: userId });
         interactedWith =
-            userDataNew?.tracks.map((track: UserTrack) => track.id) || [];
+            userDataNew?.tracks?.map((track: UserTrack) => track.id) || [];
     }
 
     const collectionRef = collection(db, "spotifyTracks");
@@ -216,12 +216,17 @@ export const fetchStoredSpotifyTracks = async ({
 interface GetReviewStepTracksProps {
     userId: string | null;
     reviewStep: number;
+    lastDoc: DocumentData | null;
 }
 
 export const getReviewStepTracks = async ({
     userId,
     reviewStep,
-}: GetReviewStepTracksProps): Promise<ITrack[] | null> => {
+    lastDoc,
+}: GetReviewStepTracksProps): Promise<{
+    tracks: ITrack[];
+    lastDoc: DocumentData;
+} | null> => {
     if (!userId) return null;
 
     const userData = await fetchUserData({ userId: userId });
@@ -235,12 +240,22 @@ export const getReviewStepTracks = async ({
     let q;
 
     if (reviewStepTrackIds && reviewStepTrackIds.length > 0) {
-        q = query(
-            collectionRef,
-            where("id", "in", reviewStepTrackIds),
-            orderBy("id"),
-            limit(30)
-        );
+        if (lastDoc) {
+            q = query(
+                collectionRef,
+                where("id", "in", reviewStepTrackIds),
+                orderBy("id"),
+                startAfter(lastDoc),
+                limit(30)
+            );
+        } else {
+            q = query(
+                collectionRef,
+                where("id", "in", reviewStepTrackIds),
+                orderBy("id"),
+                limit(30)
+            );
+        }
     } else {
         return null;
     }
@@ -252,7 +267,10 @@ export const getReviewStepTracks = async ({
     });
 
     if (querySnapshot.docs.length > 0) {
-        return tracks;
+        return {
+            tracks: tracks,
+            lastDoc: querySnapshot.docs[querySnapshot.docs.length - 1],
+        };
     }
 
     return null;

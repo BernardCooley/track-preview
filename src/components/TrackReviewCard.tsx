@@ -53,13 +53,12 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
     const [spotifyNotFoundTracks, setSpotifyNotFoundTracks] = useState<
         ReleaseTrack[] | null
     >(null);
-    const [storedSpotifyTracks, setStoredSpotifyTracks] = useState<
-        ITrack[] | null
-    >([]);
+    const [tracks, setTracks] = useState<ITrack[] | null>([]);
     const storedTracksLimit = 50;
     const [spotifyLastDoc, setSpotifyLastDoc] = useState<DocumentData | null>(
         null
     );
+    const [userLastDoc, setUserLastDoc] = useState<DocumentData | null>(null);
 
     useEffect(() => {
         (async () => {
@@ -86,22 +85,16 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
             if (reviewStep === 1) {
                 refetchStoredSpotifyTracks();
             } else {
-                (async () => {
-                    setStoredSpotifyTracks(
-                        (await getReviewStepTracks({ userId, reviewStep })) ||
-                            []
-                    );
-                    setLoading(false);
-                })();
+                refetchUserTracks();
             }
         }
     }, [reviewStep, selectedGenre]);
 
     useEffect(() => {
-        if (storedSpotifyTracks) {
-            setTrack(storedSpotifyTracks[0]);
+        if (tracks) {
+            setTrack(tracks[0]);
         }
-    }, [storedSpotifyTracks]);
+    }, [tracks]);
 
     useEffect(() => {
         setIsPlaying(false);
@@ -116,6 +109,25 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
         }
     }, [track]);
 
+    const refetchUserTracks = async (lastDoc?: DocumentData) => {
+        const userTracks = await getReviewStepTracks({
+            userId,
+            reviewStep,
+            lastDoc: lastDoc || null,
+        });
+
+        if (userTracks) {
+            setTracks(userTracks.tracks);
+            setUserLastDoc(userTracks.lastDoc);
+            setLoading(false);
+        } else {
+            setLoading(false);
+            setTracks(null);
+            setTrack(null);
+            updateUserData(await fetchUserData({ userId: userId }));
+        }
+    };
+
     const refetchStoredSpotifyTracks = async (lastDoc?: DocumentData) => {
         setLoading(true);
 
@@ -127,7 +139,7 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
         });
 
         if (spTracks) {
-            setStoredSpotifyTracks(spTracks.tracks);
+            setTracks(spTracks.tracks);
             setSpotifyLastDoc(spTracks.lastDoc);
 
             setLoading(false);
@@ -136,7 +148,7 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
             }
         } else {
             setLoading(false);
-            setStoredSpotifyTracks(null);
+            setTracks(null);
             setTrack(null);
             updateUserData(await fetchUserData({ userId: userId }));
             // Get discogs release ids here to search for more tracks
@@ -186,10 +198,15 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
             track: track || null,
             like: likeOrDislike,
             reviewStep,
-            storedSpotifyTracks,
-            onMoreStoredTracks: (val: ITrack[]) => setStoredSpotifyTracks(val),
-            onNoMoreStoredTracks: () =>
-                refetchStoredSpotifyTracks(spotifyLastDoc || undefined),
+            tracks,
+            onMoreTracks: (val: ITrack[]) => setTracks(val),
+            onNoMoreTracks: () => {
+                if (reviewStep === 1) {
+                    refetchStoredSpotifyTracks(spotifyLastDoc || undefined);
+                } else {
+                    refetchUserTracks(userLastDoc || undefined);
+                }
+            },
         };
     };
 
