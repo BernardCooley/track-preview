@@ -217,12 +217,14 @@ interface GetReviewStepTracksProps {
     userId: string | null;
     reviewStep: number;
     lastDoc: DocumentData | null;
+    genre: string;
 }
 
 export const getReviewStepTracks = async ({
     userId,
     reviewStep,
     lastDoc,
+    genre,
 }: GetReviewStepTracksProps): Promise<{
     tracks: ITrack[];
     lastDoc: DocumentData;
@@ -244,6 +246,7 @@ export const getReviewStepTracks = async ({
             q = query(
                 collectionRef,
                 where("id", "in", reviewStepTrackIds),
+                where("genre", "==", genre),
                 orderBy("id"),
                 startAfter(lastDoc),
                 limit(30)
@@ -252,6 +255,7 @@ export const getReviewStepTracks = async ({
             q = query(
                 collectionRef,
                 where("id", "in", reviewStepTrackIds),
+                where("genre", "==", genre),
                 orderBy("id"),
                 limit(30)
             );

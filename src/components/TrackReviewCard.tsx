@@ -49,7 +49,7 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
     const [listened, setListened] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
     const [selectedGenre, setSelectedGenre] = useState<string | null>(null);
-    const genreDropdownRef = useRef<HTMLSelectElement>(null);
+    const genreRef = useRef<HTMLSelectElement>(null);
     const [spotifyNotFoundTracks, setSpotifyNotFoundTracks] = useState<
         ReleaseTrack[] | null
     >(null);
@@ -114,6 +114,7 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
             userId,
             reviewStep,
             lastDoc: lastDoc || null,
+            genre: selectedGenre || "N/A",
         });
 
         if (userTracks) {
@@ -186,7 +187,7 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
     const getPreferredGenre = () => {
         if (userData?.preferredGenre) {
             setSelectedGenre(userData.preferredGenre);
-            genreDropdownRef.current!.value = userData.preferredGenre;
+            genreRef.current!.value = userData.preferredGenre;
         } else {
             setSelectedGenre("N/A");
         }
@@ -242,7 +243,7 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
                 genres={styles}
                 autoPlay={autoPlay}
                 onAutoPlayChange={(value) => setAutoPlay(value)}
-                ref={genreDropdownRef}
+                ref={genreRef}
             />
             {track ? (
                 <Card
