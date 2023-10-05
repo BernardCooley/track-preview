@@ -8,7 +8,6 @@ import { useEffect, useRef, useState } from "react";
 import { db } from "../../firebase/firebaseInit";
 import ProgressStepper from "@/components/ProgressStepper";
 import { useTrackContext } from "../../context/TrackContext";
-import TrackList from "@/components/TrackList";
 import AudioPlayer from "@/components/AudioPlayer";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useAuthContext } from "../../Contexts/AuthContext";
@@ -94,11 +93,8 @@ export default function Home() {
                                 router.push(`${pathname}?reviewStep=${step}`);
                             }}
                         />
-                        {currentStep <= 3 ? (
-                            <TrackReviewCard reviewStep={currentStep} />
-                        ) : (
-                            <TrackList tracks={buyTracks} />
-                        )}
+
+                        <TrackReviewCard reviewStep={currentStep} />
                     </Stack>
                     <Slide
                         direction="bottom"

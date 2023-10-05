@@ -31,12 +31,15 @@ import {
 import { DocumentData } from "firebase/firestore";
 import { useAuthContext } from "../../Contexts/AuthContext";
 import { removeDuplicates } from "../../utils";
+import { useTracksContext } from "../../Contexts/TracksContext";
+import TrackList from "./TrackList";
 
 interface Props {
     reviewStep: number;
 }
 
 const TrackReviewCard = ({ reviewStep }: Props) => {
+    const { tracks, updateTracks } = useTracksContext();
     const { userData, updateUserData, userId } = useAuthContext();
     const [releaseIds, setReleaseIds] = useState<number[]>([]);
     const [releaseNumber, setReleaseNumber] = useState<number>(0);
@@ -54,7 +57,6 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
     const [spotifyNotFoundTracks, setSpotifyNotFoundTracks] = useState<
         ReleaseTrack[] | null
     >(null);
-    const [tracks, setTracks] = useState<ITrack[] | null>([]);
     const storedTracksLimit = 50;
     const [spotifyLastDoc, setSpotifyLastDoc] = useState<DocumentData | null>(
         null
@@ -107,10 +109,10 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
                 ? userData.preferredGenre
                 : availableGenres[0];
 
-                setTimeout(() => {
-                    setSelectedGenre(currentGenre);
-                    genreRef.current!.value = currentGenre;
-                }, 100);
+            setTimeout(() => {
+                setSelectedGenre(currentGenre);
+                genreRef.current!.value = currentGenre;
+            }, 100);
         } else {
             setSelectedGenre("N/A");
         }
@@ -146,12 +148,12 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
         });
 
         if (userTracks) {
-            setTracks(userTracks.tracks);
+            updateTracks(userTracks.tracks);
             setUserLastDoc(userTracks.lastDoc);
             setLoading(false);
         } else {
             setLoading(false);
-            setTracks(null);
+            updateTracks(null);
             setTrack(null);
             updateUserData(await fetchUserData({ userId: userId }));
         }
@@ -168,7 +170,7 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
         });
 
         if (spTracks) {
-            setTracks(spTracks.tracks);
+            updateTracks(spTracks.tracks);
             setSpotifyLastDoc(spTracks.lastDoc);
 
             setLoading(false);
@@ -177,7 +179,7 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
             }
         } else {
             setLoading(false);
-            setTracks(null);
+            updateTracks(null);
             setTrack(null);
             updateUserData(await fetchUserData({ userId: userId }));
             // Get discogs release ids here to search for more tracks
@@ -219,7 +221,7 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
             like: likeOrDislike,
             reviewStep,
             tracks,
-            onMoreTracks: (val: ITrack[]) => setTracks(val),
+            onMoreTracks: (val: ITrack[]) => updateTracks(val),
             onNoMoreTracks: () => {
                 if (reviewStep === 1) {
                     refetchStoredSpotifyTracks(spotifyLastDoc || undefined);
@@ -264,119 +266,145 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
                 onAutoPlayChange={(value) => setAutoPlay(value)}
                 ref={genreRef}
             />
-            {track ? (
-                <Card
-                    size="md"
-                    h="full"
-                    opacity={loading ? "0.4" : "1"}
-                    mt="35px"
-                >
-                    <CardHeader>
-                        <Heading size="md">
-                            <Link href={track.release.url} isExternal>
+            {track && (
+                <>
+                    {reviewStep < 4 ? (
+                        <Card
+                            size="md"
+                            h="full"
+                            opacity={loading ? "0.4" : "1"}
+                            mt="35px"
+                        >
+                            <CardHeader>
+                                <Heading size="md">
+                                    <Link href={track.release.url} isExternal>
+                                        <Flex
+                                            alignItems="center"
+                                            direction="column"
+                                            position="relative"
+                                        >
+                                            <Text
+                                                fontSize="3xl"
+                                                fontWeight="bold"
+                                            >
+                                                {track.artist}
+                                            </Text>
+                                            <Flex gap={1}>
+                                                <Text fontSize="xl">
+                                                    {track.title}
+                                                </Text>
+                                                <OpenInNewIcon />
+                                            </Flex>
+                                        </Flex>
+                                    </Link>
+                                </Heading>
+                            </CardHeader>
+                            <CardBody
+                                w="full"
+                                h="full"
+                                bgImage={track.thumbnail}
+                                bgSize="cover"
+                            >
                                 <Flex
-                                    alignItems="center"
                                     direction="column"
-                                    position="relative"
+                                    h="full"
+                                    justifyContent="space-between"
                                 >
-                                    <Text fontSize="3xl" fontWeight="bold">
-                                        {track.artist}
-                                    </Text>
-                                    <Flex gap={1}>
-                                        <Text fontSize="xl">{track.title}</Text>
-                                        <OpenInNewIcon />
+                                    <Flex w="full" pb={10} h="full">
+                                        {isPlaying ? (
+                                            <>
+                                                <IconButton
+                                                    isDisabled={!listened}
+                                                    onClick={() =>
+                                                        likeDislike(
+                                                            getLikeDislikeProps(
+                                                                false
+                                                            )
+                                                        )
+                                                    }
+                                                    variant="ghost"
+                                                    w="full"
+                                                    h="full"
+                                                    colorScheme="red"
+                                                    aria-label="Call Segun"
+                                                    fontSize={[
+                                                        "100px",
+                                                        "200px",
+                                                    ]}
+                                                    icon={
+                                                        <ThumbDownIcon fontSize="inherit" />
+                                                    }
+                                                />
+                                                <IconButton
+                                                    isDisabled={!listened}
+                                                    onClick={() =>
+                                                        likeDislike(
+                                                            getLikeDislikeProps(
+                                                                true
+                                                            )
+                                                        )
+                                                    }
+                                                    variant="ghost"
+                                                    w="full"
+                                                    h="full"
+                                                    colorScheme="green"
+                                                    aria-label="Call Segun"
+                                                    fontSize={[
+                                                        "100px",
+                                                        "200px",
+                                                    ]}
+                                                    icon={
+                                                        <ThumbUpIcon fontSize="inherit" />
+                                                    }
+                                                />
+                                            </>
+                                        ) : (
+                                            <IconButton
+                                                onClick={play}
+                                                variant="ghost"
+                                                w="full"
+                                                h="full"
+                                                colorScheme="black"
+                                                aria-label="Call Segun"
+                                                fontSize={["100px", "200px"]}
+                                                icon={
+                                                    <PlayArrowIcon fontSize="inherit" />
+                                                }
+                                            />
+                                        )}
+                                    </Flex>
+
+                                    <Flex direction="column" h="auto">
+                                        <Flex w="full">
+                                            <audio
+                                                onPlay={() =>
+                                                    setIsPlaying(true)
+                                                }
+                                                onTimeUpdate={(e) => {
+                                                    if (
+                                                        e.currentTarget
+                                                            .currentTime > 2
+                                                    ) {
+                                                        setListened(true);
+                                                    }
+                                                }}
+                                                ref={audioElement}
+                                                style={{
+                                                    width: "100%",
+                                                }}
+                                                src={track.previewUrl}
+                                                controls
+                                            />
+                                        </Flex>
                                     </Flex>
                                 </Flex>
-                            </Link>
-                        </Heading>
-                    </CardHeader>
-                    <CardBody
-                        w="full"
-                        h="full"
-                        bgImage={track.thumbnail}
-                        bgSize="cover"
-                    >
-                        <Flex
-                            direction="column"
-                            h="full"
-                            justifyContent="space-between"
-                        >
-                            <Flex w="full" pb={10} h="full">
-                                {isPlaying ? (
-                                    <>
-                                        <IconButton
-                                            isDisabled={!listened}
-                                            onClick={() =>
-                                                likeDislike(
-                                                    getLikeDislikeProps(false)
-                                                )
-                                            }
-                                            variant="ghost"
-                                            w="full"
-                                            h="full"
-                                            colorScheme="red"
-                                            aria-label="Call Segun"
-                                            fontSize={["100px", "200px"]}
-                                            icon={
-                                                <ThumbDownIcon fontSize="inherit" />
-                                            }
-                                        />
-                                        <IconButton
-                                            isDisabled={!listened}
-                                            onClick={() =>
-                                                likeDislike(
-                                                    getLikeDislikeProps(true)
-                                                )
-                                            }
-                                            variant="ghost"
-                                            w="full"
-                                            h="full"
-                                            colorScheme="green"
-                                            aria-label="Call Segun"
-                                            fontSize={["100px", "200px"]}
-                                            icon={
-                                                <ThumbUpIcon fontSize="inherit" />
-                                            }
-                                        />
-                                    </>
-                                ) : (
-                                    <IconButton
-                                        onClick={play}
-                                        variant="ghost"
-                                        w="full"
-                                        h="full"
-                                        colorScheme="black"
-                                        aria-label="Call Segun"
-                                        fontSize={["100px", "200px"]}
-                                        icon={
-                                            <PlayArrowIcon fontSize="inherit" />
-                                        }
-                                    />
-                                )}
-                            </Flex>
-
-                            <Flex direction="column" h="auto">
-                                <Flex w="full">
-                                    <audio
-                                        onPlay={() => setIsPlaying(true)}
-                                        onTimeUpdate={(e) => {
-                                            if (
-                                                e.currentTarget.currentTime > 2
-                                            ) {
-                                                setListened(true);
-                                            }
-                                        }}
-                                        ref={audioElement}
-                                        style={{ width: "100%" }}
-                                        src={track.previewUrl}
-                                        controls
-                                    />
-                                </Flex>
-                            </Flex>
-                        </Flex>
-                    </CardBody>
-                </Card>
-            ) : null}
+                            </CardBody>
+                        </Card>
+                    ) : (
+                        <TrackList tracks={tracks || []} />
+                    )}
+                </>
+            )}
         </Box>
     );
 };
