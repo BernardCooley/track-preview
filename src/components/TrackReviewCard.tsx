@@ -107,8 +107,10 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
                 ? userData.preferredGenre
                 : availableGenres[0];
 
-            setSelectedGenre(currentGenre);
-            genreRef.current!.value = currentGenre;
+                setTimeout(() => {
+                    setSelectedGenre(currentGenre);
+                    genreRef.current!.value = currentGenre;
+                }, 100);
         } else {
             setSelectedGenre("N/A");
         }
