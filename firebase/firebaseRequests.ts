@@ -14,7 +14,7 @@ import {
     where,
 } from "firebase/firestore";
 import { db } from "./firebaseInit";
-import { ITrack, ReleaseTrack, UserData } from "../types";
+import { ITrack, ReleaseTrack, UserData, UserTrack } from "../types";
 
 interface SaveNewDocumentProps {
     collection: string;
@@ -151,19 +151,27 @@ export const fetchSpotifyNotFoundTracks = async (): Promise<
 interface GetStoredSpotifyTracks {
     lim: number;
     genre: string;
-    interactedWith: string[];
     lastDoc: DocumentData | null;
+    userId: string | null;
 }
 
 export const fetchStoredSpotifyTracks = async ({
     lim,
     genre,
-    interactedWith,
     lastDoc,
+    userId,
 }: GetStoredSpotifyTracks): Promise<{
     tracks: ITrack[];
     lastDoc: DocumentData;
 } | null> => {
+    let interactedWith: string[];
+
+    if (userId) {
+        const userDataNew = await fetchUserData({ userId: userId });
+        interactedWith =
+            userDataNew?.tracks.map((track: UserTrack) => track.id) || [];
+    }
+
     const collectionRef = collection(db, "spotifyTracks");
 
     let qu;
@@ -200,6 +208,51 @@ export const fetchStoredSpotifyTracks = async ({
             tracks: filteredTracks,
             lastDoc: querySnapshot.docs[querySnapshot.docs.length - 1],
         };
+    }
+
+    return null;
+};
+
+interface GetReviewStepTracksProps {
+    userId: string | null;
+    reviewStep: number;
+}
+
+export const getReviewStepTracks = async ({
+    userId,
+    reviewStep,
+}: GetReviewStepTracksProps): Promise<ITrack[] | null> => {
+    if (!userId) return null;
+
+    const userData = await fetchUserData({ userId: userId });
+
+    const collectionRef = collection(db, "spotifyTracks");
+
+    const reviewStepTrackIds = userData?.tracks
+        ?.filter((track) => track.step === reviewStep)
+        .map((track) => track.id);
+
+    let q;
+
+    if (reviewStepTrackIds && reviewStepTrackIds.length > 0) {
+        q = query(
+            collectionRef,
+            where("id", "in", reviewStepTrackIds),
+            orderBy("id"),
+            limit(30)
+        );
+    } else {
+        return null;
+    }
+
+    const querySnapshot = await getDocs(q);
+
+    const tracks = querySnapshot.docs.map((doc) => {
+        return doc.data() as ITrack;
+    });
+
+    if (querySnapshot.docs.length > 0) {
+        return tracks;
     }
 
     return null;

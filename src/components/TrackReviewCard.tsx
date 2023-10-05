@@ -13,19 +13,19 @@ import {
     Spinner,
 } from "@chakra-ui/react";
 import React, { useEffect, useRef, useState } from "react";
-import { ITrack, ReleaseTrack, UserData } from "../../types";
+import { ITrack, ReleaseTrack } from "../../types";
 import { Link } from "@chakra-ui/react";
 import ThumbDownIcon from "@mui/icons-material/ThumbDown";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import { styles } from "../../data/genres";
 import ReviewTracksFilters from "./ReviewTracksFilters";
-import { reviewStepMap } from "../../const";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import { LikeDislikeProps, likeDislike } from "../../functions";
 import {
     fetchStoredSpotifyTracks,
     fetchUserData,
+    getReviewStepTracks,
     updateDocument,
 } from "../../firebase/firebaseRequests";
 import { DocumentData } from "firebase/firestore";
@@ -57,7 +57,6 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
         ITrack[] | null
     >([]);
     const storedTracksLimit = 50;
-    const [interactedWith, setInteractedWith] = useState<string[] | null>(null);
     const [spotifyLastDoc, setSpotifyLastDoc] = useState<DocumentData | null>(
         null
     );
@@ -66,7 +65,6 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
         (async () => {
             if (userData) {
                 getPreferredGenre();
-                setInteractedWith(userData.tracksInteractedWith);
             }
 
             // setReleaseIds(
@@ -85,7 +83,17 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
     useEffect(() => {
         setLoading(true);
         if (selectedGenre) {
-            refetchStoredSpotifyTracks();
+            if (reviewStep === 1) {
+                refetchStoredSpotifyTracks();
+            } else {
+                (async () => {
+                    setStoredSpotifyTracks(
+                        (await getReviewStepTracks({ userId, reviewStep })) ||
+                            []
+                    );
+                    setLoading(false);
+                })();
+            }
         }
     }, [reviewStep, selectedGenre]);
 
@@ -110,11 +118,12 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
 
     const refetchStoredSpotifyTracks = async (lastDoc?: DocumentData) => {
         setLoading(true);
+
         const spTracks = await fetchStoredSpotifyTracks({
             lim: storedTracksLimit,
             genre: selectedGenre || "N/A",
-            interactedWith: interactedWith || [],
             lastDoc: lastDoc || null,
+            userId,
         });
 
         if (spTracks) {
@@ -176,7 +185,6 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
             userId,
             track: track || null,
             like: likeOrDislike,
-            reviewStepMap,
             reviewStep,
             storedSpotifyTracks,
             onMoreStoredTracks: (val: ITrack[]) => setStoredSpotifyTracks(val),
@@ -263,7 +271,7 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
                                             isDisabled={!listened}
                                             onClick={() =>
                                                 likeDislike(
-                                                    getLikeDislikeProps(true)
+                                                    getLikeDislikeProps(false)
                                                 )
                                             }
                                             variant="ghost"
@@ -280,7 +288,7 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
                                             isDisabled={!listened}
                                             onClick={() =>
                                                 likeDislike(
-                                                    getLikeDislikeProps(false)
+                                                    getLikeDislikeProps(true)
                                                 )
                                             }
                                             variant="ghost"

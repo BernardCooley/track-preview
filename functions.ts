@@ -5,11 +5,12 @@ import {
 } from "@/bff/bff";
 import {
     fetchSpotifyNotFoundTracks,
-    fetchUnseenTrackReleaseIds,
+    fetchUserData,
     saveNewDocument,
+    updateDocument,
     updateNestedArray,
 } from "./firebase/firebaseRequests";
-import { ITrack, ReleaseTrack, ReviewStepMap, UserData } from "./types";
+import { ITrack, ReleaseTrack, UserData } from "./types";
 
 interface GetSpotifyTrackProps {
     trackToSearch: ReleaseTrack[] | null;
@@ -125,39 +126,10 @@ export const getSpotifyNotFoundTracks = async () => {
 
     return null;
 };
-
-interface GetUninteractedTracksProps {
-    userData: UserData | null;
-    onTracksNotFound: () => void;
-}
-
-export const getUninteractedTracks = async ({
-    userData,
-    onTracksNotFound,
-}: GetUninteractedTracksProps): Promise<number[] | null> => {
-    if (userData?.tracksInteractedWith) {
-        const uninteractedTracks = await fetchUnseenTrackReleaseIds({
-            tracksInteractedWith: userData.tracksInteractedWith || [],
-        });
-
-        if (uninteractedTracks) {
-            return uninteractedTracks;
-        } else {
-            onTracksNotFound();
-
-            return null;
-        }
-    } else {
-        onTracksNotFound();
-        return null;
-    }
-};
-
 export interface LikeDislikeProps {
     userId: string | null;
     track: ITrack | null;
     like: boolean;
-    reviewStepMap: ReviewStepMap;
     reviewStep: number;
     storedSpotifyTracks: ITrack[] | null;
     onMoreStoredTracks: (tracks: ITrack[]) => void;
@@ -168,31 +140,44 @@ export const likeDislike = async ({
     userId,
     track,
     like,
-    reviewStepMap,
     reviewStep,
     storedSpotifyTracks,
     onMoreStoredTracks,
     onNoMoreStoredTracks,
 }: LikeDislikeProps): Promise<ITrack[] | null> => {
     if (track) {
-        const fieldToUpdate = like
-            ? reviewStepMap[reviewStep as keyof typeof reviewStepMap].liked
-            : reviewStepMap[reviewStep as keyof typeof reviewStepMap].disliked;
-
         if (userId) {
-            await updateNestedArray({
-                collection: "users",
-                docId: userId,
-                field: fieldToUpdate,
-                data: track.id,
-            });
+            if (reviewStep === 1) {
+                await updateNestedArray({
+                    collection: "users",
+                    docId: userId,
+                    field: "tracks",
+                    data: {
+                        id: track.id,
+                        step: like ? reviewStep + 1 : 0,
+                        furthestStep: like ? reviewStep + 1 : reviewStep,
+                    },
+                });
+            } else {
+                const userDataNew = await fetchUserData({ userId: userId });
+                const updatedTracks = userDataNew?.tracks?.map((t) => {
+                    if (track.id === t.id) {
+                        return {
+                            id: t.id,
+                            step: like ? reviewStep + 1 : 0,
+                            furthestStep: like ? reviewStep + 1 : reviewStep,
+                        };
+                    }
+                    return t;
+                });
 
-            await updateNestedArray({
-                collection: "users",
-                docId: userId,
-                field: "tracksInteractedWith",
-                data: track.id,
-            });
+                await updateDocument({
+                    collection: "users",
+                    docId: userId,
+                    field: "tracks",
+                    data: updatedTracks,
+                });
+            }
         }
 
         if (storedSpotifyTracks) {
