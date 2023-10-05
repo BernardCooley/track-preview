@@ -21,8 +21,14 @@ import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import { styles } from "../../data/genres";
 import ReviewTracksFilters from "./ReviewTracksFilters";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
-import { LikeDislikeProps, likeDislike } from "../../functions";
 import {
+    LikeDislikeProps,
+    getReleaseTracks,
+    getSpotifyTrack,
+    likeDislike,
+} from "../../functions";
+import {
+    fetchSpotifyNotFoundTracks,
     fetchStoredSpotifyTracks,
     fetchUserData,
     getReviewStepTracks,
@@ -33,6 +39,7 @@ import { useAuthContext } from "../../Contexts/AuthContext";
 import { removeDuplicates } from "../../utils";
 import { useTracksContext } from "../../Contexts/TracksContext";
 import TrackList from "./TrackList";
+import { fetchDiscogsReleaseIds } from "@/bff/bff";
 
 interface Props {
     reviewStep: number;
@@ -41,7 +48,7 @@ interface Props {
 const TrackReviewCard = ({ reviewStep }: Props) => {
     const { tracks, updateTracks } = useTracksContext();
     const { userData, updateUserData, userId } = useAuthContext();
-    const [releaseIds, setReleaseIds] = useState<number[]>([]);
+    const [releaseIds, setReleaseIds] = useState<number[] | null>([]);
     const [releaseNumber, setReleaseNumber] = useState<number>(0);
     const [searchTracks, setSearchTracks] = useState<ReleaseTrack[] | null>(
         null
@@ -55,8 +62,8 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
     const [selectedGenre, setSelectedGenre] = useState<string | null>(null);
     const genreRef = useRef<HTMLSelectElement>(null);
     const [spotifyNotFoundTracks, setSpotifyNotFoundTracks] = useState<
-        ReleaseTrack[] | null
-    >(null);
+        ReleaseTrack[] | []
+    >([]);
     const storedTracksLimit = 50;
     const [spotifyLastDoc, setSpotifyLastDoc] = useState<DocumentData | null>(
         null
@@ -97,6 +104,32 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
             play();
         }
     }, [track]);
+
+    useEffect(() => {
+        getReleaseTracks({
+            releaseIds,
+            releaseNumber,
+            onSuccess: (val) => setSearchTracks(val),
+            onFail: (val) => setReleaseNumber(val + 1),
+        });
+    }, [releaseNumber, releaseIds]);
+
+    useEffect(() => {
+        (async () => {
+            const notFound = await fetchSpotifyNotFoundTracks();
+
+            setTrack(
+                await getSpotifyTrack({
+                    tracksToSearch: searchTracks,
+                    spotifyNotFoundTracks: notFound,
+                    selectedGenre: selectedGenre || "N/A",
+                    onTrackNotFound: () => setReleaseNumber(releaseNumber + 1),
+                    onTrackFound: () => setLoading(false),
+                    onStartSearch: () => setLoading(true),
+                })
+            );
+        })();
+    }, [searchTracks]);
 
     const getPreferredGenre = async (
         availableGenres: string[],
@@ -179,34 +212,20 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
             updateTracks(null);
             setTrack(null);
             updateUserData(await fetchUserData({ userId: userId }));
-            // Get discogs release ids here to search for more tracks
+            triggerDiscogsSearch();
         }
         setLoading(false);
     };
 
-    // useEffect(() => {
-    //     getReleaseTracks({
-    //         releaseIds,
-    //         releaseNumber,
-    //         onSuccess: (val) => setSearchTracks(val),
-    //         onFail: (val) => setReleaseNumber(val + 1),
-    //     });
-    // }, [releaseNumber, releaseIds]);
+    const triggerDiscogsSearch = async () => {
+        const randomPage = Math.floor(Math.random() * 200);
+        const rel = await fetchDiscogsReleaseIds({
+            selectedGenre: selectedGenre,
+            pageNumber: randomPage,
+        });
 
-    // useEffect(() => {
-    //     (async () => {
-    //         setTrack(
-    //             await getSpotifyTrack({
-    //                 trackToSearch: searchTracks,
-    //                 spotifyNotFoundTracks,
-    //                 selectedGenre: selectedGenre || "N/A",
-    //                 onTrackNotFound: () => setReleaseNumber(releaseNumber + 1),
-    //                 onTrackFound: () => setLoading(false),
-    //                 onStartSearch: () => setLoading(true),
-    //             })
-    //         );
-    //     })();
-    // }, [searchTracks]);
+        setReleaseIds(rel);
+    };
 
     const play = () => {
         audioElement.current?.play();

@@ -1,10 +1,5 @@
+import { fetchDiscogsReleaseTracks, fetchSpotifyTrack } from "@/bff/bff";
 import {
-    fetchDiscogsReleaseIds,
-    fetchDiscogsReleaseTracks,
-    fetchSpotifyTrack,
-} from "@/bff/bff";
-import {
-    fetchSpotifyNotFoundTracks,
     fetchUserData,
     saveNewDocument,
     updateDocument,
@@ -13,7 +8,7 @@ import {
 import { ITrack, ReleaseTrack } from "./types";
 
 interface GetSpotifyTrackProps {
-    trackToSearch: ReleaseTrack[] | null;
+    tracksToSearch: ReleaseTrack[] | null;
     spotifyNotFoundTracks: ReleaseTrack[] | null;
     selectedGenre: string;
     onTrackNotFound: () => void;
@@ -22,7 +17,7 @@ interface GetSpotifyTrackProps {
 }
 
 export const getSpotifyTrack = async ({
-    trackToSearch,
+    tracksToSearch,
     spotifyNotFoundTracks,
     selectedGenre,
     onTrackNotFound,
@@ -30,18 +25,18 @@ export const getSpotifyTrack = async ({
     onStartSearch,
 }: GetSpotifyTrackProps): Promise<ITrack | null> => {
     onStartSearch();
-    if (trackToSearch && trackToSearch.length > 0) {
-        const randomTrackNumber =
-            Math.floor(Math.random() * trackToSearch.length) *
-            trackToSearch.length;
+    if (tracksToSearch && tracksToSearch.length > 0) {
+        const randomTrackNumber = Math.floor(
+            Math.random() * tracksToSearch.length
+        );
 
         if (
-            !spotifyNotFoundTracks?.includes(trackToSearch[randomTrackNumber])
+            !spotifyNotFoundTracks?.includes(tracksToSearch[randomTrackNumber])
         ) {
             const spotifyTrack = await fetchSpotifyTrack({
-                trackToSearch: trackToSearch[randomTrackNumber],
+                trackToSearch: tracksToSearch[randomTrackNumber],
                 genre: selectedGenre || "N/A",
-                discogsReleaseId: trackToSearch[0].releaseId,
+                discogsReleaseId: tracksToSearch[0].releaseId,
             });
 
             if (spotifyTrack?.id) {
@@ -57,7 +52,7 @@ export const getSpotifyTrack = async ({
                 await saveNewDocument({
                     collection: "spotifyTracksNotFound",
                     docId: new Date().getTime().toString(),
-                    data: trackToSearch[randomTrackNumber],
+                    data: tracksToSearch[randomTrackNumber],
                 });
 
                 onTrackNotFound();
@@ -68,28 +63,6 @@ export const getSpotifyTrack = async ({
             return null;
         }
     }
-
-    return null;
-};
-
-interface GetDiscogsReleaseIdsProps {
-    onSearchStart: () => void;
-    selectedGenre: string;
-}
-
-export const getDiscogsReleaseIds = async ({
-    onSearchStart,
-    selectedGenre,
-}: GetDiscogsReleaseIdsProps): Promise<number[] | null> => {
-    onSearchStart();
-
-    const randomPage = Math.floor(Math.random() * 200);
-    const ids = await fetchDiscogsReleaseIds({
-        selectedGenre: selectedGenre,
-        pageNumber: randomPage,
-    });
-
-    if (ids) return ids;
 
     return null;
 };
@@ -111,6 +84,7 @@ export const getReleaseTracks = async ({
         const releaseTracks = await fetchDiscogsReleaseTracks({
             releaseId: releaseIds[releaseNumber],
         });
+
         if (releaseTracks) {
             onSuccess(releaseTracks);
         } else {
@@ -119,13 +93,6 @@ export const getReleaseTracks = async ({
     }
 };
 
-export const getSpotifyNotFoundTracks = async () => {
-    const notFoundTracks = await fetchSpotifyNotFoundTracks();
-
-    if (notFoundTracks) return notFoundTracks;
-
-    return null;
-};
 export interface LikeDislikeProps {
     userId: string | null;
     track: ITrack | null;

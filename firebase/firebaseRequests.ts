@@ -99,36 +99,6 @@ export const fetchUserData = async ({
     return null;
 };
 
-interface GetUnseenTrackReleaseIdsProps {
-    tracksInteractedWith: string[];
-}
-
-export const fetchUnseenTrackReleaseIds = async ({
-    tracksInteractedWith,
-}: GetUnseenTrackReleaseIdsProps): Promise<number[] | null> => {
-    const releaseIds: number[] = [];
-
-    const collectionRef = collection(db, "spotifyTracks");
-    const condition = where("id", "not-in", tracksInteractedWith);
-    const q = query(collectionRef, condition);
-
-    return getDocs(q)
-        .then((querySnapshot) => {
-            querySnapshot.forEach((doc) => {
-                releaseIds.push(Number(doc.data().release.discogsReleaseId));
-            });
-
-            if (releaseIds.length > 0) {
-                return releaseIds;
-            } else {
-                return null;
-            }
-        })
-        .catch((error) => {
-            return null;
-        });
-};
-
 export const fetchSpotifyNotFoundTracks = async (): Promise<
     ReleaseTrack[] | null
 > => {
@@ -138,7 +108,6 @@ export const fetchSpotifyNotFoundTracks = async (): Promise<
 
             querySnapshot.forEach((doc) => {
                 tracks.push(doc.data() as ReleaseTrack);
-                console.log(doc.id, " => ", doc.data());
             });
             return tracks;
         })
