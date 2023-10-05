@@ -13,7 +13,7 @@ import {
     Spinner,
 } from "@chakra-ui/react";
 import React, { useEffect, useRef, useState } from "react";
-import { ITrack, ReleaseTrack, UserTrack } from "../../types";
+import { ITrack, ReleaseTrack, UserData, UserTrack } from "../../types";
 import { Link } from "@chakra-ui/react";
 import ThumbDownIcon from "@mui/icons-material/ThumbDown";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
@@ -96,23 +96,34 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
         }
     }, [track]);
 
-    const getAvailableGrnres = () => {
-        if (userData) {
+    const getPreferredGenre = async (userData: UserData) => {
+        if (userData?.preferredGenre) {
+            setSelectedGenre(userData.preferredGenre);
+            genreRef.current!.value = userData.preferredGenre;
+        } else {
+            setSelectedGenre("N/A");
+        }
+    };
+
+    const getAvailableGrnres = async () => {
+        const uData = await fetchUserData({ userId: userId });
+        if (uData) {
             if (reviewStep === 1) {
                 setAvailableGenres(styles);
+                getPreferredGenre(uData);
             } else {
                 const allGenres =
-                    userData.tracks
+                    uData.tracks
                         ?.filter(
                             (track: UserTrack) => track.step === reviewStep
                         )
                         .map((t) => t.genre) || [];
                 if (allGenres) {
                     setAvailableGenres(removeDuplicates(allGenres));
+                    getPreferredGenre(uData);
                 }
             }
         }
-        getPreferredGenre();
     };
 
     const refetchUserTracks = async (lastDoc?: DocumentData) => {
@@ -188,16 +199,6 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
 
     const play = () => {
         audioElement.current?.play();
-    };
-
-    const getPreferredGenre = async () => {
-        const uData = await fetchUserData({ userId: userId });
-        if (uData?.preferredGenre) {
-            setSelectedGenre(uData.preferredGenre);
-            genreRef.current!.value = uData.preferredGenre;
-        } else {
-            setSelectedGenre("N/A");
-        }
     };
 
     const getLikeDislikeProps = (likeOrDislike: boolean): LikeDislikeProps => {
