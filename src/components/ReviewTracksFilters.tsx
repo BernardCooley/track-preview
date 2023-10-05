@@ -45,7 +45,7 @@ const ReviewTracksFilters = forwardRef(
                             }}
                             ref={ref}
                             variant="outline"
-                            placeholder="Select option"
+                            placeholder="Select genre"
                             onChange={(e) => onGenreSelect(e.target.value)}
                             defaultValue={selectedGenre || ""}
                         >
