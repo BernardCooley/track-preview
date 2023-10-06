@@ -31,7 +31,6 @@ import {
     fetchStoredSpotifyTracks,
     fetchUserData,
     fetchUserTracks,
-    updateDocument,
 } from "../../firebase/firebaseRequests";
 import { DocumentData } from "firebase/firestore";
 import { useAuthContext } from "../../Contexts/AuthContext";
@@ -39,12 +38,17 @@ import { removeDuplicates } from "../../utils";
 import { useTracksContext } from "../../Contexts/TracksContext";
 import TrackList from "./TrackList";
 import { fetchDiscogsReleaseIds } from "@/bff/bff";
+import { useLocalStorage } from "usehooks-ts";
 
 interface Props {
     reviewStep: number;
 }
 
 const TrackReviewCard = ({ reviewStep }: Props) => {
+    const [preferredGenre, setPreferredGenre] = useLocalStorage(
+        "preferredGenre",
+        "N/A"
+    );
     const { tracks, updateTracks } = useTracksContext();
     const { userData, updateUserData, userId } = useAuthContext();
     const [releaseIds, setReleaseIds] = useState<number[] | null>([]);
@@ -131,24 +135,15 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
         })();
     }, [searchTracks]);
 
-    const getPreferredGenre = async (
-        availableGenres: string[],
-        userData: UserData
-    ) => {
-        if (userData?.preferredGenre) {
-            const currentGenre = availableGenres.includes(
-                userData.preferredGenre
-            )
-                ? userData.preferredGenre
-                : availableGenres[0];
+    const getPreferredGenre = async (availableGenres: string[]) => {
+        const currentGenre = availableGenres.includes(preferredGenre)
+            ? preferredGenre
+            : availableGenres[0];
 
-            setTimeout(() => {
-                setSelectedGenre(currentGenre);
-                genreRef.current!.value = currentGenre;
-            }, 100);
-        } else {
-            setSelectedGenre("N/A");
-        }
+        setTimeout(() => {
+            setSelectedGenre(currentGenre);
+            genreRef.current!.value = currentGenre;
+        }, 100);
     };
 
     const getAvailableGrnres = async () => {
@@ -159,7 +154,7 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
         if (uData) {
             if (reviewStep === 1) {
                 setAvailableGenres(styles);
-                getPreferredGenre(styles, uData);
+                getPreferredGenre(styles);
             } else {
                 const allGenres =
                     uData.tracks
@@ -169,7 +164,7 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
                         .map((t) => t.genre) || [];
                 if (allGenres) {
                     setAvailableGenres(removeDuplicates(allGenres));
-                    getPreferredGenre(removeDuplicates(allGenres), uData);
+                    getPreferredGenre(removeDuplicates(allGenres));
                 }
             }
         }
@@ -194,7 +189,7 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
         setLoading(false);
     };
 
-    interface PefetchStoredSpotifyTracksProps {
+    interface RefetchStoredSpotifyTracksProps {
         userData: UserData | null;
         lastDoc?: DocumentData;
         genreChange?: boolean;
@@ -204,7 +199,7 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
         userData,
         lastDoc,
         genreChange,
-    }: PefetchStoredSpotifyTracksProps) => {
+    }: RefetchStoredSpotifyTracksProps) => {
         setLoading(true);
 
         const spTracks = await fetchStoredSpotifyTracks({
@@ -296,14 +291,7 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
             <ReviewTracksFilters
                 onGenreSelect={async (genre) => {
                     setSelectedGenre(genre);
-                    if (userId) {
-                        await updateDocument({
-                            collection: "users",
-                            docId: userId,
-                            field: "preferredGenre",
-                            data: genre,
-                        });
-                    }
+                    setPreferredGenre(genre);
                 }}
                 selectedGenre={selectedGenre}
                 genres={availableGenres}

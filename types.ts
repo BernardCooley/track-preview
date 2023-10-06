@@ -296,7 +296,6 @@ export type ExtendedGetRelease = GetRelease & { artists_sort: string };
 export interface UserData {
     email?: string;
     name?: string;
-    preferredGenre: string;
     tracks: {
         id: string;
         step: number;
