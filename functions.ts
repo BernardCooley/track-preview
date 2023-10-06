@@ -1,11 +1,10 @@
 import { fetchDiscogsReleaseTracks, fetchSpotifyTrack } from "@/bff/bff";
 import {
-    fetchUserData,
     saveNewDocument,
     updateDocument,
     updateNestedArray,
 } from "./firebase/firebaseRequests";
-import { ITrack, ReleaseTrack } from "./types";
+import { ITrack, ReleaseTrack, UserTrack } from "./types";
 
 interface GetSpotifyTrackProps {
     tracksToSearch: ReleaseTrack[] | null;
@@ -69,26 +68,24 @@ export const getSpotifyTrack = async ({
 
 interface GetReleaseTracksProps {
     releaseIds: number[] | null;
-    releaseNumber: number;
     onSuccess: (releaseTracks: ReleaseTrack[]) => void;
-    onFail: (releaseNumber: number) => void;
+    onFail: (releaseIds: number[]) => void;
 }
 
 export const getReleaseTracks = async ({
     releaseIds,
-    releaseNumber,
     onSuccess,
     onFail,
 }: GetReleaseTracksProps) => {
     if (releaseIds && releaseIds.length > 0) {
         const releaseTracks = await fetchDiscogsReleaseTracks({
-            releaseId: releaseIds[releaseNumber],
+            releaseId: releaseIds[0],
         });
 
         if (releaseTracks) {
             onSuccess(releaseTracks);
         } else {
-            onFail(releaseNumber);
+            onFail(releaseIds.splice(1));
         }
     }
 };
@@ -101,6 +98,7 @@ export interface LikeDislikeProps {
     tracks: ITrack[] | null;
     onMoreTracks: (tracks: ITrack[]) => void;
     onNoMoreTracks: () => void;
+    userTracks: UserTrack[] | null;
 }
 
 export const likeDislike = async ({
@@ -111,6 +109,7 @@ export const likeDislike = async ({
     tracks,
     onMoreTracks,
     onNoMoreTracks,
+    userTracks,
 }: LikeDislikeProps): Promise<ITrack[] | null> => {
     if (track) {
         if (userId) {
@@ -127,25 +126,37 @@ export const likeDislike = async ({
                     },
                 });
             } else {
-                const userDataNew = await fetchUserData({ userId: userId });
-                const updatedTracks = userDataNew?.tracks?.map((t) => {
-                    if (track.id === t.id) {
-                        return {
-                            id: t.id,
+                if (userTracks) {
+                    if (!userTracks.map((tr) => tr.id).includes(track.id)) {
+                        userTracks.push({
+                            id: track.id,
                             step: like ? reviewStep + 1 : 0,
                             furthestStep: like ? reviewStep + 1 : reviewStep,
                             genre: track.genre,
-                        };
+                        });
                     }
-                    return t;
-                });
 
-                await updateDocument({
-                    collection: "users",
-                    docId: userId,
-                    field: "tracks",
-                    data: updatedTracks,
-                });
+                    const updatedTracks = userTracks.map((tr) => {
+                        if (track.id === tr.id) {
+                            return {
+                                id: tr.id,
+                                step: like ? reviewStep + 1 : 0,
+                                furthestStep: like
+                                    ? reviewStep + 1
+                                    : reviewStep,
+                                genre: track.genre,
+                            };
+                        }
+                        return tr;
+                    });
+
+                    await updateDocument({
+                        collection: "users",
+                        docId: userId,
+                        field: "tracks",
+                        data: updatedTracks,
+                    });
+                }
             }
         }
 

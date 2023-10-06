@@ -29,9 +29,7 @@ export const saveNewDocument = async ({
 }: SaveNewDocumentProps) => {
     const docRef = doc(db, collection, docId);
 
-    setDoc(docRef, data).then(() => {
-        console.log("Document successfully written!");
-    });
+    await setDoc(docRef, data);
 };
 
 interface UpdateDocumentProps {
@@ -122,6 +120,7 @@ interface GetStoredSpotifyTracks {
     genre: string;
     lastDoc: DocumentData | null;
     userId: string | null;
+    userData?: UserData | null;
 }
 
 export const fetchStoredSpotifyTracks = async ({
@@ -129,6 +128,7 @@ export const fetchStoredSpotifyTracks = async ({
     genre,
     lastDoc,
     userId,
+    userData,
 }: GetStoredSpotifyTracks): Promise<{
     tracks: ITrack[];
     lastDoc: DocumentData;
@@ -136,9 +136,8 @@ export const fetchStoredSpotifyTracks = async ({
     let interactedWith: string[];
 
     if (userId) {
-        const userDataNew = await fetchUserData({ userId: userId });
         interactedWith =
-            userDataNew?.tracks?.map((track: UserTrack) => track.id) || [];
+            userData?.tracks?.map((track: UserTrack) => track.id) || [];
     }
 
     const collectionRef = collection(db, "spotifyTracks");
@@ -189,7 +188,7 @@ interface GetReviewStepTracksProps {
     genre: string;
 }
 
-export const getReviewStepTracks = async ({
+export const fetchUserTracks = async ({
     userId,
     reviewStep,
     lastDoc,

@@ -33,7 +33,9 @@ export async function POST(req: Request) {
             trackResponse.body.tracks.total > 0
         ) {
             const randomNumber = Math.floor(
-                Math.random() * trackResponse.body.tracks.items.length
+                Math.floor(
+                    Math.random() * trackResponse.body.tracks.items.length
+                )
             );
             const tracks = trackResponse.body.tracks.items[randomNumber];
 

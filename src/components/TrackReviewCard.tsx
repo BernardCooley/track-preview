@@ -31,7 +31,7 @@ import {
     fetchSpotifyNotFoundTracks,
     fetchStoredSpotifyTracks,
     fetchUserData,
-    getReviewStepTracks,
+    fetchUserTracks,
     updateDocument,
 } from "../../firebase/firebaseRequests";
 import { DocumentData } from "firebase/firestore";
@@ -74,13 +74,16 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
 
     useEffect(() => {
         getAvailableGrnres();
-    }, [userData, reviewStep]);
+    }, [reviewStep]);
 
     useEffect(() => {
         setLoading(true);
         if (selectedGenre) {
             if (reviewStep === 1) {
-                refetchStoredSpotifyTracks();
+                refetchStoredSpotifyTracks({
+                    userData,
+                    genreChange: true,
+                });
             } else {
                 refetchUserTracks();
             }
@@ -109,11 +112,10 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
     useEffect(() => {
         getReleaseTracks({
             releaseIds,
-            releaseNumber,
             onSuccess: (val) => setSearchTracks(val),
-            onFail: (val) => setReleaseNumber(val + 1),
+            onFail: (val) => setReleaseIds(val),
         });
-    }, [releaseNumber, releaseIds]);
+    }, [releaseIds]);
 
     useEffect(() => {
         (async () => {
@@ -124,7 +126,8 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
                     tracksToSearch: searchTracks,
                     spotifyNotFoundTracks: notFound,
                     selectedGenre: selectedGenre || "N/A",
-                    onTrackNotFound: () => setReleaseNumber(releaseNumber + 1),
+                    onTrackNotFound: () =>
+                        setReleaseIds((prev) => prev?.splice(1) || null),
                     onTrackFound: () => setLoading(false),
                     onStartSearch: () => setLoading(true),
                 })
@@ -153,7 +156,10 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
     };
 
     const getAvailableGrnres = async () => {
+        // Other functions depend on getting user data from here - do not delete
         const uData = await fetchUserData({ userId: userId });
+        updateUserData(uData);
+
         if (uData) {
             if (reviewStep === 1) {
                 setAvailableGenres(styles);
@@ -175,7 +181,7 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
 
     const refetchUserTracks = async (lastDoc?: DocumentData) => {
         setSearchingDiscogs(false);
-        const userTracks = await getReviewStepTracks({
+        const userTracks = await fetchUserTracks({
             userId,
             reviewStep,
             lastDoc: lastDoc || null,
@@ -188,12 +194,21 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
         } else {
             updateTracks(null);
             setTrack(null);
-            updateUserData(await fetchUserData({ userId: userId }));
         }
         setLoading(false);
     };
 
-    const refetchStoredSpotifyTracks = async (lastDoc?: DocumentData) => {
+    interface PefetchStoredSpotifyTracksProps {
+        userData: UserData | null;
+        lastDoc?: DocumentData;
+        genreChange?: boolean;
+    }
+
+    const refetchStoredSpotifyTracks = async ({
+        userData,
+        lastDoc,
+        genreChange,
+    }: PefetchStoredSpotifyTracksProps) => {
         setLoading(true);
 
         const spTracks = await fetchStoredSpotifyTracks({
@@ -201,6 +216,7 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
             genre: selectedGenre || "N/A",
             lastDoc: lastDoc || null,
             userId,
+            userData,
         });
 
         if (spTracks) {
@@ -209,33 +225,37 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
             setSpotifyLastDoc(spTracks.lastDoc);
 
             if (spTracks.tracks.length === 0) {
-                refetchStoredSpotifyTracks(spTracks.lastDoc);
+                refetchStoredSpotifyTracks({
+                    userData,
+                    lastDoc: spTracks.lastDoc,
+                });
             }
         } else {
             updateTracks(null);
             setTrack(null);
-            updateUserData(await fetchUserData({ userId: userId }));
             setSearchingDiscogs(true);
-            triggerDiscogsSearch();
+            if (genreChange || !releaseIds || releaseIds.length === 0) {
+                setReleaseIds(
+                    await fetchDiscogsReleaseIds({
+                        selectedGenre: selectedGenre,
+                        pageNumber: Math.floor(Math.random() * 200),
+                    })
+                );
+            }
         }
         setLoading(false);
-    };
-
-    const triggerDiscogsSearch = async () => {
-        const randomPage = Math.floor(Math.random() * 200);
-        const rel = await fetchDiscogsReleaseIds({
-            selectedGenre: selectedGenre,
-            pageNumber: randomPage,
-        });
-
-        setReleaseIds(rel);
     };
 
     const play = () => {
         audioElement.current?.play();
     };
 
-    const getLikeDislikeProps = (likeOrDislike: boolean): LikeDislikeProps => {
+    const getLikeDislikeProps = async (
+        likeOrDislike: boolean
+    ): Promise<LikeDislikeProps> => {
+        console.log("fetch user data - getLikeDislikeProps");
+        const uData = await fetchUserData({ userId: userId });
+
         return {
             userId,
             track: track || null,
@@ -246,14 +266,18 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
             onNoMoreTracks: () => {
                 if (reviewStep === 1) {
                     if (searchingDiscogs) {
-                        setReleaseNumber(releaseNumber + 1);
+                        setReleaseIds((prev) => prev?.splice(1) || null);
                     } else {
-                        refetchStoredSpotifyTracks(spotifyLastDoc || undefined);
+                        refetchStoredSpotifyTracks({
+                            userData: uData,
+                            lastDoc: spotifyLastDoc || undefined,
+                        });
                     }
                 } else {
                     refetchUserTracks(userLastDoc || undefined);
                 }
             },
+            userTracks: uData?.tracks || null,
         };
     };
 
@@ -340,9 +364,9 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
                                             <>
                                                 <IconButton
                                                     isDisabled={!listened}
-                                                    onClick={() =>
+                                                    onClick={async () =>
                                                         likeDislike(
-                                                            getLikeDislikeProps(
+                                                            await getLikeDislikeProps(
                                                                 false
                                                             )
                                                         )
@@ -362,9 +386,9 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
                                                 />
                                                 <IconButton
                                                     isDisabled={!listened}
-                                                    onClick={() =>
+                                                    onClick={async () =>
                                                         likeDislike(
-                                                            getLikeDislikeProps(
+                                                            await getLikeDislikeProps(
                                                                 true
                                                             )
                                                         )

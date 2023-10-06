@@ -10,11 +10,8 @@ import ProgressStepper from "@/components/ProgressStepper";
 import { useTrackContext } from "../../context/TrackContext";
 import AudioPlayer from "@/components/AudioPlayer";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useAuthContext } from "../../Contexts/AuthContext";
-import { fetchUserData } from "../../firebase/firebaseRequests";
 
 export default function Home() {
-    const { updateUserData, userId } = useAuthContext();
     const router = useRouter();
     const searchParams = useSearchParams();
     const pathname = usePathname();
@@ -28,9 +25,6 @@ export default function Home() {
         if (!reviewStep) {
             router.push(`${pathname}?reviewStep=1`);
         }
-        (async () => {
-            updateUserData(await fetchUserData({ userId: userId }));
-        })();
     }, []);
 
     useEffect(() => {
