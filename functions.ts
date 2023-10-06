@@ -8,7 +8,6 @@ import { ITrack, ReleaseTrack, UserTrack } from "./types";
 
 interface GetSpotifyTrackProps {
     tracksToSearch: ReleaseTrack[] | null;
-    spotifyNotFoundTracks: ReleaseTrack[] | null;
     selectedGenre: string;
     onTrackNotFound: () => void;
     onTrackFound: () => void;
@@ -17,7 +16,6 @@ interface GetSpotifyTrackProps {
 
 export const getSpotifyTrack = async ({
     tracksToSearch,
-    spotifyNotFoundTracks,
     selectedGenre,
     onTrackNotFound,
     onTrackFound,
@@ -29,34 +27,21 @@ export const getSpotifyTrack = async ({
             Math.random() * tracksToSearch.length
         );
 
-        if (
-            !spotifyNotFoundTracks?.includes(tracksToSearch[randomTrackNumber])
-        ) {
-            const spotifyTrack = await fetchSpotifyTrack({
-                trackToSearch: tracksToSearch[randomTrackNumber],
-                genre: selectedGenre || "N/A",
-                discogsReleaseId: tracksToSearch[0].releaseId,
+        const spotifyTrack = await fetchSpotifyTrack({
+            trackToSearch: tracksToSearch[randomTrackNumber],
+            genre: selectedGenre || "N/A",
+            discogsReleaseId: tracksToSearch[0].releaseId,
+        });
+
+        if (spotifyTrack?.id) {
+            await saveNewDocument({
+                collection: "spotifyTracks",
+                docId: spotifyTrack.id.toString(),
+                data: spotifyTrack,
             });
 
-            if (spotifyTrack?.id) {
-                await saveNewDocument({
-                    collection: "spotifyTracks",
-                    docId: spotifyTrack.id.toString(),
-                    data: spotifyTrack,
-                });
-
-                onTrackFound();
-                return spotifyTrack;
-            } else {
-                await saveNewDocument({
-                    collection: "spotifyTracksNotFound",
-                    docId: new Date().getTime().toString(),
-                    data: tracksToSearch[randomTrackNumber],
-                });
-
-                onTrackNotFound();
-                return null;
-            }
+            onTrackFound();
+            return spotifyTrack;
         } else {
             onTrackNotFound();
             return null;
