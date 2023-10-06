@@ -28,7 +28,6 @@ import {
     likeDislike,
 } from "../../functions";
 import {
-    fetchSpotifyNotFoundTracks,
     fetchStoredSpotifyTracks,
     fetchUserData,
     fetchUserTracks,
@@ -119,12 +118,9 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
 
     useEffect(() => {
         (async () => {
-            const notFound = await fetchSpotifyNotFoundTracks();
-
             setTrack(
                 await getSpotifyTrack({
                     tracksToSearch: searchTracks,
-                    spotifyNotFoundTracks: notFound,
                     selectedGenre: selectedGenre || "N/A",
                     onTrackNotFound: () =>
                         setReleaseIds((prev) => prev?.splice(1) || null),

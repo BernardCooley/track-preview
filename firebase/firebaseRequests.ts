@@ -14,7 +14,7 @@ import {
     where,
 } from "firebase/firestore";
 import { db } from "./firebaseInit";
-import { ITrack, ReleaseTrack, UserData, UserTrack } from "../types";
+import { ITrack, UserData, UserTrack } from "../types";
 
 interface SaveNewDocumentProps {
     collection: string;
@@ -95,24 +95,6 @@ export const fetchUserData = async ({
     }
 
     return null;
-};
-
-export const fetchSpotifyNotFoundTracks = async (): Promise<
-    ReleaseTrack[] | null
-> => {
-    return getDocs(collection(db, "spotifyTracksNotFound"))
-        .then((querySnapshot) => {
-            const tracks: ReleaseTrack[] = [];
-
-            querySnapshot.forEach((doc) => {
-                tracks.push(doc.data() as ReleaseTrack);
-            });
-            return tracks;
-        })
-        .catch((error) => {
-            console.log("Error getting documents: ", error);
-            return null;
-        });
 };
 
 interface GetStoredSpotifyTracks {
