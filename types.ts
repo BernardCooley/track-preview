@@ -294,14 +294,8 @@ export type GetRelease = {
 export type ExtendedGetRelease = GetRelease & { artists_sort: string };
 
 export interface UserData {
-    email?: string;
-    name?: string;
-    tracks: {
-        id: string;
-        step: number;
-        furthestStep: number;
-        genre: string;
-    }[];
+    preferredGenre: string;
+    tracks: UserTrack[];
 }
 
 export interface UserTrack {
@@ -309,4 +303,6 @@ export interface UserTrack {
     step: number;
     furthestStep: number;
     genre: string;
+    title: string;
+    artist: string;
 }

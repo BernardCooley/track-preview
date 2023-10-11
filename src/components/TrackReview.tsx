@@ -1,141 +1,202 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-"use client";
-
+import React, { useEffect, useRef, useState } from "react";
+import { styles } from "../../data/genres";
 import {
+    Box,
     Card,
     CardBody,
     CardHeader,
     Flex,
     Heading,
-    Text,
     IconButton,
-    Box,
+    Link,
     Spinner,
+    Text,
 } from "@chakra-ui/react";
-import React, { useEffect, useRef, useState } from "react";
-import { ITrack, ReleaseTrack, UserTrack } from "../../types";
-import { Link } from "@chakra-ui/react";
+import ReviewTracksFilters from "./ReviewTracksFilters";
+import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import ThumbDownIcon from "@mui/icons-material/ThumbDown";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
-import { styles } from "../../data/genres";
-import ReviewTracksFilters from "./ReviewTracksFilters";
-import OpenInNewIcon from "@mui/icons-material/OpenInNew";
-import { getSpotifyTrack } from "../../functions";
-import { fetchUserData } from "../../firebase/firebaseRequests";
-import { DocumentData } from "firebase/firestore";
-import { useAuthContext } from "../../Contexts/AuthContext";
-import { removeDuplicates } from "../../utils";
-import { useTracksContext } from "../../Contexts/TracksContext";
 import TrackList from "./TrackList";
 import { useLocalStorage } from "usehooks-ts";
+import { ITrack, ReleaseTrack, UserTrack } from "../../types";
+import { useTracksContext } from "../../Contexts/TracksContext";
+import { fetchDiscogsReleaseIds } from "@/bff/bff";
+import { fetchUserData, addUserTrack } from "../../firebase/firebaseRequests";
+import { useAuthContext } from "../../Contexts/AuthContext";
+import {
+    ReleaseIdsTestData,
+    SearchTrackTestData,
+    UserDataTestData,
+} from "../../testData";
+import { getReleaseTrack, getSpotifyTrack } from "../../functions";
+import { mockReleaseIds, mockSearchTrack, mockUserData } from "../../const";
 
 interface Props {
     reviewStep: number;
 }
 
-const TrackReviewCard = ({ reviewStep }: Props) => {
+const TrackReview = ({ reviewStep }: Props) => {
+    const { tracks, updateTracks } = useTracksContext();
+    const [availableGenres, setAvailableGenres] = useState<string[]>(styles);
+    const [loading, setLoading] = useState<boolean>(false);
     const [preferredGenre, setPreferredGenre] = useLocalStorage(
         "preferredGenre",
         "N/A"
     );
-    const { tracks, updateTracks } = useTracksContext();
-    const { userData, updateUserData, userId } = useAuthContext();
-    const [releaseIds, setReleaseIds] = useState<number[] | null>([]);
-    const [releaseNumber, setReleaseNumber] = useState<number>(0);
-    const [searchTracks, setSearchTracks] = useState<ReleaseTrack | null>(null);
-    const audioElement = useRef<HTMLAudioElement>(null);
-    const [track, setTrack] = useState<ITrack | null>();
-    const [isPlaying, setIsPlaying] = useState<boolean>(false);
     const [autoPlay, setAutoPlay] = useState<boolean>(false);
-    const [listened, setListened] = useState<boolean>(false);
-    const [loading, setLoading] = useState<boolean>(false);
-    const [selectedGenre, setSelectedGenre] = useState<string | null>(null);
     const genreRef = useRef<HTMLSelectElement>(null);
-    const [spotifyNotFoundTracks, setSpotifyNotFoundTracks] = useState<
-        ReleaseTrack[] | []
-    >([]);
-    const storedTracksLimit = 50;
-    const [spotifyLastDoc, setSpotifyLastDoc] = useState<DocumentData | null>(
-        null
-    );
-    const [userLastDoc, setUserLastDoc] = useState<DocumentData | null>(null);
-    const [availableGenres, setAvailableGenres] = useState<string[]>([]);
-    const [searchingDiscogs, setSearchingDiscogs] = useState<boolean>(false);
+    const [currentTrack, setCurrentTrack] = useState<ITrack | null>();
+    const [isPlaying, setIsPlaying] = useState<boolean>(false);
+    const [listened, setListened] = useState<boolean>(false);
+    const audioElement = useRef<HTMLAudioElement>(null);
+    const [releaseIds, setReleaseIds] = useState<number[]>([]);
+    const [userTracks, setUserTracks] = useState<UserTrack[] | null>(null);
+    const { userId } = useAuthContext();
+    const [searchTrack, setSearchTrack] = useState<ReleaseTrack | null>(null);
 
     useEffect(() => {
-        getAvailableGrnres();
-    }, [reviewStep]);
-
-    useEffect(() => {
-        if (tracks) {
-            setTrack(tracks[0]);
+        if (preferredGenre) {
+            setUserTracks(null);
+            genreRef.current!.value = preferredGenre;
+            getDiscogsReleaseIds(preferredGenre);
         }
-    }, [tracks]);
+    }, [preferredGenre]);
+
+    useEffect(() => {
+        if (releaseIds && releaseIds.length > 0) {
+            if (userTracks) {
+                getDiscogsReleaseTrack();
+            } else {
+                getUserTracks();
+            }
+        } else {
+            getDiscogsReleaseIds(preferredGenre);
+        }
+    }, [releaseIds]);
+
+    useEffect(() => {
+        getDiscogsReleaseTrack();
+    }, [userTracks]);
+
+    useEffect(() => {
+        if (searchTrack && userTracks) {
+            const track = userTracks.find(
+                (track) =>
+                    track.title === searchTrack.title &&
+                    track.artist === searchTrack.artist
+            );
+
+            if (track) {
+                spliceReleaseIds();
+            } else {
+                searchSpotifyTrack(searchTrack);
+            }
+        }
+    }, [searchTrack]);
 
     useEffect(() => {
         setIsPlaying(false);
 
-        if (track) {
+        if (currentTrack) {
             setLoading(false);
             setListened(false);
         }
 
-        if (autoPlay && track) {
+        if (autoPlay && currentTrack) {
             play();
         }
-    }, [track]);
+    }, [currentTrack]);
 
-    useEffect(() => {
-        (async () => {
-            setTrack(
-                await getSpotifyTrack({
-                    trackToSearch: searchTracks,
-                    selectedGenre: selectedGenre || "N/A",
-                    onTrackFound: () => setLoading(false),
-                    onStartSearch: () => setLoading(true),
-                })
-            );
-        })();
-    }, [searchTracks]);
-
-    const getPreferredGenre = async (availableGenres: string[]) => {
-        const currentGenre = availableGenres.includes(preferredGenre)
-            ? preferredGenre
-            : availableGenres[0];
-
-        setTimeout(() => {
-            setSelectedGenre(currentGenre);
-            genreRef.current!.value = currentGenre;
-        }, 100);
-    };
-
-    const getAvailableGrnres = async () => {
-        // Other functions depend on getting user data from here - do not delete
-        const uData = await fetchUserData({ userId: userId });
-        updateUserData(uData);
-
-        if (uData) {
-            if (reviewStep === 1) {
-                setAvailableGenres(styles);
-                getPreferredGenre(styles);
-            } else {
-                const allGenres =
-                    uData.tracks
-                        ?.filter(
-                            (track: UserTrack) => track.step === reviewStep
-                        )
-                        .map((t) => t.genre) || [];
-                if (allGenres) {
-                    setAvailableGenres(removeDuplicates(allGenres));
-                    getPreferredGenre(removeDuplicates(allGenres));
+    const getDiscogsReleaseTrack = async () => {
+        if (userTracks) {
+            if (releaseIds && releaseIds.length > 0) {
+                if (mockSearchTrack && releaseIds) {
+                    setSearchTrack(SearchTrackTestData);
+                    spliceReleaseIds();
+                } else {
+                    getReleaseTrack({
+                        releaseIds,
+                        onSuccess: (val) => setSearchTrack(val),
+                        onFail: (val) => setReleaseIds(val),
+                    });
                 }
+            } else {
+                getDiscogsReleaseIds(preferredGenre);
             }
         }
     };
 
+    const searchSpotifyTrack = async (track: ReleaseTrack) => {
+        const spTrack = await getSpotifyTrack({
+            trackToSearch: track,
+            selectedGenre: preferredGenre || "N/A",
+            onTrackFound: () => setLoading(false),
+            onStartSearch: () => setLoading(true),
+        });
+
+        if (spTrack) {
+            setCurrentTrack(spTrack);
+        } else {
+            spliceReleaseIds();
+        }
+    };
+
+    const spliceReleaseIds = () => {
+        setReleaseIds((prev) => prev.splice(1));
+    };
+
+    const getUserTracks = async () => {
+        const uData = mockUserData
+            ? UserDataTestData
+            : await fetchUserData({ userId: userId });
+        if (uData) {
+            setUserTracks(uData.tracks || []);
+        }
+    };
+
+    const getDiscogsReleaseIds = async (genre: string) => {
+        setReleaseIds(
+            mockReleaseIds
+                ? ReleaseIdsTestData
+                : (await fetchDiscogsReleaseIds({
+                      selectedGenre: genre,
+                      pageNumber: Math.floor(Math.random() * 200),
+                  })) || []
+        );
+    };
+
     const play = () => {
         audioElement.current?.play();
+    };
+
+    const likeOrDislike = async (like: boolean) => {
+        if (userId && currentTrack && searchTrack) {
+            const newTrack = {
+                id: currentTrack.id,
+                step: like ? reviewStep + 1 : 0,
+                furthestStep: like ? reviewStep + 1 : reviewStep,
+                genre: currentTrack.genre,
+                artist: searchTrack.artist,
+                title: searchTrack.title,
+            };
+
+            await addUserTrack({
+                collection: "users",
+                docId: userId,
+                data: newTrack,
+            });
+
+            if (userTracks) {
+                const updatedUserTracks = [...userTracks, newTrack];
+                setUserTracks(updatedUserTracks);
+            } else {
+                setUserTracks([newTrack]);
+            }
+
+            spliceReleaseIds();
+        }
     };
 
     return (
@@ -156,16 +217,15 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
             )}
             <ReviewTracksFilters
                 onGenreSelect={async (genre) => {
-                    setSelectedGenre(genre);
                     setPreferredGenre(genre);
                 }}
-                selectedGenre={selectedGenre}
+                selectedGenre={preferredGenre}
                 genres={availableGenres}
                 autoPlay={autoPlay}
                 onAutoPlayChange={(value) => setAutoPlay(value)}
                 ref={genreRef}
             />
-            {track && (
+            {currentTrack && (
                 <>
                     {reviewStep < 4 ? (
                         <Card
@@ -176,7 +236,10 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
                         >
                             <CardHeader>
                                 <Heading size="md">
-                                    <Link href={track.release.url} isExternal>
+                                    <Link
+                                        href={currentTrack.release.url}
+                                        isExternal
+                                    >
                                         <Flex
                                             alignItems="center"
                                             direction="column"
@@ -186,11 +249,11 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
                                                 fontSize="3xl"
                                                 fontWeight="bold"
                                             >
-                                                {track.artist}
+                                                {currentTrack.artist}
                                             </Text>
                                             <Flex gap={1}>
                                                 <Text fontSize="xl">
-                                                    {track.title}
+                                                    {currentTrack.title}
                                                 </Text>
                                                 <OpenInNewIcon />
                                             </Flex>
@@ -201,7 +264,7 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
                             <CardBody
                                 w="full"
                                 h="full"
-                                bgImage={track.thumbnail}
+                                bgImage={currentTrack.thumbnail}
                                 bgSize="cover"
                             >
                                 <Flex
@@ -214,7 +277,9 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
                                             <>
                                                 <IconButton
                                                     isDisabled={!listened}
-                                                    onClick={async () => {}}
+                                                    onClick={async () =>
+                                                        likeOrDislike(false)
+                                                    }
                                                     variant="ghost"
                                                     w="full"
                                                     h="full"
@@ -230,7 +295,9 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
                                                 />
                                                 <IconButton
                                                     isDisabled={!listened}
-                                                    onClick={async () => {}}
+                                                    onClick={async () =>
+                                                        likeOrDislike(true)
+                                                    }
                                                     variant="ghost"
                                                     w="full"
                                                     h="full"
@@ -279,7 +346,7 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
                                                 style={{
                                                     width: "100%",
                                                 }}
-                                                src={track.previewUrl}
+                                                src={currentTrack.previewUrl}
                                                 controls
                                             />
                                         </Flex>
@@ -296,4 +363,4 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
     );
 };
 
-export default TrackReviewCard;
+export default TrackReview;

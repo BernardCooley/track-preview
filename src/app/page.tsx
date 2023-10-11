@@ -2,6 +2,7 @@
 
 import { Box, Center, Flex, Slide, Stack } from "@chakra-ui/react";
 import TrackReviewCard from "@/components/TrackReviewCard";
+import TrackReview from "@/components/TrackReview";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { ITrack } from "../../types";
 import { useEffect, useRef, useState } from "react";
@@ -88,7 +89,8 @@ export default function Home() {
                             }}
                         />
 
-                        <TrackReviewCard reviewStep={currentStep} />
+                        {/* <TrackReviewCard reviewStep={currentStep} /> */}
+                        <TrackReview reviewStep={currentStep} />
                     </Stack>
                     <Slide
                         direction="bottom"
