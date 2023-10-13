@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { styles } from "../../data/genres";
 import {
+    Badge,
     Box,
     Card,
     CardBody,
@@ -10,7 +11,6 @@ import {
     Heading,
     IconButton,
     Link,
-    Spinner,
     Text,
 } from "@chakra-ui/react";
 import ReviewTracksFilters from "./ReviewTracksFilters";
@@ -50,6 +50,7 @@ const TrackReview = ({ reviewStep }: Props) => {
     const [userTracks, setUserTracks] = useState<UserTrack[] | null>(null);
     const { userId } = useAuthContext();
     const [trackPlayed, setTrackPlayed] = useState<boolean>(false);
+    const [spinnerProgress, setSpinnerProgress] = useState<number>(0);
 
     useEffect(() => {
         if (preferredGenre) {
@@ -176,21 +177,39 @@ const TrackReview = ({ reviewStep }: Props) => {
         }
     };
 
+    setInterval(() => {
+        setSpinnerProgress((prev) => {
+            if (prev === 100) {
+                return 0;
+            } else {
+                return prev + 1;
+            }
+        });
+    }, 100);
+
     return (
         <Box h="full" position="relative">
-            {loading && (
-                <Spinner
-                    top="50%"
-                    left="50%"
-                    transform="translate(-50%, -50%)"
+            {!loading && (
+                <Flex
+                    direction="column"
+                    alignItems="center"
                     position="absolute"
-                    zIndex="100"
-                    thickness="6px"
-                    speed="0.65s"
-                    emptyColor="gray.200"
-                    color="blue.500"
-                    size="xl"
-                />
+                    top="50%"
+                    left="25%"
+                    w="50%"
+                    zIndex={150}
+                >
+                    <Badge
+                        opacity={spinnerProgress / 100}
+                        position="relative"
+                        variant="outline"
+                        colorScheme="green"
+                        fontSize="36px"
+                        px={4}
+                    >
+                        {`Loading a new Track...`}
+                    </Badge>
+                </Flex>
             )}
             <ReviewTracksFilters
                 onGenreSelect={async (genre) => {
@@ -253,7 +272,6 @@ const TrackReview = ({ reviewStep }: Props) => {
                                         {isPlaying ? (
                                             <>
                                                 <IconButton
-                                                    isActive={false}
                                                     isDisabled={!listened}
                                                     onClick={async () =>
                                                         likeOrDislike(false)
@@ -272,7 +290,6 @@ const TrackReview = ({ reviewStep }: Props) => {
                                                     }
                                                 />
                                                 <IconButton
-                                                    isActive={false}
                                                     isDisabled={!listened}
                                                     onClick={async () =>
                                                         likeOrDislike(true)
