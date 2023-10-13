@@ -93,7 +93,6 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
                     trackToSearch: searchTracks,
                     selectedGenre: selectedGenre || "N/A",
                     onTrackFound: () => setLoading(false),
-                    onStartSearch: () => setLoading(true),
                 })
             );
         })();
