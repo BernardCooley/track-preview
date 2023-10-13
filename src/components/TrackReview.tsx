@@ -253,6 +253,7 @@ const TrackReview = ({ reviewStep }: Props) => {
                                         {isPlaying ? (
                                             <>
                                                 <IconButton
+                                                    isActive={false}
                                                     isDisabled={!listened}
                                                     onClick={async () =>
                                                         likeOrDislike(false)
@@ -271,6 +272,7 @@ const TrackReview = ({ reviewStep }: Props) => {
                                                     }
                                                 />
                                                 <IconButton
+                                                    isActive={false}
                                                     isDisabled={!listened}
                                                     onClick={async () =>
                                                         likeOrDislike(true)
