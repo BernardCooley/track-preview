@@ -1,4 +1,4 @@
-import { ITrack, ReleaseTrack } from "../../types";
+import { SpotifyTrack, ReleaseTrack } from "../../types";
 
 export class GoneError extends Error {
     statusCode = 410;
@@ -126,8 +126,8 @@ export const fetchSpotifyTrack = async ({
     trackToSearch,
     genre,
     discogsReleaseId,
-}: FetchSpotifyTrackProps): Promise<ITrack | null> => {
-    const spotifyTrack: ITrack | null = await fetchWithErrorHandling(
+}: FetchSpotifyTrackProps): Promise<SpotifyTrack | null> => {
+    const spotifyTrack: SpotifyTrack | null = await fetchWithErrorHandling(
         "/api/getSpotifyTrack",
         "POST",
         {

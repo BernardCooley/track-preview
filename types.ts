@@ -6,7 +6,7 @@ export interface ReleaseTrack {
     releaseId: number;
 }
 
-export interface ITrack {
+export interface SpotifyTrack {
     artist: string;
     title: string;
     previewUrl: string;
@@ -305,4 +305,5 @@ export interface UserTrack {
     genre: string;
     title: string;
     artist: string;
+    discogsReleaseId: number;
 }

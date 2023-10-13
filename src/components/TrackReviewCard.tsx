@@ -13,7 +13,7 @@ import {
     Spinner,
 } from "@chakra-ui/react";
 import React, { useEffect, useRef, useState } from "react";
-import { ITrack, ReleaseTrack, UserTrack } from "../../types";
+import { SpotifyTrack, ReleaseTrack, UserTrack } from "../../types";
 import { Link } from "@chakra-ui/react";
 import ThumbDownIcon from "@mui/icons-material/ThumbDown";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
@@ -45,7 +45,7 @@ const TrackReviewCard = ({ reviewStep }: Props) => {
     const [releaseNumber, setReleaseNumber] = useState<number>(0);
     const [searchTracks, setSearchTracks] = useState<ReleaseTrack | null>(null);
     const audioElement = useRef<HTMLAudioElement>(null);
-    const [track, setTrack] = useState<ITrack | null>();
+    const [track, setTrack] = useState<SpotifyTrack | null>();
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
     const [autoPlay, setAutoPlay] = useState<boolean>(false);
     const [listened, setListened] = useState<boolean>(false);

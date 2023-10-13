@@ -1,7 +1,7 @@
 import SpotifyWebApi from "spotify-web-api-node";
 import SpotifyWebApiServer from "spotify-web-api-node/src/server-methods";
 import { NextResponse } from "next/server";
-import { ITrack } from "../../../../types";
+import { SpotifyTrack } from "../../../../types";
 
 export async function POST(req: Request) {
     const { trackToSearch, genre, discogsReleaseId } = await req.json();
@@ -40,7 +40,7 @@ export async function POST(req: Request) {
             const tracks = trackResponse.body.tracks.items[randomNumber];
 
             if (tracks.preview_url) {
-                const track: ITrack = {
+                const track: SpotifyTrack = {
                     artist: tracks.artists[0].name,
                     title: tracks.name,
                     previewUrl: tracks.preview_url,

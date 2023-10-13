@@ -1,5 +1,5 @@
 import { fetchDiscogsReleaseTracks, fetchSpotifyTrack } from "@/bff/bff";
-import { ITrack, ReleaseTrack } from "./types";
+import { SpotifyTrack, ReleaseTrack } from "./types";
 
 interface GetSpotifyTrackProps {
     trackToSearch: ReleaseTrack | null;
@@ -11,7 +11,7 @@ export const getSpotifyTrack = async ({
     trackToSearch,
     selectedGenre,
     onTrackFound,
-}: GetSpotifyTrackProps): Promise<ITrack | null> => {
+}: GetSpotifyTrackProps): Promise<SpotifyTrack | null> => {
     if (trackToSearch) {
         const spotifyTrack = await fetchSpotifyTrack({
             trackToSearch: trackToSearch,

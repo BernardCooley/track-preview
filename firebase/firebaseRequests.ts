@@ -21,18 +21,18 @@ export const saveNewDocument = async ({
 interface UpdateDocumentProps {
     collection: string;
     docId: string;
-    data: UserTrack;
+    track: UserTrack;
 }
 
 export const addUserTrack = async ({
     collection,
     docId,
-    data,
+    track,
 }: UpdateDocumentProps) => {
     const docRef = doc(db, collection, docId);
 
     await updateDoc(docRef, {
-        tracks: arrayUnion(data),
+        tracks: arrayUnion(track),
     });
 };
 

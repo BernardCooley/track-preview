@@ -20,7 +20,7 @@ import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import TrackList from "./TrackList";
 import { useLocalStorage } from "usehooks-ts";
-import { ITrack, UserTrack } from "../../types";
+import { SpotifyTrack, UserTrack } from "../../types";
 import { useTracksContext } from "../../Contexts/TracksContext";
 import { fetchDiscogsReleaseIds } from "@/bff/bff";
 import { fetchUserData, addUserTrack } from "../../firebase/firebaseRequests";
@@ -41,8 +41,8 @@ const TrackReview = ({ reviewStep }: Props) => {
     );
     const [autoPlay, setAutoPlay] = useState<boolean>(false);
     const genreRef = useRef<HTMLSelectElement>(null);
-    const [currentTrack, setCurrentTrack] = useState<ITrack | null>();
-    const [queuedTrack, setQueuedTrack] = useState<ITrack | null>();
+    const [currentTrack, setCurrentTrack] = useState<SpotifyTrack | null>();
+    const [queuedTrack, setQueuedTrack] = useState<SpotifyTrack | null>();
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
     const [listened, setListened] = useState<boolean>(false);
     const audioElement = useRef<HTMLAudioElement>(null);
@@ -67,8 +67,6 @@ const TrackReview = ({ reviewStep }: Props) => {
             } else {
                 getUserTracks();
             }
-        } else {
-            getDiscogsReleaseIds(preferredGenre);
         }
     }, [releaseIds]);
 
@@ -76,7 +74,7 @@ const TrackReview = ({ reviewStep }: Props) => {
         setIsPlaying(false);
 
         if (currentTrack) {
-            setTrackPlayed(false);
+            setTrackPlayed(true);
             setLoading(false);
             setListened(false);
         }
@@ -92,8 +90,8 @@ const TrackReview = ({ reviewStep }: Props) => {
         }
     }, [trackPlayed]);
 
-    const getDiscogsReleaseTrack = async () => {
-        if (userTracks) {
+    const getDiscogsReleaseTrack = async (skipCheck?: boolean) => {
+        if (userTracks || skipCheck) {
             if (releaseIds && releaseIds.length > 0) {
                 getReleaseTrack({
                     releaseIds,
@@ -130,21 +128,20 @@ const TrackReview = ({ reviewStep }: Props) => {
         const uData = await fetchUserData({ userId: userId });
         if (uData) {
             setUserTracks(uData.tracks || []);
+            getDiscogsReleaseTrack(true);
         }
     };
 
     const getDiscogsReleaseIds = async (genre: string) => {
-        setReleaseIds(
-            (await fetchDiscogsReleaseIds({
-                selectedGenre: genre,
-                pageNumber: Math.floor(Math.random() * 200),
-            })) || []
-        );
+        const ids = await fetchDiscogsReleaseIds({
+            selectedGenre: genre,
+            pageNumber: Math.floor(Math.random() * 200),
+        });
+        setReleaseIds(ids || []);
     };
 
     const play = () => {
         audioElement.current?.play();
-        setTrackPlayed(true);
     };
 
     const likeOrDislike = async (like: boolean) => {
@@ -157,12 +154,13 @@ const TrackReview = ({ reviewStep }: Props) => {
                 genre: currentTrack.genre,
                 artist: currentTrack.artist,
                 title: currentTrack.title,
+                discogsReleaseId: currentTrack.release.discogsReleaseId,
             };
 
             await addUserTrack({
                 collection: "users",
                 docId: userId,
-                data: newTrack,
+                track: newTrack,
             });
 
             if (userTracks) {
