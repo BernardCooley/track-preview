@@ -5,16 +5,13 @@ interface GetSpotifyTrackProps {
     trackToSearch: ReleaseTrack | null;
     selectedGenre: string;
     onTrackFound: () => void;
-    onStartSearch: () => void;
 }
 
 export const getSpotifyTrack = async ({
     trackToSearch,
     selectedGenre,
     onTrackFound,
-    onStartSearch,
 }: GetSpotifyTrackProps): Promise<ITrack | null> => {
-    onStartSearch();
     if (trackToSearch) {
         const spotifyTrack = await fetchSpotifyTrack({
             trackToSearch: trackToSearch,

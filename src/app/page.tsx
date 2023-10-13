@@ -1,7 +1,6 @@
 "use client";
 
 import { Box, Center, Flex, Slide, Stack } from "@chakra-ui/react";
-import TrackReviewCard from "@/components/TrackReviewCard";
 import TrackReview from "@/components/TrackReview";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { ITrack } from "../../types";
@@ -88,8 +87,6 @@ export default function Home() {
                                 router.push(`${pathname}?reviewStep=${step}`);
                             }}
                         />
-
-                        {/* <TrackReviewCard reviewStep={currentStep} /> */}
                         <TrackReview reviewStep={currentStep} />
                     </Stack>
                     <Slide

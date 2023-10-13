@@ -20,26 +20,20 @@ import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import TrackList from "./TrackList";
 import { useLocalStorage } from "usehooks-ts";
-import { ITrack, ReleaseTrack, UserTrack } from "../../types";
+import { ITrack, UserTrack } from "../../types";
 import { useTracksContext } from "../../Contexts/TracksContext";
 import { fetchDiscogsReleaseIds } from "@/bff/bff";
 import { fetchUserData, addUserTrack } from "../../firebase/firebaseRequests";
 import { useAuthContext } from "../../Contexts/AuthContext";
-import {
-    ReleaseIdsTestData,
-    SearchTrackTestData,
-    UserDataTestData,
-} from "../../testData";
 import { getReleaseTrack, getSpotifyTrack } from "../../functions";
-import { mockReleaseIds, mockSearchTrack, mockUserData } from "../../const";
 
 interface Props {
     reviewStep: number;
 }
 
 const TrackReview = ({ reviewStep }: Props) => {
-    const { tracks, updateTracks } = useTracksContext();
-    const [availableGenres, setAvailableGenres] = useState<string[]>(styles);
+    const { tracks } = useTracksContext();
+    const [availableGenres] = useState<string[]>(styles);
     const [loading, setLoading] = useState<boolean>(false);
     const [preferredGenre, setPreferredGenre] = useLocalStorage(
         "preferredGenre",
@@ -48,16 +42,18 @@ const TrackReview = ({ reviewStep }: Props) => {
     const [autoPlay, setAutoPlay] = useState<boolean>(false);
     const genreRef = useRef<HTMLSelectElement>(null);
     const [currentTrack, setCurrentTrack] = useState<ITrack | null>();
+    const [queuedTrack, setQueuedTrack] = useState<ITrack | null>();
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
     const [listened, setListened] = useState<boolean>(false);
     const audioElement = useRef<HTMLAudioElement>(null);
     const [releaseIds, setReleaseIds] = useState<number[]>([]);
     const [userTracks, setUserTracks] = useState<UserTrack[] | null>(null);
     const { userId } = useAuthContext();
-    const [searchTrack, setSearchTrack] = useState<ReleaseTrack | null>(null);
+    const [trackPlayed, setTrackPlayed] = useState<boolean>(false);
 
     useEffect(() => {
         if (preferredGenre) {
+            setLoading(true);
             setUserTracks(null);
             genreRef.current!.value = preferredGenre;
             getDiscogsReleaseIds(preferredGenre);
@@ -77,29 +73,10 @@ const TrackReview = ({ reviewStep }: Props) => {
     }, [releaseIds]);
 
     useEffect(() => {
-        getDiscogsReleaseTrack();
-    }, [userTracks]);
-
-    useEffect(() => {
-        if (searchTrack && userTracks) {
-            const track = userTracks.find(
-                (track) =>
-                    track.title === searchTrack.title &&
-                    track.artist === searchTrack.artist
-            );
-
-            if (track) {
-                spliceReleaseIds();
-            } else {
-                searchSpotifyTrack(searchTrack);
-            }
-        }
-    }, [searchTrack]);
-
-    useEffect(() => {
         setIsPlaying(false);
 
         if (currentTrack) {
+            setTrackPlayed(false);
             setLoading(false);
             setListened(false);
         }
@@ -109,37 +86,39 @@ const TrackReview = ({ reviewStep }: Props) => {
         }
     }, [currentTrack]);
 
+    useEffect(() => {
+        if (trackPlayed) {
+            getDiscogsReleaseTrack();
+        }
+    }, [trackPlayed]);
+
     const getDiscogsReleaseTrack = async () => {
         if (userTracks) {
             if (releaseIds && releaseIds.length > 0) {
-                if (mockSearchTrack && releaseIds) {
-                    setSearchTrack(SearchTrackTestData);
-                    spliceReleaseIds();
-                } else {
-                    getReleaseTrack({
-                        releaseIds,
-                        onSuccess: (val) => setSearchTrack(val),
-                        onFail: (val) => setReleaseIds(val),
-                    });
-                }
+                getReleaseTrack({
+                    releaseIds,
+                    onSuccess: async (val) => {
+                        const spotifyTrack = await getSpotifyTrack({
+                            trackToSearch: val,
+                            selectedGenre: preferredGenre || "N/A",
+                            onTrackFound: () => setLoading(false),
+                        });
+
+                        if (spotifyTrack) {
+                            if (!currentTrack) {
+                                setCurrentTrack(spotifyTrack);
+                            } else if (!queuedTrack) {
+                                setQueuedTrack(spotifyTrack);
+                            }
+                        } else {
+                            spliceReleaseIds();
+                        }
+                    },
+                    onFail: (val) => setReleaseIds(val),
+                });
             } else {
                 getDiscogsReleaseIds(preferredGenre);
             }
-        }
-    };
-
-    const searchSpotifyTrack = async (track: ReleaseTrack) => {
-        const spTrack = await getSpotifyTrack({
-            trackToSearch: track,
-            selectedGenre: preferredGenre || "N/A",
-            onTrackFound: () => setLoading(false),
-            onStartSearch: () => setLoading(true),
-        });
-
-        if (spTrack) {
-            setCurrentTrack(spTrack);
-        } else {
-            spliceReleaseIds();
         }
     };
 
@@ -148,9 +127,7 @@ const TrackReview = ({ reviewStep }: Props) => {
     };
 
     const getUserTracks = async () => {
-        const uData = mockUserData
-            ? UserDataTestData
-            : await fetchUserData({ userId: userId });
+        const uData = await fetchUserData({ userId: userId });
         if (uData) {
             setUserTracks(uData.tracks || []);
         }
@@ -158,28 +135,28 @@ const TrackReview = ({ reviewStep }: Props) => {
 
     const getDiscogsReleaseIds = async (genre: string) => {
         setReleaseIds(
-            mockReleaseIds
-                ? ReleaseIdsTestData
-                : (await fetchDiscogsReleaseIds({
-                      selectedGenre: genre,
-                      pageNumber: Math.floor(Math.random() * 200),
-                  })) || []
+            (await fetchDiscogsReleaseIds({
+                selectedGenre: genre,
+                pageNumber: Math.floor(Math.random() * 200),
+            })) || []
         );
     };
 
     const play = () => {
         audioElement.current?.play();
+        setTrackPlayed(true);
     };
 
     const likeOrDislike = async (like: boolean) => {
-        if (userId && currentTrack && searchTrack) {
+        setTrackPlayed(false);
+        if (userId && currentTrack) {
             const newTrack = {
                 id: currentTrack.id,
                 step: like ? reviewStep + 1 : 0,
                 furthestStep: like ? reviewStep + 1 : reviewStep,
                 genre: currentTrack.genre,
-                artist: searchTrack.artist,
-                title: searchTrack.title,
+                artist: currentTrack.artist,
+                title: currentTrack.title,
             };
 
             await addUserTrack({
@@ -195,7 +172,9 @@ const TrackReview = ({ reviewStep }: Props) => {
                 setUserTracks([newTrack]);
             }
 
-            spliceReleaseIds();
+            setCurrentTrack(queuedTrack);
+            setQueuedTrack(null);
+            setListened(false);
         }
     };
 
@@ -337,7 +316,8 @@ const TrackReview = ({ reviewStep }: Props) => {
                                                 onTimeUpdate={(e) => {
                                                     if (
                                                         e.currentTarget
-                                                            .currentTime > 2
+                                                            .currentTime > 2 &&
+                                                        queuedTrack
                                                     ) {
                                                         setListened(true);
                                                     }
