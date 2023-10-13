@@ -189,14 +189,14 @@ const TrackReview = ({ reviewStep }: Props) => {
 
     return (
         <Box h="full" position="relative">
-            {!loading && (
+            {loading && (
                 <Flex
                     direction="column"
                     alignItems="center"
                     position="absolute"
                     top="50%"
                     left="25%"
-                    w="50%"
+                    w={["90%", "50%"]}
                     zIndex={150}
                 >
                     <Badge
@@ -207,7 +207,7 @@ const TrackReview = ({ reviewStep }: Props) => {
                         fontSize="36px"
                         px={4}
                     >
-                        {`Loading a new Track...`}
+                        {`Loading new Track...`}
                     </Badge>
                 </Flex>
             )}
