@@ -51,6 +51,23 @@ const TrackReview = ({ reviewStep }: Props) => {
     const { userId } = useAuthContext();
     const [trackPlayed, setTrackPlayed] = useState<boolean>(false);
     const [spinnerProgress, setSpinnerProgress] = useState<number>(0);
+    const [interval, upDateInterval] = useState<NodeJS.Timeout | null>(null);
+
+    useEffect(() => {
+        const interval = setInterval(
+            () =>
+                setSpinnerProgress((prev) => {
+                    console.log(prev);
+                    if (prev === 100) {
+                        return 0;
+                    } else {
+                        return prev + 1;
+                    }
+                }),
+            2
+        );
+        upDateInterval(interval);
+    }, []);
 
     useEffect(() => {
         if (preferredGenre) {
@@ -75,12 +92,13 @@ const TrackReview = ({ reviewStep }: Props) => {
         setIsPlaying(false);
 
         if (currentTrack) {
-            setTrackPlayed(true);
+            clearInterval(interval as NodeJS.Timeout);
             setLoading(false);
             setListened(false);
         }
 
         if (autoPlay && currentTrack) {
+            setTrackPlayed(true);
             play();
         }
     }, [currentTrack]);
@@ -176,16 +194,6 @@ const TrackReview = ({ reviewStep }: Props) => {
             setListened(false);
         }
     };
-
-    setInterval(() => {
-        setSpinnerProgress((prev) => {
-            if (prev === 100) {
-                return 0;
-            } else {
-                return prev + 1;
-            }
-        });
-    }, 100);
 
     return (
         <Box h="full" position="relative">
