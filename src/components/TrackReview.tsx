@@ -7,6 +7,7 @@ import {
     Card,
     CardBody,
     CardHeader,
+    Center,
     Flex,
     Heading,
     IconButton,
@@ -98,7 +99,6 @@ const TrackReview = ({ reviewStep }: Props) => {
         }
 
         if (autoPlay && currentTrack) {
-            setTrackPlayed(true);
             play();
         }
     }, [currentTrack]);
@@ -160,6 +160,7 @@ const TrackReview = ({ reviewStep }: Props) => {
     };
 
     const play = () => {
+        setTrackPlayed(true);
         audioElement.current?.play();
     };
 
@@ -198,26 +199,20 @@ const TrackReview = ({ reviewStep }: Props) => {
     return (
         <Box h="full" position="relative">
             {loading && (
-                <Flex
-                    direction="column"
-                    alignItems="center"
-                    position="absolute"
-                    top="50%"
-                    left="25%"
-                    w={["90%", "50%"]}
-                    zIndex={150}
-                >
+                <Center>
                     <Badge
+                        zIndex={150}
+                        top="50%"
+                        position="absolute"
                         opacity={spinnerProgress / 100}
-                        position="relative"
                         variant="outline"
                         colorScheme="green"
-                        fontSize="36px"
+                        fontSize={["24px", "36px"]}
                         px={4}
                     >
                         {`Loading new Track...`}
                     </Badge>
-                </Flex>
+                </Center>
             )}
             <ReviewTracksFilters
                 onGenreSelect={async (genre) => {
