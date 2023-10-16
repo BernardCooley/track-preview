@@ -52,22 +52,32 @@ const TrackReview = ({ reviewStep }: Props) => {
     const { userId } = useAuthContext();
     const [trackPlayed, setTrackPlayed] = useState<boolean>(false);
     const [spinnerProgress, setSpinnerProgress] = useState<number>(0);
-    const [interval, upDateInterval] = useState<NodeJS.Timeout | null>(null);
+    const [interval, updateInterval] = useState<NodeJS.Timeout | null>(null);
+    let directionUp = true;
 
     useEffect(() => {
         const interval = setInterval(
             () =>
                 setSpinnerProgress((prev) => {
-                    console.log(prev);
-                    if (prev === 100) {
-                        return 0;
+                    if (directionUp) {
+                        if (prev === 100) {
+                            directionUp = false;
+                            return 100;
+                        } else {
+                            return prev + 1;
+                        }
                     } else {
-                        return prev + 1;
+                        if (prev === 0) {
+                            directionUp = true;
+                            return 0;
+                        } else {
+                            return prev - 1;
+                        }
                     }
                 }),
-            2
+            5
         );
-        upDateInterval(interval);
+        updateInterval(interval);
     }, []);
 
     useEffect(() => {
@@ -116,7 +126,7 @@ const TrackReview = ({ reviewStep }: Props) => {
                     releaseIds,
                     onSuccess: async (val) => {
                         const spotifyTrack = await getSpotifyTrack({
-                            trackToSearch: val,
+                            trackToSearch: val.releaseTrack,
                             selectedGenre: preferredGenre || "N/A",
                             onTrackFound: () => setLoading(false),
                         });
@@ -128,19 +138,23 @@ const TrackReview = ({ reviewStep }: Props) => {
                                 setQueuedTrack(spotifyTrack);
                             }
                         } else {
-                            spliceReleaseIds();
+                            if (val.releaseId) {
+                                setReleaseIds(
+                                    releaseIds.filter(
+                                        (item) => item !== val.releaseId
+                                    )
+                                );
+                            }
                         }
                     },
-                    onFail: (val) => setReleaseIds(val),
+                    onFail: (val) => {
+                        setReleaseIds(val);
+                    },
                 });
             } else {
                 getDiscogsReleaseIds(preferredGenre);
             }
         }
-    };
-
-    const spliceReleaseIds = () => {
-        setReleaseIds((prev) => prev.splice(1));
     };
 
     const getUserTracks = async () => {

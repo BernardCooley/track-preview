@@ -32,7 +32,13 @@ export const getSpotifyTrack = async ({
 
 interface GetReleaseTracksProps {
     releaseIds: number[] | null;
-    onSuccess: (releaseTrack: ReleaseTrack) => void;
+    onSuccess: ({
+        releaseTrack,
+        releaseId,
+    }: {
+        releaseTrack: ReleaseTrack;
+        releaseId: number;
+    }) => void;
     onFail: (releaseIds: number[]) => void;
 }
 
@@ -42,11 +48,11 @@ export const getReleaseTrack = async ({
     onFail,
 }: GetReleaseTracksProps) => {
     if (releaseIds && releaseIds.length > 0) {
-        const randomReleaseId =
+        const releaseId =
             releaseIds[Math.floor(Math.random() * releaseIds.length)];
 
         const releaseTracks = await fetchDiscogsReleaseTracks({
-            releaseId: randomReleaseId,
+            releaseId: releaseId,
         });
 
         if (releaseTracks) {
@@ -54,9 +60,12 @@ export const getReleaseTrack = async ({
                 Math.random() * releaseTracks.length
             );
 
-            onSuccess(releaseTracks[randomTrackNumber]);
+            onSuccess({
+                releaseTrack: releaseTracks[randomTrackNumber],
+                releaseId: releaseId,
+            });
         } else {
-            onFail(releaseIds.splice(1));
+            onFail(releaseIds.filter((item) => item !== releaseId));
         }
     }
 };
