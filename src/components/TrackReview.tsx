@@ -38,7 +38,7 @@ const TrackReview = ({ reviewStep }: Props) => {
     const [loading, setLoading] = useState<boolean>(false);
     const [preferredGenre, setPreferredGenre] = useLocalStorage(
         "preferredGenre",
-        "N/A"
+        "all"
     );
     const [autoPlay, setAutoPlay] = useState<boolean>(false);
     const genreRef = useRef<HTMLSelectElement>(null);
@@ -127,7 +127,7 @@ const TrackReview = ({ reviewStep }: Props) => {
                     onSuccess: async (val) => {
                         const spotifyTrack = await getSpotifyTrack({
                             trackToSearch: val.releaseTrack,
-                            selectedGenre: preferredGenre || "N/A",
+                            selectedGenre: preferredGenre,
                             onTrackFound: () => setLoading(false),
                         });
 
@@ -136,14 +136,6 @@ const TrackReview = ({ reviewStep }: Props) => {
                                 setCurrentTrack(spotifyTrack);
                             } else if (!queuedTrack) {
                                 setQueuedTrack(spotifyTrack);
-                            }
-                        } else {
-                            if (val.releaseId) {
-                                setReleaseIds(
-                                    releaseIds.filter(
-                                        (item) => item !== val.releaseId
-                                    )
-                                );
                             }
                         }
                     },
@@ -165,7 +157,7 @@ const TrackReview = ({ reviewStep }: Props) => {
         }
     };
 
-    const getDiscogsReleaseIds = async (genre: string) => {
+    const getDiscogsReleaseIds = async (genre: string | null) => {
         const ids = await fetchDiscogsReleaseIds({
             selectedGenre: genre,
             pageNumber: Math.floor(Math.random() * 200),

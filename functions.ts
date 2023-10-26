@@ -15,7 +15,7 @@ export const getSpotifyTrack = async ({
     if (trackToSearch) {
         const spotifyTrack = await fetchSpotifyTrack({
             trackToSearch: trackToSearch,
-            genre: selectedGenre || "N/A",
+            genre: selectedGenre,
             discogsReleaseId: trackToSearch.releaseId,
         });
 

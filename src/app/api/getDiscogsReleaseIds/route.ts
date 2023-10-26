@@ -11,7 +11,7 @@ export async function POST(req: Request) {
     try {
         const releases = await client.searchDatabase(
             {
-                style: selectedGenre,
+                ...(selectedGenre !== "all" && { style: selectedGenre }),
                 type: SearchTypeEnum.RELEASE,
             },
             {
