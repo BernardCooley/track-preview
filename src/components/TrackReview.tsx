@@ -79,11 +79,11 @@ const TrackReview = ({ reviewStep }: Props) => {
             5
         );
         updateInterval(interval);
-    }, []);
 
-    useEffect(() => {
         if (preferredGenre) {
             setLoading(true);
+            setCurrentTrack(null);
+            setQueuedTrack(null);
             genreRef.current!.value = preferredGenre;
             getDiscogsReleaseIds(preferredGenre);
         }
@@ -256,7 +256,7 @@ const TrackReview = ({ reviewStep }: Props) => {
                         fontSize={["24px", "36px"]}
                         px={4}
                     >
-                        {`Loading new Track...`}
+                        {`Loading new ${preferredGenre} Track...`}
                     </Badge>
                 </Center>
             )}
