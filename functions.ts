@@ -39,7 +39,7 @@ interface GetReleaseTracksProps {
         releaseTrack: ReleaseTrack;
         releaseId: number;
     }) => void;
-    onFail: (releaseIds: number[]) => void;
+    onFail: (releaseId: number) => void;
 }
 
 export const getReleaseTrack = async ({
@@ -65,7 +65,7 @@ export const getReleaseTrack = async ({
                 releaseId: releaseId,
             });
         } else {
-            onFail(releaseIds.filter((item) => item !== releaseId));
+            onFail(releaseId);
         }
     }
 };

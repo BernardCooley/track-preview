@@ -21,7 +21,7 @@ import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import TrackList from "./TrackList";
 import { useLocalStorage } from "usehooks-ts";
-import { SpotifyTrack, UserTrack } from "../../types";
+import { ReleaseTrack, SpotifyTrack, UserTrack } from "../../types";
 import { useTracksContext } from "../../Contexts/TracksContext";
 import { fetchDiscogsReleaseIds } from "@/bff/bff";
 import { fetchUserData, addUserTrack } from "../../firebase/firebaseRequests";
@@ -47,13 +47,14 @@ const TrackReview = ({ reviewStep }: Props) => {
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
     const [listened, setListened] = useState<boolean>(false);
     const audioElement = useRef<HTMLAudioElement>(null);
-    const [releaseIds, setReleaseIds] = useState<number[]>([]);
-    const [userTracks, setUserTracks] = useState<UserTrack[] | null>(null);
+    const [releaseIds, setReleaseIds] = useState<number[] | null>([]);
+    const [userTracks, setUserTracks] = useState<UserTrack[] | null>([]);
     const { userId } = useAuthContext();
     const [trackPlayed, setTrackPlayed] = useState<boolean>(false);
     const [spinnerProgress, setSpinnerProgress] = useState<number>(0);
     const [interval, updateInterval] = useState<NodeJS.Timeout | null>(null);
     let directionUp = true;
+    const [releaseTrack, setReleaseTrack] = useState<ReleaseTrack | null>(null);
 
     useEffect(() => {
         const interval = setInterval(
@@ -83,7 +84,6 @@ const TrackReview = ({ reviewStep }: Props) => {
     useEffect(() => {
         if (preferredGenre) {
             setLoading(true);
-            setUserTracks(null);
             genreRef.current!.value = preferredGenre;
             getDiscogsReleaseIds(preferredGenre);
         }
@@ -91,11 +91,7 @@ const TrackReview = ({ reviewStep }: Props) => {
 
     useEffect(() => {
         if (releaseIds && releaseIds.length > 0) {
-            if (userTracks) {
-                getDiscogsReleaseTrack();
-            } else {
-                getUserTracks();
-            }
+            getDiscogsReleaseTrack(userTracks, releaseIds);
         }
     }, [releaseIds]);
 
@@ -113,74 +109,102 @@ const TrackReview = ({ reviewStep }: Props) => {
         }
     }, [currentTrack]);
 
+    const play = () => {
+        setTrackPlayed(true);
+        audioElement.current?.play();
+    };
+
     useEffect(() => {
-        if (trackPlayed) {
-            getDiscogsReleaseTrack();
+        if (trackPlayed && releaseIds && releaseIds.length > 0) {
+            getDiscogsReleaseTrack(userTracks, releaseIds);
         }
     }, [trackPlayed]);
-
-    const getDiscogsReleaseTrack = async (skipCheck?: boolean) => {
-        if (userTracks || skipCheck) {
-            if (releaseIds && releaseIds.length > 0) {
-                getReleaseTrack({
-                    releaseIds,
-                    onSuccess: async (val) => {
-                        const spotifyTrack = await getSpotifyTrack({
-                            trackToSearch: val.releaseTrack,
-                            selectedGenre: preferredGenre,
-                            onTrackFound: () => setLoading(false),
-                        });
-
-                        if (spotifyTrack) {
-                            if (!currentTrack) {
-                                setCurrentTrack(spotifyTrack);
-                            } else if (!queuedTrack) {
-                                setQueuedTrack(spotifyTrack);
-                            }
-                        }
-                    },
-                    onFail: (val) => {
-                        setReleaseIds(val);
-                    },
-                });
-            } else {
-                getDiscogsReleaseIds(preferredGenre);
-            }
-        }
-    };
-
-    const getUserTracks = async () => {
-        const uData = await fetchUserData({ userId: userId });
-        if (uData) {
-            setUserTracks(uData.tracks || []);
-            getDiscogsReleaseTrack(true);
-        }
-    };
 
     const getDiscogsReleaseIds = async (genre: string | null) => {
         const ids = await fetchDiscogsReleaseIds({
             selectedGenre: genre,
             pageNumber: Math.floor(Math.random() * 200),
         });
-        setReleaseIds(ids || []);
+
+        setReleaseIds(ids);
+        const uTracks = await getUserTracks();
+        setUserTracks(uTracks);
+
+        if (ids && ids.length > 0) {
+            getDiscogsReleaseTrack(uTracks, ids);
+        } else {
+            // TODO: get releaseIds again
+            console.error(`Cant find any releaseIds for genre: ${genre}`);
+        }
     };
 
-    const play = () => {
-        setTrackPlayed(true);
-        audioElement.current?.play();
+    const getUserTracks = async () => {
+        const uData = await fetchUserData({ userId: userId });
+        if (uData && uData.tracks) return uData.tracks;
+        return [];
     };
 
-    const likeOrDislike = async (like: boolean) => {
-        setTrackPlayed(false);
-        if (userId && currentTrack) {
-            const newTrack = {
+    const getDiscogsReleaseTrack = async (
+        userTracks: UserTrack[] | null,
+        releaseIds: number[]
+    ) => {
+        getReleaseTrack({
+            releaseIds,
+            onSuccess: async (val) => {
+                setReleaseTrack(val.releaseTrack);
+                const alreadyHeardTrack =
+                    userTracks &&
+                    userTracks.filter(
+                        (t) =>
+                            t.artist === val.releaseTrack.artist &&
+                            t.title === val.releaseTrack.title
+                    ).length > 0;
+
+                if (alreadyHeardTrack) {
+                    setReleaseIds(
+                        releaseIds.filter(
+                            (id) => id !== val.releaseTrack.releaseId
+                        )
+                    );
+                } else {
+                    const spotifyTrack = await getSpotifyTrack({
+                        trackToSearch: val.releaseTrack,
+                        selectedGenre: preferredGenre,
+                        onTrackFound: () => setLoading(false),
+                    });
+
+                    if (spotifyTrack) {
+                        if (!currentTrack) {
+                            setCurrentTrack(spotifyTrack);
+                        } else if (!queuedTrack) {
+                            setQueuedTrack(spotifyTrack);
+                        }
+                    } else {
+                        storeTrack(false);
+                        setReleaseIds(
+                            releaseIds.filter(
+                                (id) => id !== val.releaseTrack.releaseId
+                            )
+                        );
+                    }
+                }
+            },
+            onFail: (releaseId) => {
+                setReleaseIds(releaseIds.filter((item) => item !== releaseId));
+            },
+        });
+    };
+
+    const storeTrack = async (like: boolean) => {
+        if (userId && currentTrack && releaseTrack) {
+            const newTrack: UserTrack = {
                 id: currentTrack.id,
                 step: like ? reviewStep + 1 : 0,
                 furthestStep: like ? reviewStep + 1 : reviewStep,
                 genre: currentTrack.genre,
-                artist: currentTrack.artist,
-                title: currentTrack.title,
-                discogsReleaseId: currentTrack.release.discogsReleaseId,
+                artist: releaseTrack.artist,
+                title: releaseTrack.title,
+                discogsReleaseId: releaseTrack.releaseId,
             };
 
             await addUserTrack({
@@ -189,16 +213,32 @@ const TrackReview = ({ reviewStep }: Props) => {
                 track: newTrack,
             });
 
-            if (userTracks) {
-                const updatedUserTracks = [...userTracks, newTrack];
-                setUserTracks(updatedUserTracks);
-            } else {
-                setUserTracks([newTrack]);
-            }
+            return newTrack;
+        }
 
-            setCurrentTrack(queuedTrack);
-            setQueuedTrack(null);
-            setListened(false);
+        return null;
+    };
+
+    const likeOrDislike = async (like: boolean) => {
+        setTrackPlayed(false);
+
+        const newTrack = await storeTrack(like);
+
+        if (userTracks && newTrack) {
+            const updatedUserTracks = [...userTracks, newTrack];
+            setUserTracks(updatedUserTracks);
+        }
+
+        setCurrentTrack(queuedTrack);
+        setQueuedTrack(null);
+        setListened(false);
+
+        if (releaseIds) {
+            setReleaseIds(
+                releaseIds.filter(
+                    (id) => id !== currentTrack?.release.discogsReleaseId
+                )
+            );
         }
     };
 

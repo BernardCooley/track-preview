@@ -31,9 +31,13 @@ export const addUserTrack = async ({
 }: UpdateDocumentProps) => {
     const docRef = doc(db, collection, docId);
 
-    await updateDoc(docRef, {
-        tracks: arrayUnion(track),
-    });
+    try {
+        return await updateDoc(docRef, {
+            tracks: arrayUnion(track),
+        });
+    } catch (error) {
+        return error;
+    }
 };
 
 interface GetUserDataProps {
