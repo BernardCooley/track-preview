@@ -1,10 +1,10 @@
 import SpotifyWebApi from "spotify-web-api-node";
 import SpotifyWebApiServer from "spotify-web-api-node/src/server-methods";
 import { NextResponse } from "next/server";
-import { SpotifyTrack } from "../../../../types";
+import { SearchedTrack } from "../../../../types";
 
 export async function POST(req: Request) {
-    const { trackToSearch, genre, discogsReleaseId } = await req.json();
+    const { trackToSearch } = await req.json();
 
     try {
         SpotifyWebApi._addMethods = function (fncs: any) {
@@ -40,17 +40,13 @@ export async function POST(req: Request) {
             const tracks = trackResponse.body.tracks.items[randomNumber];
 
             if (tracks.preview_url) {
-                const track: SpotifyTrack = {
+                const track: SearchedTrack = {
                     artist: tracks.artists[0].name,
                     title: tracks.name,
                     previewUrl: tracks.preview_url,
                     id: tracks.id,
                     thumbnail: tracks.album.images[0].url,
-                    release: {
-                        url: tracks.album.uri,
-                        discogsReleaseId: discogsReleaseId,
-                    },
-                    genre: genre,
+                    url: tracks.album.uri,
                 };
 
                 const response = NextResponse.json(track, {

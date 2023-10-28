@@ -13,13 +13,13 @@ import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import StopIcon from "@mui/icons-material/Stop";
-import { SpotifyTrack } from "../../types";
+import { SearchedTrack } from "../../types";
 import { useTrackContext } from "../../context/TrackContext";
 import { db } from "../../firebase/firebaseInit";
 import { doc, updateDoc } from "firebase/firestore";
 
 interface Props {
-    tracks: SpotifyTrack[];
+    tracks: SearchedTrack[];
 }
 
 const TrackList = ({ tracks }: Props) => {

@@ -1,9 +1,9 @@
 import React, { createContext, ReactNode, useContext, useState } from "react";
-import { SpotifyTrack } from "../types";
+import { SearchedTrack } from "../types";
 
 interface TracksContextProps {
-    tracks: SpotifyTrack[] | null;
-    updateTracks: (tracks: SpotifyTrack[] | null) => void;
+    tracks: SearchedTrack[] | null;
+    updateTracks: (tracks: SearchedTrack[] | null) => void;
 }
 
 export const TracksContext = createContext<TracksContextProps | null>(null);
@@ -25,9 +25,9 @@ export const TracksContextProvider = ({
 }: {
     children: ReactNode;
 }) => {
-    const [tracks, setTracks] = useState<SpotifyTrack[] | null>(null);
+    const [tracks, setTracks] = useState<SearchedTrack[] | null>(null);
 
-    const updateTracks = (tracks: SpotifyTrack[] | null) => {
+    const updateTracks = (tracks: SearchedTrack[] | null) => {
         setTracks(tracks);
     };
 

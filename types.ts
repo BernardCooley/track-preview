@@ -1,24 +1,5 @@
 import { CommunityStatusesEnum, DataQualityEnum } from "discojs";
 
-export interface ReleaseTrack {
-    artist: string;
-    title: string;
-    releaseId: number;
-}
-
-export interface SpotifyTrack {
-    artist: string;
-    title: string;
-    previewUrl: string;
-    id: string;
-    thumbnail: string;
-    release: {
-        url: string;
-        discogsReleaseId: number;
-    };
-    genre: string;
-}
-
 export interface IArtist {
     anv: string;
     id: number;
@@ -293,17 +274,28 @@ export type GetRelease = {
 
 export type ExtendedGetRelease = GetRelease & { artists_sort: string };
 
-export interface UserData {
-    preferredGenre: string;
-    tracks: UserTrack[];
+export interface ReleaseTrack {
+    artist: string;
+    title: string;
+    releaseId: number;
 }
 
-export interface UserTrack {
-    id: string;
-    step: number;
-    furthestStep: number;
-    genre: string;
+export interface SearchedTrack {
+    artist: string;
     title: string;
+    previewUrl: string;
+    id: string;
+    thumbnail: string;
+    url: string;
+}
+export interface Track {
     artist: string;
     discogsReleaseId: number;
+    furthestReviewStep: number;
+    currentReviewStep: number;
+    genre: string;
+    searchedTrack: SearchedTrack;
+    title: string;
+    userId: string;
+    id: string;
 }

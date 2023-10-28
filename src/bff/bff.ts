@@ -1,4 +1,4 @@
-import { SpotifyTrack, ReleaseTrack } from "../../types";
+import { SearchedTrack, ReleaseTrack } from "../../types";
 
 export class GoneError extends Error {
     statusCode = 410;
@@ -118,23 +118,34 @@ export const fetchDiscogsReleaseTracks = async ({
 
 interface FetchSpotifyTrackProps {
     trackToSearch: ReleaseTrack;
-    genre: string;
-    discogsReleaseId: number;
 }
 
 export const fetchSpotifyTrack = async ({
     trackToSearch,
-    genre,
-    discogsReleaseId,
-}: FetchSpotifyTrackProps): Promise<SpotifyTrack | null> => {
-    const spotifyTrack: SpotifyTrack | null = await fetchWithErrorHandling(
+}: FetchSpotifyTrackProps): Promise<SearchedTrack | null> => {
+    const spotifyTrack: SearchedTrack | null = await fetchWithErrorHandling(
         "/api/getSpotifyTrack",
         "POST",
         {
             trackToSearch: trackToSearch,
-            genre: genre,
-            discogsReleaseId: discogsReleaseId,
         }
     );
     return spotifyTrack;
+};
+
+interface FetchDeezerTrackProps {
+    trackToSearch: string;
+}
+
+export const fetchDeezerTrack = async ({
+    trackToSearch,
+}: FetchDeezerTrackProps): Promise<SearchedTrack | null> => {
+    const deezerTrack: SearchedTrack | null = await fetchWithErrorHandling(
+        "/api/getDeezerTrack",
+        "POST",
+        {
+            trackToSearch: trackToSearch,
+        }
+    );
+    return deezerTrack;
 };

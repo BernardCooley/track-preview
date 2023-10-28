@@ -3,7 +3,7 @@
 import { Box, Center, Flex, Slide, Stack } from "@chakra-ui/react";
 import TrackReview from "@/components/TrackReview";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
-import { SpotifyTrack } from "../../types";
+import { SearchedTrack } from "../../types";
 import { useEffect, useRef, useState } from "react";
 import { db } from "../../firebase/firebaseInit";
 import ProgressStepper from "@/components/ProgressStepper";
@@ -17,8 +17,8 @@ export default function Home() {
     const pathname = usePathname();
     const { currentlyPlaying, updateCurrentlyPlaying } = useTrackContext();
     const audioElement = useRef<HTMLAudioElement>(null);
-    const [buyTracks, setBuyTracks] = useState<SpotifyTrack[]>([]);
-    const [currentStep, setCurrentStep] = useState<number>(1);
+    const [buyTracks, setBuyTracks] = useState<SearchedTrack[]>([]);
+    const [currentStep, setCurrentStep] = useState<number>(0);
 
     useEffect(() => {
         const reviewStep = searchParams?.get("reviewStep");
@@ -55,9 +55,12 @@ export default function Home() {
             );
 
             const unsubscribe: any = onSnapshot(q, (querySnapshot) => {
-                const tracks: SpotifyTrack[] = [];
+                const tracks: SearchedTrack[] = [];
                 querySnapshot.forEach((doc) => {
-                    const track = { ...doc.data(), id: doc.id } as SpotifyTrack;
+                    const track = {
+                        ...doc.data(),
+                        id: doc.id,
+                    } as SearchedTrack;
                     tracks.push(track);
                 });
                 setBuyTracks(tracks);

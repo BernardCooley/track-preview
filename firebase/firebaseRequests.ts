@@ -1,67 +1,94 @@
-import { arrayUnion, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import {
+    addDoc,
+    collection,
+    doc,
+    getDocs,
+    query,
+    setDoc,
+    updateDoc,
+    where,
+} from "firebase/firestore";
 import { db } from "./firebaseInit";
-import { UserData, UserTrack } from "../types";
+import { ReleaseTrack, Track } from "../types";
 
-interface SaveNewDocumentProps {
-    collection: string;
-    docId: string;
-    data: any;
+interface SaveNewTrackProps {
+    track: Track;
 }
 
-export const saveNewDocument = async ({
-    collection,
-    docId,
-    data,
-}: SaveNewDocumentProps) => {
-    const docRef = doc(db, collection, docId);
-
-    await setDoc(docRef, data);
+export const saveNewTrack = async ({ track }: SaveNewTrackProps) => {
+    await addDoc(collection(db, "tracks"), track);
 };
 
-interface UpdateDocumentProps {
-    collection: string;
-    docId: string;
-    track: UserTrack;
+interface TrackExistsProps {
+    track: ReleaseTrack;
 }
 
-export const addUserTrack = async ({
-    collection,
-    docId,
+export const searchStoredTracks = async ({
     track,
-}: UpdateDocumentProps) => {
-    const docRef = doc(db, collection, docId);
+}: TrackExistsProps): Promise<Track | null> => {
+    const q = query(
+        collection(db, "tracks"),
+        where("title", "==", track.title),
+        where("artist", "==", track.artist)
+    );
 
-    try {
-        return await updateDoc(docRef, {
-            tracks: arrayUnion(track),
-        });
-    } catch (error) {
-        return error;
-    }
-};
+    const querySnapshot = await getDocs(q as any);
 
-interface GetUserDataProps {
-    userId?: string | null;
-}
+    const tracks = querySnapshot.docs.map((doc) => doc.data()) as Track[];
 
-export const fetchUserData = async ({
-    userId,
-}: GetUserDataProps): Promise<UserData | null> => {
-    if (userId) {
-        const docRef = doc(db, "users", userId);
-
-        return getDoc(docRef)
-            .then((doc) => {
-                if (doc.exists()) {
-                    return doc.data() as UserData;
-                } else {
-                    return null;
-                }
-            })
-            .catch((error) => {
-                return error;
-            });
+    if (tracks.length > 0) {
+        return tracks[0];
     }
 
     return null;
+};
+
+interface GetStoredTracksProps {
+    genre: string;
+    currentReviewStep: number;
+    userId: string;
+}
+
+export const getStoredTracks = async ({
+    genre,
+    currentReviewStep,
+    userId,
+}: GetStoredTracksProps): Promise<Track[] | null> => {
+    const q = query(
+        collection(db, "tracks"),
+        where("genre", "==", genre),
+        where("userId", "==", userId),
+        where("currentReviewStep", "==", currentReviewStep)
+    );
+
+    const querySnapshot = await getDocs(q as any);
+
+    const tracks = querySnapshot.docs.map((doc) => {
+        return { ...(doc.data() as Track), id: doc.id };
+    }) as Track[];
+
+    if (tracks.length > 0) {
+        return tracks;
+    }
+
+    return null;
+};
+
+interface UpdateTrackReviewStep {
+    trackId: string;
+    newReviewStep: number;
+    furthestReviewStep: number;
+}
+
+export const updateTrackReviewStep = async ({
+    trackId,
+    newReviewStep,
+    furthestReviewStep,
+}: UpdateTrackReviewStep) => {
+    const trackRef = doc(db, "tracks", trackId);
+
+    await updateDoc(trackRef, {
+        currentReviewStep: newReviewStep,
+        furthestReviewStep: furthestReviewStep,
+    });
 };

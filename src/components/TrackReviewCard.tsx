@@ -13,12 +13,13 @@ import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import ThumbDownIcon from "@mui/icons-material/ThumbDown";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
-import { SpotifyTrack } from "../../types";
+import { SearchedTrack } from "../../types";
 
 interface Props {
+    ignoreQueuedTrack: boolean;
     loading: boolean;
-    currentTrack: SpotifyTrack;
-    queuedTrack: SpotifyTrack | null | undefined;
+    currentTrack: SearchedTrack;
+    queuedTrack: SearchedTrack | null | undefined;
     isPlaying: boolean;
     listened: boolean;
     onLikeOrDislike: (liked: boolean) => Promise<void>;
@@ -30,6 +31,7 @@ interface Props {
 const TrackReviewCard = forwardRef(
     (
         {
+            ignoreQueuedTrack,
             loading,
             currentTrack,
             queuedTrack,
@@ -46,7 +48,7 @@ const TrackReviewCard = forwardRef(
             <Card size="md" h="full" opacity={loading ? "0.4" : "1"} mt="35px">
                 <CardHeader>
                     <Heading size="md">
-                        <Link href={currentTrack.release.url} isExternal>
+                        <Link href={currentTrack.url} isExternal>
                             <Flex
                                 alignItems="center"
                                 direction="column"
@@ -131,7 +133,7 @@ const TrackReviewCard = forwardRef(
                                     onTimeUpdate={(e) => {
                                         if (
                                             e.currentTarget.currentTime > 2 &&
-                                            queuedTrack
+                                            (queuedTrack || ignoreQueuedTrack)
                                         ) {
                                             onListened();
                                         }
