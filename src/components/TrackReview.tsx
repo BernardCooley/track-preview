@@ -103,8 +103,12 @@ const TrackReview = ({ reviewStep }: Props) => {
     }, [preferredGenre, reviewStep]);
 
     useEffect(() => {
-        if (releaseIds && releaseIds.length > 0) {
-            getDiscogsReleaseTrack(releaseIds);
+        if (reviewStep === 1) {
+            if (releaseIds && releaseIds.length > 0) {
+                getDiscogsReleaseTrack(releaseIds);
+            } else {
+                getDiscogsReleaseIds(preferredGenre);
+            }
         }
     }, [releaseIds]);
 
@@ -169,11 +173,10 @@ const TrackReview = ({ reviewStep }: Props) => {
                 });
 
                 if (storedTrack?.userId === userId) {
-                    setReleaseIds(
-                        releaseIds.filter(
-                            (id) => id !== val.releaseTrack.releaseId
-                        )
+                    const newReleaseIds = releaseIds.filter(
+                        (id) => id !== val.releaseTrack.releaseId
                     );
+                    setReleaseIds(newReleaseIds);
                 } else {
                     let searchedTrack;
 
@@ -204,16 +207,19 @@ const TrackReview = ({ reviewStep }: Props) => {
                             setQueuedTrack(searchedTrack);
                         }
                     } else {
-                        setReleaseIds(
-                            releaseIds.filter(
-                                (id) => id !== val.releaseTrack.releaseId
-                            )
+                        const newReleaseIds = releaseIds.filter(
+                            (id) => id !== val.releaseTrack.releaseId
                         );
+
+                        setReleaseIds(newReleaseIds);
                     }
                 }
             },
             onFail: (releaseId) => {
-                setReleaseIds(releaseIds.filter((item) => item !== releaseId));
+                const newReleaseIds = releaseIds.filter(
+                    (id) => id !== releaseId
+                );
+                setReleaseIds(newReleaseIds);
             },
         });
     };
@@ -245,9 +251,10 @@ const TrackReview = ({ reviewStep }: Props) => {
             storeTrack(like);
 
             if (releaseIds) {
-                setReleaseIds(
-                    releaseIds.filter((id) => id !== currentReleaseId)
+                const newReleaseIds = releaseIds.filter(
+                    (id) => id !== currentReleaseId
                 );
+                setReleaseIds(newReleaseIds);
             }
         } else if (reviewStep > 1 && reviewStep < 4) {
             if (userTracks && userTracks.length > 0) {
