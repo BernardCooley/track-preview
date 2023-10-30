@@ -334,7 +334,7 @@ const TrackReview = ({ reviewStep }: Props) => {
                 </Center>
             )}
             <ReviewTracksFilters
-                onGenreSelect={async (genre) => {
+                onGenreSelect={async (genre: string) => {
                     setPreferredGenre(genre);
                 }}
                 onYearSelect={async (year) => {
