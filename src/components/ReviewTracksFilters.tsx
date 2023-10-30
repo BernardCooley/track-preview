@@ -71,13 +71,13 @@ const ReviewTracksFilters = forwardRef(
                             onChange={(e) => onYearSelect(e.target.value)}
                             defaultValue={selectedYear || ""}
                         >
-                            {arrayRange(1900, new Date().getFullYear(), 1).map(
-                                (year) => (
+                            {arrayRange(1900, new Date().getFullYear(), 1)
+                                .reverse()
+                                .map((year) => (
                                     <option key={year} value={year.toString()}>
                                         {year}
                                     </option>
-                                )
-                            )}
+                                ))}
                         </Select>
                     </Flex>
                     <Flex direction="row" gap={4}>
