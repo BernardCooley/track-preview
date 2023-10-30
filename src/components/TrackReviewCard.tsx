@@ -45,7 +45,7 @@ const TrackReviewCard = forwardRef(
         ref: LegacyRef<HTMLAudioElement> | undefined
     ) => {
         return (
-            <Card size="md" h="full" opacity={loading ? "0.4" : "1"} mt="35px">
+            <Card size="md" h="full" opacity={loading ? "0.4" : "1"} mt={2}>
                 <CardHeader>
                     <Heading size="md">
                         <Link href={currentTrack.url} isExternal>

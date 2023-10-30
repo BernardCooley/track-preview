@@ -9,6 +9,8 @@ import {
     Badge,
     Box,
     Center,
+    Flex,
+    IconButton,
 } from "@chakra-ui/react";
 import ReviewTracksFilters from "./ReviewTracksFilters";
 import TrackList from "./TrackList";
@@ -30,6 +32,7 @@ import { useAuthContext } from "../../Contexts/AuthContext";
 import { getReleaseTrack, getSpotifyTrack } from "../../functions";
 import TrackReviewCard from "./TrackReviewCard";
 import { removeBracketedText } from "../../utils";
+import { SettingsIcon } from "@chakra-ui/icons";
 
 interface Props {
     reviewStep: number;
@@ -63,6 +66,7 @@ const TrackReview = ({ reviewStep }: Props) => {
     const [userTracks, setUserTracks] = useState<Track[] | null>(null);
     const [releaseIdAttempts, setReleaseIdAttempts] = useState<number>(0);
     const [releaseIdsError, setReleaseIdsError] = useState<string | null>(null);
+    const [settingsOpen, setSettingsOpen] = useState<boolean>(false);
 
     useEffect(() => {
         if (reviewStep === 1) {
@@ -333,20 +337,34 @@ const TrackReview = ({ reviewStep }: Props) => {
                     </Badge>
                 </Center>
             )}
-            <ReviewTracksFilters
-                onGenreSelect={async (genre: string) => {
-                    setPreferredGenre(genre);
-                }}
-                onYearSelect={async (year) => {
-                    setPreferredYear(year);
-                }}
-                selectedYear={preferredYear}
-                selectedGenre={preferredGenre}
-                genres={availableGenres}
-                autoPlay={autoPlay}
-                onAutoPlayChange={(value) => setAutoPlay(value)}
-                ref={genreRef}
-            />
+            <Flex
+                w="full"
+                justifyContent="space-between"
+                py={0}
+                px={4}
+                backgroundColor={settingsOpen ? "gray.200" : "transparent"}
+            >
+                <IconButton
+                    onClick={() => setSettingsOpen((prev) => !prev)}
+                    aria-label="Search database"
+                    icon={<SettingsIcon />}
+                />
+                <ReviewTracksFilters
+                    isOpen={settingsOpen}
+                    onGenreSelect={async (genre: string) => {
+                        setPreferredGenre(genre);
+                    }}
+                    onYearSelect={async (year) => {
+                        setPreferredYear(year);
+                    }}
+                    selectedYear={preferredYear}
+                    selectedGenre={preferredGenre}
+                    genres={availableGenres}
+                    autoPlay={autoPlay}
+                    onAutoPlayChange={(value) => setAutoPlay(value)}
+                    ref={genreRef}
+                />
+            </Flex>
             {currentTrack && (
                 <>
                     {reviewStep < 4 ? (
