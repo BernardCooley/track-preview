@@ -344,11 +344,11 @@ const TrackReview = ({ reviewStep }: Props) => {
                 direction="column"
                 py={0}
                 px={4}
-                gap={6}
+                gap={2}
             >
                 <Flex alignItems="center" gap={2}>
                     <IconButton
-                        height={settingsOpen ? "40px" : "20px"}
+                        height="40px"
                         transition="height 200ms"
                         onClick={() => setSettingsOpen((prev) => !prev)}
                         aria-label="Search database"
@@ -361,10 +361,24 @@ const TrackReview = ({ reviewStep }: Props) => {
                         }
                     />
 
-                    <Flex direction="row">
-                        <Box>Genre: {preferredGenre}</Box>
-                        <Box>, Year: {preferredYear || "All"}</Box>
-                        <Box>, Autoplay: {autoPlay ? "On" : "Off"}</Box>
+                    <Flex
+                        direction="row"
+                        gap={[4, 10, 28]}
+                        opacity={settingsOpen ? 0 : 1}
+                        transition="opacity 200ms"
+                    >
+                        <Flex flexDirection="column" alignItems="center">
+                            <Box fontWeight="bold">Genre</Box>
+                            <Box>{preferredGenre}</Box>
+                        </Flex>
+                        <Flex flexDirection="column" alignItems="center">
+                            <Box fontWeight="bold">Year</Box>
+                            <Box>{preferredYear || "All"}</Box>
+                        </Flex>
+                        <Flex flexDirection="column" alignItems="center">
+                            <Box fontWeight="bold">Autoplay</Box>
+                            <Box>{autoPlay ? "On" : "Off"}</Box>
+                        </Flex>
                     </Flex>
                 </Flex>
                 <ReviewTracksFilters
