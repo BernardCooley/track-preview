@@ -1,5 +1,12 @@
 import React, { LegacyRef, forwardRef } from "react";
-import { Collapse, Flex, Select, Switch, Text } from "@chakra-ui/react";
+import {
+    Collapse,
+    Flex,
+    FormControl,
+    FormLabel,
+    Select,
+    Switch,
+} from "@chakra-ui/react";
 import { arrayRange } from "../../utils";
 
 interface Props {
@@ -36,7 +43,7 @@ const ReviewTracksFilters = forwardRef(
                     w="full"
                 >
                     <Flex
-                        gap={10}
+                        gap={2}
                         zIndex="100"
                         justifyContent="space-between"
                         mx={4}
@@ -44,9 +51,11 @@ const ReviewTracksFilters = forwardRef(
                         w="full"
                         px={4}
                         flexWrap="wrap"
+                        mb={1}
                     >
                         <Flex alignItems="center" gap={4}>
                             <Select
+                                boxShadow="md"
                                 _focusVisible={{
                                     boxShadow: "none",
                                 }}
@@ -65,6 +74,7 @@ const ReviewTracksFilters = forwardRef(
                         </Flex>
                         <Flex alignItems="center" gap={4}>
                             <Select
+                                boxShadow="md"
                                 _focusVisible={{
                                     boxShadow: "none",
                                 }}
@@ -85,17 +95,37 @@ const ReviewTracksFilters = forwardRef(
                                     ))}
                             </Select>
                         </Flex>
-                        <Flex direction="row" gap={4}>
-                            <Text>Autoplay </Text>
+                        <FormControl
+                            display="flex"
+                            alignItems="center"
+                            w="auto"
+                            boxShadow="md"
+                            rounded={6}
+                            h="40px"
+                            px={4}
+                            _hover={{
+                                cursor: "pointer",
+                            }}
+                        >
+                            <FormLabel
+                                _hover={{
+                                    cursor: "pointer",
+                                }}
+                                htmlFor="autoplay"
+                                mb="0"
+                            >
+                                AutoPlay
+                            </FormLabel>
                             <Switch
                                 isChecked={autoPlay}
+                                id="autoplay"
                                 onChange={(e) => {
                                     onAutoPlayChange(e.target.checked);
                                 }}
-                                colorScheme="teal"
-                                size="lg"
+                                size="md"
+                                rounded={6}
                             />
-                        </Flex>
+                        </FormControl>
                     </Flex>
                 </Flex>
             </Collapse>

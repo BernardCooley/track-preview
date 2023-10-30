@@ -32,7 +32,7 @@ import { useAuthContext } from "../../Contexts/AuthContext";
 import { getReleaseTrack, getSpotifyTrack } from "../../functions";
 import TrackReviewCard from "./TrackReviewCard";
 import { removeBracketedText } from "../../utils";
-import { SettingsIcon } from "@chakra-ui/icons";
+import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 
 interface Props {
     reviewStep: number;
@@ -339,16 +339,34 @@ const TrackReview = ({ reviewStep }: Props) => {
             )}
             <Flex
                 w="full"
+                alignItems="baseline"
                 justifyContent="space-between"
+                direction="column"
                 py={0}
                 px={4}
-                backgroundColor={settingsOpen ? "gray.200" : "transparent"}
+                gap={6}
             >
-                <IconButton
-                    onClick={() => setSettingsOpen((prev) => !prev)}
-                    aria-label="Search database"
-                    icon={<SettingsIcon />}
-                />
+                <Flex alignItems="center" gap={2}>
+                    <IconButton
+                        height={settingsOpen ? "40px" : "20px"}
+                        transition="height 200ms"
+                        onClick={() => setSettingsOpen((prev) => !prev)}
+                        aria-label="Search database"
+                        icon={
+                            settingsOpen ? (
+                                <ChevronUpIcon />
+                            ) : (
+                                <ChevronDownIcon />
+                            )
+                        }
+                    />
+
+                    <Flex direction="row">
+                        <Box>Genre: {preferredGenre}</Box>
+                        <Box>, Year: {preferredYear || "All"}</Box>
+                        <Box>, Autoplay: {autoPlay ? "On" : "Off"}</Box>
+                    </Flex>
+                </Flex>
                 <ReviewTracksFilters
                     isOpen={settingsOpen}
                     onGenreSelect={async (genre: string) => {
