@@ -1,7 +1,15 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useRef, useState } from "react";
 import { styles } from "../../data/genres";
-import { Badge, Box, Center } from "@chakra-ui/react";
+import {
+    Alert,
+    AlertDescription,
+    AlertIcon,
+    AlertTitle,
+    Badge,
+    Box,
+    Center,
+} from "@chakra-ui/react";
 import ReviewTracksFilters from "./ReviewTracksFilters";
 import TrackList from "./TrackList";
 import { useLocalStorage } from "usehooks-ts";
@@ -52,6 +60,8 @@ const TrackReview = ({ reviewStep }: Props) => {
         null
     );
     const [userTracks, setUserTracks] = useState<Track[] | null>(null);
+    const [releaseIdAttempts, setReleaseIdAttempts] = useState<number>(0);
+    const [releaseIdsError, setReleaseIdsError] = useState<string | null>(null);
 
     useEffect(() => {
         if (reviewStep === 1) {
@@ -156,10 +166,19 @@ const TrackReview = ({ reviewStep }: Props) => {
         setReleaseIds(ids);
 
         if (ids && ids.length > 0) {
+            setReleaseIdAttempts(0);
+            setReleaseIdsError(null);
             getDiscogsReleaseTrack(ids);
         } else {
-            // TODO: get releaseIds again
-            console.error(`Cant find any releaseIds for genre: ${genre}`);
+            setReleaseIdAttempts((prev) => prev + 1);
+
+            if (releaseIdAttempts + 1 > 5) {
+                setReleaseIdsError(
+                    "There was an error loading tracks. Please try again later."
+                );
+            } else {
+                getDiscogsReleaseIds(preferredGenre);
+            }
         }
     };
 
@@ -279,6 +298,21 @@ const TrackReview = ({ reviewStep }: Props) => {
 
     return (
         <Box h="full" position="relative">
+            {releaseIdsError && (
+                <Box
+                    position="absolute"
+                    zIndex="150"
+                    right="50%"
+                    top="50%"
+                    transform="translate(50%, 50%)"
+                >
+                    <Alert status="error">
+                        <AlertIcon />
+                        <AlertTitle>ERROR</AlertTitle>
+                        <AlertDescription>{releaseIdsError}</AlertDescription>
+                    </Alert>
+                </Box>
+            )}
             {loading && (
                 <Center>
                     <Badge
