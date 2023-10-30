@@ -1,9 +1,12 @@
 import React, { LegacyRef, forwardRef } from "react";
 import { Flex, Select, Switch, Text } from "@chakra-ui/react";
+import { arrayRange } from "../../utils";
 
 interface Props {
     onGenreSelect: (genre: string) => void;
+    onYearSelect: (genre: string) => void;
     selectedGenre: string | null;
+    selectedYear: string | null;
     genres: string[];
     autoPlay: boolean;
     onAutoPlayChange: (autoPlay: boolean) => void;
@@ -13,7 +16,9 @@ const ReviewTracksFilters = forwardRef(
     (
         {
             onGenreSelect,
+            onYearSelect,
             selectedGenre,
+            selectedYear,
             genres,
             autoPlay,
             onAutoPlayChange,
@@ -54,6 +59,25 @@ const ReviewTracksFilters = forwardRef(
                                     {style}
                                 </option>
                             ))}
+                        </Select>
+                    </Flex>
+                    <Flex alignItems="center" gap={4}>
+                        <Select
+                            _focusVisible={{
+                                boxShadow: "none",
+                            }}
+                            variant="outline"
+                            placeholder="Select year"
+                            onChange={(e) => onYearSelect(e.target.value)}
+                            defaultValue={selectedYear || ""}
+                        >
+                            {arrayRange(1900, new Date().getFullYear(), 1).map(
+                                (year) => (
+                                    <option key={year} value={year.toString()}>
+                                        {year}
+                                    </option>
+                                )
+                            )}
                         </Select>
                     </Flex>
                     <Flex direction="row" gap={4}>

@@ -82,17 +82,20 @@ export const fetchWithErrorHandling = async <T>(
 interface FetchDiscogsReleaseIdsProps {
     selectedGenre: string | null;
     pageNumber: number;
+    year: string | null;
 }
 
 export const fetchDiscogsReleaseIds = async ({
     selectedGenre,
     pageNumber,
+    year,
 }: FetchDiscogsReleaseIdsProps): Promise<number[] | null> => {
     const releaseIds: number[] | null = await fetchWithErrorHandling(
         "/api/getDiscogsReleaseIds",
         "POST",
         {
-            ...(selectedGenre && { selectedGenre: selectedGenre }),
+            ...(selectedGenre && { selectedGenre }),
+            ...(year && { year }),
             pageNumber: pageNumber,
         }
     );

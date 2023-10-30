@@ -2,7 +2,7 @@ import { Discojs, SearchTypeEnum } from "discojs";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
-    const { selectedGenre, pageNumber } = await req.json();
+    const { selectedGenre, pageNumber, year } = await req.json();
 
     const client = new Discojs({
         userToken: process.env.NEXT_PUBLIC_DISCOGS_API_TOKEN,
@@ -12,6 +12,7 @@ export async function POST(req: Request) {
         const releases = await client.searchDatabase(
             {
                 ...(selectedGenre !== "all" && { style: selectedGenre }),
+                ...(year && { year }),
                 type: SearchTypeEnum.RELEASE,
             },
             {

@@ -43,6 +43,7 @@ const TrackReview = ({ reviewStep }: Props) => {
         "preferredGenre",
         "all"
     );
+    const [preferredYear, setPreferredYear] = useState<string | null>(null);
     const [autoPlay, setAutoPlay] = useState<boolean>(false);
     const genreRef = useRef<HTMLSelectElement>(null);
     const [currentTrack, setCurrentTrack] = useState<SearchedTrack | null>();
@@ -96,7 +97,7 @@ const TrackReview = ({ reviewStep }: Props) => {
             genreRef.current!.value = preferredGenre;
 
             if (reviewStep === 1) {
-                getDiscogsReleaseIds(preferredGenre);
+                getDiscogsReleaseIds(preferredGenre, preferredYear);
             } else if (reviewStep > 1 && reviewStep < 4) {
                 (async () => {
                     if (userId) {
@@ -110,14 +111,14 @@ const TrackReview = ({ reviewStep }: Props) => {
                 })();
             }
         }
-    }, [preferredGenre, reviewStep]);
+    }, [preferredGenre, reviewStep, preferredYear]);
 
     useEffect(() => {
         if (reviewStep === 1) {
             if (releaseIds && releaseIds.length > 0) {
                 getDiscogsReleaseTrack(releaseIds);
             } else {
-                getDiscogsReleaseIds(preferredGenre);
+                getDiscogsReleaseIds(preferredGenre, preferredYear);
             }
         }
     }, [releaseIds]);
@@ -158,10 +159,14 @@ const TrackReview = ({ reviewStep }: Props) => {
         audioElementRef.current?.play();
     };
 
-    const getDiscogsReleaseIds = async (genre: string | null) => {
+    const getDiscogsReleaseIds = async (
+        genre: string | null,
+        year: string | null
+    ) => {
         const ids = await fetchDiscogsReleaseIds({
             selectedGenre: genre,
             pageNumber: Math.floor(Math.random() * 200),
+            year,
         });
 
         setReleaseIds(ids);
@@ -178,7 +183,7 @@ const TrackReview = ({ reviewStep }: Props) => {
                     "There was an error loading tracks. Please try again later."
                 );
             } else {
-                getDiscogsReleaseIds(preferredGenre);
+                getDiscogsReleaseIds(preferredGenre, preferredYear);
             }
         }
     };
@@ -332,6 +337,10 @@ const TrackReview = ({ reviewStep }: Props) => {
                 onGenreSelect={async (genre) => {
                     setPreferredGenre(genre);
                 }}
+                onYearSelect={async (year) => {
+                    setPreferredYear(year);
+                }}
+                selectedYear={preferredYear}
                 selectedGenre={preferredGenre}
                 genres={availableGenres}
                 autoPlay={autoPlay}
