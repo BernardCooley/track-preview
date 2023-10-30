@@ -145,6 +145,7 @@ const TrackReview = ({ reviewStep }: Props) => {
             clearInterval(interval as NodeJS.Timeout);
             setLoading(false);
             setListened(false);
+            setTrackPlayed(false);
         }
 
         if (autoPlay && currentTrack) {
@@ -262,8 +263,6 @@ const TrackReview = ({ reviewStep }: Props) => {
     };
 
     const likeOrDislike = async (like: boolean) => {
-        setTrackPlayed(false);
-
         if (reviewStep === 1) {
             setCurrentTrack(queuedTrack);
             setQueuedTrack(null);
