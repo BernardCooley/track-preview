@@ -27,6 +27,7 @@
         "firebase": "10.3.0",
         "framer-motion": "10.16.1",
         "next": "13.4.19",
+        "node-itunes-search": "^1.2.3",
         "react": "18.2.0",
         "react-dom": "18.2.0",
         "spotify-web-api-node": "5.0.2",

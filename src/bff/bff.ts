@@ -149,3 +149,20 @@ export const fetchDeezerTrack = async ({
     );
     return deezerTrack;
 };
+
+interface FetchITunesTracksProps {
+    trackToSearch: string;
+}
+
+export const fetchITunesTrack = async ({
+    trackToSearch,
+}: FetchITunesTracksProps): Promise<SearchedTrack | null> => {
+    const iTinesTrack: SearchedTrack | null = await fetchWithErrorHandling(
+        "/api/getITunesTracks",
+        "POST",
+        {
+            trackToSearch,
+        }
+    );
+    return iTinesTrack;
+};

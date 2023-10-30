@@ -7,7 +7,11 @@ import TrackList from "./TrackList";
 import { useLocalStorage } from "usehooks-ts";
 import { SearchedTrack, Track } from "../../types";
 import { useTracksContext } from "../../Contexts/TracksContext";
-import { fetchDeezerTrack, fetchDiscogsReleaseIds } from "@/bff/bff";
+import {
+    fetchDeezerTrack,
+    fetchDiscogsReleaseIds,
+    fetchITunesTrack,
+} from "@/bff/bff";
 import {
     getStoredTracks,
     saveNewTrack,
@@ -17,6 +21,7 @@ import {
 import { useAuthContext } from "../../Contexts/AuthContext";
 import { getReleaseTrack, getSpotifyTrack } from "../../functions";
 import TrackReviewCard from "./TrackReviewCard";
+import { removeBracketedText } from "../../utils";
 
 interface Props {
     reviewStep: number;
@@ -172,9 +177,17 @@ const TrackReview = ({ reviewStep }: Props) => {
                 } else {
                     let searchedTrack;
 
-                    searchedTrack = await fetchDeezerTrack({
-                        trackToSearch: `${val.releaseTrack.artist} - ${val.releaseTrack.title}`,
+                    searchedTrack = await fetchITunesTrack({
+                        trackToSearch: `${removeBracketedText(
+                            val.releaseTrack.artist
+                        )} - ${val.releaseTrack.title}`,
                     });
+
+                    if (!searchedTrack) {
+                        searchedTrack = await fetchDeezerTrack({
+                            trackToSearch: `${val.releaseTrack.artist} - ${val.releaseTrack.title}`,
+                        });
+                    }
 
                     if (!searchedTrack) {
                         searchedTrack = await getSpotifyTrack({
