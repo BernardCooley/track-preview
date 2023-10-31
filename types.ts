@@ -299,3 +299,8 @@ export interface Track {
     userId: string;
     id: string;
 }
+
+export interface User {
+    uid: string;
+    email: string;
+}

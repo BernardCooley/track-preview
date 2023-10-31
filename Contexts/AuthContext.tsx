@@ -1,8 +1,9 @@
 import React, { createContext, ReactNode, useContext, useState } from "react";
+import { User } from "../types";
 
 interface AuthContextProps {
-    userId: string | null;
-    updateUserId: (userId: string | null) => void;
+    user: User | null;
+    updateUser: (user: User | null) => void;
 }
 
 export const AuthContext = createContext<AuthContextProps | null>(null);
@@ -20,17 +21,17 @@ export const useAuthContext = () => {
 };
 
 export const AuthContextProvider = ({ children }: { children: ReactNode }) => {
-    const [userId, setUserId] = useState<string | null>("bernard_cooley");
+    const [user, setUser] = useState<User | null>(null);
 
-    const updateUserId = (userId: string | null) => {
-        setUserId(userId);
+    const updateUser = (user: User | null) => {
+        setUser(user);
     };
 
     return (
         <AuthContext.Provider
             value={{
-                userId,
-                updateUserId,
+                user,
+                updateUser,
             }}
         >
             {children}

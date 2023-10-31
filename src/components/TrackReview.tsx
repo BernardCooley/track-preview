@@ -33,12 +33,15 @@ import { getReleaseTrack, getSpotifyTrack } from "../../functions";
 import TrackReviewCard from "./TrackReviewCard";
 import { removeBracketedText } from "../../utils";
 import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
+import { useRouter } from "next/navigation";
+import SettingsIcon from "@mui/icons-material/Settings";
 
 interface Props {
     reviewStep: number;
 }
 
 const TrackReview = ({ reviewStep }: Props) => {
+    const router = useRouter();
     const { tracks } = useTracksContext();
     const [availableGenres] = useState<string[]>(styles);
     const [loading, setLoading] = useState<boolean>(false);
@@ -55,7 +58,7 @@ const TrackReview = ({ reviewStep }: Props) => {
     const [listened, setListened] = useState<boolean>(false);
     const audioElementRef = useRef<HTMLAudioElement>(null);
     const [releaseIds, setReleaseIds] = useState<number[] | null>([]);
-    const { userId } = useAuthContext();
+    const { user } = useAuthContext();
     const [trackPlayed, setTrackPlayed] = useState<boolean>(false);
     const [spinnerProgress, setSpinnerProgress] = useState<number>(0);
     const [interval, updateInterval] = useState<NodeJS.Timeout | null>(null);
@@ -64,7 +67,7 @@ const TrackReview = ({ reviewStep }: Props) => {
         null
     );
     const [userTracks, setUserTracks] = useState<Track[] | null>(null);
-    const [releaseIdAttempts, setReleaseIdAttempts] = useState<number>(0);
+    let releaseIdAttempts = 0;
     const [releaseIdsError, setReleaseIdsError] = useState<string | null>(null);
     const [settingsOpen, setSettingsOpen] = useState<boolean>(false);
 
@@ -104,11 +107,11 @@ const TrackReview = ({ reviewStep }: Props) => {
                 getDiscogsReleaseIds(preferredGenre, preferredYear);
             } else if (reviewStep > 1 && reviewStep < 4) {
                 (async () => {
-                    if (userId) {
+                    if (user?.uid) {
                         const tracks = await getStoredTracks({
                             genre: preferredGenre,
                             currentReviewStep: reviewStep,
-                            userId,
+                            userId: user.uid,
                         });
                         setUserTracks(tracks);
                     }
@@ -176,13 +179,13 @@ const TrackReview = ({ reviewStep }: Props) => {
         setReleaseIds(ids);
 
         if (ids && ids.length > 0) {
-            setReleaseIdAttempts(0);
+            releaseIdAttempts = 0;
             setReleaseIdsError(null);
             getDiscogsReleaseTrack(ids);
         } else {
-            setReleaseIdAttempts((prev) => prev + 1);
-
-            if (releaseIdAttempts + 1 > 5) {
+            releaseIdAttempts = releaseIdAttempts + 1;
+            if (releaseIdAttempts > 5) {
+                setLoading(false);
                 setReleaseIdsError(
                     "There was an error loading tracks. Please try again later."
                 );
@@ -201,7 +204,7 @@ const TrackReview = ({ reviewStep }: Props) => {
                     track: val.releaseTrack,
                 });
 
-                if (storedTrack?.userId === userId) {
+                if (storedTrack?.userId === user?.uid) {
                     const newReleaseIds = releaseIds.filter(
                         (id) => id !== val.releaseTrack.releaseId
                     );
@@ -254,7 +257,7 @@ const TrackReview = ({ reviewStep }: Props) => {
     };
 
     const storeTrack = async (like: boolean) => {
-        if (userId && currentTrack) {
+        if (user?.uid && currentTrack) {
             const newTrack: Track = {
                 artist: currentTrack.artist,
                 discogsReleaseId: currentReleaseId!,
@@ -263,7 +266,7 @@ const TrackReview = ({ reviewStep }: Props) => {
                 genre: preferredGenre,
                 searchedTrack: currentTrack,
                 title: currentTrack.title,
-                userId: userId,
+                userId: user.uid,
                 id: "",
             };
 
@@ -313,6 +316,7 @@ const TrackReview = ({ reviewStep }: Props) => {
                     right="50%"
                     top="50%"
                     transform="translate(50%, 50%)"
+                    w="80%"
                 >
                     <Alert status="error">
                         <AlertIcon />
@@ -396,6 +400,17 @@ const TrackReview = ({ reviewStep }: Props) => {
                     onAutoPlayChange={(value) => setAutoPlay(value)}
                     ref={genreRef}
                 />
+                <Box position="absolute" right={0}>
+                    <IconButton
+                        onClick={() => router.push("/settings")}
+                        variant="ghost"
+                        h={1 / 2}
+                        colorScheme="teal"
+                        aria-label="Show password"
+                        fontSize="3xl"
+                        icon={<SettingsIcon fontSize="inherit" />}
+                    />
+                </Box>
             </Flex>
             {currentTrack && (
                 <>
