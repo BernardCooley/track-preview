@@ -235,8 +235,36 @@ export async function GET() {
         return allTracks;
     };
 
+    const flattenDate = async () => {
+        for (let i = 1; i < 19; i++) {
+            var data = await fs.readFileSync(`juno_scraped_tracks/${i}.json`);
+
+            const tracksWithNewDate = JSON.parse(data).map((t: any) => {
+                const date = t.releaseDate;
+
+                const newDate = new Date(
+                    `${date.year}-${date.month}-${date.day}`
+                );
+                t.releaseDate = newDate;
+
+                return t;
+            });
+
+            fs.writeFileSync(
+                `juno_scraped_tracks/newDate/${i}.json`,
+                JSON.stringify(tracksWithNewDate, null, 4),
+                (err: any) => {
+                    if (err) console.log(err);
+                }
+            );
+        }
+    };
+
+    // await flattenDate();
+
     try {
-        const tracks = await getTracks();
+        const tracks: any = [];
+        // const tracks = await getTracks();
 
         if (tracks) {
             const response = NextResponse.json(tracks, {
