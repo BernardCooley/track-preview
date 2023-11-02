@@ -6,8 +6,11 @@ import ReviewTracksFilters from "./ReviewTracksFilters";
 import TrackList from "./TrackList";
 import { useLocalStorage } from "usehooks-ts";
 import { ScrapeTrack, SearchedTrack, Track } from "../../types";
-import { useTracksContext } from "../../Contexts/TracksContext";
-import { fetchDeezerTrack, fetchITunesTrack } from "@/bff/bff";
+import {
+    fetchDeezerTrack,
+    fetchITunesTrack,
+    fetchSpotifyTrack,
+} from "@/bff/bff";
 import {
     fetchStoredTracks,
     getUserTracks,
@@ -15,7 +18,6 @@ import {
     updateTrackReviewStep,
 } from "../../firebase/firebaseRequests";
 import { useAuthContext } from "../../Contexts/AuthContext";
-import { getSpotifyTrack } from "../../functions";
 import TrackReviewCard from "./TrackReviewCard";
 import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 import { useRouter } from "next/navigation";
@@ -26,13 +28,6 @@ interface Props {
 }
 
 const TrackReview = ({ reviewStep }: Props) => {
-    const [storedTracks, setStoredTracks] = useState<ScrapeTrack[] | null>(
-        null
-    );
-    const router = useRouter();
-    const { tracks } = useTracksContext();
-    const [availableGenres] = useState<string[]>(genres);
-    const [loading, setLoading] = useState<boolean>(false);
     const [preferredGenre, setPreferredGenre] = useLocalStorage(
         "preferredGenre",
         "all"
@@ -45,6 +40,12 @@ const TrackReview = ({ reviewStep }: Props) => {
         "preferredAutoPlay",
         false
     );
+    const [storedTracks, setStoredTracks] = useState<ScrapeTrack[] | null>(
+        null
+    );
+    const router = useRouter();
+    const [availableGenres] = useState<string[]>(genres);
+    const [loading, setLoading] = useState<boolean>(false);
     const genreRef = useRef<HTMLSelectElement>(null);
     const [currentTrack, setCurrentTrack] = useState<SearchedTrack | null>();
     const [queuedTrack, setQueuedTrack] = useState<SearchedTrack | null>();
@@ -53,39 +54,11 @@ const TrackReview = ({ reviewStep }: Props) => {
     const audioElementRef = useRef<HTMLAudioElement>(null);
     const { user } = useAuthContext();
     const [trackPlayed, setTrackPlayed] = useState<boolean>(false);
-    const [spinnerProgress, setSpinnerProgress] = useState<number>(0);
-    const [interval, updateInterval] = useState<NodeJS.Timeout | null>(null);
-    let directionUp = true;
     const [userTracks, setUserTracks] = useState<Track[] | null>(null);
     const [settingsOpen, setSettingsOpen] = useState<boolean>(false);
     const [randomNumber, setRandomNumber] = useState<number>(0);
 
     useEffect(() => {
-        if (reviewStep === 1) {
-            const interval = setInterval(
-                () =>
-                    setSpinnerProgress((prev) => {
-                        if (directionUp) {
-                            if (prev === 100) {
-                                directionUp = false;
-                                return 100;
-                            } else {
-                                return prev + 1;
-                            }
-                        } else {
-                            if (prev === 0) {
-                                directionUp = true;
-                                return 0;
-                            } else {
-                                return prev - 1;
-                            }
-                        }
-                    }),
-                5
-            );
-            updateInterval(interval);
-        }
-
         if (preferredGenre) {
             setLoading(true);
             setCurrentTrack(null);
@@ -139,7 +112,6 @@ const TrackReview = ({ reviewStep }: Props) => {
         setIsPlaying(false);
 
         if (currentTrack) {
-            clearInterval(interval as NodeJS.Timeout);
             setLoading(false);
             setListened(false);
             setTrackPlayed(false);
@@ -170,12 +142,11 @@ const TrackReview = ({ reviewStep }: Props) => {
             }
 
             if (!searchedTrack) {
-                searchedTrack = await getSpotifyTrack({
+                searchedTrack = await fetchSpotifyTrack({
                     trackToSearch: {
                         artist: storedTracks[rand].artist,
                         title: storedTracks[rand].title,
                     },
-                    onTrackFound: () => {},
                 });
             }
 
@@ -259,7 +230,6 @@ const TrackReview = ({ reviewStep }: Props) => {
                         zIndex={150}
                         top="50%"
                         position="absolute"
-                        opacity={spinnerProgress / 100}
                         variant="outline"
                         colorScheme="green"
                         fontSize={["24px", "36px"]}
@@ -361,7 +331,7 @@ const TrackReview = ({ reviewStep }: Props) => {
                             ref={audioElementRef}
                         />
                     ) : (
-                        <TrackList tracks={tracks || []} />
+                        <TrackList tracks={userTracks || []} />
                     )}
                 </>
             )}

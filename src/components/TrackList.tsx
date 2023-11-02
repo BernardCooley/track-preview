@@ -13,13 +13,13 @@ import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import StopIcon from "@mui/icons-material/Stop";
-import { SearchedTrack } from "../../types";
+import { Track } from "../../types";
 import { useTrackContext } from "../../context/TrackContext";
 import { db } from "../../firebase/firebaseInit";
 import { doc, updateDoc } from "firebase/firestore";
 
 interface Props {
-    tracks: SearchedTrack[];
+    tracks: Track[];
 }
 
 const TrackList = ({ tracks }: Props) => {
@@ -36,39 +36,48 @@ const TrackList = ({ tracks }: Props) => {
     return (
         <Stack
             p={[2, 4, 8]}
-            h='full'
+            h="full"
             overflowY="scroll"
             divider={<StackDivider />}
             spacing="4"
             css={{
-                '&::-webkit-scrollbar': {
-                  width: '4px',
+                "&::-webkit-scrollbar": {
+                    width: "4px",
                 },
-                '&::-webkit-scrollbar-track': {
-                  width: '6px',
+                "&::-webkit-scrollbar-track": {
+                    width: "6px",
                 },
-                '&::-webkit-scrollbar-thumb': {
-                  background: 'lightgray',
-                  borderRadius: '24px',
+                "&::-webkit-scrollbar-thumb": {
+                    background: "lightgray",
+                    borderRadius: "24px",
                 },
-              }}
+            }}
         >
             {tracks.map((track) => (
                 <Card
-                    key={track.previewUrl}
+                    key={track.searchedTrack.previewUrl}
                     bg={
-                        currentlyPlaying === track.previewUrl
+                        currentlyPlaying === track.searchedTrack.previewUrl
                             ? "lightgrey"
                             : "white"
                     }
                 >
                     <CardBody>
-                        <Flex gap={8} justifyContent={['center', "space-between"]} direction={['column', 'row']} >
+                        <Flex
+                            gap={8}
+                            justifyContent={["center", "space-between"]}
+                            direction={["column", "row"]}
+                        >
                             <Box>
-                                <Text fontSize={["2xl", "xl", "3xl"]} fontWeight="bold">
+                                <Text
+                                    fontSize={["2xl", "xl", "3xl"]}
+                                    fontWeight="bold"
+                                >
                                     {track.artist}
                                 </Text>
-                                <Text fontSize={["xl", "md", "xl"]}>{track.title}</Text>
+                                <Text fontSize={["xl", "md", "xl"]}>
+                                    {track.title}
+                                </Text>
                             </Box>
                             <Flex gap={2}>
                                 <IconButton
@@ -94,11 +103,12 @@ const TrackList = ({ tracks }: Props) => {
                                         <ShoppingCartIcon fontSize="inherit" />
                                     }
                                 />
-                                {currentlyPlaying !== track.previewUrl ? (
+                                {currentlyPlaying !==
+                                track.searchedTrack.previewUrl ? (
                                     <IconButton
                                         onClick={() =>
                                             updateCurrentlyPlaying(
-                                                track.previewUrl
+                                                track.searchedTrack.previewUrl
                                             )
                                         }
                                         variant="ghost"

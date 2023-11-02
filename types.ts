@@ -1,9 +1,3 @@
-export interface ReleaseTrack {
-    artist: string;
-    title: string;
-    releaseId: number;
-}
-
 export interface SearchedTrack {
     artist: string;
     title: string;

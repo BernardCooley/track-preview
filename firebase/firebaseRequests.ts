@@ -9,7 +9,7 @@ import {
     where,
 } from "firebase/firestore";
 import { db } from "./firebaseInit";
-import { ReleaseTrack, ScrapeTrack, Track } from "../types";
+import { ScrapeTrack, Track } from "../types";
 
 interface SaveNewTrackProps {
     track: Track;
@@ -17,30 +17,6 @@ interface SaveNewTrackProps {
 
 export const saveNewTrack = async ({ track }: SaveNewTrackProps) => {
     await addDoc(collection(db, "userTracks"), track);
-};
-
-interface TrackExistsProps {
-    track: ReleaseTrack;
-}
-
-export const searchStoredTracks = async ({
-    track,
-}: TrackExistsProps): Promise<Track | null> => {
-    const q = query(
-        collection(db, "userTracks"),
-        where("title", "==", track.title),
-        where("artist", "==", track.artist)
-    );
-
-    const querySnapshot = await getDocs(q as any);
-
-    const tracks = querySnapshot.docs.map((doc) => doc.data()) as Track[];
-
-    if (tracks.length > 0) {
-        return tracks[0];
-    }
-
-    return null;
 };
 
 interface GetUserTracksProps {
