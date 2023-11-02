@@ -7,7 +7,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ZodType, z } from "zod";
 import { LoginUser } from "../../../firebase/utils";
 import { TextInput } from "@/components/TextInput";
-import { Button, Flex, IconButton, Link, Text } from "@chakra-ui/react";
+import {
+    Box,
+    Button,
+    Flex,
+    FormErrorMessage,
+    IconButton,
+    Link,
+    Text,
+} from "@chakra-ui/react";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 
@@ -29,6 +37,7 @@ const SignIn = ({}: Props) => {
     const [showPassword, setShowPassword] = useState<boolean>(false);
     const [submitting, setSubmitting] = useState(false);
     const router = useRouter();
+    const [authError, setAuthError] = useState<string | null>(null);
 
     const {
         register,
@@ -44,11 +53,15 @@ const SignIn = ({}: Props) => {
 
     const performLogin = async (formData: FormData) => {
         setSubmitting(true);
-        const loginResponse = LoginUser(
-            formData.email,
-            formData.password,
-            router
-        );
+        try {
+            LoginUser(formData.email, formData.password, router);
+            setAuthError(null);
+        } catch (error) {
+            // TODO error not being thrown or caught - FIX
+            setAuthError(
+                "Error signing in. Please check your email and password and try again."
+            );
+        }
     };
 
     return (
@@ -123,6 +136,13 @@ const SignIn = ({}: Props) => {
                         </Flex>
                     </Flex>
                 </form>
+                {/* TODO - add forgot password link
+                TODO - Message not showing up */}
+                {authError && (
+                    <Box h="16px" mt="8px">
+                        <FormErrorMessage>{authError}</FormErrorMessage>
+                    </Box>
+                )}
             </Flex>
             <Flex px={20} pb={6} gap={2}>
                 <Text>Not registered? </Text>

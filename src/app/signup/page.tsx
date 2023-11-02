@@ -7,7 +7,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ZodType, z } from "zod";
 import { RegisterUser } from "../../../firebase/utils";
 import { TextInput } from "@/components/TextInput";
-import { Button, Flex, IconButton, Link, Text } from "@chakra-ui/react";
+import {
+    Box,
+    Button,
+    Flex,
+    FormErrorMessage,
+    IconButton,
+    Link,
+    Text,
+} from "@chakra-ui/react";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 
@@ -42,6 +50,7 @@ const SignUp = ({}: Props) => {
     const [showPassword, setShowPassword] = useState<boolean>(false);
     const [submitting, setSubmitting] = useState(false);
     const router = useRouter();
+    const [authError, setAuthError] = useState<string | null>(null);
 
     const {
         register,
@@ -58,11 +67,15 @@ const SignUp = ({}: Props) => {
 
     const performRegister = async (formData: FormData) => {
         setSubmitting(true);
-        const registerResponse = RegisterUser(
-            formData.email,
-            formData.password,
-            router
-        );
+        try {
+            RegisterUser(formData.email, formData.password, router);
+            setAuthError(null);
+        } catch (error) {
+            // TODO error not being thrown or caught - FIX
+            setAuthError(
+                "Error registering. Please check your email and password and try again."
+            );
+        }
     };
 
     return (
@@ -161,6 +174,12 @@ const SignUp = ({}: Props) => {
                         </Flex>
                     </Flex>
                 </form>
+                {/* TODO - Message not showing up */}
+                {authError && (
+                    <Box h="16px" mt="8px">
+                        <FormErrorMessage>{authError}</FormErrorMessage>
+                    </Box>
+                )}
             </Flex>
             <Flex px={20} pb={6} gap={2}>
                 <Text>Already registered? </Text>

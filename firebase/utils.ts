@@ -7,31 +7,37 @@ import {
 } from "firebase/auth";
 import { auth } from "./firebaseInit";
 
-// TODO error handling
-export const LoginUser = (
+export const LoginUser = async (
     email: string,
     password: string,
     router: AppRouterInstance
 ) => {
-    signInWithEmailAndPassword(auth, email, password).then((userCredential) => {
+    try {
+        await signInWithEmailAndPassword(auth, email, password);
         router.push("/");
-    });
+    } catch (error) {
+        throw error;
+    }
 };
 
-export const LogOut = (router: AppRouterInstance) => {
-    signOut(auth).then(() => {
+export const LogOut = async (router: AppRouterInstance) => {
+    try {
+        await signOut(auth);
         router.push("/signin");
-    });
+    } catch (error) {
+        throw error;
+    }
 };
 
-export const RegisterUser = (
+export const RegisterUser = async (
     email: string,
     password: string,
     router: AppRouterInstance
 ) => {
-    createUserWithEmailAndPassword(auth, email, password).then(
-        (userCredential) => {
-            router.push("/");
-        }
-    );
+    try {
+        await createUserWithEmailAndPassword(auth, email, password);
+        router.push("/");
+    } catch (error) {
+        throw error;
+    }
 };
