@@ -76,6 +76,7 @@ export const TextInput = forwardRef(
                         <InputLeftElement>{leftIcon}</InputLeftElement>
                     )}
                     <Input
+                        backgroundColor={error ? "red.50" : "white"}
                         variant="outline"
                         colorScheme="teal"
                         ref={ref}

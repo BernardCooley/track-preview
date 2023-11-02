@@ -35,13 +35,9 @@ const schema: ZodType<FormData> = z
             .string()
             .min(6, { message: "Password must be 6 characters or more." }),
     })
-    .superRefine(({ confirmPassword, password }, ctx) => {
-        if (confirmPassword !== password) {
-            ctx.addIssue({
-                code: "custom",
-                message: "The passwords did not match",
-            });
-        }
+    .refine((data) => data.password === data.confirmPassword, {
+        message: "Passwords do not match",
+        path: ["confirmPassword"],
     });
 
 interface Props {}
@@ -89,14 +85,15 @@ const SignUp = ({}: Props) => {
                         direction="column"
                         gap="18px"
                         p={20}
+                        pt={10}
                         justifyContent="space-between"
                     >
-                        <Flex direction="column">
+                        <Flex direction="column" gap={8}>
                             <TextInput
                                 required={true}
                                 title="Email"
-                                height="40px"
-                                size="sm"
+                                height="50px"
+                                size="md"
                                 fieldProps={register("email")}
                                 error={errors.email?.message}
                             />
@@ -104,8 +101,8 @@ const SignUp = ({}: Props) => {
                                 type={showPassword ? "text" : "password"}
                                 required={true}
                                 title="Password"
-                                height="40px"
-                                size="sm"
+                                height="50px"
+                                size="md"
                                 fieldProps={register("password")}
                                 error={errors.password?.message}
                                 rightIcon={
@@ -132,8 +129,8 @@ const SignUp = ({}: Props) => {
                                 type={showPassword ? "text" : "password"}
                                 required={true}
                                 title="Confirm password"
-                                height="40px"
-                                size="sm"
+                                height="50px"
+                                size="md"
                                 fieldProps={register("confirmPassword")}
                                 error={errors.confirmPassword?.message}
                                 rightIcon={
@@ -159,7 +156,7 @@ const SignUp = ({}: Props) => {
                             <Button
                                 colorScheme="teal"
                                 isLoading={submitting}
-                                size="sm"
+                                size="md"
                                 type="submit"
                                 variant="outline"
                                 onClick={handleSubmit(performRegister)}
@@ -169,7 +166,7 @@ const SignUp = ({}: Props) => {
                                         : undefined
                                 }
                             >
-                                Sign Up
+                                Register
                             </Button>
                         </Flex>
                     </Flex>

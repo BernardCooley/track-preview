@@ -78,15 +78,16 @@ const SignIn = ({}: Props) => {
                         direction="column"
                         gap="18px"
                         p={20}
+                        pt={10}
                         justifyContent="space-between"
                         height="full"
                     >
-                        <Flex direction="column">
+                        <Flex direction="column" gap={8}>
                             <TextInput
                                 required={true}
                                 title="Email"
-                                height="40px"
-                                size="sm"
+                                height="50px"
+                                size="md"
                                 fieldProps={register("email")}
                                 error={errors.email?.message}
                             />
@@ -94,8 +95,8 @@ const SignIn = ({}: Props) => {
                                 type={showPassword ? "text" : "password"}
                                 required={true}
                                 title="Password"
-                                height="40px"
-                                size="sm"
+                                height="50px"
+                                size="md"
                                 fieldProps={register("password")}
                                 error={errors.password?.message}
                                 rightIcon={
@@ -121,7 +122,7 @@ const SignIn = ({}: Props) => {
                             <Button
                                 colorScheme="teal"
                                 isLoading={submitting}
-                                size="sm"
+                                size="md"
                                 type="submit"
                                 variant="outline"
                                 onClick={handleSubmit(performLogin)}
