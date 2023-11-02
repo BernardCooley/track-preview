@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useRef, useState } from "react";
-import { styles } from "../../data/genres";
+import { genres } from "../../data/genres";
 import { Badge, Box, Center, Flex, IconButton } from "@chakra-ui/react";
 import ReviewTracksFilters from "./ReviewTracksFilters";
 import TrackList from "./TrackList";
@@ -31,7 +31,7 @@ const TrackReview = ({ reviewStep }: Props) => {
     );
     const router = useRouter();
     const { tracks } = useTracksContext();
-    const [availableGenres] = useState<string[]>(styles);
+    const [availableGenres] = useState<string[]>(genres);
     const [loading, setLoading] = useState<boolean>(false);
     const [preferredGenre, setPreferredGenre] = useLocalStorage(
         "preferredGenre",
