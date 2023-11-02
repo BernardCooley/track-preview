@@ -4,12 +4,14 @@ import { Box, Center, Flex, Slide, Stack } from "@chakra-ui/react";
 import TrackReview from "@/components/TrackReview";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { SearchedTrack } from "../../types";
-import { useEffect, useRef, useState } from "react";
-import { db } from "../../firebase/firebaseInit";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { auth, db } from "../../firebase/firebaseInit";
 import ProgressStepper from "@/components/ProgressStepper";
 import { useTrackContext } from "../../context/TrackContext";
 import AudioPlayer from "@/components/AudioPlayer";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { onAuthStateChanged } from "firebase/auth";
+import { useAuthContext } from "../../Contexts/AuthContext";
 
 export default function Home() {
     const router = useRouter();
@@ -19,6 +21,22 @@ export default function Home() {
     const audioElement = useRef<HTMLAudioElement>(null);
     const [buyTracks, setBuyTracks] = useState<SearchedTrack[]>([]);
     const [currentStep, setCurrentStep] = useState<number>(0);
+    const { updateUser } = useAuthContext();
+
+    const isUserLoggedIn = useCallback(() => {
+        onAuthStateChanged(auth, (user) => {
+            if (user && user.email && user.uid) {
+                updateUser({ email: user.email, uid: user.uid });
+                return router.push("/");
+            } else {
+                return router.push("/signin");
+            }
+        });
+    }, [router]);
+
+    useEffect(() => {
+        isUserLoggedIn();
+    }, [isUserLoggedIn]);
 
     useEffect(() => {
         const reviewStep = searchParams?.get("reviewStep");

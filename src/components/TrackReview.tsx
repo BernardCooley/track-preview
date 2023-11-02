@@ -1,37 +1,22 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useRef, useState } from "react";
 import { styles } from "../../data/genres";
-import {
-    Alert,
-    AlertDescription,
-    AlertIcon,
-    AlertTitle,
-    Badge,
-    Box,
-    Center,
-    Flex,
-    IconButton,
-} from "@chakra-ui/react";
+import { Badge, Box, Center, Flex, IconButton } from "@chakra-ui/react";
 import ReviewTracksFilters from "./ReviewTracksFilters";
 import TrackList from "./TrackList";
 import { useLocalStorage } from "usehooks-ts";
-import { SearchedTrack, Track } from "../../types";
+import { ScrapeTrack, SearchedTrack, Track } from "../../types";
 import { useTracksContext } from "../../Contexts/TracksContext";
+import { fetchDeezerTrack, fetchITunesTrack } from "@/bff/bff";
 import {
-    fetchDeezerTrack,
-    fetchDiscogsReleaseIds,
-    fetchITunesTrack,
-} from "@/bff/bff";
-import {
-    getStoredTracks,
+    fetchStoredTracks,
+    getUserTracks,
     saveNewTrack,
-    searchStoredTracks,
     updateTrackReviewStep,
 } from "../../firebase/firebaseRequests";
 import { useAuthContext } from "../../Contexts/AuthContext";
-import { getReleaseTrack, getSpotifyTrack } from "../../functions";
+import { getSpotifyTrack } from "../../functions";
 import TrackReviewCard from "./TrackReviewCard";
-import { removeBracketedText } from "../../utils";
 import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 import { useRouter } from "next/navigation";
 import SettingsIcon from "@mui/icons-material/Settings";
@@ -41,6 +26,9 @@ interface Props {
 }
 
 const TrackReview = ({ reviewStep }: Props) => {
+    const [storedTracks, setStoredTracks] = useState<ScrapeTrack[] | null>(
+        null
+    );
     const router = useRouter();
     const { tracks } = useTracksContext();
     const [availableGenres] = useState<string[]>(styles);
@@ -57,19 +45,14 @@ const TrackReview = ({ reviewStep }: Props) => {
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
     const [listened, setListened] = useState<boolean>(false);
     const audioElementRef = useRef<HTMLAudioElement>(null);
-    const [releaseIds, setReleaseIds] = useState<number[] | null>([]);
     const { user } = useAuthContext();
     const [trackPlayed, setTrackPlayed] = useState<boolean>(false);
     const [spinnerProgress, setSpinnerProgress] = useState<number>(0);
     const [interval, updateInterval] = useState<NodeJS.Timeout | null>(null);
     let directionUp = true;
-    const [currentReleaseId, setCurrentReleaseId] = useState<number | null>(
-        null
-    );
     const [userTracks, setUserTracks] = useState<Track[] | null>(null);
-    let releaseIdAttempts = 0;
-    const [releaseIdsError, setReleaseIdsError] = useState<string | null>(null);
     const [settingsOpen, setSettingsOpen] = useState<boolean>(false);
+    const [randomNumber, setRandomNumber] = useState<number>(0);
 
     useEffect(() => {
         if (reviewStep === 1) {
@@ -104,11 +87,16 @@ const TrackReview = ({ reviewStep }: Props) => {
             genreRef.current!.value = preferredGenre;
 
             if (reviewStep === 1) {
-                getDiscogsReleaseIds(preferredGenre, preferredYear);
+                (async () => {
+                    const tracks = await fetchStoredTracks({
+                        genre: preferredGenre,
+                    });
+                    setStoredTracks(tracks);
+                })();
             } else if (reviewStep > 1 && reviewStep < 4) {
                 (async () => {
                     if (user?.uid) {
-                        const tracks = await getStoredTracks({
+                        const tracks = await getUserTracks({
                             genre: preferredGenre,
                             currentReviewStep: reviewStep,
                             userId: user.uid,
@@ -118,23 +106,13 @@ const TrackReview = ({ reviewStep }: Props) => {
                 })();
             }
         }
-    }, [preferredGenre, reviewStep, preferredYear]);
+    }, [preferredGenre, reviewStep, preferredYear, user]);
 
     useEffect(() => {
-        if (reviewStep === 1) {
-            if (releaseIds && releaseIds.length > 0) {
-                getDiscogsReleaseTrack(releaseIds);
-            } else {
-                getDiscogsReleaseIds(preferredGenre, preferredYear);
-            }
+        if (trackPlayed || (storedTracks && storedTracks.length > 0)) {
+            searchForTrack();
         }
-    }, [releaseIds]);
-
-    useEffect(() => {
-        if (trackPlayed && releaseIds && releaseIds.length > 0) {
-            getDiscogsReleaseTrack(releaseIds);
-        }
-    }, [trackPlayed]);
+    }, [trackPlayed, storedTracks]);
 
     useEffect(() => {
         if (reviewStep > 1 && reviewStep < 4) {
@@ -161,111 +139,66 @@ const TrackReview = ({ reviewStep }: Props) => {
         }
     }, [currentTrack]);
 
+    const searchForTrack = async () => {
+        if (storedTracks && storedTracks.length > 0) {
+            const rand = Math.floor(
+                Math.floor(Math.random() * storedTracks.length)
+            );
+            setRandomNumber(rand);
+
+            let searchedTrack;
+
+            searchedTrack = await fetchITunesTrack({
+                trackToSearch: `${storedTracks[rand].artist} - ${storedTracks[rand].title}`,
+            });
+
+            if (!searchedTrack) {
+                searchedTrack = await fetchDeezerTrack({
+                    trackToSearch: `${storedTracks[rand].artist} - ${storedTracks[rand].title}`,
+                });
+            }
+
+            if (!searchedTrack) {
+                searchedTrack = await getSpotifyTrack({
+                    trackToSearch: {
+                        artist: storedTracks[rand].artist,
+                        title: storedTracks[rand].title,
+                    },
+                    onTrackFound: () => {},
+                });
+            }
+
+            if (searchedTrack) {
+                if (!currentTrack) {
+                    setCurrentTrack(searchedTrack);
+                    setLoading(false);
+                } else if (!queuedTrack) {
+                    setQueuedTrack(searchedTrack);
+                }
+            } else {
+                const newStoredTracks = storedTracks.filter(
+                    (track) => track !== storedTracks[rand]
+                );
+                setStoredTracks(newStoredTracks);
+            }
+        }
+    };
+
     const play = () => {
         setTrackPlayed(true);
         audioElementRef.current?.play();
     };
 
-    const getDiscogsReleaseIds = async (
-        genre: string | null,
-        year: string | null
-    ) => {
-        const ids = await fetchDiscogsReleaseIds({
-            selectedGenre: genre,
-            pageNumber: Math.floor(Math.random() * 200),
-            year,
-        });
-
-        setReleaseIds(ids);
-
-        if (ids && ids.length > 0) {
-            releaseIdAttempts = 0;
-            setReleaseIdsError(null);
-            getDiscogsReleaseTrack(ids);
-        } else {
-            releaseIdAttempts = releaseIdAttempts + 1;
-            if (releaseIdAttempts > 5) {
-                setLoading(false);
-                setReleaseIdsError(
-                    "There was an error loading tracks. Please try again later."
-                );
-            } else {
-                getDiscogsReleaseIds(preferredGenre, preferredYear);
-            }
-        }
-    };
-
-    const getDiscogsReleaseTrack = async (releaseIds: number[]) => {
-        getReleaseTrack({
-            releaseIds,
-            onSuccess: async (val) => {
-                setCurrentReleaseId(val.releaseTrack.releaseId);
-                const storedTrack = await searchStoredTracks({
-                    track: val.releaseTrack,
-                });
-
-                if (storedTrack?.userId === user?.uid) {
-                    const newReleaseIds = releaseIds.filter(
-                        (id) => id !== val.releaseTrack.releaseId
-                    );
-                    setReleaseIds(newReleaseIds);
-                } else {
-                    let searchedTrack;
-
-                    searchedTrack = await fetchITunesTrack({
-                        trackToSearch: `${removeBracketedText(
-                            val.releaseTrack.artist
-                        )} - ${val.releaseTrack.title}`,
-                    });
-
-                    if (!searchedTrack) {
-                        searchedTrack = await fetchDeezerTrack({
-                            trackToSearch: `${val.releaseTrack.artist} - ${val.releaseTrack.title}`,
-                        });
-                    }
-
-                    if (!searchedTrack) {
-                        searchedTrack = await getSpotifyTrack({
-                            trackToSearch: val.releaseTrack,
-                            onTrackFound: () => {},
-                        });
-                    }
-
-                    if (searchedTrack) {
-                        if (!currentTrack) {
-                            setCurrentTrack(searchedTrack);
-                            setLoading(false);
-                        } else if (!queuedTrack) {
-                            setQueuedTrack(searchedTrack);
-                        }
-                    } else {
-                        const newReleaseIds = releaseIds.filter(
-                            (id) => id !== val.releaseTrack.releaseId
-                        );
-
-                        setReleaseIds(newReleaseIds);
-                    }
-                }
-            },
-            onFail: (releaseId) => {
-                const newReleaseIds = releaseIds.filter(
-                    (id) => id !== releaseId
-                );
-                setReleaseIds(newReleaseIds);
-            },
-        });
-    };
-
     const storeTrack = async (like: boolean) => {
-        if (user?.uid && currentTrack) {
+        if (user?.uid && currentTrack && storedTracks) {
             const newTrack: Track = {
-                artist: currentTrack.artist,
-                discogsReleaseId: currentReleaseId!,
+                storedTrackId: storedTracks[randomNumber].id,
+                artist: storedTracks[randomNumber].artist,
                 furthestReviewStep: like ? reviewStep + 1 : reviewStep,
                 currentReviewStep: like ? reviewStep + 1 : 0,
                 genre: preferredGenre,
                 searchedTrack: currentTrack,
-                title: currentTrack.title,
+                title: storedTracks[randomNumber].title,
                 userId: user.uid,
                 id: "",
             };
@@ -280,11 +213,11 @@ const TrackReview = ({ reviewStep }: Props) => {
             setQueuedTrack(null);
             storeTrack(like);
 
-            if (releaseIds) {
-                const newReleaseIds = releaseIds.filter(
-                    (id) => id !== currentReleaseId
+            if (storedTracks) {
+                const newStoredTracks = storedTracks.filter(
+                    (track) => track !== storedTracks[randomNumber]
                 );
-                setReleaseIds(newReleaseIds);
+                setStoredTracks(newStoredTracks);
             }
         } else if (reviewStep > 1 && reviewStep < 4) {
             if (userTracks && userTracks.length > 0) {
@@ -309,22 +242,6 @@ const TrackReview = ({ reviewStep }: Props) => {
 
     return (
         <Box h="full" position="relative">
-            {releaseIdsError && (
-                <Box
-                    position="absolute"
-                    zIndex="150"
-                    right="50%"
-                    top="50%"
-                    transform="translate(50%, 50%)"
-                    w="80%"
-                >
-                    <Alert status="error">
-                        <AlertIcon />
-                        <AlertTitle>ERROR</AlertTitle>
-                        <AlertDescription>{releaseIdsError}</AlertDescription>
-                    </Alert>
-                </Box>
-            )}
             {loading && (
                 <Center>
                     <Badge

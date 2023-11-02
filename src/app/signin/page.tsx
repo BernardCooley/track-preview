@@ -1,8 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
-import { onAuthStateChanged } from "firebase/auth";
-import React, { useState, useEffect, useCallback } from "react";
-import { auth } from "../../../firebase/firebaseInit";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,7 +8,6 @@ import { ZodType, z } from "zod";
 import { LoginUser } from "../../../firebase/utils";
 import { TextInput } from "@/components/TextInput";
 import { Button, Flex, IconButton, Link, Text } from "@chakra-ui/react";
-import { useAuthContext } from "../../../Contexts/AuthContext";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 
@@ -30,7 +27,6 @@ interface Props {}
 
 const SignIn = ({}: Props) => {
     const [showPassword, setShowPassword] = useState<boolean>(false);
-    const { updateUser } = useAuthContext();
     const [submitting, setSubmitting] = useState(false);
     const router = useRouter();
 
@@ -54,21 +50,6 @@ const SignIn = ({}: Props) => {
             router
         );
     };
-
-    const isUserLoggedIn = useCallback(() => {
-        onAuthStateChanged(auth, (user) => {
-            if (user && user.email && user.uid) {
-                updateUser({ email: user.email, uid: user.uid });
-                return router.push("/");
-            } else {
-                return router.push("/signin");
-            }
-        });
-    }, [router]);
-
-    useEffect(() => {
-        isUserLoggedIn();
-    }, [isUserLoggedIn]);
 
     return (
         <Flex direction="column" h="100vh" justifyContent="space-between">

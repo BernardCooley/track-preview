@@ -1,8 +1,11 @@
-import { fetchDiscogsReleaseTracks, fetchSpotifyTrack } from "@/bff/bff";
+import { fetchSpotifyTrack } from "@/bff/bff";
 import { SearchedTrack, ReleaseTrack } from "./types";
 
 interface GetSpotifyTrackProps {
-    trackToSearch: ReleaseTrack | null;
+    trackToSearch: {
+        artist: string;
+        title: string;
+    } | null;
     onTrackFound: () => void;
 }
 
@@ -37,31 +40,3 @@ interface GetReleaseTracksProps {
     }) => void;
     onFail: (releaseId: number) => void;
 }
-
-export const getReleaseTrack = async ({
-    releaseIds,
-    onSuccess,
-    onFail,
-}: GetReleaseTracksProps) => {
-    if (releaseIds && releaseIds.length > 0) {
-        const releaseId =
-            releaseIds[Math.floor(Math.random() * releaseIds.length)];
-
-        const releaseTracks = await fetchDiscogsReleaseTracks({
-            releaseId: releaseId,
-        });
-
-        if (releaseTracks) {
-            const randomTrackNumber = Math.floor(
-                Math.random() * releaseTracks.length
-            );
-
-            onSuccess({
-                releaseTrack: releaseTracks[randomTrackNumber],
-                releaseId: releaseId,
-            });
-        } else {
-            onFail(releaseId);
-        }
-    }
-};

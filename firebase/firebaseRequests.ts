@@ -3,20 +3,20 @@ import {
     collection,
     doc,
     getDocs,
+    limit,
     query,
-    setDoc,
     updateDoc,
     where,
 } from "firebase/firestore";
 import { db } from "./firebaseInit";
-import { ReleaseTrack, Track } from "../types";
+import { ReleaseTrack, ScrapeTrack, Track } from "../types";
 
 interface SaveNewTrackProps {
     track: Track;
 }
 
 export const saveNewTrack = async ({ track }: SaveNewTrackProps) => {
-    await addDoc(collection(db, "tracks"), track);
+    await addDoc(collection(db, "userTracks"), track);
 };
 
 interface TrackExistsProps {
@@ -27,7 +27,7 @@ export const searchStoredTracks = async ({
     track,
 }: TrackExistsProps): Promise<Track | null> => {
     const q = query(
-        collection(db, "tracks"),
+        collection(db, "userTracks"),
         where("title", "==", track.title),
         where("artist", "==", track.artist)
     );
@@ -43,19 +43,19 @@ export const searchStoredTracks = async ({
     return null;
 };
 
-interface GetStoredTracksProps {
+interface GetUserTracksProps {
     genre: string;
     currentReviewStep: number;
     userId: string;
 }
 
-export const getStoredTracks = async ({
+export const getUserTracks = async ({
     genre,
     currentReviewStep,
     userId,
-}: GetStoredTracksProps): Promise<Track[] | null> => {
+}: GetUserTracksProps): Promise<Track[] | null> => {
     const q = query(
-        collection(db, "tracks"),
+        collection(db, "userTracks"),
         where("genre", "==", genre),
         where("userId", "==", userId),
         where("currentReviewStep", "==", currentReviewStep)
@@ -85,10 +85,36 @@ export const updateTrackReviewStep = async ({
     newReviewStep,
     furthestReviewStep,
 }: UpdateTrackReviewStep) => {
-    const trackRef = doc(db, "tracks", trackId);
+    const trackRef = doc(db, "userTracks", trackId);
 
     await updateDoc(trackRef, {
         currentReviewStep: newReviewStep,
         furthestReviewStep: furthestReviewStep,
     });
+};
+
+interface FetchStoredTracksProps {
+    genre: string;
+}
+
+export const fetchStoredTracks = async ({
+    genre,
+}: FetchStoredTracksProps): Promise<ScrapeTrack[] | null> => {
+    const q = query(
+        collection(db, "scrapedTracks"),
+        where("genre", "==", genre),
+        limit(100)
+    );
+
+    const querySnapshot = await getDocs(q as any);
+
+    const tracks = querySnapshot.docs.map((doc) => {
+        return { ...(doc.data() as ScrapeTrack), id: doc.id };
+    }) as ScrapeTrack[];
+
+    if (tracks.length > 0) {
+        return tracks;
+    }
+
+    return null;
 };

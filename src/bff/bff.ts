@@ -1,4 +1,4 @@
-import { SearchedTrack, ReleaseTrack } from "../../types";
+import { SearchedTrack } from "../../types";
 
 export class GoneError extends Error {
     statusCode = 410;
@@ -31,31 +31,6 @@ export const handleFetchErrors = (response: Response) => {
     }
 };
 
-export const fetchWithErrorHandlingWithAuth = async <T>(
-    endpoint: RequestInfo,
-    method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH",
-    body?: any
-) => {
-    try {
-        const res = await fetch(endpoint, {
-            method: method,
-            headers: {
-                "Content-Type": "application/json",
-                Authorization:
-                    "Discogs key=YZnWZvvioyaRkOAuzkPU, secret=uhzfcvYWQRUAJUKFgwfqGvONiJglYTnq",
-            },
-            body: JSON.stringify(body),
-        });
-        if (res.ok) {
-            return (await res.json()) as T;
-        }
-        handleFetchErrors(res);
-    } catch (e) {
-        throw e;
-    }
-    return null;
-};
-
 export const fetchWithErrorHandling = async <T>(
     endpoint: RequestInfo,
     method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH",
@@ -79,48 +54,11 @@ export const fetchWithErrorHandling = async <T>(
     return null;
 };
 
-interface FetchDiscogsReleaseIdsProps {
-    selectedGenre: string | null;
-    pageNumber: number;
-    year: string | null;
-}
-
-export const fetchDiscogsReleaseIds = async ({
-    selectedGenre,
-    pageNumber,
-    year,
-}: FetchDiscogsReleaseIdsProps): Promise<number[] | null> => {
-    const releaseIds: number[] | null = await fetchWithErrorHandling(
-        "/api/getDiscogsReleaseIds",
-        "POST",
-        {
-            ...(selectedGenre && { selectedGenre }),
-            ...(year && { year }),
-            pageNumber: pageNumber,
-        }
-    );
-    return releaseIds;
-};
-
-interface FetchDiscogsReleaseTracksProps {
-    releaseId: number;
-}
-
-export const fetchDiscogsReleaseTracks = async ({
-    releaseId,
-}: FetchDiscogsReleaseTracksProps): Promise<ReleaseTrack[] | null> => {
-    const releaseTracks: ReleaseTrack[] | null = await fetchWithErrorHandling(
-        "/api/getDiscogsReleaseTracks",
-        "POST",
-        {
-            releaseId: releaseId,
-        }
-    );
-    return releaseTracks;
-};
-
 interface FetchSpotifyTrackProps {
-    trackToSearch: ReleaseTrack;
+    trackToSearch: {
+        artist: string;
+        title: string;
+    };
 }
 
 export const fetchSpotifyTrack = async ({
@@ -168,4 +106,12 @@ export const fetchITunesTrack = async ({
         }
     );
     return iTinesTrack;
+};
+
+export const scrapeJuno = async (): Promise<any[] | null> => {
+    const scrapedData: any[] | null = await fetchWithErrorHandling(
+        "/api/scrapeJuno",
+        "GET"
+    );
+    return scrapedData;
 };
