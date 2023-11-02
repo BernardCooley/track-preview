@@ -37,8 +37,14 @@ const TrackReview = ({ reviewStep }: Props) => {
         "preferredGenre",
         "all"
     );
-    const [preferredYear, setPreferredYear] = useState<string | null>(null);
-    const [autoPlay, setAutoPlay] = useState<boolean>(false);
+    const [preferredYear, setPreferredYear] = useLocalStorage(
+        "preferredYear",
+        "all"
+    );
+    const [preferredAutoPlay, setPreferredAutoPlay] = useLocalStorage(
+        "preferredAutoPlay",
+        false
+    );
     const genreRef = useRef<HTMLSelectElement>(null);
     const [currentTrack, setCurrentTrack] = useState<SearchedTrack | null>();
     const [queuedTrack, setQueuedTrack] = useState<SearchedTrack | null>();
@@ -87,9 +93,14 @@ const TrackReview = ({ reviewStep }: Props) => {
             genreRef.current!.value = preferredGenre;
 
             if (reviewStep === 1) {
+                const from = preferredYear === "all" ? 1950 : preferredYear;
+                const to = preferredYear === "all" ? 2090 : preferredYear + 1;
+
                 (async () => {
                     const tracks = await fetchStoredTracks({
                         genre: preferredGenre,
+                        startDate: new Date(`${from}-00-00`),
+                        endDate: new Date(`${to}-00-00`),
                     });
                     setStoredTracks(tracks);
                 })();
@@ -134,7 +145,7 @@ const TrackReview = ({ reviewStep }: Props) => {
             setTrackPlayed(false);
         }
 
-        if (autoPlay && currentTrack) {
+        if (preferredAutoPlay && currentTrack) {
             play();
         }
     }, [currentTrack]);
@@ -298,7 +309,7 @@ const TrackReview = ({ reviewStep }: Props) => {
                         </Flex>
                         <Flex flexDirection="column" alignItems="center">
                             <Box fontWeight="bold">Autoplay</Box>
-                            <Box>{autoPlay ? "On" : "Off"}</Box>
+                            <Box>{preferredAutoPlay ? "On" : "Off"}</Box>
                         </Flex>
                     </Flex>
                 </Flex>
@@ -313,8 +324,8 @@ const TrackReview = ({ reviewStep }: Props) => {
                     selectedYear={preferredYear}
                     selectedGenre={preferredGenre}
                     genres={availableGenres}
-                    autoPlay={autoPlay}
-                    onAutoPlayChange={(value) => setAutoPlay(value)}
+                    autoPlay={preferredAutoPlay}
+                    onAutoPlayChange={(value) => setPreferredAutoPlay(value)}
                     ref={genreRef}
                 />
                 <Box position="absolute" right={0}>

@@ -1,4 +1,4 @@
-import React, { LegacyRef, forwardRef } from "react";
+import React, { LegacyRef, forwardRef, useEffect, useRef } from "react";
 import {
     Collapse,
     Flex,
@@ -8,6 +8,7 @@ import {
     Switch,
 } from "@chakra-ui/react";
 import { arrayRange } from "../../utils";
+import { useReadLocalStorage } from "usehooks-ts";
 
 interface Props {
     onGenreSelect: (genre: string) => void;
@@ -34,6 +35,23 @@ const ReviewTracksFilters = forwardRef(
         }: Props,
         ref: LegacyRef<HTMLSelectElement>
     ) => {
+        const yearRef = useRef<HTMLSelectElement>(null);
+        const autoPlayRef = useRef<HTMLInputElement>(null);
+        const preferredYear: any = useReadLocalStorage("preferredYear");
+        const preferredAutoPlay: any = useReadLocalStorage("preferredAutoPlay");
+
+        useEffect(() => {
+            if (yearRef?.current?.value) {
+                yearRef.current.value = preferredYear;
+            }
+        }, [preferredYear]);
+
+        useEffect(() => {
+            if (autoPlayRef?.current?.value) {
+                autoPlayRef.current.value = preferredAutoPlay;
+            }
+        }, [preferredAutoPlay]);
+
         return (
             <Collapse in={isOpen} animateOpacity>
                 <Flex
@@ -74,6 +92,7 @@ const ReviewTracksFilters = forwardRef(
                         </Flex>
                         <Flex alignItems="center" gap={4}>
                             <Select
+                                ref={yearRef}
                                 boxShadow="md"
                                 _focusVisible={{
                                     boxShadow: "none",
@@ -83,7 +102,8 @@ const ReviewTracksFilters = forwardRef(
                                 onChange={(e) => onYearSelect(e.target.value)}
                                 defaultValue={selectedYear || ""}
                             >
-                                {arrayRange(1900, new Date().getFullYear(), 1)
+                                <option value="all">All</option>
+                                {arrayRange(1950, new Date().getFullYear(), 1)
                                     .reverse()
                                     .map((year) => (
                                         <option
@@ -117,6 +137,7 @@ const ReviewTracksFilters = forwardRef(
                                 AutoPlay
                             </FormLabel>
                             <Switch
+                                ref={autoPlayRef}
                                 isChecked={autoPlay}
                                 id="autoplay"
                                 onChange={(e) => {
