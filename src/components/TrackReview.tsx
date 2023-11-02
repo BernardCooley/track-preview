@@ -1,7 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useRef, useState } from "react";
 import { genres } from "../../data/genres";
-import { Badge, Box, Center, Flex, IconButton } from "@chakra-ui/react";
+import {
+    Badge,
+    Box,
+    Center,
+    Flex,
+    IconButton,
+    useToast,
+} from "@chakra-ui/react";
 import ReviewTracksFilters from "./ReviewTracksFilters";
 import TrackList from "./TrackList";
 import { useLocalStorage } from "usehooks-ts";
@@ -13,7 +20,7 @@ import {
 } from "@/bff/bff";
 import {
     fetchStoredTracks,
-    getUserTracks,
+    fetchUserTracks,
     saveNewTrack,
     updateTrackReviewStep,
 } from "../../firebase/firebaseRequests";
@@ -43,6 +50,7 @@ const TrackReview = ({ reviewStep }: Props) => {
     const [storedTracks, setStoredTracks] = useState<ScrapeTrack[] | null>(
         null
     );
+    const toast = useToast();
     const router = useRouter();
     const [availableGenres] = useState<string[]>(genres);
     const [loading, setLoading] = useState<boolean>(false);
@@ -60,32 +68,53 @@ const TrackReview = ({ reviewStep }: Props) => {
 
     useEffect(() => {
         if (preferredGenre) {
-            setLoading(true);
             setCurrentTrack(null);
             setQueuedTrack(null);
             genreRef.current!.value = preferredGenre;
 
             if (reviewStep === 1) {
-                const from = preferredYear === "all" ? 1950 : preferredYear;
-                const to = preferredYear === "all" ? 2090 : preferredYear + 1;
+                setLoading(true);
+                const from =
+                    preferredYear === "all" || !preferredYear
+                        ? 1950
+                        : preferredYear;
+                const to =
+                    preferredYear === "all" || !preferredYear
+                        ? 2090
+                        : Number(preferredYear) + 1;
 
                 (async () => {
-                    const tracks = await fetchStoredTracks({
-                        genre: preferredGenre,
-                        startDate: new Date(`${from}-00-00`),
-                        endDate: new Date(`${to}-00-00`),
-                    });
-                    setStoredTracks(tracks);
+                    try {
+                        const tracks = await fetchStoredTracks({
+                            genre: preferredGenre,
+                            startDate: new Date(`${from}-01-01`),
+                            endDate: new Date(`${to}-01-01`),
+                        });
+                        setStoredTracks(tracks);
+                    } catch (error) {
+                        setLoading(false);
+                        showToast({ status: "error" });
+                        console.log(error);
+                    }
                 })();
             } else if (reviewStep > 1 && reviewStep < 4) {
+                setLoading(false);
                 (async () => {
                     if (user?.uid) {
-                        const tracks = await getUserTracks({
-                            genre: preferredGenre,
-                            currentReviewStep: reviewStep,
-                            userId: user.uid,
-                        });
-                        setUserTracks(tracks);
+                        try {
+                            const tracks = await fetchUserTracks({
+                                genre: preferredGenre,
+                                currentReviewStep: reviewStep,
+                                userId: user.uid,
+                            });
+                            setUserTracks(tracks);
+                        } catch (error) {
+                            showToast({
+                                status: "error",
+                                title: "Error getting your tracks",
+                            });
+                            console.log(error);
+                        }
                     }
                 })();
             }
@@ -121,6 +150,22 @@ const TrackReview = ({ reviewStep }: Props) => {
             play();
         }
     }, [currentTrack]);
+
+    interface ToastProps {
+        status: "error" | "success" | "info";
+        title?: string;
+        description?: string;
+    }
+
+    const showToast = ({ status, title, description }: ToastProps) => {
+        toast({
+            title: title || "An error has occured.",
+            description: description || "Please try again later.",
+            status: status,
+            duration: 5000,
+            isClosable: true,
+        });
+    };
 
     const searchForTrack = async () => {
         if (storedTracks && storedTracks.length > 0) {
@@ -185,7 +230,15 @@ const TrackReview = ({ reviewStep }: Props) => {
                 id: "",
             };
 
-            await saveNewTrack({ track: newTrack });
+            try {
+                await saveNewTrack({ track: newTrack });
+            } catch (error) {
+                showToast({
+                    status: "error",
+                    title: "Error saving track",
+                });
+                console.log(error);
+            }
         }
     };
 

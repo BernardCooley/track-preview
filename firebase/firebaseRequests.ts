@@ -1,4 +1,5 @@
 import {
+    Timestamp,
     addDoc,
     collection,
     doc,
@@ -16,7 +17,11 @@ interface SaveNewTrackProps {
 }
 
 export const saveNewTrack = async ({ track }: SaveNewTrackProps) => {
-    await addDoc(collection(db, "userTracks"), track);
+    try {
+        await addDoc(collection(db, "userTracks"), track);
+    } catch (error) {
+        throw error;
+    }
 };
 
 interface GetUserTracksProps {
@@ -25,7 +30,7 @@ interface GetUserTracksProps {
     userId: string;
 }
 
-export const getUserTracks = async ({
+export const fetchUserTracks = async ({
     genre,
     currentReviewStep,
     userId,
@@ -37,17 +42,21 @@ export const getUserTracks = async ({
         where("currentReviewStep", "==", currentReviewStep)
     );
 
-    const querySnapshot = await getDocs(q as any);
+    try {
+        const querySnapshot = await getDocs(q as any);
 
-    const tracks = querySnapshot.docs.map((doc) => {
-        return { ...(doc.data() as Track), id: doc.id };
-    }) as Track[];
+        const tracks = querySnapshot.docs.map((doc) => {
+            return { ...(doc.data() as Track), id: doc.id };
+        }) as Track[];
 
-    if (tracks.length > 0) {
-        return tracks;
+        if (tracks.length > 0) {
+            return tracks;
+        }
+
+        return null;
+    } catch (error) {
+        throw error;
     }
-
-    return null;
 };
 
 interface UpdateTrackReviewStep {
@@ -84,25 +93,32 @@ export const fetchStoredTracks = async ({
 
     let q = query(collectionRef, where("genre", "==", genre), limit(100));
 
+    const from = Timestamp.fromDate(startDate as Date);
+    const to = Timestamp.fromDate(endDate as Date);
+
     if (startDate) {
         q = query(
             collectionRef,
             where("genre", "==", genre),
-            where("releaseDate", ">=", startDate),
-            where("releaseDate", "<=", endDate),
+            where("releaseDate", ">=", from),
+            where("releaseDate", "<=", to),
             limit(100)
         );
     }
 
-    const querySnapshot = await getDocs(q as any);
+    try {
+        const querySnapshot = await getDocs(q as any);
 
-    const tracks = querySnapshot.docs.map((doc) => {
-        return { ...(doc.data() as ScrapeTrack), id: doc.id };
-    }) as ScrapeTrack[];
+        const tracks = querySnapshot.docs.map((doc) => {
+            return { ...(doc.data() as ScrapeTrack), id: doc.id };
+        }) as ScrapeTrack[];
 
-    if (tracks.length > 0) {
-        return tracks;
+        if (tracks.length > 0) {
+            return tracks;
+        }
+
+        return null;
+    } catch (error) {
+        throw error;
     }
-
-    return null;
 };
