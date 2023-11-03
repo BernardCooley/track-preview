@@ -342,7 +342,7 @@ const TrackReview = ({ reviewStep }: Props) => {
     };
 
     return (
-        <Box h="full" position="relative">
+        <Box h="90vh" position="relative">
             {loading && (
                 <Center>
                     <Badge
@@ -473,30 +473,42 @@ const TrackReview = ({ reviewStep }: Props) => {
                     ref={genreRef}
                 />
             </Flex>
-            {trackList[0] && (
-                <>
-                    {reviewStep < 4 ? (
-                        <TrackReviewCard
-                            trackList={trackList}
-                            ignoreQueuedTrack={reviewStep > 1}
-                            loading={loading}
-                            isPlaying={isPlaying}
-                            listened={listened}
-                            onLikeOrDislike={async (val) =>
-                                await likeOrDislike(val)
-                            }
-                            onPlayButtonClicked={() => play()}
-                            onAudioPlay={() => {
-                                setIsPlaying(true);
-                            }}
-                            onListened={() => setListened(true)}
-                            ref={audioElementRef}
-                        />
-                    ) : (
-                        <TrackList tracks={userTracks || []} />
-                    )}
-                </>
-            )}
+            <Flex direction="column" position="relative" top={20}>
+                {trackList[0] && (
+                    <>
+                        {reviewStep < 4 ? (
+                            <TrackReviewCard
+                                trackList={trackList}
+                                ignoreQueuedTrack={reviewStep > 1}
+                                loading={loading}
+                                isPlaying={isPlaying}
+                                listened={listened}
+                                onLikeOrDislike={async (val) =>
+                                    await likeOrDislike(val)
+                                }
+                                onPlayButtonClicked={() => play()}
+                                onAudioPlay={() => {
+                                    setIsPlaying(true);
+                                }}
+                                onListened={() => setListened(true)}
+                                ref={audioElementRef}
+                            />
+                        ) : (
+                            <TrackList tracks={userTracks || []} />
+                        )}
+                    </>
+                )}
+                {trackList[1] && (
+                    <Center mt={[6, 16]}>
+                        <Flex direction="column" alignItems="center">
+                            <Text>Up Next</Text>
+                            <Text noOfLines={1} fontWeight="bold">
+                                {trackList[1].artist} - {trackList[1].title}
+                            </Text>
+                        </Flex>
+                    </Center>
+                )}
+            </Flex>
         </Box>
     );
 };
