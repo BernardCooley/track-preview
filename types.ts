@@ -16,6 +16,7 @@ export interface Track {
     userId: string;
     id: string;
     storedTrackId: string;
+    purchaseUrl: string;
 }
 
 export interface User {

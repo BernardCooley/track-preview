@@ -105,7 +105,7 @@ const TrackReview = ({ reviewStep }: Props) => {
     ]);
 
     const init = async () => {
-        if (preferredGenre) {
+        if (preferredGenre && user?.uid) {
             setTrackList([]);
             genreRef.current!.value = preferredGenre;
 
@@ -118,6 +118,14 @@ const TrackReview = ({ reviewStep }: Props) => {
                         endYear: preferredYearRange.to,
                     });
                     setStoredTracks(tracks);
+
+                    const userTracks = await fetchUserTracks({
+                        genre: preferredGenre,
+                        currentReviewStep: reviewStep,
+                        userId: user.uid,
+                    });
+                    setUserTracks(userTracks);
+
                     if (!tracks) {
                         setLoading(false);
                         showToast({
@@ -134,21 +142,19 @@ const TrackReview = ({ reviewStep }: Props) => {
             } else if (reviewStep > 1 && reviewStep < 4) {
                 setLoading(false);
 
-                if (user?.uid) {
-                    try {
-                        const tracks = await fetchUserTracks({
-                            genre: preferredGenre,
-                            currentReviewStep: reviewStep,
-                            userId: user.uid,
-                        });
-                        setUserTracks(tracks);
-                    } catch (error) {
-                        showToast({
-                            status: "error",
-                            title: "Error getting your tracks",
-                        });
-                        console.log(error);
-                    }
+                try {
+                    const tracks = await fetchUserTracks({
+                        genre: preferredGenre,
+                        currentReviewStep: reviewStep,
+                        userId: user.uid,
+                    });
+                    setUserTracks(tracks);
+                } catch (error) {
+                    showToast({
+                        status: "error",
+                        title: "Error getting your tracks",
+                    });
+                    console.log(error);
                 }
             }
         }
@@ -164,11 +170,6 @@ const TrackReview = ({ reviewStep }: Props) => {
             searchForTrack();
         } else {
             setTrackList([]);
-            showToast({
-                status: "info",
-                title: `No more ${preferredGenre} tracks available`,
-                description: `Please try again with different filters.`,
-            });
             setLoading(false);
         }
     }, [trackPlayed, storedTracks]);
@@ -230,37 +231,48 @@ const TrackReview = ({ reviewStep }: Props) => {
             );
             setRandomNumber(rand);
 
-            let searchedTrack;
+            if (
+                !userTracks
+                    ?.map((track) => track.storedTrackId)
+                    .includes(storedTracks[rand].id)
+            ) {
+                let searchedTrack;
 
-            searchedTrack = await fetchITunesTrack({
-                trackToSearch: `${storedTracks[rand].artist} - ${storedTracks[rand].title}`,
-            });
-
-            if (!searchedTrack) {
-                searchedTrack = await fetchDeezerTrack({
+                searchedTrack = await fetchITunesTrack({
                     trackToSearch: `${storedTracks[rand].artist} - ${storedTracks[rand].title}`,
                 });
-            }
 
-            if (!searchedTrack) {
-                searchedTrack = await fetchSpotifyTrack({
-                    trackToSearch: {
-                        artist: storedTracks[rand].artist,
-                        title: storedTracks[rand].title,
-                    },
-                });
-            }
+                if (!searchedTrack) {
+                    searchedTrack = await fetchDeezerTrack({
+                        trackToSearch: `${storedTracks[rand].artist} - ${storedTracks[rand].title}`,
+                    });
+                }
 
-            if (searchedTrack && trackList.length < trackListLimit) {
-                const track = searchedTrack as SearchedTrack;
+                if (!searchedTrack) {
+                    searchedTrack = await fetchSpotifyTrack({
+                        trackToSearch: {
+                            artist: storedTracks[rand].artist,
+                            title: storedTracks[rand].title,
+                        },
+                    });
+                }
 
-                setTrackList((prev) => {
-                    if (prev && prev.length < trackListLimit) {
-                        return [...prev, track];
-                    } else {
-                        return prev;
-                    }
-                });
+                if (searchedTrack && trackList.length < trackListLimit) {
+                    const track = searchedTrack as SearchedTrack;
+
+                    setTrackList((prev) => {
+                        if (prev && prev.length < trackListLimit) {
+                            return [...prev, track];
+                        } else {
+                            return prev;
+                        }
+                    });
+                } else {
+                    const newStoredTracks = storedTracks.filter(
+                        (track) => track !== storedTracks[rand]
+                    );
+                    setStoredTracks(newStoredTracks);
+                }
             } else {
                 const newStoredTracks = storedTracks.filter(
                     (track) => track !== storedTracks[rand]
@@ -288,6 +300,7 @@ const TrackReview = ({ reviewStep }: Props) => {
                 title: storedTracks[randomNumber].title,
                 userId: user.uid,
                 id: generatedId,
+                purchaseUrl: storedTracks[randomNumber].purchaseUrl,
             };
 
             try {
@@ -474,9 +487,9 @@ const TrackReview = ({ reviewStep }: Props) => {
                 />
             </Flex>
             <Flex direction="column" position="relative" top={20}>
-                {trackList[0] && (
+                {reviewStep < 4 ? (
                     <>
-                        {reviewStep < 4 ? (
+                        {trackList[0] && (
                             <TrackReviewCard
                                 trackList={trackList}
                                 ignoreQueuedTrack={reviewStep > 1}
@@ -493,20 +506,21 @@ const TrackReview = ({ reviewStep }: Props) => {
                                 onListened={() => setListened(true)}
                                 ref={audioElementRef}
                             />
-                        ) : (
-                            <TrackList tracks={userTracks || []} />
+                        )}
+                        {trackList[1] && (
+                            <Center mt={[6, 16]}>
+                                <Flex direction="column" alignItems="center">
+                                    <Text>Up Next</Text>
+                                    <Text noOfLines={1} fontWeight="bold">
+                                        {trackList[1].artist} -{" "}
+                                        {trackList[1].title}
+                                    </Text>
+                                </Flex>
+                            </Center>
                         )}
                     </>
-                )}
-                {trackList[1] && (
-                    <Center mt={[6, 16]}>
-                        <Flex direction="column" alignItems="center">
-                            <Text>Up Next</Text>
-                            <Text noOfLines={1} fontWeight="bold">
-                                {trackList[1].artist} - {trackList[1].title}
-                            </Text>
-                        </Flex>
-                    </Center>
+                ) : (
+                    <TrackList tracks={(userTracks as Track[]) || []} />
                 )}
             </Flex>
         </Box>
