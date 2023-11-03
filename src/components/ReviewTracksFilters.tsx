@@ -26,6 +26,7 @@ interface Props {
     onAutoPlayChange: (autoPlay: boolean) => void;
     isOpen: boolean;
     onConfirm: () => void;
+    preferredYearRange: { from: string; to: string };
 }
 
 const ReviewTracksFilters = forwardRef(
@@ -42,6 +43,7 @@ const ReviewTracksFilters = forwardRef(
             onAutoPlayChange,
             isOpen,
             onConfirm,
+            preferredYearRange,
         }: Props,
         ref: LegacyRef<HTMLSelectElement>
     ) => {
@@ -49,8 +51,6 @@ const ReviewTracksFilters = forwardRef(
         const yearFromRef = useRef<HTMLSelectElement>(null);
         const yearToRef = useRef<HTMLSelectElement>(null);
         const autoPlayRef = useRef<HTMLInputElement>(null);
-        const preferredYearRange: any =
-            useReadLocalStorage("preferredYearRange");
         const preferredAutoPlay: any = useReadLocalStorage("preferredAutoPlay");
 
         useEffect(() => {
@@ -105,8 +105,9 @@ const ReviewTracksFilters = forwardRef(
                                     onChange={(e) =>
                                         onGenreSelect(e.target.value)
                                     }
-                                    defaultValue={selectedGenre || ""}
+                                    defaultValue={selectedGenre || "All"}
                                 >
+                                    <option value="all">All</option>
                                     {genres.sort().map((style) => (
                                         <option key={style} value={style}>
                                             {style}

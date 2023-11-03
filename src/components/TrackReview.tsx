@@ -4,7 +4,6 @@ import { genres } from "../../data/genres";
 import {
     Badge,
     Box,
-    Button,
     Center,
     Flex,
     IconButton,
@@ -28,7 +27,6 @@ import {
 } from "../../firebase/firebaseRequests";
 import { useAuthContext } from "../../Contexts/AuthContext";
 import TrackReviewCard from "./TrackReviewCard";
-import { useRouter } from "next/navigation";
 import SettingsIcon from "@mui/icons-material/Settings";
 import CheckIcon from "@mui/icons-material/Check";
 
@@ -39,13 +37,13 @@ interface Props {
 const TrackReview = ({ reviewStep }: Props) => {
     const [preferredGenre, setPreferredGenre] = useLocalStorage(
         "preferredGenre",
-        "all"
+        "All"
     );
     const [preferredYearRange, setPreferredYearRange] = useLocalStorage(
         "preferredYearRange",
         {
-            from: "all",
-            to: "",
+            from: "All",
+            to: new Date().getFullYear().toString(),
         }
     );
     const [preferredAutoPlay, setPreferredAutoPlay] = useLocalStorage(
@@ -56,7 +54,6 @@ const TrackReview = ({ reviewStep }: Props) => {
         null
     );
     const toast = useToast();
-    const router = useRouter();
     const [availableGenres] = useState<string[]>(genres);
     const [loading, setLoading] = useState<boolean>(false);
     const genreRef = useRef<HTMLSelectElement>(null);
@@ -84,7 +81,7 @@ const TrackReview = ({ reviewStep }: Props) => {
             if (reviewStep === 1) {
                 setLoading(true);
                 const from =
-                    preferredYearRange.from === "all" ||
+                    preferredYearRange.from === "All" ||
                     !preferredYearRange.from
                         ? 1950
                         : preferredYearRange.from;
@@ -100,6 +97,14 @@ const TrackReview = ({ reviewStep }: Props) => {
                         endDate: new Date(`${to}-01-01`),
                     });
                     setStoredTracks(tracks);
+                    setLoading(false);
+                    if (!tracks) {
+                        showToast({
+                            status: "info",
+                            title: `No more ${preferredGenre} tracks available`,
+                            description: `Please try again with different filters.`,
+                        });
+                    }
                 } catch (error) {
                     setLoading(false);
                     showToast({ status: "error" });
@@ -363,7 +368,7 @@ const TrackReview = ({ reviewStep }: Props) => {
                         </Flex>
                         <Flex flexDirection="column" alignItems="center">
                             <Box fontWeight="bold">Year range</Box>
-                            {preferredYearRange.from === "all" ? (
+                            {preferredYearRange.from === "All" ? (
                                 <Box>{preferredYearRange.from || "All"}</Box>
                             ) : (
                                 <Box>
@@ -379,6 +384,7 @@ const TrackReview = ({ reviewStep }: Props) => {
                     </Flex>
                 </Flex>
                 <ReviewTracksFilters
+                    preferredYearRange={preferredYearRange}
                     onConfirm={() => {
                         setSettingsOpen(false);
                     }}
@@ -389,7 +395,7 @@ const TrackReview = ({ reviewStep }: Props) => {
                     onYearFromSelect={async (year) => {
                         setPreferredYearRange((prev) => ({
                             to:
-                                year === "all" ||
+                                year === "All" ||
                                 year === new Date().getFullYear().toString()
                                     ? new Date().getFullYear().toString()
                                     : prev.to,

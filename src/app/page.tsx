@@ -2,10 +2,8 @@
 
 import { Box, Center, Flex, Slide, Stack } from "@chakra-ui/react";
 import TrackReview from "@/components/TrackReview";
-import { collection, onSnapshot, query, where } from "firebase/firestore";
-import { SearchedTrack } from "../../types";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { auth, db } from "../../firebase/firebaseInit";
+import { auth } from "../../firebase/firebaseInit";
 import ProgressStepper from "@/components/ProgressStepper";
 import { useTrackContext } from "../../context/TrackContext";
 import AudioPlayer from "@/components/AudioPlayer";
@@ -19,7 +17,6 @@ export default function Home() {
     const pathname = usePathname();
     const { currentlyPlaying, updateCurrentlyPlaying } = useTrackContext();
     const audioElement = useRef<HTMLAudioElement>(null);
-    const [buyTracks, setBuyTracks] = useState<SearchedTrack[]>([]);
     const [currentStep, setCurrentStep] = useState<number>(0);
     const { updateUser } = useAuthContext();
 
@@ -64,31 +61,6 @@ export default function Home() {
             audioElement.current?.pause();
         }
     }, [currentlyPlaying]);
-
-    useEffect(() => {
-        if (currentStep === 4) {
-            let q = query(
-                collection(db, "tracks"),
-                where("reviewStep", "==", 4)
-            );
-
-            const unsubscribe: any = onSnapshot(q, (querySnapshot) => {
-                const tracks: SearchedTrack[] = [];
-                querySnapshot.forEach((doc) => {
-                    const track = {
-                        ...doc.data(),
-                        id: doc.id,
-                    } as SearchedTrack;
-                    tracks.push(track);
-                });
-                setBuyTracks(tracks);
-            });
-
-            return () => {
-                unsubscribe();
-            };
-        }
-    }, [currentStep]);
 
     return (
         <Box m={0} px={[0, 4, 8]} h="full">

@@ -89,7 +89,7 @@ export const fetchStoredTracks = async ({
     startDate,
     endDate,
 }: FetchStoredTracksProps): Promise<ScrapeTrack[] | null> => {
-    const collectionRef = collection(db, "scrapedTracks");
+    const collectionRef = collection(db, "tracks");
 
     let q = query(collectionRef, where("genre", "==", genre), limit(100));
 
@@ -119,6 +119,7 @@ export const fetchStoredTracks = async ({
 
         return null;
     } catch (error) {
+        console.log(error);
         throw error;
     }
 };
