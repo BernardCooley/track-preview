@@ -69,10 +69,33 @@ const TrackReview = ({ reviewStep }: Props) => {
     const [settingsOpen, setSettingsOpen] = useState<boolean>(false);
     const [randomNumber, setRandomNumber] = useState<number>(0);
     const id = "test-toast";
+    const [oldValues, setOldValues] = useState<{
+        genre: string;
+        yearFrom: number;
+        yearTo: number;
+    }>({
+        genre: preferredGenre,
+        yearFrom: preferredYearRange.from,
+        yearTo: preferredYearRange.to,
+    });
+    const [filtesToApply, setSetFiltersToApply] = useState<boolean>(false);
 
     useEffect(() => {
         init();
     }, [reviewStep, user]);
+
+    useEffect(() => {
+        setSetFiltersToApply(
+            oldValues.genre !== preferredGenre ||
+                oldValues.yearFrom !== preferredYearRange.from ||
+                oldValues.yearTo !== preferredYearRange.to
+        );
+    }, [
+        preferredGenre,
+        preferredYearRange.from,
+        preferredYearRange.to,
+        settingsOpen,
+    ]);
 
     const init = async () => {
         if (preferredGenre) {
@@ -123,6 +146,11 @@ const TrackReview = ({ reviewStep }: Props) => {
                 }
             }
         }
+        setOldValues({
+            genre: preferredGenre,
+            yearFrom: preferredYearRange.from,
+            yearTo: preferredYearRange.to,
+        });
     };
 
     useEffect(() => {
@@ -140,7 +168,7 @@ const TrackReview = ({ reviewStep }: Props) => {
     }, [trackPlayed, storedTracks]);
 
     useEffect(() => {
-        if (!settingsOpen) {
+        if (!settingsOpen && filtesToApply) {
             init();
         }
     }, [settingsOpen]);
@@ -331,7 +359,7 @@ const TrackReview = ({ reviewStep }: Props) => {
                     <IconButton
                         backgroundColor={settingsOpen ? "gray.500" : "white"}
                         height="40px"
-                        width={settingsOpen ? "110px" : "40px"}
+                        width={settingsOpen && filtesToApply ? "160px" : "40px"}
                         transition="width 200ms"
                         onClick={() => setSettingsOpen((prev) => !prev)}
                         aria-label="Search database"
@@ -339,7 +367,7 @@ const TrackReview = ({ reviewStep }: Props) => {
                             backgroundColor: settingsOpen ? "none" : "gray.300",
                         }}
                         icon={
-                            !settingsOpen ? (
+                            !settingsOpen || !filtesToApply ? (
                                 <SettingsIcon
                                     fontSize="inherit"
                                     sx={{
@@ -348,7 +376,7 @@ const TrackReview = ({ reviewStep }: Props) => {
                                 />
                             ) : (
                                 <Flex gap={2} alignItems="center">
-                                    <Text color="gray.100">Confirm</Text>
+                                    <Text color="gray.100">Apply & search</Text>
                                     <CheckIcon
                                         fontSize="inherit"
                                         sx={{
