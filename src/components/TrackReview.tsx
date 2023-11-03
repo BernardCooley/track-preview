@@ -68,6 +68,7 @@ const TrackReview = ({ reviewStep }: Props) => {
     const [userTracks, setUserTracks] = useState<Track[] | null>(null);
     const [settingsOpen, setSettingsOpen] = useState<boolean>(false);
     const [randomNumber, setRandomNumber] = useState<number>(0);
+    const id = "test-toast";
 
     useEffect(() => {
         init();
@@ -99,6 +100,7 @@ const TrackReview = ({ reviewStep }: Props) => {
                     });
                     setStoredTracks(tracks);
                     if (!tracks) {
+                        setLoading(false);
                         showToast({
                             status: "info",
                             title: `No more ${preferredGenre} tracks available`,
@@ -136,6 +138,14 @@ const TrackReview = ({ reviewStep }: Props) => {
     useEffect(() => {
         if (trackPlayed || (storedTracks && storedTracks.length > 0)) {
             searchForTrack();
+        } else {
+            setCurrentTrack(null);
+            showToast({
+                status: "info",
+                title: `No more ${preferredGenre} tracks available`,
+                description: `Please try again with different filters.`,
+            });
+            setLoading(false);
         }
     }, [trackPlayed, storedTracks]);
 
@@ -176,13 +186,16 @@ const TrackReview = ({ reviewStep }: Props) => {
     }
 
     const showToast = ({ status, title, description }: ToastProps) => {
-        toast({
-            title: title || "An error has occured.",
-            description: description || "Please try again later.",
-            status: status,
-            duration: 5000,
-            isClosable: true,
-        });
+        if (!toast.isActive(id)) {
+            toast({
+                id,
+                title: title || "An error has occured.",
+                description: description || "Please try again later.",
+                status: status,
+                duration: 5000,
+                isClosable: true,
+            });
+        }
     };
 
     const searchForTrack = async () => {

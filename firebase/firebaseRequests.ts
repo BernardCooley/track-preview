@@ -101,9 +101,8 @@ export const fetchStoredTracks = async ({
         q = query(
             collectionRef,
             where("genre", "==", genre),
-            // TODO - Not getting the correct results here
-            // where("releaseDate", ">=", from),
-            // where("releaseDate", "<=", to),
+            where("releaseDate", ">=", from),
+            where("releaseDate", "<=", to),
             limit(100)
         );
     }
