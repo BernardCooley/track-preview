@@ -1,11 +1,11 @@
 import {
     Timestamp,
-    addDoc,
     collection,
     doc,
     getDocs,
     limit,
     query,
+    setDoc,
     updateDoc,
     where,
 } from "firebase/firestore";
@@ -14,11 +14,12 @@ import { ScrapeTrack, Track } from "../types";
 
 interface SaveNewTrackProps {
     track: Track;
+    id: string;
 }
 
-export const saveNewTrack = async ({ track }: SaveNewTrackProps) => {
+export const saveNewTrack = async ({ track, id }: SaveNewTrackProps) => {
     try {
-        await addDoc(collection(db, "userTracks"), track);
+        await setDoc(doc(db, "userTracks", id), track);
     } catch (error) {
         throw error;
     }
@@ -46,7 +47,7 @@ export const fetchUserTracks = async ({
         const querySnapshot = await getDocs(q as any);
 
         const tracks = querySnapshot.docs.map((doc) => {
-            return { ...(doc.data() as Track), id: doc.id };
+            return doc.data();
         }) as Track[];
 
         if (tracks.length > 0) {
@@ -100,8 +101,9 @@ export const fetchStoredTracks = async ({
         q = query(
             collectionRef,
             where("genre", "==", genre),
-            where("releaseDate", ">=", from),
-            where("releaseDate", "<=", to),
+            // TODO - Not getting the correct results here
+            // where("releaseDate", ">=", from),
+            // where("releaseDate", "<=", to),
             limit(100)
         );
     }

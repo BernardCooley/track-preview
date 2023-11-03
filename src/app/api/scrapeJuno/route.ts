@@ -249,13 +249,13 @@ export async function GET() {
             }
 
             chunks.forEach((chunk, index) => {
-                fs.writeFileSync(
-                    `juno_scraped_tracks/split/${fileNumber}.json`,
-                    JSON.stringify(chunk, null, 4),
-                    (err: any) => {
-                        if (err) console.log(err);
-                    }
-                );
+                // fs.writeFileSync(
+                //     `juno_scraped_tracks/split/${fileNumber}.json`,
+                //     JSON.stringify(chunk, null, 4),
+                //     (err: any) => {
+                //         if (err) console.log(err);
+                //     }
+                // );
                 fileNumber = fileNumber + 1;
             });
             fileNumber = fileNumber + 1;

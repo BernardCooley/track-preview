@@ -29,6 +29,7 @@ import { useAuthContext } from "../../Contexts/AuthContext";
 import TrackReviewCard from "./TrackReviewCard";
 import SettingsIcon from "@mui/icons-material/Settings";
 import CheckIcon from "@mui/icons-material/Check";
+import { v4 as uuidv4 } from "uuid";
 
 interface Props {
     reviewStep: number;
@@ -97,7 +98,6 @@ const TrackReview = ({ reviewStep }: Props) => {
                         endDate: new Date(`${to}-01-01`),
                     });
                     setStoredTracks(tracks);
-                    setLoading(false);
                     if (!tracks) {
                         showToast({
                             status: "info",
@@ -235,6 +235,7 @@ const TrackReview = ({ reviewStep }: Props) => {
     };
 
     const storeTrack = async (like: boolean) => {
+        const generatedId = uuidv4();
         if (user?.uid && currentTrack && storedTracks) {
             const newTrack: Track = {
                 storedTrackId: storedTracks[randomNumber].id,
@@ -245,11 +246,11 @@ const TrackReview = ({ reviewStep }: Props) => {
                 searchedTrack: currentTrack,
                 title: storedTracks[randomNumber].title,
                 userId: user.uid,
-                id: "",
+                id: generatedId,
             };
 
             try {
-                await saveNewTrack({ track: newTrack });
+                await saveNewTrack({ track: newTrack, id: generatedId });
             } catch (error) {
                 showToast({
                     status: "error",

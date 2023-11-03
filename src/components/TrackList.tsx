@@ -81,7 +81,7 @@ const TrackList = ({ tracks }: Props) => {
                             </Box>
                             <Flex gap={2}>
                                 <IconButton
-                                    onClick={() => deleteTrack(track.id)}
+                                    onClick={() => deleteTrack("track.id")}
                                     variant="ghost"
                                     w="full"
                                     h="full"
