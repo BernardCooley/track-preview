@@ -226,7 +226,7 @@ const ReviewTracksFilters = forwardRef(
                                 </FormControl>
                             </Flex>
                         </Flex>
-                        <Box position="absolute" top={3} right={2}>
+                        <Box position="absolute" top={3} right={[6, 2]}>
                             <IconButton
                                 rounded="full"
                                 onClick={() => router.push("/settings")}

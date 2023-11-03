@@ -343,13 +343,14 @@ const TrackReview = ({ reviewStep }: Props) => {
                 </Center>
             )}
             <Flex
-                w="full"
+                w="auto"
                 alignItems="baseline"
                 justifyContent="space-between"
                 direction="column"
                 p={4}
-                pl={settingsOpen ? 4 : 0}
+                pl={settingsOpen ? 4 : [4, 0]}
                 gap={2}
+                mx={settingsOpen ? [4, 0] : 0}
                 transition="ease-in-out 200ms"
                 backgroundColor={settingsOpen ? "gray.300" : "transparent"}
                 shadow={settingsOpen ? "2xl" : "none"}
