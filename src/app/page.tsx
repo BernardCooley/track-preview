@@ -19,12 +19,13 @@ export default function Home() {
     const audioElement = useRef<HTMLAudioElement>(null);
     const [currentStep, setCurrentStep] = useState<number>(0);
     const { updateUser } = useAuthContext();
+    const reviewStep = searchParams?.get("reviewStep");
 
     const isUserLoggedIn = useCallback(() => {
         onAuthStateChanged(auth, (user) => {
             if (user && user.email && user.uid) {
                 updateUser({ email: user.email, uid: user.uid });
-                return router.push("/");
+                return router.push(`/?reviewStep=${reviewStep || 1}`);
             } else {
                 return router.push("/signin");
             }
@@ -34,13 +35,6 @@ export default function Home() {
     useEffect(() => {
         isUserLoggedIn();
     }, [isUserLoggedIn]);
-
-    useEffect(() => {
-        const reviewStep = searchParams?.get("reviewStep");
-        if (!reviewStep) {
-            router.push(`${pathname}?reviewStep=1`);
-        }
-    }, []);
 
     useEffect(() => {
         updateCurrentlyPlaying(undefined);
