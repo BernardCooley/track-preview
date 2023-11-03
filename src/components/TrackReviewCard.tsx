@@ -18,8 +18,7 @@ import { SearchedTrack } from "../../types";
 interface Props {
     ignoreQueuedTrack: boolean;
     loading: boolean;
-    currentTrack: SearchedTrack;
-    queuedTrack: SearchedTrack | null | undefined;
+    trackList: SearchedTrack[];
     isPlaying: boolean;
     listened: boolean;
     onLikeOrDislike: (liked: boolean) => Promise<void>;
@@ -33,8 +32,7 @@ const TrackReviewCard = forwardRef(
         {
             ignoreQueuedTrack,
             loading,
-            currentTrack,
-            queuedTrack,
+            trackList,
             isPlaying,
             listened,
             onLikeOrDislike,
@@ -54,18 +52,18 @@ const TrackReviewCard = forwardRef(
             >
                 <CardHeader>
                     <Heading size="md">
-                        <Link href={currentTrack.url} isExternal>
+                        <Link href={trackList[0].url} isExternal>
                             <Flex
                                 alignItems="center"
                                 direction="column"
                                 position="relative"
                             >
                                 <Text fontSize="3xl" fontWeight="bold">
-                                    {currentTrack.artist}
+                                    {trackList[0].artist}
                                 </Text>
                                 <Flex gap={1}>
                                     <Text fontSize="xl">
-                                        {currentTrack.title}
+                                        {trackList[0].title}
                                     </Text>
                                     <OpenInNewIcon />
                                 </Flex>
@@ -76,7 +74,7 @@ const TrackReviewCard = forwardRef(
                 <CardBody
                     w="full"
                     h="full"
-                    bgImage={currentTrack.thumbnail}
+                    bgImage={trackList[0].thumbnail}
                     bgSize="cover"
                 >
                     <Flex
@@ -139,7 +137,7 @@ const TrackReviewCard = forwardRef(
                                     onTimeUpdate={(e) => {
                                         if (
                                             e.currentTarget.currentTime > 2 &&
-                                            (queuedTrack || ignoreQueuedTrack)
+                                            (trackList[1] || ignoreQueuedTrack)
                                         ) {
                                             onListened();
                                         }
@@ -148,7 +146,7 @@ const TrackReviewCard = forwardRef(
                                     style={{
                                         width: "100%",
                                     }}
-                                    src={currentTrack.previewUrl}
+                                    src={trackList[0].previewUrl}
                                     controls
                                 />
                             </Flex>

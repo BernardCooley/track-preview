@@ -59,8 +59,6 @@ const TrackReview = ({ reviewStep }: Props) => {
     const [availableGenres] = useState<string[]>(genres);
     const [loading, setLoading] = useState<boolean>(false);
     const genreRef = useRef<HTMLSelectElement>(null);
-    const [currentTrack, setCurrentTrack] = useState<SearchedTrack | null>();
-    const [queuedTrack, setQueuedTrack] = useState<SearchedTrack | null>();
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
     const [listened, setListened] = useState<boolean>(false);
     const audioElementRef = useRef<HTMLAudioElement>(null);
@@ -80,10 +78,18 @@ const TrackReview = ({ reviewStep }: Props) => {
         yearTo: preferredYearRange.to,
     });
     const [filtesToApply, setSetFiltersToApply] = useState<boolean>(false);
+    const [trackList, setTrackList] = useState<SearchedTrack[]>([]);
+    const trackListLimit = 2;
 
     useEffect(() => {
         init();
     }, [reviewStep, user]);
+
+    useEffect(() => {
+        if (isPlaying && trackList.length < trackListLimit) {
+            searchForTrack();
+        }
+    }, [isPlaying]);
 
     useEffect(() => {
         setSetFiltersToApply(
@@ -100,8 +106,7 @@ const TrackReview = ({ reviewStep }: Props) => {
 
     const init = async () => {
         if (preferredGenre) {
-            setCurrentTrack(null);
-            setQueuedTrack(null);
+            setTrackList([]);
             genreRef.current!.value = preferredGenre;
 
             if (reviewStep === 1) {
@@ -158,7 +163,7 @@ const TrackReview = ({ reviewStep }: Props) => {
         if (trackPlayed || (storedTracks && storedTracks.length > 0)) {
             searchForTrack();
         } else {
-            setCurrentTrack(null);
+            setTrackList([]);
             showToast({
                 status: "info",
                 title: `No more ${preferredGenre} tracks available`,
@@ -177,9 +182,9 @@ const TrackReview = ({ reviewStep }: Props) => {
     useEffect(() => {
         if (reviewStep > 1 && reviewStep < 4) {
             if (userTracks && userTracks.length > 0) {
-                setCurrentTrack(userTracks[0].searchedTrack);
+                setTrackList([userTracks[0].searchedTrack]);
             } else {
-                setCurrentTrack(null);
+                setTrackList([]);
             }
         }
     }, [userTracks]);
@@ -187,16 +192,17 @@ const TrackReview = ({ reviewStep }: Props) => {
     useEffect(() => {
         setIsPlaying(false);
 
-        if (currentTrack) {
+        if (trackList[0]) {
             setLoading(false);
             setListened(false);
             setTrackPlayed(false);
         }
 
-        if (preferredAutoPlay && currentTrack) {
+        if (preferredAutoPlay && trackList[0]) {
             play();
+            setIsPlaying(true);
         }
-    }, [currentTrack]);
+    }, [trackList]);
 
     interface ToastProps {
         status: "error" | "success" | "info";
@@ -245,13 +251,16 @@ const TrackReview = ({ reviewStep }: Props) => {
                 });
             }
 
-            if (searchedTrack) {
-                if (!currentTrack) {
-                    setCurrentTrack(searchedTrack);
-                    setLoading(false);
-                } else if (!queuedTrack) {
-                    setQueuedTrack(searchedTrack);
-                }
+            if (searchedTrack && trackList.length < trackListLimit) {
+                const track = searchedTrack as SearchedTrack;
+
+                setTrackList((prev) => {
+                    if (prev && prev.length < trackListLimit) {
+                        return [...prev, track];
+                    } else {
+                        return prev;
+                    }
+                });
             } else {
                 const newStoredTracks = storedTracks.filter(
                     (track) => track !== storedTracks[rand]
@@ -268,14 +277,14 @@ const TrackReview = ({ reviewStep }: Props) => {
 
     const storeTrack = async (like: boolean) => {
         const generatedId = uuidv4();
-        if (user?.uid && currentTrack && storedTracks) {
+        if (user?.uid && trackList[0] && storedTracks) {
             const newTrack: Track = {
                 storedTrackId: storedTracks[randomNumber].id,
                 artist: storedTracks[randomNumber].artist,
                 furthestReviewStep: like ? reviewStep + 1 : reviewStep,
                 currentReviewStep: like ? reviewStep + 1 : 0,
                 genre: preferredGenre,
-                searchedTrack: currentTrack,
+                searchedTrack: trackList[0],
                 title: storedTracks[randomNumber].title,
                 userId: user.uid,
                 id: generatedId,
@@ -295,8 +304,14 @@ const TrackReview = ({ reviewStep }: Props) => {
 
     const likeOrDislike = async (like: boolean) => {
         if (reviewStep === 1) {
-            setCurrentTrack(queuedTrack);
-            setQueuedTrack(null);
+            setTrackList((prev) => {
+                if (prev && prev.length > 0) {
+                    prev.splice(0, 1);
+                    return [...prev];
+                } else {
+                    return [];
+                }
+            });
             storeTrack(like);
 
             if (storedTracks) {
@@ -458,14 +473,13 @@ const TrackReview = ({ reviewStep }: Props) => {
                     ref={genreRef}
                 />
             </Flex>
-            {currentTrack && (
+            {trackList[0] && (
                 <>
                     {reviewStep < 4 ? (
                         <TrackReviewCard
+                            trackList={trackList}
                             ignoreQueuedTrack={reviewStep > 1}
                             loading={loading}
-                            currentTrack={currentTrack}
-                            queuedTrack={queuedTrack}
                             isPlaying={isPlaying}
                             listened={listened}
                             onLikeOrDislike={async (val) =>
