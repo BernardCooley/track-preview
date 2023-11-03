@@ -7,6 +7,7 @@ import {
     Center,
     Flex,
     IconButton,
+    Tag,
     Text,
     useToast,
 } from "@chakra-ui/react";
@@ -343,7 +344,7 @@ const TrackReview = ({ reviewStep }: Props) => {
                 </Center>
             )}
             <Flex
-                w="auto"
+                w={[settingsOpen ? "auto" : "full", "full"]}
                 alignItems="baseline"
                 justifyContent="space-between"
                 direction="column"
@@ -355,8 +356,15 @@ const TrackReview = ({ reviewStep }: Props) => {
                 backgroundColor={settingsOpen ? "gray.300" : "transparent"}
                 shadow={settingsOpen ? "2xl" : "none"}
                 rounded="3xl"
+                position="absolute"
+                zIndex={200}
             >
-                <Flex alignItems="center" gap={6}>
+                <Flex
+                    alignItems="center"
+                    gap={6}
+                    justifyContent="space-between"
+                    w="full"
+                >
                     <IconButton
                         backgroundColor={settingsOpen ? "gray.500" : "white"}
                         height="40px"
@@ -390,29 +398,28 @@ const TrackReview = ({ reviewStep }: Props) => {
                     />
 
                     <Flex
-                        direction="row"
-                        gap={[4, 10, 28]}
                         opacity={settingsOpen ? 0 : 1}
                         transition="opacity 200ms"
+                        h={8}
                     >
-                        <Flex flexDirection="column" alignItems="center">
-                            <Box fontWeight="bold">Genre</Box>
-                            <Box>{preferredGenre}</Box>
-                        </Flex>
-                        <Flex flexDirection="column" alignItems="center">
-                            <Box fontWeight="bold">Year range</Box>
-                            {preferredYearRange.from === 0 ? (
-                                <Box>{preferredYearRange.from || "All"}</Box>
-                            ) : (
-                                <Box>
-                                    {preferredYearRange.from} -{" "}
-                                    {preferredYearRange.to}
-                                </Box>
-                            )}
-                        </Flex>
-                        <Flex flexDirection="column" alignItems="center">
-                            <Box fontWeight="bold">Autoplay</Box>
-                            <Box>{preferredAutoPlay ? "On" : "Off"}</Box>
+                        <Flex gap={2}>
+                            <Tag colorScheme="teal" variant="solid">
+                                {preferredGenre}
+                            </Tag>
+                            <Tag colorScheme="teal" variant="solid">
+                                {preferredYearRange.from === 0
+                                    ? "All"
+                                    : `${preferredYearRange.from} -
+                                ${preferredYearRange.to}`}
+                            </Tag>
+                            <Tag
+                                colorScheme="teal"
+                                variant={
+                                    preferredAutoPlay ? "solid" : "outline"
+                                }
+                            >
+                                AutoPlay
+                            </Tag>
                         </Flex>
                     </Flex>
                 </Flex>
