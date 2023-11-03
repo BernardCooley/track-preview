@@ -126,11 +126,6 @@ const SignIn = ({}: Props) => {
                                 type="submit"
                                 variant="outline"
                                 onClick={handleSubmit(performLogin)}
-                                _hover={
-                                    submitting
-                                        ? { backgroundColor: "red" }
-                                        : undefined
-                                }
                             >
                                 Sign In
                             </Button>

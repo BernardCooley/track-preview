@@ -4,9 +4,11 @@ import { genres } from "../../data/genres";
 import {
     Badge,
     Box,
+    Button,
     Center,
     Flex,
     IconButton,
+    Text,
     useToast,
 } from "@chakra-ui/react";
 import ReviewTracksFilters from "./ReviewTracksFilters";
@@ -26,9 +28,9 @@ import {
 } from "../../firebase/firebaseRequests";
 import { useAuthContext } from "../../Contexts/AuthContext";
 import TrackReviewCard from "./TrackReviewCard";
-import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 import { useRouter } from "next/navigation";
 import SettingsIcon from "@mui/icons-material/Settings";
+import CheckIcon from "@mui/icons-material/Check";
 
 interface Props {
     reviewStep: number;
@@ -39,9 +41,12 @@ const TrackReview = ({ reviewStep }: Props) => {
         "preferredGenre",
         "all"
     );
-    const [preferredYear, setPreferredYear] = useLocalStorage(
-        "preferredYear",
-        "all"
+    const [preferredYearRange, setPreferredYearRange] = useLocalStorage(
+        "preferredYearRange",
+        {
+            from: "all",
+            to: "",
+        }
     );
     const [preferredAutoPlay, setPreferredAutoPlay] = useLocalStorage(
         "preferredAutoPlay",
@@ -67,6 +72,10 @@ const TrackReview = ({ reviewStep }: Props) => {
     const [randomNumber, setRandomNumber] = useState<number>(0);
 
     useEffect(() => {
+        init();
+    }, [reviewStep, user]);
+
+    const init = async () => {
         if (preferredGenre) {
             setCurrentTrack(null);
             setQueuedTrack(null);
@@ -75,57 +84,61 @@ const TrackReview = ({ reviewStep }: Props) => {
             if (reviewStep === 1) {
                 setLoading(true);
                 const from =
-                    preferredYear === "all" || !preferredYear
+                    preferredYearRange.from === "all" ||
+                    !preferredYearRange.from
                         ? 1950
-                        : preferredYear;
+                        : preferredYearRange.from;
                 const to =
-                    preferredYear === "all" || !preferredYear
-                        ? 2090
-                        : Number(preferredYear) + 1;
+                    preferredYearRange.to === "" || !preferredYearRange.to
+                        ? new Date().getFullYear()
+                        : Number(preferredYearRange.to);
 
-                (async () => {
-                    try {
-                        const tracks = await fetchStoredTracks({
-                            genre: preferredGenre,
-                            startDate: new Date(`${from}-01-01`),
-                            endDate: new Date(`${to}-01-01`),
-                        });
-                        setStoredTracks(tracks);
-                    } catch (error) {
-                        setLoading(false);
-                        showToast({ status: "error" });
-                        console.log(error);
-                    }
-                })();
+                try {
+                    const tracks = await fetchStoredTracks({
+                        genre: preferredGenre,
+                        startDate: new Date(`${from}-01-01`),
+                        endDate: new Date(`${to}-01-01`),
+                    });
+                    setStoredTracks(tracks);
+                } catch (error) {
+                    setLoading(false);
+                    showToast({ status: "error" });
+                    console.log(error);
+                }
             } else if (reviewStep > 1 && reviewStep < 4) {
                 setLoading(false);
-                (async () => {
-                    if (user?.uid) {
-                        try {
-                            const tracks = await fetchUserTracks({
-                                genre: preferredGenre,
-                                currentReviewStep: reviewStep,
-                                userId: user.uid,
-                            });
-                            setUserTracks(tracks);
-                        } catch (error) {
-                            showToast({
-                                status: "error",
-                                title: "Error getting your tracks",
-                            });
-                            console.log(error);
-                        }
+
+                if (user?.uid) {
+                    try {
+                        const tracks = await fetchUserTracks({
+                            genre: preferredGenre,
+                            currentReviewStep: reviewStep,
+                            userId: user.uid,
+                        });
+                        setUserTracks(tracks);
+                    } catch (error) {
+                        showToast({
+                            status: "error",
+                            title: "Error getting your tracks",
+                        });
+                        console.log(error);
                     }
-                })();
+                }
             }
         }
-    }, [preferredGenre, reviewStep, preferredYear, user]);
+    };
 
     useEffect(() => {
         if (trackPlayed || (storedTracks && storedTracks.length > 0)) {
             searchForTrack();
         }
     }, [trackPlayed, storedTracks]);
+
+    useEffect(() => {
+        if (!settingsOpen) {
+            init();
+        }
+    }, [settingsOpen]);
 
     useEffect(() => {
         if (reviewStep > 1 && reviewStep < 4) {
@@ -297,21 +310,43 @@ const TrackReview = ({ reviewStep }: Props) => {
                 alignItems="baseline"
                 justifyContent="space-between"
                 direction="column"
-                py={0}
-                px={4}
+                p={4}
+                pl={settingsOpen ? 4 : 0}
                 gap={2}
+                transition="ease-in-out 200ms"
+                backgroundColor={settingsOpen ? "gray.300" : "transparent"}
+                shadow={settingsOpen ? "2xl" : "none"}
+                rounded="3xl"
             >
-                <Flex alignItems="center" gap={2}>
+                <Flex alignItems="center" gap={6}>
                     <IconButton
+                        backgroundColor={settingsOpen ? "gray.500" : "white"}
                         height="40px"
-                        transition="height 200ms"
+                        width={settingsOpen ? "110px" : "40px"}
+                        transition="width 200ms"
                         onClick={() => setSettingsOpen((prev) => !prev)}
                         aria-label="Search database"
+                        _hover={{
+                            backgroundColor: settingsOpen ? "none" : "gray.300",
+                        }}
                         icon={
-                            settingsOpen ? (
-                                <ChevronUpIcon />
+                            !settingsOpen ? (
+                                <SettingsIcon
+                                    fontSize="inherit"
+                                    sx={{
+                                        color: "gray.500",
+                                    }}
+                                />
                             ) : (
-                                <ChevronDownIcon />
+                                <Flex gap={2} alignItems="center">
+                                    <Text color="gray.100">Confirm</Text>
+                                    <CheckIcon
+                                        fontSize="inherit"
+                                        sx={{
+                                            color: "white",
+                                        }}
+                                    />
+                                </Flex>
                             )
                         }
                     />
@@ -327,8 +362,15 @@ const TrackReview = ({ reviewStep }: Props) => {
                             <Box>{preferredGenre}</Box>
                         </Flex>
                         <Flex flexDirection="column" alignItems="center">
-                            <Box fontWeight="bold">Year</Box>
-                            <Box>{preferredYear || "All"}</Box>
+                            <Box fontWeight="bold">Year range</Box>
+                            {preferredYearRange.from === "all" ? (
+                                <Box>{preferredYearRange.from || "All"}</Box>
+                            ) : (
+                                <Box>
+                                    {preferredYearRange.from} -{" "}
+                                    {preferredYearRange.to}
+                                </Box>
+                            )}
                         </Flex>
                         <Flex flexDirection="column" alignItems="center">
                             <Box fontWeight="bold">Autoplay</Box>
@@ -337,31 +379,37 @@ const TrackReview = ({ reviewStep }: Props) => {
                     </Flex>
                 </Flex>
                 <ReviewTracksFilters
+                    onConfirm={() => {
+                        setSettingsOpen(false);
+                    }}
                     isOpen={settingsOpen}
                     onGenreSelect={async (genre: string) => {
                         setPreferredGenre(genre);
                     }}
-                    onYearSelect={async (year) => {
-                        setPreferredYear(year);
+                    onYearFromSelect={async (year) => {
+                        setPreferredYearRange((prev) => ({
+                            to:
+                                year === "all" ||
+                                year === new Date().getFullYear().toString()
+                                    ? new Date().getFullYear().toString()
+                                    : prev.to,
+                            from: year,
+                        }));
                     }}
-                    selectedYear={preferredYear}
+                    onYearToSelect={async (year) => {
+                        setPreferredYearRange((prev) => ({
+                            ...prev,
+                            to: year,
+                        }));
+                    }}
+                    selectedYearFrom={preferredYearRange.from}
+                    selectedYearTo={preferredYearRange.to}
                     selectedGenre={preferredGenre}
                     genres={availableGenres}
                     autoPlay={preferredAutoPlay}
                     onAutoPlayChange={(value) => setPreferredAutoPlay(value)}
                     ref={genreRef}
                 />
-                <Box position="absolute" right={0}>
-                    <IconButton
-                        onClick={() => router.push("/settings")}
-                        variant="ghost"
-                        h={1 / 2}
-                        colorScheme="teal"
-                        aria-label="Show password"
-                        fontSize="3xl"
-                        icon={<SettingsIcon fontSize="inherit" />}
-                    />
-                </Box>
             </Flex>
             {currentTrack && (
                 <>

@@ -160,11 +160,6 @@ const SignUp = ({}: Props) => {
                                 type="submit"
                                 variant="outline"
                                 onClick={handleSubmit(performRegister)}
-                                _hover={
-                                    submitting
-                                        ? { backgroundColor: "red" }
-                                        : undefined
-                                }
                             >
                                 Register
                             </Button>
