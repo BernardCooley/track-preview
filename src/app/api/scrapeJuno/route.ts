@@ -236,29 +236,36 @@ export async function GET() {
     };
 
     const util = async () => {
-        let fileNumber = 1;
-        for (let i = 1; i < 19; i++) {
-            var data = await fs.readFileSync(`juno_scraped_tracks/${i}.json`);
-            const tracks = JSON.parse(data);
+        for (let i = 1; i < 67; i++) {
+            try {
+                var data = await fs.readFileSync(
+                    `juno_scraped_tracks/stillToUpload/${32}.json`
+                );
+                console.log(
+                    "🚀 ~ file: route.ts:245 ~ util ~ `juno_scraped_tracks/stillToUpload/${i}.json`:",
+                    `juno_scraped_tracks/stillToUpload/${i}.json`
+                );
+                const tracks = JSON.parse(data);
+                console.log(
+                    "🚀 ~ file: route.ts:246 ~ util ~ tracks:",
+                    tracks.length
+                );
 
-            const chunks = [];
+                // const tracksWithUpdatedDates = tracks.map((t: any) => {
+                //     return {
+                //         ...t,
+                //         releaseYear: new Date(t.releaseDate).getFullYear(),
+                //     };
+                // });
 
-            for (let j = 0; j < tracks.length; j += 12000) {
-                const chunk = tracks.slice(j, j + 12000);
-                chunks.push(chunk);
-            }
-
-            chunks.forEach((chunk, index) => {
                 // fs.writeFileSync(
-                //     `juno_scraped_tracks/split/${fileNumber}.json`,
-                //     JSON.stringify(chunk, null, 4),
+                //     `juno_scraped_tracks/stillToUpload/withYear/${i}.json`,
+                //     JSON.stringify(tracksWithUpdatedDates, null, 4),
                 //     (err: any) => {
                 //         if (err) console.log(err);
                 //     }
                 // );
-                fileNumber = fileNumber + 1;
-            });
-            fileNumber = fileNumber + 1;
+            } catch (error) {}
         }
     };
 
