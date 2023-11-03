@@ -40,13 +40,13 @@ const TrackReview = ({ reviewStep }: Props) => {
         "preferredGenre",
         "All"
     );
-    const [preferredYearRange, setPreferredYearRange] = useLocalStorage(
-        "preferredYearRange",
-        {
-            from: "All",
-            to: new Date().getFullYear().toString(),
-        }
-    );
+    const [preferredYearRange, setPreferredYearRange] = useLocalStorage<{
+        from: number;
+        to: number;
+    }>("preferredYearRange", {
+        from: 0,
+        to: new Date().getFullYear(),
+    });
     const [preferredAutoPlay, setPreferredAutoPlay] = useLocalStorage(
         "preferredAutoPlay",
         false
@@ -82,21 +82,11 @@ const TrackReview = ({ reviewStep }: Props) => {
 
             if (reviewStep === 1) {
                 setLoading(true);
-                const from =
-                    preferredYearRange.from === "All" ||
-                    !preferredYearRange.from
-                        ? 1950
-                        : preferredYearRange.from;
-                const to =
-                    preferredYearRange.to === "" || !preferredYearRange.to
-                        ? new Date().getFullYear()
-                        : Number(preferredYearRange.to);
-
                 try {
                     const tracks = await fetchStoredTracks({
                         genre: preferredGenre,
-                        startDate: new Date(`${from}-01-01`),
-                        endDate: new Date(`${to}-01-01`),
+                        startYear: preferredYearRange.from,
+                        endYear: preferredYearRange.to,
                     });
                     setStoredTracks(tracks);
                     if (!tracks) {
@@ -382,7 +372,7 @@ const TrackReview = ({ reviewStep }: Props) => {
                         </Flex>
                         <Flex flexDirection="column" alignItems="center">
                             <Box fontWeight="bold">Year range</Box>
-                            {preferredYearRange.from === "All" ? (
+                            {preferredYearRange.from === 0 ? (
                                 <Box>{preferredYearRange.from || "All"}</Box>
                             ) : (
                                 <Box>
@@ -407,19 +397,20 @@ const TrackReview = ({ reviewStep }: Props) => {
                         setPreferredGenre(genre);
                     }}
                     onYearFromSelect={async (year) => {
+                        const y = Number(year);
                         setPreferredYearRange((prev) => ({
                             to:
-                                year === "All" ||
-                                year === new Date().getFullYear().toString()
-                                    ? new Date().getFullYear().toString()
+                                y === 0 || y === new Date().getFullYear()
+                                    ? new Date().getFullYear()
                                     : prev.to,
-                            from: year,
+                            from: y,
                         }));
                     }}
                     onYearToSelect={async (year) => {
+                        const y = Number(year);
                         setPreferredYearRange((prev) => ({
                             ...prev,
-                            to: year,
+                            to: y,
                         }));
                     }}
                     selectedYearFrom={preferredYearRange.from}

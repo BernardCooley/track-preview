@@ -81,35 +81,31 @@ export const updateTrackReviewStep = async ({
 
 interface FetchStoredTracksProps {
     genre: string;
-    startDate?: Date;
-    endDate?: Date;
+    startYear?: number;
+    endYear?: number;
 }
 
 export const fetchStoredTracks = async ({
     genre,
-    startDate,
-    endDate,
+    startYear,
+    endYear,
 }: FetchStoredTracksProps): Promise<ScrapeTrack[] | null> => {
     const collectionRef = collection(db, "tracks");
 
     let q = query(collectionRef, where("genre", "==", genre), limit(100));
 
-    const from = Timestamp.fromDate(startDate as Date);
-    const to = Timestamp.fromDate(endDate as Date);
-
-    if (startDate) {
+    if (startYear) {
         q = query(
             collectionRef,
             where("genre", "==", genre),
-            where("releaseDate", ">=", from),
-            where("releaseDate", "<=", to),
+            where("releaseYear", ">", Number(startYear)),
+            where("releaseYear", "<=", Number(endYear)),
             limit(100)
         );
     }
 
     try {
         const querySnapshot = await getDocs(q as any);
-
         const tracks = querySnapshot.docs.map((doc) => {
             return { ...(doc.data() as ScrapeTrack), id: doc.id };
         }) as ScrapeTrack[];
