@@ -136,7 +136,7 @@ const ReviewTracksFilters = forwardRef(
                                     }
                                     defaultValue={selectedYearFrom}
                                 >
-                                    <option value="all">All</option>
+                                    <option value={0}>All</option>
                                     {arrayRange(
                                         1950,
                                         new Date().getFullYear(),

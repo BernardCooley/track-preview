@@ -106,6 +106,7 @@ export const fetchStoredTracks = async ({
 
     try {
         const querySnapshot = await getDocs(q as any);
+
         const tracks = querySnapshot.docs.map((doc) => {
             return { ...(doc.data() as ScrapeTrack), id: doc.id };
         }) as ScrapeTrack[];
