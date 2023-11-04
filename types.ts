@@ -19,11 +19,6 @@ export interface Track {
     purchaseUrl: string;
 }
 
-export interface User {
-    uid: string;
-    email: string;
-}
-
 export interface ScrapeTrack {
     purchaseUrl: string;
     artist: string;
@@ -37,4 +32,9 @@ export interface ScrapeTrack {
         day: number;
     };
     id: string;
+}
+
+export interface User {
+    uid: string;
+    email: string;
 }
