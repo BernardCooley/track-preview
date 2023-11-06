@@ -513,9 +513,13 @@ const TrackReview = ({ reviewStep }: Props) => {
                         )}
                         {trackList[1] && (
                             <Center mt={[6, 16]}>
-                                <Flex direction="column" alignItems="center">
+                                <Flex
+                                    direction="column"
+                                    alignItems="center"
+                                    px={6}
+                                >
                                     <Text>Up Next</Text>
-                                    <Text noOfLines={1} fontWeight="bold">
+                                    <Text noOfLines={2} fontWeight="bold">
                                         {trackList[1].artist} -{" "}
                                         {trackList[1].title}
                                     </Text>
