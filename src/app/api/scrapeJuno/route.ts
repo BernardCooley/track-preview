@@ -239,7 +239,7 @@ export async function GET() {
         for (let i = 1; i < 67; i++) {
             try {
                 var data = await fs.readFileSync(
-                    `juno_scraped_tracks/stillToUpload/${32}.json`
+                    `juno_scraped_tracks/stillToUpload/${i}.json`
                 );
                 console.log(
                     "🚀 ~ file: route.ts:245 ~ util ~ `juno_scraped_tracks/stillToUpload/${i}.json`:",

@@ -24,7 +24,7 @@ interface Props {
     onLikeOrDislike: (liked: boolean) => Promise<void>;
     onPlayButtonClicked: () => void;
     onAudioPlay: () => void;
-    onListened: () => void;
+    onListenedToggle: (listened: boolean) => void;
 }
 
 const TrackReviewCard = forwardRef(
@@ -38,7 +38,7 @@ const TrackReviewCard = forwardRef(
             onLikeOrDislike,
             onPlayButtonClicked,
             onAudioPlay,
-            onListened,
+            onListenedToggle,
         }: Props,
         ref: LegacyRef<HTMLAudioElement> | undefined
     ) => {
@@ -129,12 +129,11 @@ const TrackReviewCard = forwardRef(
                                 <audio
                                     onPlay={onAudioPlay}
                                     onTimeUpdate={(e) => {
-                                        if (
-                                            e.currentTarget.currentTime > 2 &&
-                                            (trackList[1] || ignoreQueuedTrack)
-                                        ) {
-                                            onListened();
-                                        }
+                                        onListenedToggle(
+                                            (e.currentTarget.currentTime > 2 &&
+                                                (trackList[1] ||
+                                                    ignoreQueuedTrack)) as boolean
+                                        );
                                     }}
                                     ref={ref}
                                     style={{

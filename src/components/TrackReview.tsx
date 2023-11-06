@@ -191,11 +191,8 @@ const TrackReview = ({ reviewStep }: Props) => {
     }, [userTracks]);
 
     useEffect(() => {
-        setIsPlaying(false);
-
         if (trackList[0]) {
             setLoading(false);
-            setListened(false);
             setTrackPlayed(false);
         }
 
@@ -316,6 +313,7 @@ const TrackReview = ({ reviewStep }: Props) => {
     };
 
     const likeOrDislike = async (like: boolean) => {
+        setIsPlaying(false);
         if (reviewStep === 1) {
             setTrackList((prev) => {
                 if (prev && prev.length > 0) {
@@ -486,7 +484,13 @@ const TrackReview = ({ reviewStep }: Props) => {
                     ref={genreRef}
                 />
             </Flex>
-            <Flex direction="column" position="relative" top={20}>
+            <Flex
+                direction="column"
+                position="relative"
+                top={20}
+                opacity={settingsOpen ? 0.3 : 1}
+                pointerEvents={settingsOpen ? "none" : "auto"}
+            >
                 {reviewStep < 4 ? (
                     <>
                         {trackList[0] && (
@@ -503,7 +507,7 @@ const TrackReview = ({ reviewStep }: Props) => {
                                 onAudioPlay={() => {
                                     setIsPlaying(true);
                                 }}
-                                onListened={() => setListened(true)}
+                                onListenedToggle={(val) => setListened(val)}
                                 ref={audioElementRef}
                             />
                         )}
