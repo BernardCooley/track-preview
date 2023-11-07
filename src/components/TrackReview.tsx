@@ -37,10 +37,7 @@ interface Props {
 }
 
 const TrackReview = ({ reviewStep }: Props) => {
-    const [preferredGenre, setPreferredGenre] = useLocalStorage(
-        "preferredGenre",
-        "All"
-    );
+    const [genre, setPreferredGenre] = useLocalStorage("genre", "All");
     const [preferredYearRange, setPreferredYearRange] = useLocalStorage<{
         from: number;
         to: number;
@@ -56,7 +53,7 @@ const TrackReview = ({ reviewStep }: Props) => {
         null
     );
     const toast = useToast();
-    const [availableGenres] = useState<string[]>(genres);
+    const [availableGenres, setAvailableGenres] = useState<string[]>(genres);
     const [loading, setLoading] = useState<boolean>(false);
     const genreRef = useRef<HTMLSelectElement>(null);
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
@@ -66,14 +63,13 @@ const TrackReview = ({ reviewStep }: Props) => {
     const [trackPlayed, setTrackPlayed] = useState<boolean>(false);
     const [userTracks, setUserTracks] = useState<Track[] | null>(null);
     const [settingsOpen, setSettingsOpen] = useState<boolean>(false);
-    const [randomNumber, setRandomNumber] = useState<number>(0);
     const id = "test-toast";
     const [oldValues, setOldValues] = useState<{
         genre: string;
         yearFrom: number;
         yearTo: number;
     }>({
-        genre: preferredGenre,
+        genre,
         yearFrom: preferredYearRange.from,
         yearTo: preferredYearRange.to,
     });
@@ -87,50 +83,46 @@ const TrackReview = ({ reviewStep }: Props) => {
 
     useEffect(() => {
         if (isPlaying && trackList.length < trackListLimit) {
-            searchForTrack();
+            searchForTrack(storedTracks);
         }
     }, [isPlaying]);
 
     useEffect(() => {
         setSetFiltersToApply(
-            oldValues.genre !== preferredGenre ||
+            oldValues.genre !== genre ||
                 oldValues.yearFrom !== preferredYearRange.from ||
                 oldValues.yearTo !== preferredYearRange.to
         );
-    }, [
-        preferredGenre,
-        preferredYearRange.from,
-        preferredYearRange.to,
-        settingsOpen,
-    ]);
+    }, [genre, preferredYearRange.from, preferredYearRange.to, settingsOpen]);
 
     const init = async () => {
-        if (preferredGenre && user?.uid) {
+        if (genre && user?.uid) {
             setTrackList([]);
-            genreRef.current!.value = preferredGenre;
+            genreRef.current!.value = genre;
 
             if (reviewStep === 1) {
+                setAvailableGenres(genres);
                 setLoading(true);
                 try {
                     const tracks = await fetchStoredTracks({
-                        genre: preferredGenre,
+                        genre,
                         startYear: preferredYearRange.from,
                         endYear: preferredYearRange.to,
                     });
                     setStoredTracks(tracks);
 
-                    const userTracks = await fetchUserTracks({
-                        genre: preferredGenre,
-                        currentReviewStep: reviewStep,
+                    const uTracks = await fetchUserTracks({
+                        genre,
+                        reviewStep,
                         userId: user.uid,
                     });
-                    setUserTracks(userTracks);
+                    setUserTracks(uTracks);
 
                     if (!tracks) {
                         setLoading(false);
                         showToast({
                             status: "info",
-                            title: `No more ${preferredGenre} tracks available`,
+                            title: `No more ${genre} tracks available`,
                             description: `Please try again with different filters.`,
                         });
                     }
@@ -143,12 +135,24 @@ const TrackReview = ({ reviewStep }: Props) => {
                 setLoading(false);
 
                 try {
-                    const tracks = await fetchUserTracks({
-                        genre: preferredGenre,
-                        currentReviewStep: reviewStep,
+                    const uTracks = await fetchUserTracks({
+                        reviewStep,
                         userId: user.uid,
                     });
-                    setUserTracks(tracks);
+                    setAvailableGenres(
+                        Array.from(
+                            new Set(uTracks?.map((track) => track.genre) || [])
+                        )
+                    );
+
+                    if (genre && genre !== "all") {
+                        setUserTracks(
+                            uTracks?.filter((track) => track.genre === genre) ||
+                                []
+                        );
+                    } else {
+                        setUserTracks(uTracks);
+                    }
                 } catch (error) {
                     showToast({
                         status: "error",
@@ -157,9 +161,15 @@ const TrackReview = ({ reviewStep }: Props) => {
                     console.log(error);
                 }
             }
+            if (reviewStep > 1) {
+                setPreferredYearRange({
+                    from: 0,
+                    to: new Date().getFullYear(),
+                });
+            }
         }
         setOldValues({
-            genre: preferredGenre,
+            genre,
             yearFrom: preferredYearRange.from,
             yearTo: preferredYearRange.to,
         });
@@ -167,7 +177,7 @@ const TrackReview = ({ reviewStep }: Props) => {
 
     useEffect(() => {
         if (trackPlayed || (storedTracks && storedTracks.length > 0)) {
-            searchForTrack();
+            searchForTrack(storedTracks);
         } else {
             setTrackList([]);
             setLoading(false);
@@ -221,35 +231,30 @@ const TrackReview = ({ reviewStep }: Props) => {
         }
     };
 
-    const searchForTrack = async () => {
+    const searchForTrack = async (storedTracks: ScrapeTrack[] | null) => {
         if (storedTracks && storedTracks.length > 0) {
-            const rand = Math.floor(
-                Math.floor(Math.random() * storedTracks.length)
-            );
-            setRandomNumber(rand);
-
             if (
                 !userTracks
                     ?.map((track) => track.storedTrackId)
-                    .includes(storedTracks[rand].id)
+                    .includes(storedTracks[0].id)
             ) {
                 let searchedTrack;
 
-                searchedTrack = await fetchITunesTrack({
-                    trackToSearch: `${storedTracks[rand].artist} - ${storedTracks[rand].title}`,
+                searchedTrack = await fetchDeezerTrack({
+                    trackToSearch: `${storedTracks[0].artist} - ${storedTracks[0].title}`,
                 });
 
                 if (!searchedTrack) {
-                    searchedTrack = await fetchDeezerTrack({
-                        trackToSearch: `${storedTracks[rand].artist} - ${storedTracks[rand].title}`,
+                    searchedTrack = await fetchITunesTrack({
+                        trackToSearch: `${storedTracks[0].artist} - ${storedTracks[0].title}`,
                     });
                 }
 
                 if (!searchedTrack) {
                     searchedTrack = await fetchSpotifyTrack({
                         trackToSearch: {
-                            artist: storedTracks[rand].artist,
-                            title: storedTracks[rand].title,
+                            artist: storedTracks[0].artist,
+                            title: storedTracks[0].title,
                         },
                     });
                 }
@@ -266,13 +271,13 @@ const TrackReview = ({ reviewStep }: Props) => {
                     });
                 } else {
                     const newStoredTracks = storedTracks.filter(
-                        (track) => track !== storedTracks[rand]
+                        (track) => track !== storedTracks[0]
                     );
                     setStoredTracks(newStoredTracks);
                 }
             } else {
                 const newStoredTracks = storedTracks.filter(
-                    (track) => track !== storedTracks[rand]
+                    (track) => track !== storedTracks[0]
                 );
                 setStoredTracks(newStoredTracks);
             }
@@ -288,16 +293,16 @@ const TrackReview = ({ reviewStep }: Props) => {
         const generatedId = uuidv4();
         if (user?.uid && trackList[0] && storedTracks) {
             const newTrack: Track = {
-                storedTrackId: storedTracks[randomNumber].id,
-                artist: storedTracks[randomNumber].artist,
+                storedTrackId: storedTracks[0].id,
+                artist: storedTracks[0].artist,
                 furthestReviewStep: like ? reviewStep + 1 : reviewStep,
                 currentReviewStep: like ? reviewStep + 1 : 0,
-                genre: preferredGenre,
+                genre: storedTracks[0].genre,
                 searchedTrack: trackList[0],
-                title: storedTracks[randomNumber].title,
+                title: storedTracks[0].title,
                 userId: user.uid,
                 id: generatedId,
-                purchaseUrl: storedTracks[randomNumber].purchaseUrl,
+                purchaseUrl: storedTracks[0].purchaseUrl,
             };
 
             try {
@@ -315,22 +320,23 @@ const TrackReview = ({ reviewStep }: Props) => {
     const likeOrDislike = async (like: boolean) => {
         setIsPlaying(false);
         if (reviewStep === 1) {
-            setTrackList((prev) => {
-                if (prev && prev.length > 0) {
-                    prev.splice(0, 1);
-                    return [...prev];
-                } else {
-                    return [];
-                }
-            });
             storeTrack(like);
 
-            if (storedTracks) {
-                const newStoredTracks = storedTracks.filter(
-                    (track) => track !== storedTracks[randomNumber]
-                );
-                setStoredTracks(newStoredTracks);
-            }
+            // setTrackList((prev) => {
+            //     if (prev && prev.length > 0) {
+            //         prev.splice(0, 1);
+            //         return [...prev];
+            //     } else {
+            //         return [];
+            //     }
+            // });
+
+            // if (storedTracks) {
+            //     const newStoredTracks = storedTracks.filter(
+            //         (track) => track !== storedTracks[0]
+            //     );
+            //     setStoredTracks(newStoredTracks);
+            // }
         } else if (reviewStep > 1 && reviewStep < 4) {
             if (userTracks && userTracks.length > 0) {
                 await updateTrackReviewStep({
@@ -365,7 +371,7 @@ const TrackReview = ({ reviewStep }: Props) => {
                         fontSize={["24px", "36px"]}
                         px={4}
                     >
-                        {`Loading new ${preferredGenre} Track...`}
+                        {`Loading new ${genre} Track...`}
                     </Badge>
                 </Center>
             )}
@@ -430,7 +436,7 @@ const TrackReview = ({ reviewStep }: Props) => {
                     >
                         <Flex gap={2}>
                             <Tag colorScheme="teal" variant="solid">
-                                {preferredGenre}
+                                {genre}
                             </Tag>
                             <Tag colorScheme="teal" variant="solid">
                                 {preferredYearRange.from === 0
@@ -450,10 +456,8 @@ const TrackReview = ({ reviewStep }: Props) => {
                     </Flex>
                 </Flex>
                 <ReviewTracksFilters
+                    reviewStep={reviewStep}
                     preferredYearRange={preferredYearRange}
-                    onConfirm={() => {
-                        setSettingsOpen(false);
-                    }}
                     isOpen={settingsOpen}
                     onGenreSelect={async (genre: string) => {
                         setPreferredGenre(genre);
@@ -477,7 +481,7 @@ const TrackReview = ({ reviewStep }: Props) => {
                     }}
                     selectedYearFrom={preferredYearRange.from}
                     selectedYearTo={preferredYearRange.to}
-                    selectedGenre={preferredGenre}
+                    selectedGenre={genre}
                     genres={availableGenres}
                     autoPlay={preferredAutoPlay}
                     onAutoPlayChange={(value) => setPreferredAutoPlay(value)}

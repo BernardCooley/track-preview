@@ -5,7 +5,15 @@ import {
     signInWithEmailAndPassword,
     signOut,
 } from "firebase/auth";
-import { auth } from "./firebaseInit";
+import { auth, db } from "./firebaseInit";
+import {
+    DocumentData,
+    Query,
+    collection,
+    limit,
+    query,
+    where,
+} from "firebase/firestore";
 
 export const LoginUser = async (
     email: string,
@@ -40,4 +48,56 @@ export const RegisterUser = async (
     } catch (error) {
         throw error;
     }
+};
+
+export const getUserTracksQuery = (
+    userId: string,
+    reviewStep: number,
+    genre?: string
+): Query<DocumentData, DocumentData> => {
+    const collectionRef = collection(db, "userTracks");
+    const whereUserId = where("userId", "==", userId);
+    const whereCurrentReviewStep = where("currentReviewStep", "==", reviewStep);
+
+    if (genre && genre !== "all") {
+        return query(
+            collectionRef,
+            whereCurrentReviewStep,
+            whereUserId,
+            where("genre", "==", genre)
+        );
+    }
+
+    return query(collectionRef, whereUserId, whereCurrentReviewStep);
+};
+
+export const getStoredTracksQuery = (
+    genre: string | undefined,
+    startYear: number | undefined,
+    endYear: number | undefined
+): Query<DocumentData, DocumentData> => {
+    const collectionRef = collection(db, "tracks");
+    const whereGenre = where("genre", "==", genre);
+    const whereStartYear = where("releaseYear", ">=", Number(startYear));
+    const whereEndYear = where("releaseYear", "<=", Number(endYear));
+
+    if (genre && genre !== "all") {
+        return query(collectionRef, whereGenre, limit(100));
+    }
+
+    if (startYear && (!genre || genre === "all")) {
+        return query(collectionRef, whereStartYear, whereEndYear, limit(100));
+    }
+
+    if (startYear && genre && genre !== "all") {
+        return query(
+            collectionRef,
+            whereGenre,
+            whereStartYear,
+            whereEndYear,
+            limit(100)
+        );
+    }
+
+    return query(collectionRef, limit(100));
 };

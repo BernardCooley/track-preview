@@ -25,8 +25,8 @@ interface Props {
     autoPlay: boolean;
     onAutoPlayChange: (autoPlay: boolean) => void;
     isOpen: boolean;
-    onConfirm: () => void;
     preferredYearRange: { from: number; to: number };
+    reviewStep: number;
 }
 
 const ReviewTracksFilters = forwardRef(
@@ -42,8 +42,8 @@ const ReviewTracksFilters = forwardRef(
             autoPlay,
             onAutoPlayChange,
             isOpen,
-            onConfirm,
             preferredYearRange,
+            reviewStep,
         }: Props,
         ref: LegacyRef<HTMLSelectElement>
     ) => {
@@ -115,45 +115,47 @@ const ReviewTracksFilters = forwardRef(
                                     ))}
                                 </Select>
                             </Flex>
-                            <Flex
-                                alignItems="flex-start"
-                                gap={2}
-                                direction="column"
-                            >
-                                <FormLabel fontSize="md" mb={0}>
-                                    <Box>Year from</Box>
-                                </FormLabel>
-                                <Select
-                                    ref={yearFromRef}
-                                    boxShadow="md"
-                                    _focusVisible={{
-                                        boxShadow: "none",
-                                    }}
-                                    variant="outline"
-                                    placeholder="Year from"
-                                    onChange={(e) =>
-                                        onYearFromSelect(e.target.value)
-                                    }
-                                    defaultValue={selectedYearFrom}
+                            {reviewStep === 1 && (
+                                <Flex
+                                    alignItems="flex-start"
+                                    gap={2}
+                                    direction="column"
                                 >
-                                    <option value={0}>All</option>
-                                    {arrayRange(
-                                        1950,
-                                        new Date().getFullYear(),
-                                        1
-                                    )
-                                        .reverse()
-                                        .map((year) => (
-                                            <option
-                                                key={year}
-                                                value={year.toString()}
-                                            >
-                                                {year}
-                                            </option>
-                                        ))}
-                                </Select>
-                            </Flex>
-                            {selectedYearFrom !== 0 && (
+                                    <FormLabel fontSize="md" mb={0}>
+                                        <Box>Year from</Box>
+                                    </FormLabel>
+                                    <Select
+                                        ref={yearFromRef}
+                                        boxShadow="md"
+                                        _focusVisible={{
+                                            boxShadow: "none",
+                                        }}
+                                        variant="outline"
+                                        placeholder="Year from"
+                                        onChange={(e) =>
+                                            onYearFromSelect(e.target.value)
+                                        }
+                                        defaultValue={selectedYearFrom}
+                                    >
+                                        <option value={0}>All</option>
+                                        {arrayRange(
+                                            1950,
+                                            new Date().getFullYear(),
+                                            1
+                                        )
+                                            .reverse()
+                                            .map((year) => (
+                                                <option
+                                                    key={year}
+                                                    value={year.toString()}
+                                                >
+                                                    {year}
+                                                </option>
+                                            ))}
+                                    </Select>
+                                </Flex>
+                            )}
+                            {selectedYearFrom !== 0 && reviewStep === 1 && (
                                 <Flex
                                     alignItems="flex-start"
                                     gap={2}
