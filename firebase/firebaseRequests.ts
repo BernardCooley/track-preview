@@ -36,7 +36,7 @@ export const updateTrackReviewStep = async ({
 };
 
 interface FetchUserTracksProps {
-    reviewStep: number;
+    reviewStep?: number;
     userId: string;
     genre?: string;
 }

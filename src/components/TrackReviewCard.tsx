@@ -16,9 +16,10 @@ import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import { SearchedTrack } from "../../types";
 
 interface Props {
+    currentTrack: SearchedTrack;
+    queueTrack: SearchedTrack | null;
     ignoreQueuedTrack: boolean;
     loading: boolean;
-    trackList: SearchedTrack[];
     isPlaying: boolean;
     listened: boolean;
     onLikeOrDislike: (liked: boolean) => Promise<void>;
@@ -30,9 +31,10 @@ interface Props {
 const TrackReviewCard = forwardRef(
     (
         {
+            currentTrack,
+            queueTrack,
             ignoreQueuedTrack,
             loading,
-            trackList,
             isPlaying,
             listened,
             onLikeOrDislike,
@@ -46,18 +48,18 @@ const TrackReviewCard = forwardRef(
             <Card size="md" h="400px" opacity={loading ? "0.4" : "1"} mt={2}>
                 <CardHeader>
                     <Heading size="md">
-                        <Link href={trackList[0].url} isExternal>
+                        <Link href={currentTrack.url} isExternal>
                             <Flex
                                 alignItems="center"
                                 direction="column"
                                 position="relative"
                             >
                                 <Text fontSize="3xl" fontWeight="bold">
-                                    {trackList[0].artist}
+                                    {currentTrack.artist}
                                 </Text>
                                 <Flex gap={1}>
                                     <Text fontSize="xl">
-                                        {trackList[0].title}
+                                        {currentTrack.title}
                                     </Text>
                                     <OpenInNewIcon />
                                 </Flex>
@@ -68,7 +70,7 @@ const TrackReviewCard = forwardRef(
                 <CardBody
                     w="full"
                     h="full"
-                    bgImage={trackList[0].thumbnail}
+                    bgImage={currentTrack.thumbnail}
                     bgSize="cover"
                 >
                     <Flex
@@ -131,7 +133,7 @@ const TrackReviewCard = forwardRef(
                                     onTimeUpdate={(e) => {
                                         onListenedToggle(
                                             (e.currentTarget.currentTime > 2 &&
-                                                (trackList[1] ||
+                                                (queueTrack ||
                                                     ignoreQueuedTrack)) as boolean
                                         );
                                     }}
@@ -139,7 +141,7 @@ const TrackReviewCard = forwardRef(
                                     style={{
                                         width: "100%",
                                     }}
-                                    src={trackList[0].previewUrl}
+                                    src={currentTrack.previewUrl}
                                     controls
                                 />
                             </Flex>

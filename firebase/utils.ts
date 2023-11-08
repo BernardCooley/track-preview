@@ -52,7 +52,7 @@ export const RegisterUser = async (
 
 export const getUserTracksQuery = (
     userId: string,
-    reviewStep: number,
+    reviewStep?: number,
     genre?: string
 ): Query<DocumentData, DocumentData> => {
     const collectionRef = collection(db, "userTracks");
@@ -60,12 +60,20 @@ export const getUserTracksQuery = (
     const whereCurrentReviewStep = where("currentReviewStep", "==", reviewStep);
 
     if (genre && genre !== "all") {
+        return query(collectionRef, whereUserId, where("genre", "==", genre));
+    }
+
+    if (genre && genre !== "all" && reviewStep) {
         return query(
             collectionRef,
             whereCurrentReviewStep,
             whereUserId,
             where("genre", "==", genre)
         );
+    }
+
+    if (reviewStep) {
+        return query(collectionRef, whereUserId);
     }
 
     return query(collectionRef, whereUserId, whereCurrentReviewStep);
@@ -81,14 +89,6 @@ export const getStoredTracksQuery = (
     const whereStartYear = where("releaseYear", ">=", Number(startYear));
     const whereEndYear = where("releaseYear", "<=", Number(endYear));
 
-    if (genre && genre !== "all") {
-        return query(collectionRef, whereGenre, limit(100));
-    }
-
-    if (startYear && (!genre || genre === "all")) {
-        return query(collectionRef, whereStartYear, whereEndYear, limit(100));
-    }
-
     if (startYear && genre && genre !== "all") {
         return query(
             collectionRef,
@@ -97,6 +97,14 @@ export const getStoredTracksQuery = (
             whereEndYear,
             limit(100)
         );
+    }
+
+    if (startYear && (!genre || genre === "all")) {
+        return query(collectionRef, whereStartYear, whereEndYear, limit(100));
+    }
+
+    if (genre && genre !== "all") {
+        return query(collectionRef, whereGenre, limit(100));
     }
 
     return query(collectionRef, limit(100));

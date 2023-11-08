@@ -10,6 +10,7 @@ import AudioPlayer from "@/components/AudioPlayer";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { onAuthStateChanged } from "firebase/auth";
 import { useAuthContext } from "../../Contexts/AuthContext";
+import TrackReviewStep1 from "@/components/TrackReviewStep1";
 
 export default function Home() {
     const router = useRouter();
@@ -74,7 +75,7 @@ export default function Home() {
                                 router.push(`${pathname}?reviewStep=${step}`);
                             }}
                         />
-                        <TrackReview reviewStep={currentStep} />
+                        <TrackReviewStep1 />
                     </Stack>
                     <Slide
                         direction="bottom"
