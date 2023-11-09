@@ -1,15 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { genres } from "../../data/genres";
-import {
-    Badge,
-    Box,
-    Center,
-    Flex,
-    IconButton,
-    Tag,
-    Text,
-    useToast,
-} from "@chakra-ui/react";
+import { Box, Flex, useToast } from "@chakra-ui/react";
 import ReviewTracksFilters from "./ReviewTracksFilters";
 import { useLocalStorage } from "usehooks-ts";
 import { ScrapeTrack, SearchedTrack, Track } from "../../types";
@@ -25,9 +16,10 @@ import {
 } from "../../firebase/firebaseRequests";
 import { useAuthContext } from "../../Contexts/AuthContext";
 import TrackReviewCard from "./TrackReviewCard";
-import SettingsIcon from "@mui/icons-material/Settings";
-import CheckIcon from "@mui/icons-material/Check";
-import { v4 as uuidv4 } from "uuid";
+import Loading from "./Loading";
+import ApplyFiltersButton from "./ApplyFiltersButton";
+import FilterTags from "./FilterTags";
+import { getCurrentYear } from "../../utils";
 
 const TrackReviewStep1 = () => {
     const [genre, setPreferredGenre] = useLocalStorage("genre", "All");
@@ -40,10 +32,10 @@ const TrackReviewStep1 = () => {
         to: number;
     }>("preferredYearRange", {
         from: 0,
-        to: new Date().getFullYear(),
+        to: getCurrentYear(),
     });
     const toast = useToast();
-    const id = "test-toast";
+    const id = "step1-toast";
     const [tracks, setTracks] = useState<ScrapeTrack[]>([]);
     const [settingsOpen, setSettingsOpen] = useState<boolean>(false);
     const [filtersToApply, setSetFiltersToApply] = useState<boolean>(false);
@@ -63,10 +55,8 @@ const TrackReviewStep1 = () => {
         yearFrom: preferredYearRange.from,
         yearTo: preferredYearRange.to,
     });
-    const [currentTrack, setCurrentTrack] = useState<SearchedTrack | null>(
-        null
-    );
-    const [queuedTrack, setQueuedTrack] = useState<SearchedTrack | null>(null);
+    const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
+    const [queuedTrack, setQueuedTrack] = useState<Track | null>(null);
 
     const showToast = useCallback(
         ({ status, title, description }: ToastProps) => {
@@ -100,12 +90,11 @@ const TrackReviewStep1 = () => {
                 const userTracks =
                     (await fetchUserTracks({
                         genre,
-                        reviewStep: 1,
                         userId: user.uid,
                     })) || [];
 
                 if (storedTracks && storedTracks.length > 0) {
-                    const uTrackIds = userTracks.map((t) => t.storedTrackId);
+                    const uTrackIds = userTracks.map((t) => t.id);
                     const filteredStoredTracks = storedTracks.filter(
                         (t) => !uTrackIds.includes(t.id)
                     );
@@ -133,7 +122,7 @@ const TrackReviewStep1 = () => {
 
     useEffect(() => {
         init();
-    }, [genre, preferredYearRange, user, init]);
+    }, [genre, preferredYearRange, user]);
 
     useEffect(() => {
         if (tracks.length > 1) {
@@ -145,7 +134,13 @@ const TrackReviewStep1 = () => {
         } else {
             init();
         }
-    }, [tracks, init, currentTrack]);
+    }, [tracks, currentTrack, queuedTrack]);
+
+    useEffect(() => {
+        if (currentTrack && preferredAutoPlay && !isPlaying) {
+            play();
+        }
+    }, [currentTrack]);
 
     useEffect(() => {
         setSetFiltersToApply(
@@ -153,21 +148,13 @@ const TrackReviewStep1 = () => {
                 oldValues.yearFrom !== preferredYearRange.from ||
                 oldValues.yearTo !== preferredYearRange.to
         );
-    }, [
-        genre,
-        preferredYearRange.from,
-        preferredYearRange.to,
-        settingsOpen,
-        oldValues.genre,
-        oldValues.yearFrom,
-        oldValues.yearTo,
-    ]);
+    }, [genre, preferredYearRange, settingsOpen, oldValues]);
 
     useEffect(() => {
         if (!settingsOpen && filtersToApply) {
             init();
         }
-    }, [settingsOpen, filtersToApply, init]);
+    }, [settingsOpen, filtersToApply]);
 
     const searchTrack = async (track: ScrapeTrack, isCurrentTrack: boolean) => {
         let searchedTrack: SearchedTrack | null = null;
@@ -175,12 +162,6 @@ const TrackReviewStep1 = () => {
         searchedTrack = await fetchDeezerTrack({
             trackToSearch: `${track.artist} - ${track.title}`,
         });
-
-        if (!searchedTrack) {
-            searchedTrack = await fetchITunesTrack({
-                trackToSearch: `${track.artist} - ${track.title}`,
-            });
-        }
 
         if (!searchedTrack) {
             searchedTrack = await fetchSpotifyTrack({
@@ -191,13 +172,31 @@ const TrackReviewStep1 = () => {
             });
         }
 
+        if (!searchedTrack) {
+            searchedTrack = await fetchITunesTrack({
+                trackToSearch: `${track.artist} - ${track.title}`,
+            });
+        }
+
         if (searchedTrack) {
+            const newTrack: Track = {
+                searchedTrack,
+                artist: track.artist,
+                furthestReviewStep: 1,
+                currentReviewStep: 1,
+                genre: track.genre,
+                title: track.title,
+                userId: user!.uid,
+                id: track.id,
+                purchaseUrl: track.purchaseUrl,
+            };
+
             if (isCurrentTrack) {
-                setCurrentTrack(searchedTrack);
+                setCurrentTrack(newTrack);
                 setLoading(false);
                 searchTrack(tracks[1], false);
             } else {
-                setQueuedTrack(searchedTrack);
+                setQueuedTrack(newTrack);
             }
         } else {
             setTracks((prev) => prev.filter((t) => t.id !== track.id));
@@ -211,23 +210,15 @@ const TrackReviewStep1 = () => {
     }
 
     const storeTrack = async (like: boolean) => {
-        const generatedId = uuidv4();
         if (user?.uid && currentTrack && tracks) {
-            const newTrack: Track = {
-                storedTrackId: tracks[0].id,
-                artist: tracks[0].artist,
-                furthestReviewStep: like ? 2 : 1,
-                currentReviewStep: like ? 2 : 0,
-                genre: tracks[0].genre,
-                searchedTrack: currentTrack,
-                title: tracks[0].title,
-                userId: user.uid,
-                id: generatedId,
-                purchaseUrl: tracks[0].purchaseUrl,
-            };
+            currentTrack.currentReviewStep = like ? 2 : 0;
+            currentTrack.furthestReviewStep = like ? 2 : 1;
 
             try {
-                await saveNewTrack({ track: newTrack, id: generatedId });
+                await saveNewTrack({
+                    track: currentTrack,
+                    id: currentTrack.id,
+                });
             } catch (error) {
                 showToast({
                     status: "error",
@@ -244,16 +235,17 @@ const TrackReviewStep1 = () => {
         setListened(false);
 
         if (currentTrack) {
-            const filteredTracks = tracks
-                .slice(1)
-                .filter((t) => t.id !== currentTrack.id);
+            const filteredTracks = tracks.filter(
+                (t) => t.id !== currentTrack.id
+            );
 
             if (filteredTracks.length < 2) {
                 init();
             } else {
                 setTracks(filteredTracks);
                 setCurrentTrack(queuedTrack);
-                searchTrack(tracks[1], false);
+                setQueuedTrack(null);
+                searchTrack(filteredTracks[1], false);
             }
         }
     };
@@ -264,21 +256,7 @@ const TrackReviewStep1 = () => {
 
     return (
         <Box h="90vh" position="relative">
-            {loading && (
-                <Center>
-                    <Badge
-                        zIndex={150}
-                        top="50%"
-                        position="absolute"
-                        variant="outline"
-                        colorScheme="green"
-                        fontSize={["24px", "36px"]}
-                        px={4}
-                    >
-                        {`Loading new ${genre} Track...`}
-                    </Badge>
-                </Center>
-            )}
+            {loading && <Loading genre={genre} />}
             <Flex
                 w={[settingsOpen ? "auto" : "full", "full"]}
                 alignItems="baseline"
@@ -301,68 +279,23 @@ const TrackReviewStep1 = () => {
                     justifyContent="space-between"
                     w="full"
                 >
-                    <IconButton
-                        backgroundColor={settingsOpen ? "gray.500" : "white"}
-                        height="40px"
-                        width={
-                            settingsOpen && filtersToApply ? "160px" : "40px"
-                        }
-                        transition="width 200ms"
-                        onClick={() => setSettingsOpen((prev) => !prev)}
-                        aria-label="Search database"
-                        _hover={{
-                            backgroundColor: settingsOpen ? "none" : "gray.300",
-                        }}
-                        icon={
-                            !settingsOpen || !filtersToApply ? (
-                                <SettingsIcon
-                                    fontSize="inherit"
-                                    sx={{
-                                        color: "gray.500",
-                                    }}
-                                />
-                            ) : (
-                                <Flex gap={2} alignItems="center">
-                                    <Text color="gray.100">Apply & search</Text>
-                                    <CheckIcon
-                                        fontSize="inherit"
-                                        sx={{
-                                            color: "white",
-                                        }}
-                                    />
-                                </Flex>
-                            )
+                    <ApplyFiltersButton
+                        settingsOpen={settingsOpen}
+                        filtersToApply={filtersToApply}
+                        onSetSettingsOpen={() =>
+                            setSettingsOpen((prev) => !prev)
                         }
                     />
 
-                    <Flex
-                        opacity={settingsOpen ? 0 : 1}
-                        transition="opacity 200ms"
-                        h={8}
-                    >
-                        <Flex gap={2}>
-                            <Tag colorScheme="teal" variant="solid">
-                                {genre}
-                            </Tag>
-                            <Tag colorScheme="teal" variant="solid">
-                                {preferredYearRange.from === 0
-                                    ? "All"
-                                    : `${preferredYearRange.from} -
-                                ${preferredYearRange.to}`}
-                            </Tag>
-                            <Tag
-                                colorScheme="teal"
-                                variant={
-                                    preferredAutoPlay ? "solid" : "outline"
-                                }
-                            >
-                                AutoPlay
-                            </Tag>
-                        </Flex>
-                    </Flex>
+                    <FilterTags
+                        settingsOpen={settingsOpen}
+                        genre={genre}
+                        preferredYearRange={preferredYearRange}
+                        preferredAutoPlay={preferredAutoPlay}
+                    />
                 </Flex>
                 <ReviewTracksFilters
-                    reviewStep={1}
+                    showDates={false}
                     preferredYearRange={preferredYearRange}
                     isOpen={settingsOpen}
                     onGenreSelect={async (genre: string) => {
@@ -372,8 +305,8 @@ const TrackReviewStep1 = () => {
                         const y = Number(year);
                         setPreferredYearRange((prev) => ({
                             to:
-                                y === 0 || y === new Date().getFullYear()
-                                    ? new Date().getFullYear()
+                                y === 0 || y === getCurrentYear()
+                                    ? getCurrentYear()
                                     : prev.to,
                             from: y,
                         }));
@@ -403,8 +336,8 @@ const TrackReviewStep1 = () => {
             >
                 {currentTrack && (
                     <TrackReviewCard
-                        currentTrack={currentTrack}
-                        queueTrack={queuedTrack}
+                        currentTrack={currentTrack.searchedTrack}
+                        queueTrack={queuedTrack?.searchedTrack || null}
                         ignoreQueuedTrack={false}
                         loading={loading}
                         isPlaying={isPlaying}
@@ -419,16 +352,6 @@ const TrackReviewStep1 = () => {
                         onListenedToggle={(val) => setListened(val)}
                         ref={audioElementRef}
                     />
-                )}
-                {queuedTrack && (
-                    <Center mt={[6, 16]}>
-                        <Flex direction="column" alignItems="center" px={6}>
-                            <Text>Up Next</Text>
-                            <Text noOfLines={2} fontWeight="bold">
-                                {queuedTrack.artist} - {queuedTrack.title}
-                            </Text>
-                        </Flex>
-                    </Center>
                 )}
             </Flex>
         </Box>

@@ -46,9 +46,8 @@ export const fetchUserTracks = async ({
     userId,
     genre = "all",
 }: FetchUserTracksProps): Promise<Track[] | null> => {
-    const q = getUserTracksQuery(userId, reviewStep, genre);
-
     try {
+        const q = getUserTracksQuery(userId, reviewStep, genre);
         const querySnapshot = await getDocs(q);
         const tracks = querySnapshot.docs.map((doc) => {
             return doc.data() as Track;
@@ -60,7 +59,6 @@ export const fetchUserTracks = async ({
 
         return null;
     } catch (error) {
-        console.log(error);
         throw error;
     }
 };
@@ -76,11 +74,9 @@ export const fetchStoredTracks = async ({
     startYear,
     endYear,
 }: FetchStoredTracksProps): Promise<ScrapeTrack[] | null> => {
-    let q = getStoredTracksQuery(genre, startYear, endYear);
-
     try {
+        let q = getStoredTracksQuery(genre, startYear, endYear);
         const querySnapshot = await getDocs(q as any);
-
         const tracks = querySnapshot.docs.map((doc) => {
             return { ...(doc.data() as ScrapeTrack), id: doc.id };
         }) as ScrapeTrack[];

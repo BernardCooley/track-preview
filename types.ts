@@ -15,23 +15,23 @@ export interface Track {
     title: string;
     userId: string;
     id: string;
-    storedTrackId: string;
     purchaseUrl: string;
 }
 
 export interface ScrapeTrack {
-    purchaseUrl: string;
     artist: string;
-    title: string;
-    platform: string;
-    releaseTitle: string;
     genre: string;
+    id: string;
+    platform: string;
+    purchaseUrl: string;
     releaseDate: {
         year: number;
         month: number;
         day: number;
     };
-    id: string;
+    releaseTitle: string;
+    releaseYear: number;
+    title: string;
 }
 
 export interface User {

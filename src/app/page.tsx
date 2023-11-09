@@ -1,7 +1,6 @@
 "use client";
 
 import { Box, Center, Flex, Slide, Stack } from "@chakra-ui/react";
-import TrackReview from "@/components/TrackReview";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { auth } from "../../firebase/firebaseInit";
 import ProgressStepper from "@/components/ProgressStepper";
@@ -11,6 +10,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { onAuthStateChanged } from "firebase/auth";
 import { useAuthContext } from "../../Contexts/AuthContext";
 import TrackReviewStep1 from "@/components/TrackReviewStep1";
+import TrackReviewStep2And3 from "@/components/TrackReviewStep2And3";
 
 export default function Home() {
     const router = useRouter();
@@ -75,7 +75,16 @@ export default function Home() {
                                 router.push(`${pathname}?reviewStep=${step}`);
                             }}
                         />
-                        <TrackReviewStep1 />
+                        {reviewStep && Number(reviewStep) === 1 && (
+                            <TrackReviewStep1 />
+                        )}
+                        {reviewStep &&
+                            (Number(reviewStep) === 2 ||
+                                Number(reviewStep) === 3) && (
+                                <TrackReviewStep2And3
+                                    reviewStep={Number(reviewStep)}
+                                />
+                            )}
                     </Stack>
                     <Slide
                         direction="bottom"

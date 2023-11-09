@@ -9,29 +9,30 @@ import {
     Select,
     Switch,
 } from "@chakra-ui/react";
-import { arrayRange } from "../../utils";
+import { arrayRange, getCurrentYear } from "../../utils";
 import { useReadLocalStorage } from "usehooks-ts";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { useRouter } from "next/navigation";
 
 interface Props {
+    showDates: boolean;
     onGenreSelect: (genre: string) => void;
-    onYearFromSelect: (genre: string) => void;
-    onYearToSelect: (genre: string) => void;
+    onYearFromSelect?: (genre: string) => void;
+    onYearToSelect?: (genre: string) => void;
     selectedGenre: string | null;
-    selectedYearFrom: number;
-    selectedYearTo: number;
+    selectedYearFrom?: number;
+    selectedYearTo?: number;
     genres: string[];
     autoPlay: boolean;
     onAutoPlayChange: (autoPlay: boolean) => void;
     isOpen: boolean;
-    preferredYearRange: { from: number; to: number };
-    reviewStep: number;
+    preferredYearRange?: { from: number; to: number };
 }
 
 const ReviewTracksFilters = forwardRef(
     (
         {
+            showDates,
             onGenreSelect,
             onYearFromSelect,
             onYearToSelect,
@@ -43,7 +44,6 @@ const ReviewTracksFilters = forwardRef(
             onAutoPlayChange,
             isOpen,
             preferredYearRange,
-            reviewStep,
         }: Props,
         ref: LegacyRef<HTMLSelectElement>
     ) => {
@@ -54,10 +54,10 @@ const ReviewTracksFilters = forwardRef(
         const preferredAutoPlay: any = useReadLocalStorage("preferredAutoPlay");
 
         useEffect(() => {
-            if (yearFromRef?.current?.value) {
+            if (yearFromRef?.current?.value && preferredYearRange) {
                 yearFromRef.current.value = preferredYearRange.from.toString();
             }
-            if (yearToRef?.current?.value) {
+            if (yearToRef?.current?.value && preferredYearRange) {
                 yearToRef.current.value = preferredYearRange.to.toString();
             }
         }, [preferredYearRange]);
@@ -115,7 +115,7 @@ const ReviewTracksFilters = forwardRef(
                                     ))}
                                 </Select>
                             </Flex>
-                            {reviewStep === 1 && (
+                            {showDates && (
                                 <Flex
                                     alignItems="flex-start"
                                     gap={2}
@@ -132,17 +132,17 @@ const ReviewTracksFilters = forwardRef(
                                         }}
                                         variant="outline"
                                         placeholder="Year from"
-                                        onChange={(e) =>
-                                            onYearFromSelect(e.target.value)
-                                        }
+                                        onChange={(e) => {
+                                            if (onYearFromSelect) {
+                                                onYearFromSelect(
+                                                    e.target.value
+                                                );
+                                            }
+                                        }}
                                         defaultValue={selectedYearFrom}
                                     >
                                         <option value={0}>All</option>
-                                        {arrayRange(
-                                            1950,
-                                            new Date().getFullYear(),
-                                            1
-                                        )
+                                        {arrayRange(1950, getCurrentYear(), 1)
                                             .reverse()
                                             .map((year) => (
                                                 <option
@@ -155,7 +155,7 @@ const ReviewTracksFilters = forwardRef(
                                     </Select>
                                 </Flex>
                             )}
-                            {selectedYearFrom !== 0 && reviewStep === 1 && (
+                            {selectedYearFrom !== 0 && showDates && (
                                 <Flex
                                     alignItems="flex-start"
                                     gap={2}
@@ -172,14 +172,16 @@ const ReviewTracksFilters = forwardRef(
                                         }}
                                         variant="outline"
                                         placeholder="Year to"
-                                        onChange={(e) =>
-                                            onYearToSelect(e.target.value)
-                                        }
+                                        onChange={(e) => {
+                                            if (onYearToSelect) {
+                                                onYearToSelect(e.target.value);
+                                            }
+                                        }}
                                         defaultValue={selectedYearTo || ""}
                                     >
                                         {arrayRange(
                                             Number(selectedYearFrom) + 1,
-                                            new Date().getFullYear(),
+                                            getCurrentYear(),
                                             1
                                         )
                                             .reverse()
