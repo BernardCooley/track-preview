@@ -58,9 +58,10 @@ export const getUserTracksQuery = (
     const collectionRef = collection(db, "userTracks");
     const whereUserId = where("userId", "==", userId);
     const whereCurrentReviewStep = where("currentReviewStep", "==", reviewStep);
+    const whereGenre = where("genre", "==", genre);
 
     if (genre && genre !== "all") {
-        return query(collectionRef, whereUserId, where("genre", "==", genre));
+        return query(collectionRef, whereUserId, whereGenre);
     }
 
     if (genre && genre !== "all" && reviewStep) {
@@ -68,7 +69,7 @@ export const getUserTracksQuery = (
             collectionRef,
             whereCurrentReviewStep,
             whereUserId,
-            where("genre", "==", genre)
+            whereGenre
         );
     }
 
@@ -77,6 +78,21 @@ export const getUserTracksQuery = (
     }
 
     return query(collectionRef, whereUserId, whereCurrentReviewStep);
+};
+
+export const getListenedTracksQuery = (
+    userId: string,
+    genre?: string
+): Query<DocumentData, DocumentData> => {
+    const collectionRef = collection(db, "listenedTracks");
+    const whereUserIdExists = where("userIds", "array-contains", userId);
+    const whereGenre = where("genre", "==", genre);
+
+    if (genre && genre !== "all") {
+        return query(collectionRef, whereGenre, whereUserIdExists);
+    }
+
+    return query(collectionRef, whereUserIdExists);
 };
 
 export const getStoredTracksQuery = (

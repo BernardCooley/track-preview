@@ -1,7 +1,11 @@
 import { doc, getDoc, getDocs, setDoc, updateDoc } from "firebase/firestore";
 import { db } from "./firebaseInit";
 import { ListenedTrack, StoredTrack, Track } from "../types";
-import { getStoredTracksQuery, getUserTracksQuery } from "./utils";
+import {
+    getListenedTracksQuery,
+    getStoredTracksQuery,
+    getUserTracksQuery,
+} from "./utils";
 
 interface SaveNewTrackProps {
     track: Track;
@@ -85,6 +89,32 @@ interface UpdateTrackReviewStep {
     newReviewStep: number;
     furthestReviewStep: number;
 }
+
+interface FetchListenedTracksProps {
+    userId: string;
+    genre?: string;
+}
+
+export const fetchListenedTracks = async ({
+    userId,
+    genre = "all",
+}: FetchListenedTracksProps): Promise<ListenedTrack[] | null> => {
+    try {
+        const q = getListenedTracksQuery(userId, genre);
+        const querySnapshot = await getDocs(q);
+        const tracks = querySnapshot.docs.map((doc) => {
+            return doc.data() as ListenedTrack;
+        }) as ListenedTrack[];
+
+        if (tracks.length > 0) {
+            return tracks;
+        }
+
+        return null;
+    } catch (error) {
+        throw error;
+    }
+};
 
 export const updateTrackReviewStep = async ({
     trackId,

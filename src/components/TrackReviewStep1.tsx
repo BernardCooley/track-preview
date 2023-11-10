@@ -9,6 +9,7 @@ import {
     fetchSpotifyTrack,
 } from "@/bff/bff";
 import {
+    fetchListenedTracks,
     fetchStoredTracks,
     fetchUserTracks,
 } from "../../firebase/firebaseRequests";
@@ -100,6 +101,36 @@ const TrackReviewStep1 = ({ reviewStep }: Props) => {
                           genre,
                           userId: user.uid,
                       })) || [];
+
+                const listenedTracks =
+                    (await fetchListenedTracks({
+                        userId: user.uid,
+                        genre,
+                    })) || [];
+
+                const reviewStepTracks = listenedTracks?.filter((t) =>
+                    t.reviewSteps.filter(
+                        (s) =>
+                            s.currentReviewStep === reviewStep &&
+                            s.userId === user.uid
+                    )
+                );
+
+                // TODO uncomment when listened tracks is working
+                // if (storedTracks && storedTracks.length > 0) {
+                //     const uTrackIds = reviewStepTracks.map((t) => t.id);
+                //     const filteredStoredTracks = storedTracks.filter(
+                //         (t) => !uTrackIds.includes(t.id)
+                //     );
+
+                //     if (filteredStoredTracks.length > 2) {
+                //         setTracks(filteredStoredTracks);
+                //     } else {
+                //         init();
+                //     }
+                // } else {
+                //     init();
+                // }
 
                 if (storedTracks && storedTracks.length > 0) {
                     const uTrackIds = userTracks.map((t) => t.id);
