@@ -11,7 +11,6 @@ import {
 import {
     fetchStoredTracks,
     fetchUserTracks,
-    saveNewTrack,
 } from "../../firebase/firebaseRequests";
 import { useAuthContext } from "../../Contexts/AuthContext";
 import TrackReviewCard from "./TrackReviewCard";
@@ -22,8 +21,13 @@ import { testTracks } from "@/data/testStoredTracks";
 import { testUserTracks } from "@/data/testUserTracks";
 import FiltersForm, { FormData } from "./FiltersForm";
 import TuneIcon from "@mui/icons-material/Tune";
+import { storeTrack } from "../../utilRequests";
 
-const TrackReviewStep1 = () => {
+interface Props {
+    reviewStep: number;
+}
+
+const TrackReviewStep1 = ({ reviewStep }: Props) => {
     const [genre, setPreferredGenre] = useLocalStorage("genre", "All");
     const { user } = useAuthContext();
     const [availableGenres, setAvailableGenres] = useState<string[]>(genres);
@@ -185,29 +189,16 @@ const TrackReviewStep1 = () => {
         }
     };
 
-    const storeTrack = async (like: boolean) => {
-        if (user?.uid && currentTrack && tracks) {
-            currentTrack.currentReviewStep = like ? 2 : 0;
-            currentTrack.furthestReviewStep = like ? 2 : 1;
-
-            try {
-                await saveNewTrack({
-                    track: currentTrack,
-                    id: currentTrack.id,
-                });
-            } catch (error) {
-                showToast({
-                    status: "error",
-                    title: "Error saving track",
-                });
-                console.log(error);
-            }
-        }
-    };
-
     const likeOrDislike = async (like: boolean) => {
         setIsPlaying(false);
-        storeTrack(like);
+        try {
+            storeTrack(like, reviewStep, user, currentTrack, tracks);
+        } catch (error) {
+            showToast({
+                status: "error",
+                title: "Error saving track",
+            });
+        }
         setListened(false);
 
         if (currentTrack) {

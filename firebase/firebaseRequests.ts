@@ -1,6 +1,6 @@
-import { doc, getDocs, setDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, getDocs, setDoc, updateDoc } from "firebase/firestore";
 import { db } from "./firebaseInit";
-import { StoredTrack, Track } from "../types";
+import { ListenedTrack, StoredTrack, Track } from "../types";
 import { getStoredTracksQuery, getUserTracksQuery } from "./utils";
 
 interface SaveNewTrackProps {
@@ -11,6 +11,70 @@ interface SaveNewTrackProps {
 export const saveNewTrack = async ({ track, id }: SaveNewTrackProps) => {
     try {
         await setDoc(doc(db, "userTracks", id), track);
+    } catch (error) {
+        throw error;
+    }
+};
+
+interface SaveNewListenedTrackProps {
+    track: ListenedTrack;
+    id: string;
+}
+
+export const saveNewListenedTrack = async ({
+    track,
+    id,
+}: SaveNewListenedTrackProps) => {
+    try {
+        await setDoc(doc(db, "listenedTracks", id), track);
+    } catch (error) {
+        throw error;
+    }
+};
+
+interface UpdateNewListenedTrackProps {
+    id: string;
+    userIds: string[];
+    reviewSteps: {
+        userId: string;
+        furthestReviewStep: number;
+        currentReviewStep: number;
+    }[];
+}
+
+export const updateListenedTrack = async ({
+    id,
+    userIds,
+    reviewSteps,
+}: UpdateNewListenedTrackProps) => {
+    try {
+        const trackRef = doc(db, "listenedTracks", id);
+
+        await updateDoc(trackRef, {
+            userIds,
+            reviewSteps,
+        });
+    } catch (error) {
+        throw error;
+    }
+};
+
+interface FetchListenedTrackProps {
+    id: string;
+}
+
+export const fetchListenedTrack = async ({
+    id,
+}: FetchListenedTrackProps): Promise<ListenedTrack | null> => {
+    try {
+        const docRef = doc(db, "listenedTracks", id);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            return docSnap.data() as ListenedTrack;
+        } else {
+            return null;
+        }
     } catch (error) {
         throw error;
     }

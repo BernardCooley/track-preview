@@ -18,6 +18,21 @@ export interface Track {
     purchaseUrl: string;
 }
 
+export interface ListenedTrack {
+    artist: string;
+    genre: string;
+    searchedTrack: SearchedTrack;
+    title: string;
+    id: string;
+    purchaseUrl: string;
+    userIds: string[];
+    reviewSteps: {
+        userId: string;
+        furthestReviewStep: number;
+        currentReviewStep: number;
+    }[];
+}
+
 export interface StoredTrack {
     artist: string;
     genre: string;
