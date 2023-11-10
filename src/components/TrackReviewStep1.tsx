@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { genres } from "../../data/genres";
-import { Box, Flex, useToast } from "@chakra-ui/react";
-import ReviewTracksFilters from "./ReviewTracksFilters";
+import { Box, Flex, IconButton, useToast } from "@chakra-ui/react";
 import { useLocalStorage } from "usehooks-ts";
 import { ScrapeTrack, SearchedTrack, Track } from "../../types";
 import {
@@ -17,14 +16,22 @@ import {
 import { useAuthContext } from "../../Contexts/AuthContext";
 import TrackReviewCard from "./TrackReviewCard";
 import Loading from "./Loading";
-import ApplyFiltersButton from "./ApplyFiltersButton";
 import FilterTags from "./FilterTags";
 import { getCurrentYear } from "../../utils";
+import { testTracks } from "@/data/testStoredTracks";
+import { testUserTracks } from "@/data/testUserTracks";
+import FiltersForm from "./FiltersForm";
+import TuneIcon from "@mui/icons-material/Tune";
+
+interface FormData {
+    genre: string;
+    yearFrom: number;
+    yearTo: number;
+}
 
 const TrackReviewStep1 = () => {
     const [genre, setPreferredGenre] = useLocalStorage("genre", "All");
     const { user } = useAuthContext();
-    const genreRef = useRef<HTMLSelectElement>(null);
     const [availableGenres, setAvailableGenres] = useState<string[]>(genres);
     const [loading, setLoading] = useState<boolean>(false);
     const [preferredYearRange, setPreferredYearRange] = useLocalStorage<{
@@ -38,7 +45,6 @@ const TrackReviewStep1 = () => {
     const id = "step1-toast";
     const [tracks, setTracks] = useState<ScrapeTrack[]>([]);
     const [settingsOpen, setSettingsOpen] = useState<boolean>(false);
-    const [filtersToApply, setSetFiltersToApply] = useState<boolean>(false);
     const [preferredAutoPlay, setPreferredAutoPlay] = useLocalStorage(
         "preferredAutoPlay",
         false
@@ -46,17 +52,19 @@ const TrackReviewStep1 = () => {
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
     const [listened, setListened] = useState<boolean>(false);
     const audioElementRef = useRef<HTMLAudioElement>(null);
-    const [oldValues, setOldValues] = useState<{
-        genre: string;
-        yearFrom: number;
-        yearTo: number;
-    }>({
-        genre,
-        yearFrom: preferredYearRange.from,
-        yearTo: preferredYearRange.to,
-    });
     const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
     const [queuedTrack, setQueuedTrack] = useState<Track | null>(null);
+    const testMode = false;
+
+    useEffect(() => {
+        init();
+    }, [genre && user]);
+
+    interface ToastProps {
+        status: "error" | "success" | "info";
+        title?: string;
+        description?: string;
+    }
 
     const showToast = useCallback(
         ({ status, title, description }: ToastProps) => {
@@ -76,22 +84,24 @@ const TrackReviewStep1 = () => {
 
     const init = useCallback(async () => {
         if (genre && user?.uid) {
-            genreRef.current!.value = genre;
             setAvailableGenres(genres);
             setLoading(true);
 
             try {
-                const storedTracks = await fetchStoredTracks({
-                    genre,
-                    startYear: preferredYearRange.from,
-                    endYear: preferredYearRange.to,
-                });
+                const storedTracks = testMode
+                    ? testTracks.filter((t) => t.genre === genre)
+                    : await fetchStoredTracks({
+                          genre,
+                          startYear: preferredYearRange.from,
+                          endYear: preferredYearRange.to,
+                      });
 
-                const userTracks =
-                    (await fetchUserTracks({
-                        genre,
-                        userId: user.uid,
-                    })) || [];
+                const userTracks = testMode
+                    ? testUserTracks
+                    : (await fetchUserTracks({
+                          genre,
+                          userId: user.uid,
+                      })) || [];
 
                 if (storedTracks && storedTracks.length > 0) {
                     const uTrackIds = userTracks.map((t) => t.id);
@@ -112,17 +122,7 @@ const TrackReviewStep1 = () => {
                 showToast({ status: "error" });
             }
         }
-
-        setOldValues({
-            genre,
-            yearFrom: preferredYearRange.from,
-            yearTo: preferredYearRange.to,
-        });
-    }, [genre, user, preferredYearRange, showToast]);
-
-    useEffect(() => {
-        init();
-    }, [genre, preferredYearRange, user]);
+    }, [genre, user, preferredYearRange, testMode]);
 
     useEffect(() => {
         if (tracks.length > 1) {
@@ -132,6 +132,8 @@ const TrackReviewStep1 = () => {
                 searchTrack(tracks[1], false);
             }
         } else {
+            setCurrentTrack(null);
+            setQueuedTrack(null);
             init();
         }
     }, [tracks, currentTrack, queuedTrack]);
@@ -141,20 +143,6 @@ const TrackReviewStep1 = () => {
             play();
         }
     }, [currentTrack]);
-
-    useEffect(() => {
-        setSetFiltersToApply(
-            oldValues.genre !== genre ||
-                oldValues.yearFrom !== preferredYearRange.from ||
-                oldValues.yearTo !== preferredYearRange.to
-        );
-    }, [genre, preferredYearRange, settingsOpen, oldValues]);
-
-    useEffect(() => {
-        if (!settingsOpen && filtersToApply) {
-            init();
-        }
-    }, [settingsOpen, filtersToApply]);
 
     const searchTrack = async (track: ScrapeTrack, isCurrentTrack: boolean) => {
         let searchedTrack: SearchedTrack | null = null;
@@ -203,12 +191,6 @@ const TrackReviewStep1 = () => {
         }
     };
 
-    interface ToastProps {
-        status: "error" | "success" | "info";
-        title?: string;
-        description?: string;
-    }
-
     const storeTrack = async (like: boolean) => {
         if (user?.uid && currentTrack && tracks) {
             currentTrack.currentReviewStep = like ? 2 : 0;
@@ -254,6 +236,18 @@ const TrackReviewStep1 = () => {
         audioElementRef.current?.play();
     };
 
+    const applyFilters = async (formData: FormData) => {
+        setCurrentTrack(null);
+        setTracks([]);
+        setQueuedTrack(null);
+        setSettingsOpen(false);
+        setPreferredGenre(formData.genre);
+        setPreferredYearRange({
+            from: formData.yearFrom,
+            to: formData.yearTo,
+        });
+    };
+
     return (
         <Box h="90vh" position="relative">
             {loading && <Loading genre={genre} />}
@@ -263,6 +257,7 @@ const TrackReviewStep1 = () => {
                 justifyContent="space-between"
                 direction="column"
                 p={4}
+                pt={2}
                 pl={settingsOpen ? 4 : [4, 0]}
                 gap={2}
                 mx={settingsOpen ? [4, 0] : 0}
@@ -279,52 +274,37 @@ const TrackReviewStep1 = () => {
                     justifyContent="space-between"
                     w="full"
                 >
-                    <ApplyFiltersButton
-                        settingsOpen={settingsOpen}
-                        filtersToApply={filtersToApply}
-                        onSetSettingsOpen={() =>
-                            setSettingsOpen((prev) => !prev)
-                        }
-                    />
+                    {!settingsOpen && (
+                        <IconButton
+                            rounded="full"
+                            onClick={() => setSettingsOpen((prev) => !prev)}
+                            variant="ghost"
+                            colorScheme="teal"
+                            aria-label="settings page"
+                            fontSize="3xl"
+                            icon={<TuneIcon fontSize="inherit" />}
+                        />
+                    )}
 
-                    <FilterTags
-                        settingsOpen={settingsOpen}
-                        genre={genre}
-                        preferredYearRange={preferredYearRange}
-                        preferredAutoPlay={preferredAutoPlay}
-                    />
+                    {!settingsOpen && (
+                        <FilterTags
+                            settingsOpen={settingsOpen}
+                            genre={genre}
+                            preferredYearRange={preferredYearRange}
+                            preferredAutoPlay={preferredAutoPlay}
+                        />
+                    )}
                 </Flex>
-                <ReviewTracksFilters
-                    showDates={false}
-                    preferredYearRange={preferredYearRange}
+                <FiltersForm
+                    onSettingsToggle={() => setSettingsOpen((prev) => !prev)}
+                    settingsOpen={settingsOpen}
+                    autoplay={preferredAutoPlay}
+                    showDates={true}
                     isOpen={settingsOpen}
-                    onGenreSelect={async (genre: string) => {
-                        setPreferredGenre(genre);
-                    }}
-                    onYearFromSelect={async (year) => {
-                        const y = Number(year);
-                        setPreferredYearRange((prev) => ({
-                            to:
-                                y === 0 || y === getCurrentYear()
-                                    ? getCurrentYear()
-                                    : prev.to,
-                            from: y,
-                        }));
-                    }}
-                    onYearToSelect={async (year) => {
-                        const y = Number(year);
-                        setPreferredYearRange((prev) => ({
-                            ...prev,
-                            to: y,
-                        }));
-                    }}
-                    selectedYearFrom={preferredYearRange.from}
-                    selectedYearTo={preferredYearRange.to}
-                    selectedGenre={genre}
+                    genre={genre}
                     genres={availableGenres}
-                    autoPlay={preferredAutoPlay}
-                    onAutoPlayChange={(value) => setPreferredAutoPlay(value)}
-                    ref={genreRef}
+                    preferredYearRange={preferredYearRange}
+                    onApplyFilters={(formData) => applyFilters(formData)}
                 />
             </Flex>
             <Flex

@@ -2,7 +2,7 @@ export interface SearchedTrack {
     artist: string;
     title: string;
     previewUrl: string;
-    id: string;
+    id: number;
     thumbnail: string;
     url: string;
 }

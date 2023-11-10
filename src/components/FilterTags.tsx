@@ -25,9 +25,9 @@ const FilterTags = ({
                 </Tag>
                 {preferredYearRange && (
                     <Tag colorScheme="teal" variant="solid">
-                        {preferredYearRange?.from === 0
+                        {Number(preferredYearRange?.from) === 0
                             ? "All"
-                            : `${preferredYearRange?.from} -
+                            : `${Number(preferredYearRange?.from)} -
                         ${preferredYearRange?.to}`}
                     </Tag>
                 )}

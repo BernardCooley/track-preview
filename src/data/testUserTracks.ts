@@ -1,13 +1,11 @@
+import { Track } from "../../types";
+
 export const testUserTracks = [
     {
         artist: "ARCHITECTS",
         currentReviewStep: 2,
         furthestReviewStep: 2,
         genre: "Metal",
-        id: "14adeb82-4701-4707-9950-55f4fcde96fd",
-        purchaseUrl:
-            "https://www.juno.co.uk/products/architects-for-those-that-wish-to-exist/799113-01/",
-        reviewStep: 0,
         searchedTrack: {
             artist: "S?K",
             id: 1378701152,
@@ -18,9 +16,11 @@ export const testUserTracks = [
             title: "99' K",
             url: "https://www.deezer.com/track/1378701152",
         },
-        storedTrackId: "0087261c-9010-4fd7-a76c-b68f435901f3",
         title: "Giving Blood",
         userId: "JZj7Y57oCpU3QfNaSu6wVJpODAR2",
+        id: "14adeb82-4701-4707-9950-55f4fcde96fd",
+        purchaseUrl:
+            "https://www.juno.co.uk/products/architects-for-those-that-wish-to-exist/799113-01/",
     },
     {
         artist: "BLACK REPLICA",
@@ -39,7 +39,6 @@ export const testUserTracks = [
             title: "Boy's Night Out",
             url: "https://www.deezer.com/track/1635917762",
         },
-        storedTrackId: "001a2ab0-050e-47b4-a9c5-5c61fb372228",
         title: "Nether Realm",
         userId: "JZj7Y57oCpU3QfNaSu6wVJpODAR2",
     },
@@ -60,7 +59,6 @@ export const testUserTracks = [
             title: "Boy's Night Out",
             url: "https://www.deezer.com/track/1635917762",
         },
-        storedTrackId: "001a2ab0-050e-47b4-a9c5-5c61fb372228",
         title: "Nether Realm",
         userId: "JZj7Y57oCpU3QfNaSu6wVJpODAR2",
     },
@@ -81,8 +79,7 @@ export const testUserTracks = [
             title: "Boy's Night Out",
             url: "https://www.deezer.com/track/1635917762",
         },
-        storedTrackId: "001a2ab0-050e-47b4-a9c5-5c61fb372228",
         title: "Nether Realm",
         userId: "JZj7Y57oCpU3QfNaSu6wVJpODAR2",
     },
-];
+] satisfies Track[];

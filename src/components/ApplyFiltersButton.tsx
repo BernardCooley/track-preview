@@ -6,13 +6,13 @@ import CheckIcon from "@mui/icons-material/Check";
 interface Props {
     settingsOpen: boolean;
     filtersToApply: boolean;
-    onSetSettingsOpen: () => void;
+    onClick: () => void;
 }
 
 const ApplyFiltersButton = ({
     settingsOpen,
     filtersToApply,
-    onSetSettingsOpen,
+    onClick,
 }: Props) => {
     return (
         <IconButton
@@ -20,7 +20,7 @@ const ApplyFiltersButton = ({
             height="40px"
             width={settingsOpen && filtersToApply ? "160px" : "40px"}
             transition="width 200ms"
-            onClick={() => onSetSettingsOpen()}
+            onClick={() => onClick()}
             aria-label="Apply filters"
             _hover={{
                 backgroundColor: settingsOpen ? "none" : "gray.300",
