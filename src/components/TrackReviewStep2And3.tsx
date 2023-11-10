@@ -131,7 +131,7 @@ const TrackReviewStep2And3 = ({ reviewStep }: Props) => {
 
     return (
         <Box h="90vh" position="relative">
-            {loading && <Loading genre={genre} />}
+            {loading && <Loading />}
             <Flex
                 w={[settingsOpen ? "auto" : "full", "full"]}
                 alignItems="baseline"
