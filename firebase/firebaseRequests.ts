@@ -17,7 +17,7 @@ export const saveNewTrack = async ({ track, id }: SaveNewTrackProps) => {
 };
 
 interface UpdateTrackReviewStep {
-    trackId: string;
+    trackId: number;
     newReviewStep: number;
     furthestReviewStep: number;
 }
@@ -27,7 +27,7 @@ export const updateTrackReviewStep = async ({
     newReviewStep,
     furthestReviewStep,
 }: UpdateTrackReviewStep) => {
-    const trackRef = doc(db, "userTracks", trackId);
+    const trackRef = doc(db, "userTracks", trackId.toString());
 
     await updateDoc(trackRef, {
         reviewStep: newReviewStep,

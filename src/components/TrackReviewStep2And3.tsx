@@ -120,7 +120,7 @@ const TrackReviewStep2And3 = ({ reviewStep }: Props) => {
 
         if (currentTrack) {
             const filteredTracks: Track[] = tracks.filter(
-                (t) => t.id !== currentTrack.id
+                (t) => t.id !== currentTrack.id.toString()
             );
 
             if (filteredTracks.length < 1) {
@@ -157,9 +157,7 @@ const TrackReviewStep2And3 = ({ reviewStep }: Props) => {
                     <ApplyFiltersButton
                         settingsOpen={settingsOpen}
                         filtersToApply={filtersToApply}
-                        onSetSettingsOpen={() =>
-                            setSettingsOpen((prev) => !prev)
-                        }
+                        onClick={() => setSettingsOpen((prev) => !prev)}
                     />
 
                     <FilterTags
