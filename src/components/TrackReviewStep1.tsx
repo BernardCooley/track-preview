@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { genres } from "../../data/genres";
 import { Box, Flex, IconButton, useToast } from "@chakra-ui/react";
 import { useLocalStorage } from "usehooks-ts";
-import { ScrapeTrack, SearchedTrack, Track } from "../../types";
+import { StoredTrack, SearchedTrack, Track } from "../../types";
 import {
     fetchDeezerTrack,
     fetchITunesTrack,
@@ -37,7 +37,7 @@ const TrackReviewStep1 = () => {
     });
     const toast = useToast();
     const id = "step1-toast";
-    const [tracks, setTracks] = useState<ScrapeTrack[]>([]);
+    const [tracks, setTracks] = useState<StoredTrack[]>([]);
     const [settingsOpen, setSettingsOpen] = useState<boolean>(false);
     const [preferredAutoPlay, setPreferredAutoPlay] = useLocalStorage(
         "preferredAutoPlay",
@@ -138,7 +138,7 @@ const TrackReviewStep1 = () => {
         }
     }, [currentTrack]);
 
-    const searchTrack = async (track: ScrapeTrack, isCurrentTrack: boolean) => {
+    const searchTrack = async (track: StoredTrack, isCurrentTrack: boolean) => {
         let searchedTrack: SearchedTrack | null = null;
 
         searchedTrack = await fetchDeezerTrack({

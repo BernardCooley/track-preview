@@ -18,7 +18,7 @@ export interface Track {
     purchaseUrl: string;
 }
 
-export interface ScrapeTrack {
+export interface StoredTrack {
     artist: string;
     genre: string;
     id: string;

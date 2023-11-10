@@ -1,6 +1,6 @@
 import { doc, getDocs, setDoc, updateDoc } from "firebase/firestore";
 import { db } from "./firebaseInit";
-import { ScrapeTrack, Track } from "../types";
+import { StoredTrack, Track } from "../types";
 import { getStoredTracksQuery, getUserTracksQuery } from "./utils";
 
 interface SaveNewTrackProps {
@@ -73,13 +73,13 @@ export const fetchStoredTracks = async ({
     genre,
     startYear,
     endYear,
-}: FetchStoredTracksProps): Promise<ScrapeTrack[] | null> => {
+}: FetchStoredTracksProps): Promise<StoredTrack[] | null> => {
     try {
         let q = getStoredTracksQuery(genre, startYear, endYear);
         const querySnapshot = await getDocs(q as any);
         const tracks = querySnapshot.docs.map((doc) => {
-            return { ...(doc.data() as ScrapeTrack), id: doc.id };
-        }) as ScrapeTrack[];
+            return { ...(doc.data() as StoredTrack), id: doc.id };
+        }) as StoredTrack[];
 
         if (tracks.length > 0) {
             return tracks;

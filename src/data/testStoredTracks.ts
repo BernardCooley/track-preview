@@ -1,4 +1,4 @@
-import { ScrapeTrack } from "../../types";
+import { StoredTrack } from "../../types";
 
 export const testTracks = [
     {
@@ -1153,4 +1153,4 @@ export const testTracks = [
         id: "e3059f25-dc53-47e6-a4ef-0e60aea3dd02",
         releaseYear: 1990,
     },
-] satisfies ScrapeTrack[];
+] satisfies StoredTrack[];
