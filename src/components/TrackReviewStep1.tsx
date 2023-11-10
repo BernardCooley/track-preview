@@ -23,6 +23,7 @@ import { testUserTracks } from "@/data/testUserTracks";
 import FiltersForm, { FormData } from "./FiltersForm";
 import TuneIcon from "@mui/icons-material/Tune";
 import { storeTrack } from "../../utilRequests";
+import { getAllTrackIds } from "../../firebase/utils";
 
 interface Props {
     reviewStep: number;
@@ -53,11 +54,12 @@ const TrackReviewStep1 = ({ reviewStep }: Props) => {
     const audioElementRef = useRef<HTMLAudioElement>(null);
     const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
     const [queuedTrack, setQueuedTrack] = useState<Track | null>(null);
-    const testMode = false;
+    const testMode = true;
 
     useEffect(() => {
+        getRandomTrackId();
         init();
-    }, [genre && user]);
+    }, [genre, user]);
 
     interface ToastProps {
         status: "error" | "success" | "info";
@@ -81,18 +83,33 @@ const TrackReviewStep1 = ({ reviewStep }: Props) => {
         [toast]
     );
 
+    const getRandomTrackId = async (): Promise<string | null> => {
+        try {
+            const ids = await getAllTrackIds();
+            const randomNumber = Math.floor(
+                Math.floor(Math.random() * ids.length)
+            );
+            return ids[randomNumber];
+        } catch (error) {
+            return null;
+        }
+    };
+
     const init = useCallback(async () => {
         if (genre && user?.uid) {
             setAvailableGenres(genres);
             setLoading(true);
 
             try {
+                const randomId = await getRandomTrackId();
+
                 const storedTracks = testMode
                     ? testTracks.filter((t) => t.genre === genre)
                     : await fetchStoredTracks({
                           genre,
                           startYear: preferredYearRange.from,
                           endYear: preferredYearRange.to,
+                          startFromId: randomId,
                       });
 
                 const userTracks = testMode
@@ -102,19 +119,19 @@ const TrackReviewStep1 = ({ reviewStep }: Props) => {
                           userId: user.uid,
                       })) || [];
 
-                const listenedTracks =
-                    (await fetchListenedTracks({
-                        userId: user.uid,
-                        genre,
-                    })) || [];
+                // const listenedTracks =
+                //     (await fetchListenedTracks({
+                //         userId: user.uid,
+                //         genre,
+                //     })) || [];
 
-                const reviewStepTracks = listenedTracks?.filter((t) =>
-                    t.reviewSteps.filter(
-                        (s) =>
-                            s.currentReviewStep === reviewStep &&
-                            s.userId === user.uid
-                    )
-                );
+                // const reviewStepTracks = listenedTracks?.filter((t) =>
+                //     t.reviewSteps.filter(
+                //         (s) =>
+                //             s.currentReviewStep === reviewStep &&
+                //             s.userId === user.uid
+                //     )
+                // );
 
                 // TODO uncomment when listened tracks is working
                 // if (storedTracks && storedTracks.length > 0) {

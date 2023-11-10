@@ -10,8 +10,10 @@ import {
     DocumentData,
     Query,
     collection,
+    getDocs,
     limit,
     query,
+    startAt,
     where,
 } from "firebase/firestore";
 
@@ -24,6 +26,7 @@ export const LoginUser = async (
         await signInWithEmailAndPassword(auth, email, password);
         router.push("/");
     } catch (error) {
+        console.error(error);
         throw error;
     }
 };
@@ -33,6 +36,7 @@ export const LogOut = async (router: AppRouterInstance) => {
         await signOut(auth);
         router.push("/signin");
     } catch (error) {
+        console.error(error);
         throw error;
     }
 };
@@ -46,6 +50,7 @@ export const RegisterUser = async (
         await createUserWithEmailAndPassword(auth, email, password);
         router.push("/");
     } catch (error) {
+        console.error(error);
         throw error;
     }
 };
@@ -98,30 +103,54 @@ export const getListenedTracksQuery = (
 export const getStoredTracksQuery = (
     genre: string | undefined,
     startYear: number | undefined,
-    endYear: number | undefined
+    endYear: number | undefined,
+    startFromId: string | null
 ): Query<DocumentData, DocumentData> => {
     const collectionRef = collection(db, "tracks");
     const whereGenre = where("genre", "==", genre);
     const whereStartYear = where("releaseYear", ">=", Number(startYear));
     const whereEndYear = where("releaseYear", "<=", Number(endYear));
+    const startFrom = startAt(startFromId);
 
     if (startYear && genre && genre !== "all") {
         return query(
             collectionRef,
-            whereGenre,
             whereStartYear,
+            whereGenre,
             whereEndYear,
+            startFrom,
             limit(100)
         );
     }
 
     if (startYear && (!genre || genre === "all")) {
-        return query(collectionRef, whereStartYear, whereEndYear, limit(100));
+        return query(
+            collectionRef,
+            whereStartYear,
+            whereEndYear,
+            startFrom,
+            limit(100)
+        );
     }
 
     if (genre && genre !== "all") {
-        return query(collectionRef, whereGenre, limit(100));
+        return query(collectionRef, whereGenre, startFrom, limit(100));
     }
 
-    return query(collectionRef, limit(100));
+    return query(collectionRef, startFrom, limit(100));
+};
+
+export const getAllTrackIds = async (): Promise<string[]> => {
+    try {
+        const collectionRef = collection(db, "tracks");
+        const querySnapshot = await getDocs(collectionRef);
+        const tracksIds = querySnapshot.docs.map((doc) => {
+            return doc.id;
+        });
+
+        return tracksIds;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
 };

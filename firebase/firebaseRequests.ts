@@ -16,6 +16,7 @@ export const saveNewTrack = async ({ track, id }: SaveNewTrackProps) => {
     try {
         await setDoc(doc(db, "userTracks", id), track);
     } catch (error) {
+        console.error(error);
         throw error;
     }
 };
@@ -32,6 +33,7 @@ export const saveNewListenedTrack = async ({
     try {
         await setDoc(doc(db, "listenedTracks", id), track);
     } catch (error) {
+        console.error(error);
         throw error;
     }
 };
@@ -59,6 +61,7 @@ export const updateListenedTrack = async ({
             reviewSteps,
         });
     } catch (error) {
+        console.error(error);
         throw error;
     }
 };
@@ -80,6 +83,7 @@ export const fetchListenedTrack = async ({
             return null;
         }
     } catch (error) {
+        console.error(error);
         throw error;
     }
 };
@@ -112,6 +116,7 @@ export const fetchListenedTracks = async ({
 
         return null;
     } catch (error) {
+        console.error(error);
         throw error;
     }
 };
@@ -153,6 +158,7 @@ export const fetchUserTracks = async ({
 
         return null;
     } catch (error) {
+        console.error(error);
         throw error;
     }
 };
@@ -161,15 +167,17 @@ interface FetchStoredTracksProps {
     genre?: string;
     startYear?: number;
     endYear?: number;
+    startFromId: string | null;
 }
 
 export const fetchStoredTracks = async ({
     genre,
     startYear,
     endYear,
+    startFromId,
 }: FetchStoredTracksProps): Promise<StoredTrack[] | null> => {
     try {
-        let q = getStoredTracksQuery(genre, startYear, endYear);
+        let q = getStoredTracksQuery(genre, startYear, endYear, startFromId);
         const querySnapshot = await getDocs(q as any);
         const tracks = querySnapshot.docs.map((doc) => {
             return { ...(doc.data() as StoredTrack), id: doc.id };
@@ -181,6 +189,7 @@ export const fetchStoredTracks = async ({
 
         return null;
     } catch (error) {
+        console.error(error);
         throw error;
     }
 };
