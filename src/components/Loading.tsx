@@ -1,11 +1,7 @@
 import { Badge, Center } from "@chakra-ui/react";
 import React from "react";
 
-interface Props {
-    genre: string;
-}
-
-const Loading = ({ genre }: Props) => {
+const Loading = () => {
     return (
         <Center>
             <Badge
@@ -17,7 +13,7 @@ const Loading = ({ genre }: Props) => {
                 fontSize={["24px", "36px"]}
                 px={4}
             >
-                {`Loading your ${genre} Track...`}
+                {`Loading more Tracks...`}
             </Badge>
         </Center>
     );

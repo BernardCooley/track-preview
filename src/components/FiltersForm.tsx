@@ -3,7 +3,6 @@ import {
     Collapse,
     Flex,
     FormControl,
-    FormErrorMessage,
     FormLabel,
     IconButton,
     Select,
@@ -16,7 +15,7 @@ import ApplyFiltersButton from "./ApplyFiltersButton";
 import { useRouter } from "next/navigation";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
-interface FormData {
+export interface FormData {
     genre: string;
     yearFrom: number;
     yearTo: number;
@@ -75,7 +74,7 @@ const FiltersForm = ({
                             settingsOpen={settingsOpen}
                             filtersToApply={isDirty}
                             onClick={handleSubmit((formData) => {
-                                if (settingsOpen) {
+                                if (settingsOpen && isDirty) {
                                     onApplyFilters(formData);
                                 } else {
                                     onSettingsToggle();
@@ -149,7 +148,6 @@ const FiltersForm = ({
                                                 boxShadow: "none",
                                             }}
                                             variant="outline"
-                                            placeholder="Year from"
                                         >
                                             <option value={0}>All</option>
                                             {arrayRange(
@@ -187,7 +185,6 @@ const FiltersForm = ({
                                                 boxShadow: "none",
                                             }}
                                             variant="outline"
-                                            placeholder="Year to"
                                         >
                                             {arrayRange(
                                                 Number(watchYearFrom) + 1,

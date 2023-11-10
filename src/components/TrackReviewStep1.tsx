@@ -20,14 +20,8 @@ import FilterTags from "./FilterTags";
 import { getCurrentYear } from "../../utils";
 import { testTracks } from "@/data/testStoredTracks";
 import { testUserTracks } from "@/data/testUserTracks";
-import FiltersForm from "./FiltersForm";
+import FiltersForm, { FormData } from "./FiltersForm";
 import TuneIcon from "@mui/icons-material/Tune";
-
-interface FormData {
-    genre: string;
-    yearFrom: number;
-    yearTo: number;
-}
 
 const TrackReviewStep1 = () => {
     const [genre, setPreferredGenre] = useLocalStorage("genre", "All");
@@ -246,11 +240,12 @@ const TrackReviewStep1 = () => {
             from: formData.yearFrom,
             to: formData.yearTo,
         });
+        setPreferredAutoPlay(formData.autoplay);
     };
 
     return (
         <Box h="90vh" position="relative">
-            {loading && <Loading genre={genre} />}
+            {loading && <Loading />}
             <Flex
                 w={[settingsOpen ? "auto" : "full", "full"]}
                 alignItems="baseline"
