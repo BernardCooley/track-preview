@@ -1,4 +1,4 @@
-import { SearchedTrack } from "../../types";
+import { AccessToken, SearchedTrack } from "../../types";
 
 export class GoneError extends Error {
     statusCode = 410;
@@ -68,7 +68,7 @@ export const fetchSpotifyTrack = async ({
         "/api/getSpotifyTrack",
         "POST",
         {
-            trackToSearch: trackToSearch,
+            trackToSearch,
         }
     );
     return spotifyTrack;
@@ -114,4 +114,25 @@ export const scrapeJuno = async (): Promise<any[] | null> => {
         "GET"
     );
     return scrapedData;
+};
+
+export const getSpotifyAccessToken = async (): Promise<AccessToken | null> => {
+    const token: AccessToken | null = await fetchWithErrorHandling(
+        "/api/getSpotifyAccessToken",
+        "GET"
+    );
+    return token;
+};
+
+export const searchSpotify = async (
+    token: AccessToken
+): Promise<any[] | null> => {
+    const tracks: any[] | null = await fetchWithErrorHandling(
+        "/api/searchSpotify",
+        "POST",
+        {
+            token,
+        }
+    );
+    return tracks;
 };

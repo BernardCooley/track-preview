@@ -18,38 +18,25 @@ export interface Track {
     purchaseUrl: string;
 }
 
-export interface ListenedTrack {
-    artist: string;
-    genre: string;
-    searchedTrack: SearchedTrack;
-    title: string;
-    id: string;
-    purchaseUrl: string;
-    userIds: string[];
-    reviewSteps: {
-        userId: string;
-        furthestReviewStep: number;
-        currentReviewStep: number;
-    }[];
-}
-
 export interface StoredTrack {
-    artist: string;
-    genre: string;
-    id: string;
     platform: string;
     purchaseUrl: string;
-    releaseDate: {
-        year: number;
-        month: number;
-        day: number;
-    };
+    artist: string;
     releaseTitle: string;
-    releaseYear: number;
+    genre: string;
     title: string;
+    releaseDate: string;
+    id: string;
+    releaseYear: number;
 }
 
 export interface User {
     uid: string;
     email: string;
+}
+
+export interface AccessToken {
+    access_token: string;
+    expires_in: number;
+    token_type: string;
 }

@@ -9,9 +9,9 @@ import {
     fetchSpotifyTrack,
 } from "@/bff/bff";
 import {
-    fetchListenedTracks,
     fetchStoredTracks,
     fetchUserTracks,
+    saveNewTrack,
 } from "../../firebase/firebaseRequests";
 import { useAuthContext } from "../../Contexts/AuthContext";
 import TrackReviewCard from "./TrackReviewCard";
@@ -22,7 +22,6 @@ import { testTracks } from "@/data/testStoredTracks";
 import { testUserTracks } from "@/data/testUserTracks";
 import FiltersForm, { FormData } from "./FiltersForm";
 import TuneIcon from "@mui/icons-material/Tune";
-import { storeTrack } from "../../utilRequests";
 import { getAllTrackIds } from "../../firebase/utils";
 
 interface Props {
@@ -119,36 +118,6 @@ const TrackReviewStep1 = ({ reviewStep }: Props) => {
                           userId: user.uid,
                       })) || [];
 
-                // const listenedTracks =
-                //     (await fetchListenedTracks({
-                //         userId: user.uid,
-                //         genre,
-                //     })) || [];
-
-                // const reviewStepTracks = listenedTracks?.filter((t) =>
-                //     t.reviewSteps.filter(
-                //         (s) =>
-                //             s.currentReviewStep === reviewStep &&
-                //             s.userId === user.uid
-                //     )
-                // );
-
-                // TODO uncomment when listened tracks is working
-                // if (storedTracks && storedTracks.length > 0) {
-                //     const uTrackIds = reviewStepTracks.map((t) => t.id);
-                //     const filteredStoredTracks = storedTracks.filter(
-                //         (t) => !uTrackIds.includes(t.id)
-                //     );
-
-                //     if (filteredStoredTracks.length > 2) {
-                //         setTracks(filteredStoredTracks);
-                //     } else {
-                //         init();
-                //     }
-                // } else {
-                //     init();
-                // }
-
                 if (storedTracks && storedTracks.length > 0) {
                     const uTrackIds = userTracks.map((t) => t.id);
                     const filteredStoredTracks = storedTracks.filter(
@@ -173,9 +142,9 @@ const TrackReviewStep1 = ({ reviewStep }: Props) => {
     useEffect(() => {
         if (tracks.length > 1) {
             if (!currentTrack) {
-                searchTrack(tracks[0], true);
+                handleSearchedTrack(tracks[0], tracks, true);
             } else if (!queuedTrack) {
-                searchTrack(tracks[1], false);
+                handleSearchedTrack(tracks[1], tracks, false);
             }
         } else {
             setCurrentTrack(null);
@@ -190,7 +159,9 @@ const TrackReviewStep1 = ({ reviewStep }: Props) => {
         }
     }, [currentTrack]);
 
-    const searchTrack = async (track: StoredTrack, isCurrentTrack: boolean) => {
+    const searchForTrack = async (
+        track: StoredTrack
+    ): Promise<Track | null> => {
         let searchedTrack: SearchedTrack | null = null;
 
         searchedTrack = await fetchDeezerTrack({
@@ -213,7 +184,7 @@ const TrackReviewStep1 = ({ reviewStep }: Props) => {
         }
 
         if (searchedTrack) {
-            const newTrack: Track = {
+            return {
                 searchedTrack,
                 artist: track.artist,
                 furthestReviewStep: 1,
@@ -224,23 +195,47 @@ const TrackReviewStep1 = ({ reviewStep }: Props) => {
                 id: track.id,
                 purchaseUrl: track.purchaseUrl,
             };
+        }
 
+        return null;
+    };
+
+    const handleSearchedTrack = async (
+        track: StoredTrack,
+        storedTracks: StoredTrack[],
+        isCurrentTrack: boolean
+    ) => {
+        const searchedTrack = await searchForTrack(track);
+
+        if (searchedTrack) {
             if (isCurrentTrack) {
-                setCurrentTrack(newTrack);
+                setCurrentTrack(searchedTrack);
                 setLoading(false);
-                searchTrack(tracks[1], false);
+                handleSearchedTrack(storedTracks[1], storedTracks, false);
             } else {
-                setQueuedTrack(newTrack);
+                setQueuedTrack(searchedTrack);
             }
         } else {
             setTracks((prev) => prev.filter((t) => t.id !== track.id));
         }
     };
 
+    const storeTrack = async (like: boolean) => {
+        if (user?.uid && currentTrack && tracks) {
+            currentTrack.currentReviewStep = like ? 2 : 0;
+            currentTrack.furthestReviewStep = like ? 2 : 1;
+
+            await saveNewTrack({
+                track: currentTrack,
+                id: currentTrack.id,
+            });
+        }
+    };
+
     const likeOrDislike = async (like: boolean) => {
         setIsPlaying(false);
         try {
-            storeTrack(like, reviewStep, user, currentTrack, tracks);
+            storeTrack(like);
         } catch (error) {
             showToast({
                 status: "error",
@@ -260,7 +255,7 @@ const TrackReviewStep1 = ({ reviewStep }: Props) => {
                 setTracks(filteredTracks);
                 setCurrentTrack(queuedTrack);
                 setQueuedTrack(null);
-                searchTrack(filteredTracks[1], false);
+                handleSearchedTrack(filteredTracks[1], tracks, false);
             }
         }
     };

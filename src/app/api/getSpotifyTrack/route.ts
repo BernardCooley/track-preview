@@ -37,16 +37,23 @@ export async function POST(req: Request) {
                     Math.random() * trackResponse.body.tracks.items.length
                 )
             );
-            const tracks = trackResponse.body.tracks.items[randomNumber];
 
-            if (tracks.preview_url) {
+            const foundTracks = trackResponse.body.tracks.items.filter(
+                (track: any) =>
+                    track.artist.toLowerCase() ===
+                    trackToSearch.artist.toLowerCase()
+            );
+
+            const foundTrack = foundTracks[0];
+
+            if (foundTrack.preview_url) {
                 const track: SearchedTrack = {
-                    artist: tracks.artists[0].name,
-                    title: tracks.name,
-                    previewUrl: tracks.preview_url,
-                    id: tracks.id,
-                    thumbnail: tracks.album.images[0].url,
-                    url: tracks.album.uri,
+                    artist: foundTrack.artists[0].name,
+                    title: foundTrack.name,
+                    previewUrl: foundTrack.preview_url,
+                    id: foundTrack.id,
+                    thumbnail: foundTrack.album.images[0].url,
+                    url: foundTrack.album.uri,
                 };
 
                 const response = NextResponse.json(track, {
