@@ -88,14 +88,12 @@ export const getUserTracksQuery = (
 export const getStoredTracksQuery = (
     genre: string | undefined,
     startYear: number | undefined,
-    endYear: number | undefined,
-    startFromId: string | null
+    endYear: number | undefined
 ): Query<DocumentData, DocumentData> => {
     const collectionRef = collection(db, "tracks");
     const whereGenre = where("genre", "==", genre);
     const whereStartYear = where("releaseYear", ">=", Number(startYear));
     const whereEndYear = where("releaseYear", "<=", Number(endYear));
-    const startFrom = startAt(startFromId);
 
     if (startYear && genre && genre !== "all") {
         return query(
@@ -103,26 +101,19 @@ export const getStoredTracksQuery = (
             whereStartYear,
             whereGenre,
             whereEndYear,
-            startFrom,
             limit(100)
         );
     }
 
     if (startYear && (!genre || genre === "all")) {
-        return query(
-            collectionRef,
-            whereStartYear,
-            whereEndYear,
-            startFrom,
-            limit(100)
-        );
+        return query(collectionRef, whereStartYear, whereEndYear, limit(100));
     }
 
     if (genre && genre !== "all") {
-        return query(collectionRef, whereGenre, startFrom, limit(100));
+        return query(collectionRef, whereGenre, limit(100));
     }
 
-    return query(collectionRef, startFrom, limit(100));
+    return query(collectionRef, limit(100));
 };
 
 export const getAllTrackIds = async (): Promise<string[]> => {

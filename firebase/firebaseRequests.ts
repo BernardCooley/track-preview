@@ -69,17 +69,15 @@ interface FetchStoredTracksProps {
     genre?: string;
     startYear?: number;
     endYear?: number;
-    startFromId: string | null;
 }
 
 export const fetchStoredTracks = async ({
     genre,
     startYear,
     endYear,
-    startFromId,
 }: FetchStoredTracksProps): Promise<StoredTrack[] | null> => {
     try {
-        let q = getStoredTracksQuery(genre, startYear, endYear, startFromId);
+        let q = getStoredTracksQuery(genre, startYear, endYear);
         const querySnapshot = await getDocs(q as any);
         const tracks = querySnapshot.docs.map((doc) => {
             return { ...(doc.data() as StoredTrack), id: doc.id };

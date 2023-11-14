@@ -108,7 +108,6 @@ const TrackReviewStep1 = ({ reviewStep }: Props) => {
                           genre,
                           startYear: preferredYearRange.from,
                           endYear: preferredYearRange.to,
-                          startFromId: randomId,
                       });
 
                 const userTracks = testMode

@@ -1,0 +1,52 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
+}
+
+model User {
+  id         String  @id @default(cuid())
+  firebaseId String
+  Track      Track[]
+}
+
+model SearchedTrack {
+  id         String  @id @default(cuid())
+  artist     String
+  title      String
+  previewUrl String
+  thumbnail  String
+  url        String
+  User       Track[]
+}
+
+model Track {
+  id                 String        @id @default(cuid())
+  artist             String
+  furthestReviewStep Int
+  currentReviewStep  Int
+  genre              String
+  searchedTrack      SearchedTrack @relation(fields: [searchedTrackId], references: [id])
+  searchedTrackId    String
+  title              String
+  user               User          @relation(fields: [userId], references: [id])
+  userId             String
+  purchaseUrl        String
+}
+
+model StoredTrack {
+  id           String @id @default(cuid())
+  platform     String
+  purchaseUrl  String
+  artist       String
+  releaseTitle String
+  genre        String
+  title        String
+  releaseDate  String
+  releaseYear  Int
+}
