@@ -15,7 +15,7 @@ export async function POST(req: Request) {
         const userTrackIds = userTrackstracks?.map((track) => track.id) || [];
 
         const tracks = await prisma?.storedTrack.findMany({
-            take: 100,
+            take: 300,
             where: {
                 ...(genre.toLowerCase() !== "all" && { genre }),
                 releaseYear: {
@@ -29,6 +29,8 @@ export async function POST(req: Request) {
                 },
             },
         });
+
+        tracks?.sort(() => Math.random() - 0.5);
 
         const response = NextResponse.json(tracks, {
             status: 200,

@@ -85,8 +85,8 @@ const TrackReviewStep1 = () => {
             try {
                 const storedTracks = await fetchStoredTracks({
                     genre,
-                    startYear: preferredYearRange.from,
-                    endYear: preferredYearRange.to,
+                    startYear: Number(preferredYearRange.from),
+                    endYear: Number(preferredYearRange.to),
                     userId: user.uid,
                 });
 
@@ -255,8 +255,8 @@ const TrackReviewStep1 = () => {
         setSettingsOpen(false);
         setPreferredGenre(formData.genre);
         setPreferredYearRange({
-            from: Number(formData.yearFrom),
-            to: Number(formData.yearTo),
+            from: formData.yearFrom,
+            to: formData.yearTo,
         });
         setPreferredAutoPlay(formData.autoplay);
     };
