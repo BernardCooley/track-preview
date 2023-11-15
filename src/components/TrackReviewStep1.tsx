@@ -105,7 +105,7 @@ const TrackReviewStep1 = () => {
     }, [genre, user, preferredYearRange]);
 
     useEffect(() => {
-        if (tracks.length > 1) {
+        if (tracks?.length > 1) {
             if (!currentTrack) {
                 handleSearchedTrack(tracks[0], tracks, true);
             } else if (!queuedTrack) {
@@ -255,8 +255,8 @@ const TrackReviewStep1 = () => {
         setSettingsOpen(false);
         setPreferredGenre(formData.genre);
         setPreferredYearRange({
-            from: formData.yearFrom,
-            to: formData.yearTo,
+            from: Number(formData.yearFrom),
+            to: Number(formData.yearTo),
         });
         setPreferredAutoPlay(formData.autoplay);
     };

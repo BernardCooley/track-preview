@@ -19,8 +19,8 @@ export async function POST(req: Request) {
             where: {
                 ...(genre.toLowerCase() !== "all" && { genre }),
                 releaseYear: {
-                    gte: Number(startYear),
-                    lte: Number(endYear),
+                    gte: startYear,
+                    lte: endYear,
                 },
                 NOT: {
                     id: {
@@ -36,7 +36,7 @@ export async function POST(req: Request) {
 
         return response;
     } catch (error) {
-        console.log(error);
+        console.log("🚀 ~ file: route.ts:39 ~ POST ~ error:", error);
         return NextResponse.json(
             { error: "Failed to get data" },
             {
