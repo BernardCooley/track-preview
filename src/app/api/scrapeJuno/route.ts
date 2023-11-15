@@ -416,14 +416,14 @@ export async function GET() {
         );
     };
 
-    const spotify = async () => {
-        const tracks = await fetchWithErrorHandling(
-            "http://localhost:3000/api/searchSpotify",
-            "POST"
-        );
+    // const spotify = async () => {
+    //     const tracks = await fetchWithErrorHandling(
+    //         "http://localhost:3000/api/searchSpotify",
+    //         "POST"
+    //     );
 
-        console.log("tracks: ", tracks);
-    };
+    //     console.log("tracks: ", tracks);
+    // };
 
     // await spotify();
 

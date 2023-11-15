@@ -7,28 +7,18 @@ import {
     fetchDeezerTrack,
     fetchITunesTrack,
     fetchSpotifyTrack,
-} from "@/bff/bff";
-import {
     fetchStoredTracks,
-    fetchUserTracks,
     saveNewTrack,
-} from "../../firebase/firebaseRequests";
+} from "@/bff/bff";
 import { useAuthContext } from "../../Contexts/AuthContext";
 import TrackReviewCard from "./TrackReviewCard";
 import Loading from "./Loading";
 import FilterTags from "./FilterTags";
 import { getCurrentYear } from "../../utils";
-import { testTracks } from "@/data/testStoredTracks";
-import { testUserTracks } from "@/data/testUserTracks";
 import FiltersForm, { FormData } from "./FiltersForm";
 import TuneIcon from "@mui/icons-material/Tune";
-import { getAllTrackIds } from "../../firebase/utils";
 
-interface Props {
-    reviewStep: number;
-}
-
-const TrackReviewStep1 = ({ reviewStep }: Props) => {
+const TrackReviewStep1 = () => {
     const [genre, setPreferredGenre] = useLocalStorage("genre", "All");
     const { user } = useAuthContext();
     const [availableGenres, setAvailableGenres] = useState<string[]>(genres);
@@ -53,18 +43,7 @@ const TrackReviewStep1 = ({ reviewStep }: Props) => {
     const audioElementRef = useRef<HTMLAudioElement>(null);
     const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
     const [queuedTrack, setQueuedTrack] = useState<Track | null>(null);
-    const testMode = true;
-
-    useEffect(() => {
-        getRandomTrackId();
-        init();
-    }, [genre, user]);
-
-    interface ToastProps {
-        status: "error" | "success" | "info";
-        title?: string;
-        description?: string;
-    }
+    const [initCounter, setInitCounter] = useState<number>(0);
 
     const showToast = useCallback(
         ({ status, title, description }: ToastProps) => {
@@ -82,61 +61,46 @@ const TrackReviewStep1 = ({ reviewStep }: Props) => {
         [toast]
     );
 
-    const getRandomTrackId = async (): Promise<string | null> => {
-        try {
-            const ids = await getAllTrackIds();
-            const randomNumber = Math.floor(
-                Math.floor(Math.random() * ids.length)
-            );
-            return ids[randomNumber];
-        } catch (error) {
-            return null;
+    useEffect(() => {
+        if (initCounter < 10) {
+            init();
+        } else {
+            showToast({ status: "error" });
+            throw new Error("No tracks found");
         }
-    };
+    }, [genre, user]);
+
+    interface ToastProps {
+        status: "error" | "success" | "info";
+        title?: string;
+        description?: string;
+    }
 
     const init = useCallback(async () => {
+        setInitCounter((prev) => prev + 1);
         if (genre && user?.uid) {
             setAvailableGenres(genres);
             setLoading(true);
 
             try {
-                const randomId = await getRandomTrackId();
+                const storedTracks = await fetchStoredTracks({
+                    genre,
+                    startYear: preferredYearRange.from,
+                    endYear: preferredYearRange.to,
+                    userId: user.uid,
+                });
 
-                const storedTracks = testMode
-                    ? testTracks.filter((t) => t.genre === genre)
-                    : await fetchStoredTracks({
-                          genre,
-                          startYear: preferredYearRange.from,
-                          endYear: preferredYearRange.to,
-                      });
+                setTracks(storedTracks);
 
-                const userTracks = testMode
-                    ? testUserTracks
-                    : (await fetchUserTracks({
-                          genre,
-                          userId: user.uid,
-                      })) || [];
-
-                if (storedTracks && storedTracks.length > 0) {
-                    const uTrackIds = userTracks.map((t) => t.id);
-                    const filteredStoredTracks = storedTracks.filter(
-                        (t) => !uTrackIds.includes(t.id)
-                    );
-
-                    if (filteredStoredTracks.length > 2) {
-                        setTracks(filteredStoredTracks);
-                    } else {
-                        init();
-                    }
-                } else {
-                    init();
+                if (storedTracks.length > 1) {
+                    setInitCounter(0);
                 }
             } catch (error) {
                 setLoading(false);
                 showToast({ status: "error" });
             }
         }
-    }, [genre, user, preferredYearRange, testMode]);
+    }, [genre, user, preferredYearRange]);
 
     useEffect(() => {
         if (tracks.length > 1) {
@@ -148,7 +112,12 @@ const TrackReviewStep1 = ({ reviewStep }: Props) => {
         } else {
             setCurrentTrack(null);
             setQueuedTrack(null);
-            init();
+            if (initCounter < 10) {
+                init();
+            } else {
+                showToast({ status: "error" });
+                throw new Error("No tracks found");
+            }
         }
     }, [tracks, currentTrack, queuedTrack]);
 
@@ -183,6 +152,7 @@ const TrackReviewStep1 = ({ reviewStep }: Props) => {
         }
 
         if (searchedTrack) {
+            searchedTrack.id = searchedTrack.id.toString();
             return {
                 searchedTrack,
                 artist: track.artist,
@@ -221,12 +191,20 @@ const TrackReviewStep1 = ({ reviewStep }: Props) => {
 
     const storeTrack = async (like: boolean) => {
         if (user?.uid && currentTrack && tracks) {
-            currentTrack.currentReviewStep = like ? 2 : 0;
-            currentTrack.furthestReviewStep = like ? 2 : 1;
-
             await saveNewTrack({
-                track: currentTrack,
                 id: currentTrack.id,
+                genre,
+                userId: user.uid,
+                artist: currentTrack.artist,
+                title: currentTrack.title,
+                currentReviewStep: (currentTrack.currentReviewStep = like
+                    ? 2
+                    : 0),
+                furthestReviewStep: (currentTrack.furthestReviewStep = like
+                    ? 2
+                    : 1),
+                purchaseUrl: currentTrack.purchaseUrl,
+                searchedTrack: currentTrack.searchedTrack,
             });
         }
     };
@@ -249,7 +227,12 @@ const TrackReviewStep1 = ({ reviewStep }: Props) => {
             );
 
             if (filteredTracks.length < 2) {
-                init();
+                if (initCounter < 10) {
+                    init();
+                } else {
+                    showToast({ status: "error" });
+                    throw new Error("No tracks found");
+                }
             } else {
                 setTracks(filteredTracks);
                 setCurrentTrack(queuedTrack);

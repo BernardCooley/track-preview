@@ -1,3 +1,4 @@
+import { StoredTrack, Track } from "@prisma/client";
 import { AccessToken, SearchedTrack } from "../../types";
 
 export class GoneError extends Error {
@@ -124,15 +125,105 @@ export const getSpotifyAccessToken = async (): Promise<AccessToken | null> => {
     return token;
 };
 
-export const searchSpotify = async (
-    token: AccessToken
-): Promise<any[] | null> => {
-    const tracks: any[] | null = await fetchWithErrorHandling(
-        "/api/searchSpotify",
+export const uploadTracks = async (): Promise<any[] | null> => {
+    const tracksUploaded: any[] | null = await fetchWithErrorHandling(
+        "/api/uploadTracks",
+        "GET"
+    );
+    return tracksUploaded;
+};
+
+interface FetchStoredTracksProps {
+    genre: string;
+    startYear: number;
+    endYear: number;
+    userId: string;
+}
+
+export const fetchStoredTracks = async ({
+    genre,
+    startYear,
+    endYear,
+    userId,
+}: FetchStoredTracksProps): Promise<StoredTrack[]> => {
+    try {
+        const userTracks = await fetchWithErrorHandling(
+            "/api/getStoredTracks",
+            "POST",
+            {
+                genre,
+                startYear,
+                endYear,
+                userId,
+            }
+        );
+        return userTracks as StoredTrack[];
+    } catch (error) {
+        throw error;
+    }
+};
+
+interface FetchUserTracksProps {
+    genre: string;
+    userId: string;
+}
+
+export const fetchUserTracks = async ({
+    genre,
+    userId,
+}: FetchUserTracksProps): Promise<Track[]> => {
+    try {
+        const userTracks = await fetchWithErrorHandling(
+            "/api/getUserTracks",
+            "POST",
+            {
+                genre,
+                userId,
+            }
+        );
+        return userTracks as Track[];
+    } catch (error) {
+        throw error;
+    }
+};
+
+interface SaveNewTrackProps {
+    id: string;
+    genre: string;
+    userId: string;
+    artist: string;
+    title: string;
+    currentReviewStep: number;
+    furthestReviewStep: number;
+    purchaseUrl: string;
+    searchedTrack: SearchedTrack;
+}
+
+export const saveNewTrack = async ({
+    id,
+    genre,
+    userId,
+    artist,
+    title,
+    currentReviewStep,
+    furthestReviewStep,
+    purchaseUrl,
+    searchedTrack,
+}: SaveNewTrackProps): Promise<Track[] | null> => {
+    const userTracks: any[] | null = await fetchWithErrorHandling(
+        "/api/saveNewTrack",
         "POST",
         {
-            token,
+            id,
+            genre,
+            userId,
+            artist,
+            title,
+            currentReviewStep,
+            furthestReviewStep,
+            purchaseUrl,
+            searchedTrack,
         }
     );
-    return tracks;
+    return userTracks;
 };

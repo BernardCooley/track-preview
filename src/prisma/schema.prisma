@@ -31,12 +31,12 @@ model Track {
   furthestReviewStep Int
   currentReviewStep  Int
   genre              String
-  searchedTrack      SearchedTrack @relation(fields: [searchedTrackId], references: [id])
   searchedTrackId    String
   title              String
-  user               User          @relation(fields: [userId], references: [id])
   userId             String
   purchaseUrl        String
+  searchedTrack      SearchedTrack @relation(fields: [searchedTrackId], references: [id])
+  user               User          @relation(fields: [userId], references: [id])
 }
 
 model StoredTrack {

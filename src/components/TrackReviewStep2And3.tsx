@@ -4,10 +4,7 @@ import ReviewTracksFilters from "./ReviewTracksFilters";
 import TrackReviewCard from "./TrackReviewCard";
 import { useLocalStorage } from "usehooks-ts";
 import { SearchedTrack, Track } from "../../types";
-import {
-    fetchUserTracks,
-    updateTrackReviewStep,
-} from "../../firebase/firebaseRequests";
+import { updateTrackReviewStep } from "../../firebase/firebaseRequests";
 import { useAuthContext } from "../../Contexts/AuthContext";
 import Loading from "./Loading";
 import ApplyFiltersButton from "./ApplyFiltersButton";
@@ -47,11 +44,7 @@ const TrackReviewStep2And3 = ({ reviewStep }: Props) => {
             setLoading(true);
 
             try {
-                const userTracks = await fetchUserTracks({
-                    genre,
-                    reviewStep,
-                    userId: user.uid,
-                });
+                const userTracks = [];
 
                 if (userTracks && userTracks.length > 0) {
                     setAvailableGenres(

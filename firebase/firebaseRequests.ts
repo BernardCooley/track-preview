@@ -1,21 +1,5 @@
-import { doc, getDocs, setDoc, updateDoc } from "firebase/firestore";
+import { doc, updateDoc } from "firebase/firestore";
 import { db } from "./firebaseInit";
-import { StoredTrack, Track } from "../types";
-import { getStoredTracksQuery, getUserTracksQuery } from "./utils";
-
-interface SaveNewTrackProps {
-    track: Track;
-    id: string;
-}
-
-export const saveNewTrack = async ({ track, id }: SaveNewTrackProps) => {
-    try {
-        await setDoc(doc(db, "userTracks", id), track);
-    } catch (error) {
-        console.error(error);
-        throw error;
-    }
-};
 
 interface UpdateTrackReviewStep {
     trackId: number;
@@ -34,62 +18,4 @@ export const updateTrackReviewStep = async ({
         reviewStep: newReviewStep,
         furthestReviewStep: furthestReviewStep,
     });
-};
-
-interface FetchUserTracksProps {
-    reviewStep?: number;
-    userId: string;
-    genre?: string;
-}
-
-export const fetchUserTracks = async ({
-    reviewStep,
-    userId,
-    genre = "all",
-}: FetchUserTracksProps): Promise<Track[] | null> => {
-    try {
-        const q = getUserTracksQuery(userId, reviewStep, genre);
-        const querySnapshot = await getDocs(q);
-        const tracks = querySnapshot.docs.map((doc) => {
-            return doc.data() as Track;
-        }) as Track[];
-
-        if (tracks.length > 0) {
-            return tracks;
-        }
-
-        return null;
-    } catch (error) {
-        console.error(error);
-        throw error;
-    }
-};
-
-interface FetchStoredTracksProps {
-    genre?: string;
-    startYear?: number;
-    endYear?: number;
-}
-
-export const fetchStoredTracks = async ({
-    genre,
-    startYear,
-    endYear,
-}: FetchStoredTracksProps): Promise<StoredTrack[] | null> => {
-    try {
-        let q = getStoredTracksQuery(genre, startYear, endYear);
-        const querySnapshot = await getDocs(q as any);
-        const tracks = querySnapshot.docs.map((doc) => {
-            return { ...(doc.data() as StoredTrack), id: doc.id };
-        }) as StoredTrack[];
-
-        if (tracks.length > 0) {
-            return tracks;
-        }
-
-        return null;
-    } catch (error) {
-        console.error(error);
-        throw error;
-    }
 };
