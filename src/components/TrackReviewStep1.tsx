@@ -90,6 +90,8 @@ const TrackReviewStep1 = () => {
                     userId: user.uid,
                 });
 
+                setListened(false);
+
                 setTracks(storedTracks);
 
                 if (storedTracks.length > 1) {

@@ -19,8 +19,8 @@ export async function POST(req: Request) {
             where: {
                 ...(genre.toLowerCase() !== "all" && { genre }),
                 releaseYear: {
-                    gte: startYear,
-                    lte: endYear,
+                    gte: Number(startYear),
+                    lte: Number(endYear),
                 },
                 NOT: {
                     id: {
