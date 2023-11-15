@@ -76,7 +76,7 @@ export default function Home() {
                             }}
                         />
                         {reviewStep && Number(reviewStep) === 1 && (
-                            <TrackReviewStep1 reviewStep={Number(reviewStep)} />
+                            <TrackReviewStep1 />
                         )}
                         {reviewStep &&
                             (Number(reviewStep) === 2 ||

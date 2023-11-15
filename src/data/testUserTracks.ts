@@ -8,7 +8,7 @@ export const testUserTracks = [
         genre: "Metal",
         searchedTrack: {
             artist: "S?K",
-            id: 1378701152,
+            id: "1378701152",
             previewUrl:
                 "https://cdns-preview-3.dzcdn.net/stream/c-3f97d1c51c56872e336ce1fbf91c8878-2.mp3",
             thumbnail:
@@ -31,7 +31,7 @@ export const testUserTracks = [
         purchaseUrl: "https://www.juno.co.uk/products/black-replica/823562-01/",
         searchedTrack: {
             artist: "The Jars",
-            id: 1635917762,
+            id: "1635917762",
             previewUrl:
                 "https://cdns-preview-0.dzcdn.net/stream/c-01e6a55237fe7b83787c706b6b9519f6-2.mp3",
             thumbnail:
@@ -51,7 +51,7 @@ export const testUserTracks = [
         purchaseUrl: "https://www.juno.co.uk/products/black-replica/823562-01/",
         searchedTrack: {
             artist: "The Jars",
-            id: 1635917762,
+            id: "1635917762",
             previewUrl:
                 "https://cdns-preview-0.dzcdn.net/stream/c-01e6a55237fe7b83787c706b6b9519f6-2.mp3",
             thumbnail:
@@ -71,7 +71,7 @@ export const testUserTracks = [
         purchaseUrl: "https://www.juno.co.uk/products/black-replica/823562-01/",
         searchedTrack: {
             artist: "The Jars",
-            id: 1635917762,
+            id: "1635917762",
             previewUrl:
                 "https://cdns-preview-0.dzcdn.net/stream/c-01e6a55237fe7b83787c706b6b9519f6-2.mp3",
             thumbnail:

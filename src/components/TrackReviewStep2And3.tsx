@@ -44,7 +44,7 @@ const TrackReviewStep2And3 = ({ reviewStep }: Props) => {
             setLoading(true);
 
             try {
-                const userTracks = [];
+                const userTracks: Track[] = [];
 
                 if (userTracks && userTracks.length > 0) {
                     setAvailableGenres(

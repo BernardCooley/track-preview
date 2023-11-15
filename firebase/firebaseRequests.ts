@@ -2,7 +2,7 @@ import { doc, updateDoc } from "firebase/firestore";
 import { db } from "./firebaseInit";
 
 interface UpdateTrackReviewStep {
-    trackId: number;
+    trackId: string;
     newReviewStep: number;
     furthestReviewStep: number;
 }
