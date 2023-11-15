@@ -17,7 +17,7 @@ export async function POST(req: Request) {
         const tracks = await prisma?.storedTrack.findMany({
             take: 100,
             where: {
-                genre,
+                ...(genre.toLowerCase() !== "all" && { genre }),
                 releaseYear: {
                     gte: startYear,
                     lte: endYear,
