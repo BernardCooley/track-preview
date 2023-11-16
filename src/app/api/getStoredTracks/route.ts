@@ -1,4 +1,5 @@
 import prisma from "@/lib/prisma";
+import { Prisma, StoredTrack } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -14,21 +15,20 @@ export async function POST(req: Request) {
 
         const userTrackIds = userTrackstracks?.map((track) => track.id) || [];
 
-        const tracks = await prisma?.storedTrack.findMany({
-            take: 300,
-            where: {
-                ...(genre.toLowerCase() !== "all" && { genre }),
-                releaseYear: {
-                    gte: startYear,
-                    lte: endYear,
-                },
-                NOT: {
-                    id: {
-                        in: userTrackIds,
-                    },
-                },
-            },
-        });
+        const notInUserIds = userTrackIds.map((id) => `'${id}'`).join(", ");
+
+        const sql = `
+            SELECT * FROM "StoredTrack"
+            WHERE "releaseYear" >= ${startYear}
+            AND "releaseYear" <= ${endYear}
+            ${genre.toLowerCase() === "all" ? "" : `AND "genre" = '${genre}'`}
+            ${notInUserIds.length > 0 ? `AND "id" NOT IN(${notInUserIds})` : ""}
+            ORDER BY RANDOM() ASC
+            LIMIT 100
+        `;
+
+        const tracks: StoredTrack[] =
+            (await prisma?.$queryRaw(Prisma.raw(sql))) || [];
 
         tracks?.sort(() => Math.random() - 0.5);
 
