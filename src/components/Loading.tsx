@@ -1,7 +1,11 @@
 import { Badge, Center } from "@chakra-ui/react";
 import React from "react";
 
-const Loading = () => {
+interface Props {
+    message: string;
+}
+
+const Loading = ({ message }: Props) => {
     return (
         <Center>
             <Badge
@@ -13,7 +17,7 @@ const Loading = () => {
                 fontSize={["24px", "36px"]}
                 px={4}
             >
-                {`Loading more Tracks...`}
+                {message}
             </Badge>
         </Center>
     );

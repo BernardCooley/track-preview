@@ -263,7 +263,7 @@ const TrackReviewStep1 = () => {
 
     return (
         <Box h="90vh" position="relative">
-            {loading && <Loading />}
+            {loading && <Loading message="Loading more tracks..." />}
             <Flex
                 w={[settingsOpen ? "auto" : "full", "full"]}
                 alignItems="baseline"

@@ -1,5 +1,5 @@
-import { StoredTrack, Track } from "@prisma/client";
-import { AccessToken, SearchedTrack } from "../../types";
+import { StoredTrack } from "@prisma/client";
+import { AccessToken, SearchedTrack, Track } from "../../types";
 
 export class GoneError extends Error {
     statusCode = 410;
@@ -166,11 +166,13 @@ export const fetchStoredTracks = async ({
 interface FetchUserTracksProps {
     genre: string;
     userId: string;
+    reviewStep: number;
 }
 
 export const fetchUserTracks = async ({
     genre,
     userId,
+    reviewStep,
 }: FetchUserTracksProps): Promise<Track[]> => {
     try {
         const userTracks = await fetchWithErrorHandling(
@@ -179,6 +181,7 @@ export const fetchUserTracks = async ({
             {
                 genre,
                 userId,
+                reviewStep,
             }
         );
         return userTracks as Track[];
@@ -223,6 +226,29 @@ export const saveNewTrack = async ({
             furthestReviewStep,
             purchaseUrl,
             searchedTrack,
+        }
+    );
+    return userTracks;
+};
+
+interface UpdateTrackReviewStepProps {
+    id: string;
+    like: boolean;
+    reviewStep: number;
+}
+
+export const updateTrackReviewStep = async ({
+    id,
+    like,
+    reviewStep,
+}: UpdateTrackReviewStepProps): Promise<Track[] | null> => {
+    const userTracks: any[] | null = await fetchWithErrorHandling(
+        "/api/updateTrackReviewStep",
+        "POST",
+        {
+            id,
+            like,
+            reviewStep,
         }
     );
     return userTracks;

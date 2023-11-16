@@ -2,17 +2,16 @@ import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
-    const { genre, userId, reviewStep } = await req.json();
+    const { id, like, reviewStep } = await req.json();
 
     try {
-        const tracks = await prisma?.track.findMany({
+        const tracks = await prisma?.track.update({
             where: {
-                genre: genre.toLowerCase() === "all" ? undefined : genre,
-                userId,
-                currentReviewStep: Number(reviewStep),
+                id,
             },
-            include: {
-                searchedTrack: true,
+            data: {
+                currentReviewStep: like ? reviewStep + 1 : 0,
+                furthestReviewStep: like ? reviewStep + 1 : reviewStep,
             },
         });
 

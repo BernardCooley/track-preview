@@ -1,5 +1,4 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
 import { EmailAuthProvider } from "firebase/auth";
 import { getAuth } from "firebase/auth";
 
@@ -18,5 +17,3 @@ const provider = new EmailAuthProvider();
 const auth = getAuth(app);
 
 export { provider, auth };
-
-export const db = getFirestore(app);
