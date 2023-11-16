@@ -9,6 +9,7 @@ interface Props {
         to: number;
     };
     preferredAutoPlay: boolean;
+    showDates: boolean;
 }
 
 const FilterTags = ({
@@ -16,6 +17,7 @@ const FilterTags = ({
     genre,
     preferredYearRange,
     preferredAutoPlay,
+    showDates,
 }: Props) => {
     return (
         <Flex opacity={settingsOpen ? 0 : 1} transition="opacity 200ms" h={8}>
@@ -23,7 +25,7 @@ const FilterTags = ({
                 <Tag px={3} rounded="full" colorScheme="teal" variant="solid">
                     {genre.toLowerCase() === "all" ? "All genres" : genre}
                 </Tag>
-                {preferredYearRange && (
+                {preferredYearRange && showDates && (
                     <Tag
                         px={3}
                         rounded="full"

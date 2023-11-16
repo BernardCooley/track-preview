@@ -1,14 +1,14 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Box, Flex, ToastProps, useToast } from "@chakra-ui/react";
-import ReviewTracksFilters from "./ReviewTracksFilters";
+import { Box, Flex, IconButton, ToastProps, useToast } from "@chakra-ui/react";
 import TrackReviewCard from "./TrackReviewCard";
 import { useLocalStorage } from "usehooks-ts";
 import { SearchedTrack, Track } from "../../types";
 import { useAuthContext } from "../../Contexts/AuthContext";
 import Loading from "./Loading";
-import ApplyFiltersButton from "./ApplyFiltersButton";
 import FilterTags from "./FilterTags";
 import { fetchUserTracks, updateTrackReviewStep } from "@/bff/bff";
+import TuneIcon from "@mui/icons-material/Tune";
+import FiltersForm, { FormData } from "./FiltersForm";
 
 interface Props {
     reviewStep: number;
@@ -20,13 +20,11 @@ const TrackReviewStep2And3 = ({ reviewStep }: Props) => {
     const [loading, setLoading] = useState<boolean>(false);
     const [genre, setPreferredGenre] = useLocalStorage("step2And3genre", "All");
     const [settingsOpen, setSettingsOpen] = useState<boolean>(false);
-    const [filtersToApply, setSetFiltersToApply] = useState<boolean>(false);
     const [preferredAutoPlay, setPreferredAutoPlay] = useLocalStorage(
-        "preferredAutoPlay",
+        "Step2And3preferredAutoPlay",
         false
     );
     const [availableGenres, setAvailableGenres] = useState<string[]>([]);
-    const genreRef = useRef<HTMLSelectElement>(null);
     const [currentTrack, setCurrentTrack] = useState<SearchedTrack | null>(
         null
     );
@@ -42,7 +40,6 @@ const TrackReviewStep2And3 = ({ reviewStep }: Props) => {
         setCurrentTrack(null);
         setNoTracks(false);
         if (genre && user?.uid) {
-            genreRef.current!.value = genre;
             setLoading(true);
 
             try {
@@ -133,6 +130,14 @@ const TrackReviewStep2And3 = ({ reviewStep }: Props) => {
         } catch (error) {}
     };
 
+    const applyFilters = async (formData: FormData) => {
+        setCurrentTrack(null);
+        setTracks([]);
+        setSettingsOpen(false);
+        setPreferredGenre(formData.genre);
+        setPreferredAutoPlay(formData.autoplay);
+    };
+
     return (
         <Box h="90vh" position="relative">
             {loading && (
@@ -150,6 +155,7 @@ const TrackReviewStep2And3 = ({ reviewStep }: Props) => {
                 justifyContent="space-between"
                 direction="column"
                 p={4}
+                pt={2}
                 pl={settingsOpen ? 4 : [4, 0]}
                 gap={2}
                 mx={settingsOpen ? [4, 0] : 0}
@@ -166,29 +172,44 @@ const TrackReviewStep2And3 = ({ reviewStep }: Props) => {
                     justifyContent="space-between"
                     w="full"
                 >
-                    <ApplyFiltersButton
-                        settingsOpen={settingsOpen}
-                        filtersToApply={filtersToApply}
-                        onClick={() => setSettingsOpen((prev) => !prev)}
-                    />
+                    {!settingsOpen && (
+                        <IconButton
+                            rounded="full"
+                            onClick={() => setSettingsOpen((prev) => !prev)}
+                            variant="ghost"
+                            colorScheme="teal"
+                            aria-label="set tings page"
+                            fontSize="3xl"
+                            icon={<TuneIcon fontSize="inherit" />}
+                        />
+                    )}
 
-                    <FilterTags
-                        settingsOpen={settingsOpen}
-                        genre={genre}
-                        preferredAutoPlay={preferredAutoPlay}
-                    />
+                    {!settingsOpen && (
+                        <FilterTags
+                            showDates={false}
+                            settingsOpen={settingsOpen}
+                            genre={genre}
+                            preferredYearRange={{
+                                from: 0,
+                                to: 0,
+                            }}
+                            preferredAutoPlay={preferredAutoPlay}
+                        />
+                    )}
                 </Flex>
-                <ReviewTracksFilters
+                <FiltersForm
+                    onSettingsToggle={() => setSettingsOpen((prev) => !prev)}
+                    settingsOpen={settingsOpen}
+                    autoplay={preferredAutoPlay}
                     showDates={false}
                     isOpen={settingsOpen}
-                    onGenreSelect={async (genre: string) => {
-                        setPreferredGenre(genre);
-                    }}
-                    selectedGenre={genre}
+                    genre={genre || "All"}
                     genres={availableGenres}
-                    autoPlay={preferredAutoPlay}
-                    onAutoPlayChange={(value) => setPreferredAutoPlay(value)}
-                    ref={genreRef}
+                    preferredYearRange={{
+                        from: 0,
+                        to: 0,
+                    }}
+                    onApplyFilters={(formData) => applyFilters(formData)}
                 />
             </Flex>
             <Flex

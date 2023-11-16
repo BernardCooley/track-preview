@@ -301,6 +301,7 @@ const TrackReviewStep1 = () => {
 
                     {!settingsOpen && (
                         <FilterTags
+                            showDates={true}
                             settingsOpen={settingsOpen}
                             genre={genre}
                             preferredYearRange={preferredYearRange}
