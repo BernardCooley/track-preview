@@ -11,6 +11,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { useAuthContext } from "../../Contexts/AuthContext";
 import TrackReviewStep1 from "@/components/TrackReviewStep1";
 import TrackReviewStep2And3 from "@/components/TrackReviewStep2And3";
+import TrackList from "@/components/TrackList";
 
 export default function Home() {
     const router = useRouter();
@@ -85,6 +86,9 @@ export default function Home() {
                                     reviewStep={Number(reviewStep)}
                                 />
                             )}
+                        {reviewStep && Number(reviewStep) === 4 && (
+                            <TrackList />
+                        )}
                     </Stack>
                     <Slide
                         direction="bottom"

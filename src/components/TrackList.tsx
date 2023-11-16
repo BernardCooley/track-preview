@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
     Box,
     Card,
@@ -16,13 +16,20 @@ import StopIcon from "@mui/icons-material/Stop";
 import { Track } from "../../types";
 import { useTrackContext } from "../../context/TrackContext";
 import { doc, updateDoc } from "firebase/firestore";
+import { fetchUserTracks } from "@/bff/bff";
+import { useAuthContext } from "../../Contexts/AuthContext";
+import Loading from "./Loading";
 
-interface Props {
-    tracks: Track[];
-}
-
-const TrackList = ({ tracks }: Props) => {
+const TrackList = () => {
+    const { user } = useAuthContext();
     const { currentlyPlaying, updateCurrentlyPlaying } = useTrackContext();
+    const [tracks, setTracks] = useState<Track[]>([]);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [noTracks, setNoTracks] = useState<boolean>(false);
+
+    useEffect(() => {
+        init();
+    }, [user]);
 
     const deleteTrack = async (id: string) => {
         // const trackRef = doc(db, "tracks", id);
@@ -30,6 +37,30 @@ const TrackList = ({ tracks }: Props) => {
         //         reviewStep: 0,
         //     });
         // updateCurrentlyPlaying(undefined);
+    };
+
+    const init = async () => {
+        setLoading(true);
+        if (user) {
+            try {
+                const userTracks = await fetchUserTracks({
+                    genre: "all",
+                    userId: user.uid,
+                    reviewStep: 4,
+                });
+
+                if (userTracks.length > 0) {
+                    setTracks(userTracks);
+                } else {
+                    setNoTracks(true);
+                }
+
+                setLoading(false);
+            } catch (error) {
+                setNoTracks(true);
+                setLoading(false);
+            }
+        }
     };
 
     return (
@@ -52,6 +83,15 @@ const TrackList = ({ tracks }: Props) => {
                 },
             }}
         >
+            {loading && (
+                <Loading
+                    message={
+                        noTracks
+                            ? "All done on this step"
+                            : "Loading your tracks..."
+                    }
+                />
+            )}
             {tracks.map((track) => (
                 <Card
                     key={track.searchedTrack.previewUrl}
