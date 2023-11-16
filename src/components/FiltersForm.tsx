@@ -1,5 +1,6 @@
 import {
     Box,
+    Button,
     Collapse,
     Flex,
     FormControl,
@@ -8,7 +9,7 @@ import {
     Select,
     Switch,
 } from "@chakra-ui/react";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { arrayRange, getCurrentYear } from "../../utils";
 import ApplyFiltersButton from "./ApplyFiltersButton";
@@ -48,13 +49,15 @@ const FiltersForm = ({
     autoplay,
     settingsOpen,
 }: Props) => {
+    const [isDirty, setIsDirty] = useState(false);
     const router = useRouter();
     const {
         register,
         handleSubmit,
-        formState: { isDirty },
+        formState: { dirtyFields },
         watch,
         setValue,
+        reset,
     } = useForm<FormData>({
         defaultValues: {
             genre: genre,
@@ -71,24 +74,54 @@ const FiltersForm = ({
     }, [genre, setValue]);
 
     const watchYearFrom = watch("yearFrom");
+    const watchYearTo = watch("yearTo");
+    const watchGenre = watch("genre");
+
+    useEffect(() => {
+        if (
+            dirtyFields.genre! ||
+            dirtyFields.yearFrom! ||
+            dirtyFields.yearTo!
+        ) {
+            setIsDirty(true);
+        } else {
+            setIsDirty(false);
+        }
+    }, [dirtyFields, watchYearFrom, watchYearTo, watchGenre]);
 
     return (
         <Flex>
             <Collapse in={isOpen} animateOpacity>
                 {settingsOpen && (
-                    <Box mb={2}>
+                    <Flex gap={4} mb={2}>
                         <ApplyFiltersButton
                             settingsOpen={settingsOpen}
                             filtersToApply={isDirty}
                             onClick={handleSubmit((formData) => {
-                                if (settingsOpen && isDirty) {
+                                if (settingsOpen && dirtyFields) {
                                     onApplyFilters(formData);
                                 } else {
                                     onSettingsToggle();
                                 }
                             })}
                         />
-                    </Box>
+                        {isDirty && (
+                            <Button
+                                onClick={() => {
+                                    onSettingsToggle();
+                                    reset({
+                                        genre,
+                                        yearFrom: preferredYearRange.from,
+                                        yearTo: preferredYearRange.to,
+                                    });
+                                }}
+                                colorScheme="red"
+                                variant="outline"
+                            >
+                                Cancel
+                            </Button>
+                        )}
+                    </Flex>
                 )}
                 <form
                     onSubmit={handleSubmit((formData) =>

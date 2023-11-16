@@ -20,18 +20,25 @@ const FilterTags = ({
     return (
         <Flex opacity={settingsOpen ? 0 : 1} transition="opacity 200ms" h={8}>
             <Flex gap={2}>
-                <Tag colorScheme="teal" variant="solid">
-                    {genre}
+                <Tag px={3} rounded="full" colorScheme="teal" variant="solid">
+                    {genre.toLowerCase() === "all" ? "All genres" : genre}
                 </Tag>
                 {preferredYearRange && (
-                    <Tag colorScheme="teal" variant="solid">
+                    <Tag
+                        px={3}
+                        rounded="full"
+                        colorScheme="teal"
+                        variant="solid"
+                    >
                         {Number(preferredYearRange?.from) === 0
-                            ? "All"
+                            ? "All years"
                             : `${Number(preferredYearRange?.from)} -
                         ${preferredYearRange?.to}`}
                     </Tag>
                 )}
                 <Tag
+                    px={3}
+                    rounded="full"
                     colorScheme="teal"
                     variant={preferredAutoPlay ? "solid" : "outline"}
                 >
