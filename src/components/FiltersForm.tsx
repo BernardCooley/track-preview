@@ -8,7 +8,7 @@ import {
     Select,
     Switch,
 } from "@chakra-ui/react";
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { arrayRange, getCurrentYear } from "../../utils";
 import ApplyFiltersButton from "./ApplyFiltersButton";
@@ -54,6 +54,7 @@ const FiltersForm = ({
         handleSubmit,
         formState: { isDirty },
         watch,
+        setValue,
     } = useForm<FormData>({
         defaultValues: {
             genre: genre,
@@ -62,6 +63,12 @@ const FiltersForm = ({
             autoplay,
         },
     });
+
+    useEffect(() => {
+        if (genre === "All") {
+            setValue("genre", "all");
+        }
+    }, [genre, setValue]);
 
     const watchYearFrom = watch("yearFrom");
 
@@ -120,7 +127,6 @@ const FiltersForm = ({
                                         }}
                                         {...register("genre")}
                                         variant="outline"
-                                        placeholder="Select genre"
                                     >
                                         <option value="all">All</option>
                                         {genres.sort().map((style) => (

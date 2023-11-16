@@ -314,7 +314,7 @@ const TrackReviewStep1 = () => {
                     autoplay={preferredAutoPlay}
                     showDates={true}
                     isOpen={settingsOpen}
-                    genre={genre}
+                    genre={genre || "All"}
                     genres={availableGenres}
                     preferredYearRange={preferredYearRange}
                     onApplyFilters={(formData) => applyFilters(formData)}
