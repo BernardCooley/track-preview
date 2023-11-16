@@ -20,7 +20,7 @@ export async function POST(req: Request) {
         const sql = `
             SELECT * FROM "StoredTrack"
             WHERE "releaseYear" >= ${startYear}
-            AND "releaseYear" <= ${endYear}
+            ${endYear ? `AND "releaseYear" <= ${endYear}` : ""}
             ${genre.toLowerCase() === "all" ? "" : `AND "genre" = '${genre}'`}
             ${notInUserIds.length > 0 ? `AND "id" NOT IN(${notInUserIds})` : ""}
             ORDER BY RANDOM() ASC
