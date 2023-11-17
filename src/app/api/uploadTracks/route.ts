@@ -1,6 +1,6 @@
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
-// import newTracks from "../../../../juno_scraped_tracks/to_upload_now/38.json";
+// import newTracks from "../../../../juno_scraped_tracks/uploaded/38.json";
 
 export async function GET() {
     try {
