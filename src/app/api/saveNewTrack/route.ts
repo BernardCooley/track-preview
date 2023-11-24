@@ -43,7 +43,7 @@ export async function POST(req: Request) {
     } catch (error) {
         console.log("🚀 ~ file: route.ts:44 ~ POST ~ error:", error);
         return NextResponse.json(
-            { error: error },
+            { error: "Failed to save data" },
             {
                 status: 500,
             }
