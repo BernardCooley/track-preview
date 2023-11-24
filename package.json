@@ -8,7 +8,9 @@
         "start": "next start",
         "lint": "next lint",
         "tsc": "tsc --noEmit",
-        "postinstall": "prisma generate"
+        "postinstall": "prisma generate",
+        "migrateprod": "dotenv -e .env.production npx prisma db push npx prisma migrate deploy",
+        "migratedev": "dotenv -e .env.development npx prisma db push npx prisma migrate dev"
     },
     "dependencies": {
         "@chakra-ui/icons": "2.1.0",
