@@ -136,6 +136,7 @@ const TrackReviewStep1 = () => {
 
         searchedTrack = await fetchDeezerTrack({
             trackToSearch: `${track.artist} - ${track.title}`,
+            releaseYear: track.releaseYear,
         });
 
         if (!searchedTrack) {
@@ -144,12 +145,14 @@ const TrackReviewStep1 = () => {
                     artist: track.artist,
                     title: track.title,
                 },
+                releaseYear: track.releaseYear,
             });
         }
 
         if (!searchedTrack) {
             searchedTrack = await fetchITunesTrack({
                 trackToSearch: `${track.artist} - ${track.title}`,
+                releaseYear: track.releaseYear,
             });
         }
 

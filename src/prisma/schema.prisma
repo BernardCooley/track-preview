@@ -16,13 +16,14 @@ model User {
 }
 
 model SearchedTrack {
-  id         String  @id @default(cuid())
-  artist     String
-  title      String
-  previewUrl String
-  thumbnail  String
-  url        String
-  User       Track[]
+  id          String  @id @default(cuid())
+  artist      String
+  title       String
+  previewUrl  String
+  thumbnail   String
+  url         String
+  releaseYear Int
+  User        Track[]
 }
 
 model Track {

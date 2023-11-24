@@ -5,6 +5,7 @@ export interface SearchedTrack {
     id: string;
     thumbnail: string;
     url: string;
+    releaseYear: number;
 }
 export interface Track {
     artist: string;

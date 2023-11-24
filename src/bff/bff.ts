@@ -60,16 +60,19 @@ interface FetchSpotifyTrackProps {
         artist: string;
         title: string;
     };
+    releaseYear: number;
 }
 
 export const fetchSpotifyTrack = async ({
     trackToSearch,
+    releaseYear,
 }: FetchSpotifyTrackProps): Promise<SearchedTrack | null> => {
     const spotifyTrack: SearchedTrack | null = await fetchWithErrorHandling(
         "/api/getSpotifyTrack",
         "POST",
         {
             trackToSearch,
+            releaseYear,
         }
     );
     return spotifyTrack;
@@ -77,16 +80,19 @@ export const fetchSpotifyTrack = async ({
 
 interface FetchDeezerTrackProps {
     trackToSearch: string;
+    releaseYear: number;
 }
 
 export const fetchDeezerTrack = async ({
     trackToSearch,
+    releaseYear,
 }: FetchDeezerTrackProps): Promise<SearchedTrack | null> => {
     const deezerTrack: SearchedTrack | null = await fetchWithErrorHandling(
         "/api/getDeezerTrack",
         "POST",
         {
-            trackToSearch: trackToSearch,
+            trackToSearch,
+            releaseYear,
         }
     );
     return deezerTrack;
@@ -94,16 +100,19 @@ export const fetchDeezerTrack = async ({
 
 interface FetchITunesTracksProps {
     trackToSearch: string;
+    releaseYear: number;
 }
 
 export const fetchITunesTrack = async ({
     trackToSearch,
+    releaseYear,
 }: FetchITunesTracksProps): Promise<SearchedTrack | null> => {
     const iTinesTrack: SearchedTrack | null = await fetchWithErrorHandling(
         "/api/getITunesTracks",
         "POST",
         {
             trackToSearch,
+            releaseYear,
         }
     );
     return iTinesTrack;
@@ -131,6 +140,10 @@ export const uploadTracks = async (): Promise<any[] | null> => {
         "GET"
     );
     return tracksUploaded;
+};
+
+export const restoreDatabase = async () => {
+    await fetchWithErrorHandling("/api/restoreDatabase", "GET");
 };
 
 interface FetchStoredTracksProps {

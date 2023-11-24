@@ -60,6 +60,9 @@ const TrackReviewCard = forwardRef(
                                 <Flex gap={1}>
                                     <Text fontSize="xl">
                                         {currentTrack.title}
+                                        {" ("}
+                                        {currentTrack.releaseYear}
+                                        {")"}
                                     </Text>
                                     <OpenInNewIcon />
                                 </Flex>

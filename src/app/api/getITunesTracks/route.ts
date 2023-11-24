@@ -4,7 +4,7 @@ import { ItunesMedia, ItunesSearchOptions } from "node-itunes-search";
 const itunesAPI = require("node-itunes-search");
 
 export async function POST(req: Request) {
-    const { trackToSearch } = await req.json();
+    const { trackToSearch, releaseYear } = await req.json();
 
     try {
         const searchOptions = new ItunesSearchOptions({
@@ -23,6 +23,7 @@ export async function POST(req: Request) {
                 id: iTunesResponse.results[0].trackId,
                 thumbnail: iTunesResponse.results[0].artworkUrl100,
                 url: iTunesResponse.results[0].trackViewUrl,
+                releaseYear,
             };
 
             const response = NextResponse.json(track, {

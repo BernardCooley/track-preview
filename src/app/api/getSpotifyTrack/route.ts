@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import { SearchedTrack } from "../../../../types";
 
 export async function POST(req: Request) {
-    const { trackToSearch } = await req.json();
+    const { trackToSearch, releaseYear } = await req.json();
 
     try {
         SpotifyWebApi._addMethods = function (fncs: any) {
@@ -54,6 +54,7 @@ export async function POST(req: Request) {
                     id: foundTrack.id,
                     thumbnail: foundTrack.album.images[0].url,
                     url: foundTrack.album.uri,
+                    releaseYear,
                 };
 
                 const response = NextResponse.json(track, {

@@ -3,7 +3,7 @@ import { SearchedTrack } from "../../../../types";
 const DeezerPublicApi = require("deezer-public-api");
 
 export async function POST(req: Request) {
-    const { trackToSearch } = await req.json();
+    const { trackToSearch, releaseYear } = await req.json();
 
     try {
         const deezer = new DeezerPublicApi();
@@ -17,6 +17,7 @@ export async function POST(req: Request) {
                 id: tracks.data[0].id,
                 thumbnail: tracks.data[0].album.cover_medium,
                 url: tracks.data[0].link,
+                releaseYear,
             };
 
             const response = NextResponse.json(track, {
