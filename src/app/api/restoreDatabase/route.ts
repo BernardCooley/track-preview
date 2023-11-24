@@ -27,7 +27,7 @@ export async function GET() {
 
     const dir = "./juno_scraped_tracks/to_upload";
 
-    await fs.readdir(dir, (err, files: any[]) => {
+    await fs.readdir(dir, (err: any, files: any[]) => {
         files.map(async (file) => {
             const filePath = path.join(dir, file);
             const fileContents = fs.readFileSync(filePath, "utf8");
