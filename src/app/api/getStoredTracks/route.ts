@@ -38,7 +38,8 @@ export async function POST(req: Request) {
 
         return response;
     } catch (error) {
-        console.log("🚀 ~ file: route.ts:39 ~ POST ~ error:", error);
+        console.error("🚀 ~ file: route.ts:39 ~ POST ~ error:", error);
+        console.log(process.env.POSTGRES_PHONIQUEST_URL);
         return NextResponse.json(
             { error: "Failed to get data" },
             {
