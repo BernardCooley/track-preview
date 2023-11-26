@@ -5,7 +5,6 @@ import {
     Center,
     Flex,
     IconButton,
-    Text,
     ToastProps,
     useToast,
 } from "@chakra-ui/react";
