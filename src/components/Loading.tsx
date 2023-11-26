@@ -1,25 +1,30 @@
-import { Badge, Center } from "@chakra-ui/react";
+import { Flex, Text } from "@chakra-ui/react";
+import Image from "next/image";
 import React from "react";
 
 interface Props {
-    message: string;
+    genre: string;
+    imageSrc: string;
 }
 
-const Loading = ({ message }: Props) => {
+const Loading = ({ genre, imageSrc }: Props) => {
     return (
-        <Center>
-            <Badge
-                zIndex={150}
-                top="50%"
-                position="absolute"
-                variant="outline"
-                colorScheme="green"
-                fontSize={["24px", "36px"]}
-                px={4}
-            >
-                {message}
-            </Badge>
-        </Center>
+        <Flex
+            gap={2}
+            direction="column"
+            alignItems="center"
+            position="absolute"
+            top="40%"
+            transform="translate(50%, 0)"
+            right="50%"
+        >
+            <Image src={imageSrc} alt="logo" width={150} height={100} />
+            <Text color="teal" fontSize="xl">
+                {`Loading ${
+                    genre.toLowerCase() === "all" ? "" : genre.toLowerCase()
+                } track...`}
+            </Text>
+        </Flex>
     );
 };
 

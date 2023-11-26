@@ -1,5 +1,14 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Box, Flex, IconButton, ToastProps, useToast } from "@chakra-ui/react";
+import {
+    Badge,
+    Box,
+    Center,
+    Flex,
+    IconButton,
+    Text,
+    ToastProps,
+    useToast,
+} from "@chakra-ui/react";
 import TrackReviewCard from "./TrackReviewCard";
 import { useLocalStorage } from "usehooks-ts";
 import { SearchedTrack, Track } from "../../types";
@@ -34,6 +43,12 @@ const TrackReviewStep2And3 = ({ reviewStep }: Props) => {
     const audioElementRef = useRef<HTMLAudioElement>(null);
     const { user } = useAuthContext();
     const [noTracks, setNoTracks] = useState<boolean>(false);
+
+    useEffect(() => {
+        if (noTracks) {
+            setLoading(false);
+        }
+    }, [noTracks]);
 
     const init = useCallback(async () => {
         setTracks([]);
@@ -125,6 +140,7 @@ const TrackReviewStep2And3 = ({ reviewStep }: Props) => {
                 } else {
                     setNoTracks(true);
                     setTracks([]);
+                    setCurrentTrack(null);
                 }
             }
         } catch (error) {}
@@ -140,14 +156,21 @@ const TrackReviewStep2And3 = ({ reviewStep }: Props) => {
 
     return (
         <Box h="90vh" position="relative">
-            {loading && (
-                <Loading
-                    message={
-                        noTracks
-                            ? "All done on this step"
-                            : "Loading your tracks..."
-                    }
-                />
+            {loading && <Loading genre={genre} imageSrc="/logo_1x.png" />}
+            {!loading && noTracks && (
+                <Center>
+                    <Badge
+                        zIndex={150}
+                        top="50%"
+                        position="absolute"
+                        variant="outline"
+                        colorScheme="teal"
+                        fontSize={["24px", "36px"]}
+                        px={4}
+                    >
+                        All done on this step
+                    </Badge>
+                </Center>
             )}
             <Flex
                 w={[settingsOpen ? "auto" : "full", "full"]}
