@@ -6,6 +6,7 @@ import {
     signOut,
 } from "firebase/auth";
 import { auth } from "./firebaseInit";
+import { createUser } from "@/bff/bff";
 
 export const LoginUser = async (
     email: string,
@@ -37,7 +38,16 @@ export const RegisterUser = async (
     router: AppRouterInstance
 ) => {
     try {
-        await createUserWithEmailAndPassword(auth, email, password);
+        const user = await createUserWithEmailAndPassword(
+            auth,
+            email,
+            password
+        );
+
+        await createUser({
+            userId: user.user.uid,
+        });
+
         router.push("/");
     } catch (error) {
         console.error(error);

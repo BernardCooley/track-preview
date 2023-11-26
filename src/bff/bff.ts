@@ -266,3 +266,15 @@ export const updateTrackReviewStep = async ({
     );
     return userTracks;
 };
+
+interface CreateUserProps {
+    userId: string;
+}
+
+export const createUser = async ({ userId }: CreateUserProps): Promise<any> => {
+    const user: any = await fetchWithErrorHandling("/api/createUser", "POST", {
+        userId,
+    });
+
+    return user;
+};
