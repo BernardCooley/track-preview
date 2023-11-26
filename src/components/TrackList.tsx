@@ -83,7 +83,7 @@ const TrackList = () => {
                 },
             }}
         >
-            {loading && (
+            {/* {loading && (
                 <Loading
                     message={
                         noTracks
@@ -91,7 +91,7 @@ const TrackList = () => {
                             : "Loading your tracks..."
                     }
                 />
-            )}
+            )} */}
             {tracks.map((track) => (
                 <Card
                     key={track.searchedTrack.previewUrl}
