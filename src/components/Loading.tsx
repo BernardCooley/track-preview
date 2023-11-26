@@ -1,6 +1,7 @@
 import { Flex, Text } from "@chakra-ui/react";
 import Image from "next/image";
 import React from "react";
+import BouncingDotsLoader from "./BouncingLoaderDots";
 
 interface Props {
     genre: string;
@@ -10,6 +11,7 @@ interface Props {
 const Loading = ({ genre, imageSrc }: Props) => {
     return (
         <Flex
+            className="loading"
             gap={2}
             direction="column"
             alignItems="center"
@@ -19,11 +21,14 @@ const Loading = ({ genre, imageSrc }: Props) => {
             right="50%"
         >
             <Image src={imageSrc} alt="logo" width={150} height={100} />
-            <Text color="teal" fontSize="xl">
-                {`Loading ${
-                    genre.toLowerCase() === "all" ? "" : genre.toLowerCase()
-                } track...`}
-            </Text>
+            <Flex alignItems="center" gap={2}>
+                <Text color="teal" fontSize="xl">
+                    {`Loading ${
+                        genre.toLowerCase() === "all" ? "" : genre.toLowerCase()
+                    } track`}
+                </Text>
+                <BouncingDotsLoader />
+            </Flex>
         </Flex>
     );
 };
