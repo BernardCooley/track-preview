@@ -266,7 +266,7 @@ const TrackReviewStep1 = () => {
 
     return (
         <Box h="90vh" position="relative">
-            {loading && <Loading genre={genre} imageSrc="/logo_1x.png" />}
+            {loading && <Loading imageSrc="/logo_1x.png" />}
             <Flex
                 w={[settingsOpen ? "auto" : "full", "full"]}
                 alignItems="baseline"

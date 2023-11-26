@@ -4,11 +4,10 @@ import React from "react";
 import BouncingDotsLoader from "./BouncingLoaderDots";
 
 interface Props {
-    genre: string;
     imageSrc: string;
 }
 
-const Loading = ({ genre, imageSrc }: Props) => {
+const Loading = ({ imageSrc }: Props) => {
     return (
         <Flex
             className="loading"
@@ -23,9 +22,7 @@ const Loading = ({ genre, imageSrc }: Props) => {
             <Image src={imageSrc} alt="logo" width={150} height={100} />
             <Flex alignItems="center" gap={2}>
                 <Text color="teal" fontSize="xl">
-                    {`Loading ${
-                        genre.toLowerCase() === "all" ? "" : genre.toLowerCase()
-                    } track`}
+                    Loading
                 </Text>
                 <BouncingDotsLoader />
             </Flex>

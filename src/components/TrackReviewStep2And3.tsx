@@ -156,7 +156,7 @@ const TrackReviewStep2And3 = ({ reviewStep }: Props) => {
 
     return (
         <Box h="90vh" position="relative">
-            {loading && <Loading genre={genre} imageSrc="/logo_1x.png" />}
+            {loading && <Loading imageSrc="/logo_1x.png" />}
             {!loading && noTracks && (
                 <Center>
                     <Badge
