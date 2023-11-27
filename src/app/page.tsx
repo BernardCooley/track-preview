@@ -60,16 +60,16 @@ export default function Home() {
 
     return (
         <Box m={0} px={[4, 8]} h="full">
-            <Flex w="full" justifyContent="center" mt={4}>
+            <Flex w="full" justifyContent="center" mt={6}>
                 <Box
                     height="100px"
-                    fontSize="5xl"
+                    fontSize={["3xl", "5xl"]}
                     fontFamily="brand"
-                    backgroundImage={"url(/logo_1x.png)"}
+                    backgroundImage={"url(/logo_background_4x.png)"}
                     backgroundSize="100% 100%"
                     backgroundRepeat="no-repeat"
                 >
-                    <Text color="brand.backgroundLightPrimary" mt={3}>
+                    <Text color="brand.backgroundLightPrimary" mt={[8, 3]}>
                         PHONIQUEST
                     </Text>
                 </Box>

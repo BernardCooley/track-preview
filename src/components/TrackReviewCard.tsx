@@ -79,6 +79,7 @@ const TrackReviewCard = forwardRef(
                     h="full"
                     bgImage={currentTrack.thumbnail}
                     bgSize="cover"
+                    borderBottomRadius={40}
                 >
                     <Flex
                         direction="column"
