@@ -6,10 +6,8 @@ import {
     Flex,
     Heading,
     IconButton,
-    Link,
     Text,
 } from "@chakra-ui/react";
-import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import ThumbDownIcon from "@mui/icons-material/ThumbDown";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
@@ -45,29 +43,35 @@ const TrackReviewCard = forwardRef(
         ref: LegacyRef<HTMLAudioElement> | undefined
     ) => {
         return (
-            <Card size="md" h="400px" opacity={loading ? "0.4" : "1"} mt={2}>
-                <CardHeader>
+            <Card
+                size="md"
+                h="400px"
+                opacity={loading ? "0.4" : "1"}
+                mt={2}
+                backgroundColor="transparent"
+            >
+                <CardHeader
+                    color="brand.textPrimary"
+                    backgroundColor="brand.primaryOpaque"
+                    borderTopRadius={40}
+                >
                     <Heading size="md">
-                        <Link href={currentTrack.url} isExternal>
-                            <Flex
-                                alignItems="center"
-                                direction="column"
-                                position="relative"
-                            >
-                                <Text fontSize="3xl" fontWeight="bold">
-                                    {currentTrack.artist}
+                        <Flex
+                            alignItems="center"
+                            direction="column"
+                            position="relative"
+                            gap={2}
+                        >
+                            <Text fontSize="3xl">{currentTrack.artist}</Text>
+                            <Flex gap={1}>
+                                <Text fontSize="xl">
+                                    {currentTrack.title}
+                                    {" ("}
+                                    {currentTrack.releaseYear}
+                                    {")"}
                                 </Text>
-                                <Flex gap={1}>
-                                    <Text fontSize="xl">
-                                        {currentTrack.title}
-                                        {" ("}
-                                        {currentTrack.releaseYear}
-                                        {")"}
-                                    </Text>
-                                    <OpenInNewIcon />
-                                </Flex>
                             </Flex>
-                        </Link>
+                        </Flex>
                     </Heading>
                 </CardHeader>
                 <CardBody

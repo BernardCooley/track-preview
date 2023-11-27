@@ -9,6 +9,7 @@ export const theme = extendTheme({
     colors: {
         brand: {
             primary: "#11999e",
+            primaryOpaque: "rgba(16, 152, 157, 0.47)",
             primaryLight: "#16c6cc",
             textPrimary: "#FFFFFF",
             backgroundPrimary: "#293533",
@@ -16,7 +17,7 @@ export const theme = extendTheme({
             backgroundTertiary: "#576d69",
             backgroundTertiaryOpaque: "rgba(86, 108, 104, 0.46)",
             backgroundLightPrimary: "#d6dbdc",
-            backgroundLightSecondary: "#ffffff",
+            backgroundLightSecondary: "brand.textPrimary",
         },
         primary: {
             "50": "#f1f9f9",

@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, Center, Flex, Slide, Stack } from "@chakra-ui/react";
+import { Box, Center, Flex, Slide, Stack, Text } from "@chakra-ui/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { auth } from "../../firebase/firebaseInit";
 import ProgressStepper from "@/components/ProgressStepper";
@@ -59,7 +59,21 @@ export default function Home() {
     }, [currentlyPlaying]);
 
     return (
-        <Box m={0} px={[0, 4, 8]} h="full">
+        <Box m={0} px={[4, 8]} h="full">
+            <Flex w="full" justifyContent="center" mt={4}>
+                <Box
+                    height="100px"
+                    fontSize="5xl"
+                    fontFamily="brand"
+                    backgroundImage={"url(/logo_1x.png)"}
+                    backgroundSize="100% 100%"
+                    backgroundRepeat="no-repeat"
+                >
+                    <Text color="brand.backgroundLightPrimary" mt={3}>
+                        PHONIQUEST
+                    </Text>
+                </Box>
+            </Flex>
             <Center h="full">
                 <Flex direction="column" w="full" h="full">
                     <Stack
