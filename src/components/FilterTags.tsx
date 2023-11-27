@@ -1,4 +1,4 @@
-import { Flex, Tag } from "@chakra-ui/react";
+import { Flex, Text } from "@chakra-ui/react";
 import React from "react";
 
 interface Props {
@@ -19,47 +19,68 @@ const FilterTags = ({
     preferredAutoPlay,
     showDates,
 }: Props) => {
+    const TagContainer = ({
+        children,
+        background,
+        borderColor = background,
+    }: {
+        children: React.ReactNode;
+        background: string;
+        borderColor?: string;
+    }) => {
+        return (
+            <Flex
+                pointerEvents="none"
+                userSelect="none"
+                textAlign="center"
+                whiteSpace="nowrap"
+                px={3}
+                rounded="full"
+                bg={background}
+                alignItems="center"
+                border="1px solid"
+                borderColor={borderColor}
+            >
+                {children}
+            </Flex>
+        );
+    };
+
     return (
-        <Flex opacity={settingsOpen ? 0 : 1} transition="opacity 200ms" h={8}>
-            <Flex gap={2}>
-                <Tag
-                    textOverflow="ellipsis"
-                    overflow="hidden"
-                    whiteSpace="nowrap"
-                    px={3}
-                    rounded="full"
-                    colorScheme="teal"
-                    variant="solid"
-                >
-                    {genre.toLowerCase() === "all" ? "All genres" : genre}
-                </Tag>
+        <Flex
+            opacity={settingsOpen ? 0 : 1}
+            transition="opacity 200ms"
+            h={8}
+            w="80%"
+        >
+            <Flex gap={2} w="full" overflowX="scroll">
+                <TagContainer background="brand.primaryOpaque">
+                    <Text>
+                        {genre.toLowerCase() === "all" ? "All genres" : genre}
+                    </Text>
+                </TagContainer>
                 {preferredYearRange && showDates && (
-                    <Tag
-                        px={3}
-                        rounded="full"
-                        colorScheme="teal"
-                        variant="solid"
-                        textOverflow="ellipsis"
-                        overflow="hidden"
-                        whiteSpace="nowrap"
-                    >
+                    <TagContainer background="brand.primaryOpaque">
                         {Number(preferredYearRange?.from) === 0
                             ? "All years"
                             : `${Number(preferredYearRange?.from)} -
                         ${preferredYearRange?.to}`}
-                    </Tag>
+                    </TagContainer>
                 )}
-                <Tag
-                    textOverflow="ellipsis"
-                    overflow="hidden"
-                    whiteSpace="nowrap"
-                    px={3}
-                    rounded="full"
-                    colorScheme="teal"
-                    variant={preferredAutoPlay ? "solid" : "outline"}
+                <TagContainer
+                    background={
+                        preferredAutoPlay
+                            ? "brand.primaryOpaque"
+                            : "transparent"
+                    }
+                    borderColor={
+                        preferredAutoPlay
+                            ? "transparent"
+                            : "brand.primaryOpaque"
+                    }
                 >
-                    AutoPlay
-                </Tag>
+                    <Text>AutoPlay</Text>
+                </TagContainer>
             </Flex>
         </Flex>
     );

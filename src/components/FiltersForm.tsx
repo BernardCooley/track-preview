@@ -36,6 +36,7 @@ interface Props {
     showDates: boolean;
     autoplay: boolean;
     settingsOpen: boolean;
+    onAutoplayToggle: (autoPlayValue: boolean) => void;
 }
 
 const FiltersForm = ({
@@ -48,6 +49,7 @@ const FiltersForm = ({
     showDates,
     autoplay,
     settingsOpen,
+    onAutoplayToggle,
 }: Props) => {
     const [isDirty, setIsDirty] = useState(false);
     const router = useRouter();
@@ -76,6 +78,11 @@ const FiltersForm = ({
     const watchYearFrom = watch("yearFrom");
     const watchYearTo = watch("yearTo");
     const watchGenre = watch("genre");
+    const watchAutoplay = watch("autoplay");
+
+    useEffect(() => {
+        onAutoplayToggle(watchAutoplay);
+    }, [watchAutoplay]);
 
     useEffect(() => {
         if (

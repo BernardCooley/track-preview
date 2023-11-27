@@ -292,6 +292,7 @@ const TrackReviewStep1 = () => {
                 >
                     {!settingsOpen && (
                         <IconButton
+                            w="20%"
                             rounded="full"
                             onClick={() => setSettingsOpen((prev) => !prev)}
                             variant="ghost"
@@ -322,6 +323,7 @@ const TrackReviewStep1 = () => {
                     genres={availableGenres}
                     preferredYearRange={preferredYearRange}
                     onApplyFilters={(formData) => applyFilters(formData)}
+                    onAutoplayToggle={(val) => setPreferredAutoPlay(val)}
                 />
             </Flex>
             <Flex
