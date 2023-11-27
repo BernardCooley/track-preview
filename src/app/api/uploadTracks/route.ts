@@ -14,7 +14,8 @@ export async function GET() {
 
         return response;
     } catch (error) {
-        console.log("🚀 ~ file: route.ts:17 ~ GET ~ error:", error);
+        console.error(error);
+        
         return NextResponse.json(
             { error: "Failed to get data" },
             {

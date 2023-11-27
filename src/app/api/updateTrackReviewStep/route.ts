@@ -21,7 +21,8 @@ export async function POST(req: Request) {
 
         return response;
     } catch (error) {
-        console.log("🚀 ~ file: route.ts:21 ~ POST ~ error:", error);
+        console.error(error);
+        
         return NextResponse.json(
             { error: "Failed to get data" },
             {

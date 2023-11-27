@@ -33,7 +33,7 @@ export async function POST(req: Request) {
             return response;
         }
     } catch (error) {
-        console.log("🚀 ~ file: route.ts:46 ~ POST ~ error:", error);
+        console.error(error);
 
         return NextResponse.json(
             { error: "Failed to get data" },
