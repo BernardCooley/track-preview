@@ -20,7 +20,7 @@ import React, {
 
 interface Props {
     placeholder?: string;
-    height: string;
+    height?: string;
     size: string;
     title?: string;
     error?: string;
@@ -31,13 +31,14 @@ interface Props {
     required?: boolean;
     styles?: CSSProperties;
     type?: string;
+    variant?: string;
 }
 
 export const TextInput = forwardRef(
     (
         {
             placeholder = "",
-            height,
+            height = "70px",
             size,
             title = "",
             error,
@@ -48,6 +49,7 @@ export const TextInput = forwardRef(
             required = false,
             styles = {},
             type = "text",
+            variant = "primary",
         }: Props,
         ref: LegacyRef<HTMLInputElement>
     ) => {
@@ -76,9 +78,7 @@ export const TextInput = forwardRef(
                         <InputLeftElement>{leftIcon}</InputLeftElement>
                     )}
                     <Input
-                        backgroundColor={error ? "red.50" : "white"}
-                        variant="outline"
-                        colorScheme="teal"
+                        variant={variant}
                         ref={ref}
                         type={type}
                         placeholder={placeholder}

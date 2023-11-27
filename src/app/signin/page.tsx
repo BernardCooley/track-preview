@@ -13,8 +13,6 @@ import {
     Flex,
     FormErrorMessage,
     IconButton,
-    Link,
-    Text,
 } from "@chakra-ui/react";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -31,9 +29,7 @@ const schema: ZodType<FormData> = z.object({
         .min(6, { message: "Password must be 6 characters or more." }),
 });
 
-interface Props {}
-
-const SignIn = ({}: Props) => {
+const SignIn = () => {
     const [showPassword, setShowPassword] = useState<boolean>(false);
     const [submitting, setSubmitting] = useState(false);
     const router = useRouter();
@@ -65,87 +61,72 @@ const SignIn = ({}: Props) => {
     };
 
     return (
-        <Flex direction="column" h="100vh" justifyContent="space-between">
-            <Flex direction="column">
-                <Text w="full" textAlign="center" fontSize="4xl" pt={4}>
-                    Sign In
-                </Text>
-                <form
-                    onSubmit={handleSubmit(performLogin)}
-                    style={{ height: "100%" }}
+        <Flex direction="column" w={["100%", "100%", "70%", "60%"]}>
+            <form
+                onSubmit={handleSubmit(performLogin)}
+                style={{ height: "100%" }}
+            >
+                <Flex
+                    direction="column"
+                    gap="18px"
+                    p={[6, 12, 20]}
+                    pt={10}
+                    justifyContent="space-between"
+                    height="full"
                 >
-                    <Flex
-                        direction="column"
-                        gap="18px"
-                        p={20}
-                        pt={10}
-                        justifyContent="space-between"
-                        height="full"
-                    >
-                        <Flex direction="column" gap={8}>
-                            <TextInput
-                                required={true}
-                                title="Email"
-                                height="50px"
-                                size="md"
-                                fieldProps={register("email")}
-                                error={errors.email?.message}
-                            />
-                            <TextInput
-                                type={showPassword ? "text" : "password"}
-                                required={true}
-                                title="Password"
-                                height="50px"
-                                size="md"
-                                fieldProps={register("password")}
-                                error={errors.password?.message}
-                                rightIcon={
-                                    <IconButton
-                                        onClick={() =>
-                                            setShowPassword((prev) => !prev)
-                                        }
-                                        variant="ghost"
-                                        h={1 / 2}
-                                        colorScheme="teal"
-                                        aria-label="Show password"
-                                        fontSize="3xl"
-                                        icon={
-                                            showPassword ? (
-                                                <VisibilityIcon fontSize="inherit" />
-                                            ) : (
-                                                <VisibilityOffIcon fontSize="inherit" />
-                                            )
-                                        }
-                                    />
-                                }
-                            />
-                            <Button
-                                colorScheme="teal"
-                                isLoading={submitting}
-                                size="md"
-                                type="submit"
-                                variant="outline"
-                                onClick={handleSubmit(performLogin)}
-                            >
-                                Sign In
-                            </Button>
-                        </Flex>
+                    <Flex direction="column" gap={8}>
+                        <TextInput
+                            required={true}
+                            title="Email"
+                            size="md"
+                            fieldProps={register("email")}
+                            error={errors.email?.message}
+                        />
+                        <TextInput
+                            type={showPassword ? "text" : "password"}
+                            required={true}
+                            title="Password"
+                            size="md"
+                            fieldProps={register("password")}
+                            error={errors.password?.message}
+                            rightIcon={
+                                <IconButton
+                                    onClick={() =>
+                                        setShowPassword((prev) => !prev)
+                                    }
+                                    variant="ghost"
+                                    h={1 / 2}
+                                    colorScheme="teal"
+                                    aria-label="Show password"
+                                    fontSize="3xl"
+                                    icon={
+                                        showPassword ? (
+                                            <VisibilityIcon fontSize="inherit" />
+                                        ) : (
+                                            <VisibilityOffIcon fontSize="inherit" />
+                                        )
+                                    }
+                                />
+                            }
+                        />
+                        <Button
+                            isLoading={submitting}
+                            type="submit"
+                            variant="primary"
+                            onClick={handleSubmit(performLogin)}
+                        >
+                            Sign In
+                        </Button>
                     </Flex>
-                </form>
-                {/* TODO - add forgot password link
+                </Flex>
+            </form>
+            {/* TODO - add forgot password link
                 TODO - Message not showing up */}
-                {authError && (
-                    <Box h="16px" mt="8px">
-                        <FormErrorMessage>{authError}</FormErrorMessage>
-                    </Box>
-                )}
-            </Flex>
-            <Flex px={20} pb={6} gap={2}>
-                <Text>Not registered? </Text>
-                <Link fontWeight="bold" onClick={() => router.push("/signup")}>
-                    Register here
-                </Link>
-            </Flex>
+            {authError && (
+                <Box h="16px" mt="8px">
+                    <FormErrorMessage>{authError}</FormErrorMessage>
+                </Box>
+            )}
         </Flex>
     );
 };
