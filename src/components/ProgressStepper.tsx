@@ -29,6 +29,7 @@ const ProgressStepper = ({ onStepChange, currentStep }: Props) => {
 
     return (
         <Stepper
+            variant="primary"
             colorScheme="teal"
             index={currentStep}
             size={["sm", "md", "lg"]}

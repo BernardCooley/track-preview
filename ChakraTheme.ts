@@ -77,6 +77,39 @@ export const theme = extendTheme({
                 },
             },
         },
+        Stepper: {
+            variants: {
+                primary: {
+                    step: {
+                        button: {
+                            _active: {
+                                border: "1px solid",
+                                borderColor: "brand.primary",
+                                bg: "brand.backgroundTertiary",
+                            },
+                            _hover: {
+                                bg: "brand.backgroundTertiary",
+                            },
+                        },
+                    },
+                    description: {
+                        color: "brand.backgroundLightPrimary",
+                    },
+                    indicator: {
+                        borderColor: "brand.backgroundTertiary",
+                        _hover: {
+                            borderColor: "brand.primary",
+                        },
+                    },
+                    separator: {
+                        bg: "brand.backgroundTertiary",
+                    },
+                    number: {
+                        color: "brand.backgroundLightPrimary",
+                    },
+                },
+            },
+        },
     },
     styles: {
         global: () => ({
