@@ -98,7 +98,7 @@ const FiltersForm = ({
                             settingsOpen={settingsOpen}
                             filtersToApply={isDirty}
                             onClick={handleSubmit((formData) => {
-                                if (settingsOpen && dirtyFields) {
+                                if (settingsOpen && isDirty) {
                                     onApplyFilters(formData);
                                 } else {
                                     onSettingsToggle();
