@@ -1,4 +1,4 @@
-import { Flex, Text } from "@chakra-ui/react";
+import { Button, Flex } from "@chakra-ui/react";
 import React from "react";
 
 interface Props {
@@ -10,6 +10,8 @@ interface Props {
     };
     preferredAutoPlay: boolean;
     showDates: boolean;
+    onAutoPlayToggle: () => void;
+    onGenreClick: () => void;
 }
 
 const FilterTags = ({
@@ -18,69 +20,50 @@ const FilterTags = ({
     preferredYearRange,
     preferredAutoPlay,
     showDates,
+    onAutoPlayToggle,
+    onGenreClick,
 }: Props) => {
-    const TagContainer = ({
-        children,
-        background,
-        borderColor = background,
-    }: {
-        children: React.ReactNode;
-        background: string;
-        borderColor?: string;
-    }) => {
-        return (
-            <Flex
-                pointerEvents="none"
-                userSelect="none"
-                textAlign="center"
-                whiteSpace="nowrap"
-                px={3}
-                rounded="full"
-                bg={background}
-                alignItems="center"
-                border="1px solid"
-                borderColor={borderColor}
-            >
-                {children}
-            </Flex>
-        );
-    };
-
     return (
-        <Flex
-            opacity={settingsOpen ? 0 : 1}
-            transition="opacity 200ms"
-            h={8}
-            w="80%"
-        >
-            <Flex gap={2} w="full" overflowX="scroll">
-                <TagContainer background="brand.primaryOpaque">
-                    <Text>
-                        {genre.toLowerCase() === "all" ? "All genres" : genre}
-                    </Text>
-                </TagContainer>
+        <Flex opacity={settingsOpen ? 0 : 1} transition="opacity 200ms">
+            <Flex gap={2} w="full" flexWrap="wrap">
+                <Button variant="filter" onClick={onGenreClick}>
+                    {genre.toLowerCase() === "all" ? "All genres" : genre}
+                </Button>
                 {preferredYearRange && showDates && (
-                    <TagContainer background="brand.primaryOpaque">
+                    <Button variant="filter">
                         {Number(preferredYearRange?.from) === 0
                             ? "All years"
                             : `${Number(preferredYearRange?.from)} -
-                        ${preferredYearRange?.to}`}
-                    </TagContainer>
+                         ${preferredYearRange?.to}`}
+                    </Button>
                 )}
-                <TagContainer
-                    background={
+                <Button
+                    onClick={onAutoPlayToggle}
+                    _hover={
+                        preferredAutoPlay
+                            ? {
+                                  bg: "transparent",
+                                  borderColor: "brand.primaryOpaque",
+                              }
+                            : {
+                                  bg: "brand.primaryOpaque",
+                                  borderColor: "brand.primary",
+                              }
+                    }
+                    bg={
                         preferredAutoPlay
                             ? "brand.primaryOpaque"
                             : "transparent"
                     }
                     borderColor={
                         preferredAutoPlay
-                            ? "transparent"
+                            ? "brand.primaryLight"
                             : "brand.primaryOpaque"
                     }
+                    variant="filter"
                 >
-                    <Text>AutoPlay</Text>
-                </TagContainer>
+                    AutoPlay
+                </Button>
             </Flex>
         </Flex>
     );

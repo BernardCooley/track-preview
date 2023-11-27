@@ -1,6 +1,14 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { genres } from "../../data/genres";
-import { Box, Flex, IconButton, useToast } from "@chakra-ui/react";
+import {
+    Box,
+    Collapse,
+    Flex,
+    Modal,
+    ModalContent,
+    ModalOverlay,
+    useToast,
+} from "@chakra-ui/react";
 import { useLocalStorage } from "usehooks-ts";
 import { StoredTrack, SearchedTrack, Track } from "../../types";
 import {
@@ -15,11 +23,14 @@ import TrackReviewCard from "./TrackReviewCard";
 import Loading from "./Loading";
 import FilterTags from "./FilterTags";
 import { getCurrentYear } from "../../utils";
-import FiltersForm, { FormData } from "./FiltersForm";
-import TuneIcon from "@mui/icons-material/Tune";
+import GenreSelector from "./GenreSelector";
 
 const TrackReviewStep1 = () => {
-    const [genre, setPreferredGenre] = useLocalStorage("genre", "All");
+    const [genre, setGenre] = useLocalStorage("genre", "All");
+    const [favouriteGenres, setFavouriteGenres] = useLocalStorage<string[]>(
+        "favouriteGenres",
+        []
+    );
     const { user } = useAuthContext();
     const [availableGenres, setAvailableGenres] = useState<string[]>(genres);
     const [loading, setLoading] = useState<boolean>(false);
@@ -44,6 +55,7 @@ const TrackReviewStep1 = () => {
     const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
     const [queuedTrack, setQueuedTrack] = useState<Track | null>(null);
     const [initCounter, setInitCounter] = useState<number>(0);
+    const [showGenreSelect, setShowGenreSelect] = useState<boolean>(false);
 
     const showToast = useCallback(
         ({ status, title, description }: ToastProps) => {
@@ -251,87 +263,80 @@ const TrackReviewStep1 = () => {
         audioElementRef.current?.play();
     };
 
-    const applyFilters = async (formData: FormData) => {
-        setCurrentTrack(null);
-        setTracks([]);
-        setQueuedTrack(null);
-        setSettingsOpen(false);
-        setPreferredGenre(formData.genre);
-        setPreferredYearRange({
-            from: formData.yearFrom,
-            to: formData.yearTo,
-        });
-        setPreferredAutoPlay(formData.autoplay);
-    };
-
     return (
         <Box h="90vh" position="relative">
             {loading && <Loading imageSrc="/logo_1x.png" />}
+            <Modal
+                isCentered={true}
+                isOpen={showGenreSelect}
+                onClose={() => setShowGenreSelect(false)}
+            >
+                <ModalOverlay />
+                <ModalContent rounded="3xl" mx={4}>
+                    <Flex
+                        h="full"
+                        w="full"
+                        bg="brand.backgroundSecondary"
+                        rounded="3xl"
+                        p={showGenreSelect ? 4 : 0}
+                    >
+                        <Collapse in={showGenreSelect} animateOpacity>
+                            <GenreSelector
+                                onFavouriteClearClick={() => {
+                                    setFavouriteGenres([genre]);
+                                }}
+                                favouriteGenres={favouriteGenres}
+                                genres={availableGenres}
+                                selectedGenre={genre}
+                                onClick={(gen) => {
+                                    if (gen !== genre) {
+                                        setFavouriteGenres((prev) =>
+                                            Array.from(new Set([...prev, gen]))
+                                        );
+                                        setGenre(gen);
+                                        setTracks([]);
+                                        setCurrentTrack(null);
+                                        setQueuedTrack(null);
+                                        setListened(false);
+                                        setIsPlaying(false);
+                                    }
+                                    setShowGenreSelect(false);
+                                }}
+                            />
+                        </Collapse>
+                    </Flex>
+                </ModalContent>
+            </Modal>
             <Flex
-                w={[settingsOpen ? "auto" : "full", "full"]}
+                w="full"
                 alignItems="baseline"
                 justifyContent="space-between"
                 direction="column"
                 p={4}
                 pt={2}
-                pl={settingsOpen ? 4 : [4, 0]}
                 gap={2}
                 mx={settingsOpen ? [4, 0] : 0}
                 transition="ease-in-out 200ms"
-                backgroundColor={
-                    settingsOpen ? "brand.backgroundSecondary" : "transparent"
-                }
                 shadow={settingsOpen ? "2xl" : "none"}
                 rounded="3xl"
-                position="absolute"
+                // position="absolute"
                 zIndex={200}
             >
-                <Flex
-                    alignItems="center"
-                    gap={6}
-                    justifyContent="space-between"
-                    w="full"
-                >
-                    {!settingsOpen && (
-                        <IconButton
-                            w="20%"
-                            rounded="full"
-                            onClick={() => setSettingsOpen((prev) => !prev)}
-                            variant="ghost"
-                            colorScheme="teal"
-                            aria-label="settings page"
-                            fontSize="3xl"
-                            icon={<TuneIcon fontSize="inherit" />}
-                        />
-                    )}
-
-                    {!settingsOpen && (
-                        <FilterTags
-                            showDates={true}
-                            settingsOpen={settingsOpen}
-                            genre={genre}
-                            preferredYearRange={preferredYearRange}
-                            preferredAutoPlay={preferredAutoPlay}
-                        />
-                    )}
-                </Flex>
-                <FiltersForm
-                    onSettingsToggle={() => setSettingsOpen((prev) => !prev)}
-                    settingsOpen={settingsOpen}
-                    autoplay={preferredAutoPlay}
+                <FilterTags
+                    onGenreClick={() => setShowGenreSelect((prev) => !prev)}
+                    onAutoPlayToggle={() =>
+                        setPreferredAutoPlay((prev) => !prev)
+                    }
                     showDates={true}
-                    isOpen={settingsOpen}
-                    genre={genre || "All"}
-                    genres={availableGenres}
+                    settingsOpen={settingsOpen}
+                    genre={genre}
                     preferredYearRange={preferredYearRange}
-                    onApplyFilters={(formData) => applyFilters(formData)}
-                    onAutoplayToggle={(val) => setPreferredAutoPlay(val)}
+                    preferredAutoPlay={preferredAutoPlay}
                 />
             </Flex>
             <Flex
                 direction="column"
                 position="relative"
-                top={20}
                 opacity={settingsOpen ? 0.3 : 1}
                 pointerEvents={settingsOpen ? "none" : "auto"}
             >
