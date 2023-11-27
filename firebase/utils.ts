@@ -25,7 +25,7 @@ export const LoginUser = async (
 export const LogOut = async (router: AppRouterInstance) => {
     try {
         await signOut(auth);
-        router.push("/signin");
+        router.push("/auth");
     } catch (error) {
         console.error(error);
         throw error;
