@@ -278,7 +278,9 @@ const TrackReviewStep1 = () => {
                 gap={2}
                 mx={settingsOpen ? [4, 0] : 0}
                 transition="ease-in-out 200ms"
-                backgroundColor={settingsOpen ? "gray.300" : "transparent"}
+                backgroundColor={
+                    settingsOpen ? "brand.backgroundSecondary" : "transparent"
+                }
                 shadow={settingsOpen ? "2xl" : "none"}
                 rounded="3xl"
                 position="absolute"

@@ -12,7 +12,6 @@ import {
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { arrayRange, getCurrentYear } from "../../utils";
-import ApplyFiltersButton from "./ApplyFiltersButton";
 import { useRouter } from "next/navigation";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
@@ -100,10 +99,11 @@ const FiltersForm = ({
         <Flex>
             <Collapse in={isOpen} animateOpacity>
                 {settingsOpen && (
-                    <Flex gap={4} mb={2}>
-                        <ApplyFiltersButton
-                            settingsOpen={settingsOpen}
-                            filtersToApply={isDirty}
+                    <Flex gap={2} mb={8}>
+                        <Button
+                            variant="primary"
+                            size="md"
+                            h="40px"
                             onClick={handleSubmit((formData) => {
                                 if (settingsOpen && isDirty) {
                                     onApplyFilters(formData);
@@ -111,9 +111,12 @@ const FiltersForm = ({
                                     onSettingsToggle();
                                 }
                             })}
-                        />
+                        >
+                            {isDirty ? "Apply & search" : "Close"}
+                        </Button>
                         {isDirty && (
                             <Button
+                                h="40px"
                                 onClick={() => {
                                     onSettingsToggle();
                                     reset({
@@ -122,8 +125,7 @@ const FiltersForm = ({
                                         yearTo: preferredYearRange.to,
                                     });
                                 }}
-                                colorScheme="red"
-                                variant="outline"
+                                variant="cancel"
                             >
                                 Cancel
                             </Button>

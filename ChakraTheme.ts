@@ -18,6 +18,7 @@ export const theme = extendTheme({
             backgroundTertiaryOpaque: "rgba(86, 108, 104, 0.46)",
             backgroundLightPrimary: "#d6dbdc",
             backgroundLightSecondary: "brand.textPrimary",
+            error: "#ff0000",
         },
         primary: {
             "50": "#f1f9f9",
@@ -35,20 +36,19 @@ export const theme = extendTheme({
     components: {
         Button: {
             baseStyle: {
-                border: 0,
                 cursor: "pointer",
                 fontFamily: "Roboto, Arial, Helvetica, sans-serif",
+                height: "50px",
+                size: "lg",
+                shadow: "md",
             },
             variants: {
                 outlined: {
                     border: "initial",
                 },
                 primary: {
-                    height: "50px",
-                    size: "lg",
                     border: "1px solid",
                     borderColor: "brand.backgroundTertiary",
-                    shadow: "md",
                     backgroundColor: "brand.backgroundTertiary",
                     _hover: {
                         shadow: "xl",
@@ -56,6 +56,28 @@ export const theme = extendTheme({
                         borderColor: "brand.primary",
                     },
                     color: "white",
+                },
+                secondary: {
+                    border: "1px solid",
+                    borderColor: "brand.backgroundTertiary",
+                    backgroundColor: "brand.backgroundTertiary",
+                    _hover: {
+                        shadow: "xl",
+                        border: "1px solid",
+                        borderColor: "brand.primary",
+                    },
+                    color: "white",
+                },
+                cancel: {
+                    border: "1px solid",
+                    borderColor: "transparent",
+                    backgroundColor: "brand.backgroundTertiaryOpaque",
+                    _hover: {
+                        shadow: "xl",
+                        border: "1px solid",
+                        borderColor: "brand.error",
+                    },
+                    color: "brand.error",
                 },
             },
         },
@@ -106,6 +128,24 @@ export const theme = extendTheme({
                     },
                     number: {
                         color: "brand.backgroundLightPrimary",
+                    },
+                },
+            },
+        },
+        Select: {
+            variants: {
+                outline: {
+                    field: {
+                        height: "50px",
+                        border: "1px solid",
+                        borderColor: "brand.backgroundPrimary",
+                        shadow: "md",
+                        backgroundColor: "brand.backgroundTertiaryOpaque",
+                        color: "white",
+                        _focus: {
+                            shadow: "xl",
+                            borderColor: "brand.primary",
+                        },
                     },
                 },
             },
