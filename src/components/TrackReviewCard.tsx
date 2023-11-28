@@ -45,7 +45,7 @@ const TrackReviewCard = forwardRef(
         return (
             <Card
                 size="md"
-                h="400px"
+                h="auto"
                 opacity={loading ? "0.4" : "1"}
                 mt={2}
                 backgroundColor="transparent"

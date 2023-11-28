@@ -255,7 +255,7 @@ const TrackReviewStep1 = () => {
     };
 
     return (
-        <Box h="90vh" position="relative">
+        <Box position="relative">
             {loading && <Loading imageSrc="/logo_1x.png" />}
             <GenreModal
                 showGenreSelect={showGenreSelect}

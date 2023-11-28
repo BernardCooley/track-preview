@@ -183,6 +183,8 @@ export const theme = extendTheme({
                 color: "brand.textPrimary",
                 bgGradient:
                     "linear(to-b, brand.backgroundPrimary, brand.backgroundSecondary)",
+                bgRepeat: "no-repeat",
+                height: "100vh",
             },
         }),
     },

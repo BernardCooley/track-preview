@@ -59,27 +59,27 @@ export default function Home() {
     }, [currentlyPlaying]);
 
     return (
-        <Box m={0} px={[4, 8]} h="full">
+        <Box h="full" m={0} px={[4, 8]}>
             <Flex w="full" justifyContent="center" mt={6}>
-                <Box
-                    height="100px"
+                <Flex
+                    alignItems="center"
+                    height="50px"
                     fontSize={["3xl", "5xl"]}
                     fontFamily="brand"
                     backgroundImage={"url(/logo_background_4x.png)"}
                     backgroundSize="100% 100%"
                     backgroundRepeat="no-repeat"
                 >
-                    <Text color="brand.backgroundLightPrimary" mt={[8, 3]}>
+                    <Text fontSize="2xl" color="brand.backgroundLightPrimary">
                         PHONIQUEST
                     </Text>
-                </Box>
+                </Flex>
             </Flex>
             <Center h="full">
                 <Flex direction="column" w="full" h="full">
                     <Stack
                         spacing="4"
                         w="full"
-                        h="95vh"
                         position="relative"
                         transition="ease-in-out"
                         transitionDuration="200"
