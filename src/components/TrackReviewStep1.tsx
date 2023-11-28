@@ -100,7 +100,7 @@ const TrackReviewStep1 = () => {
 
                 setTracks(storedTracks);
 
-                if (storedTracks.length > 1) {
+                if (storedTracks && storedTracks.length > 1) {
                     setInitCounter(0);
                 }
             } catch (error) {
