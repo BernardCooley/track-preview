@@ -8,8 +8,11 @@ import {
 import React, { forwardRef } from "react";
 import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import MenuDrawer from "./MenuDrawer";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const Header = forwardRef<HTMLButtonElement | undefined>((menuButtonRef) => {
+    const pathname = usePathname();
     const { isOpen, onOpen, onClose } = useDisclosure();
     return (
         <>
@@ -47,9 +50,15 @@ const Header = forwardRef<HTMLButtonElement | undefined>((menuButtonRef) => {
                     backgroundSize="100% 100%"
                     backgroundRepeat="no-repeat"
                 >
-                    <Text fontSize="2xl" color="brand.backgroundLightPrimary">
-                        PHONIQUEST
-                    </Text>
+                    <Link href={pathname !== "/" ? "/" : ""}>
+                        <Text
+                            userSelect="none"
+                            fontSize="2xl"
+                            color="brand.backgroundLightPrimary"
+                        >
+                            PHONIQUEST
+                        </Text>
+                    </Link>
                 </Flex>
             </Flex>
             <Divider mt={4} />
