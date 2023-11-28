@@ -15,7 +15,7 @@ const Loading = ({ imageSrc }: Props) => {
             direction="column"
             alignItems="center"
             position="absolute"
-            top="40%"
+            top="100%"
             transform="translate(50%, 0)"
             right="50%"
         >
