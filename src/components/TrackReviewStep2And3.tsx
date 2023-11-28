@@ -4,7 +4,6 @@ import {
     Box,
     Center,
     Flex,
-    IconButton,
     ToastProps,
     useToast,
 } from "@chakra-ui/react";
@@ -15,8 +14,6 @@ import { useAuthContext } from "../../Contexts/AuthContext";
 import Loading from "./Loading";
 import FilterTags from "./FilterTags";
 import { fetchUserTracks, updateTrackReviewStep } from "@/bff/bff";
-import TuneIcon from "@mui/icons-material/Tune";
-import FiltersForm, { FormData } from "./FiltersForm";
 
 interface Props {
     reviewStep: number;
@@ -26,13 +23,10 @@ const TrackReviewStep2And3 = ({ reviewStep }: Props) => {
     const toast = useToast();
     const id = "step2And3-toast";
     const [loading, setLoading] = useState<boolean>(false);
-    const [genre, setPreferredGenre] = useLocalStorage("step2And3genre", "All");
-    const [settingsOpen, setSettingsOpen] = useState<boolean>(false);
     const [preferredAutoPlay, setPreferredAutoPlay] = useLocalStorage(
         "Step2And3preferredAutoPlay",
         false
     );
-    const [availableGenres, setAvailableGenres] = useState<string[]>([]);
     const [currentTrack, setCurrentTrack] = useState<SearchedTrack | null>(
         null
     );
@@ -53,24 +47,17 @@ const TrackReviewStep2And3 = ({ reviewStep }: Props) => {
         setTracks([]);
         setCurrentTrack(null);
         setNoTracks(false);
-        if (genre && user?.uid) {
+        if (user?.uid) {
             setLoading(true);
 
             try {
                 const userTracks = await fetchUserTracks({
                     userId: user.uid,
-                    genre,
+                    genre: "All",
                     reviewStep,
                 });
 
                 if (userTracks && userTracks.length > 0) {
-                    setAvailableGenres(
-                        Array.from(new Set(userTracks.map((t) => t.genre)))
-                    );
-
-                    if (!availableGenres.includes(genre)) {
-                        setPreferredGenre("All");
-                    }
                     setTracks(userTracks);
                     setLoading(false);
                 } else {
@@ -80,11 +67,11 @@ const TrackReviewStep2And3 = ({ reviewStep }: Props) => {
                 showToast({ status: "error" });
             }
         }
-    }, [genre, reviewStep, user, availableGenres]);
+    }, [reviewStep, user]);
 
     useEffect(() => {
         init();
-    }, [genre, user, reviewStep]);
+    }, [user, reviewStep]);
 
     useEffect(() => {
         if (tracks.length > 0) {
@@ -145,14 +132,6 @@ const TrackReviewStep2And3 = ({ reviewStep }: Props) => {
         } catch (error) {}
     };
 
-    const applyFilters = async (formData: FormData) => {
-        setCurrentTrack(null);
-        setTracks([]);
-        setSettingsOpen(false);
-        setPreferredGenre(formData.genre);
-        setPreferredAutoPlay(formData.autoplay);
-    };
-
     return (
         <Box h="90vh" position="relative">
             {loading && <Loading imageSrc="/logo_1x.png" />}
@@ -172,20 +151,15 @@ const TrackReviewStep2And3 = ({ reviewStep }: Props) => {
                 </Center>
             )}
             <Flex
-                w={[settingsOpen ? "auto" : "full", "full"]}
+                w="full"
                 alignItems="baseline"
                 justifyContent="space-between"
                 direction="column"
                 p={4}
                 pt={2}
-                pl={settingsOpen ? 4 : [4, 0]}
                 gap={2}
-                mx={settingsOpen ? [4, 0] : 0}
                 transition="ease-in-out 200ms"
-                backgroundColor={settingsOpen ? "gray.300" : "transparent"}
-                shadow={settingsOpen ? "2xl" : "none"}
                 rounded="3xl"
-                position="absolute"
                 zIndex={200}
             >
                 <Flex
@@ -194,53 +168,18 @@ const TrackReviewStep2And3 = ({ reviewStep }: Props) => {
                     justifyContent="space-between"
                     w="full"
                 >
-                    {!settingsOpen && (
-                        <IconButton
-                            rounded="full"
-                            onClick={() => setSettingsOpen((prev) => !prev)}
-                            variant="ghost"
-                            colorScheme="teal"
-                            aria-label="set tings page"
-                            fontSize="3xl"
-                            icon={<TuneIcon fontSize="inherit" />}
-                        />
-                    )}
-
-                    {!settingsOpen && (
+                    {tracks && tracks.length > 0 && (
                         <FilterTags
-                            showDates={false}
-                            settingsOpen={settingsOpen}
-                            genre={genre}
-                            preferredYearRange={{
-                                from: 0,
-                                to: 0,
-                            }}
+                            onAutoPlayToggle={() =>
+                                setPreferredAutoPlay((prev) => !prev)
+                            }
+                            showDates={true}
                             preferredAutoPlay={preferredAutoPlay}
                         />
                     )}
                 </Flex>
-                <FiltersForm
-                    onSettingsToggle={() => setSettingsOpen((prev) => !prev)}
-                    settingsOpen={settingsOpen}
-                    autoplay={preferredAutoPlay}
-                    showDates={false}
-                    isOpen={settingsOpen}
-                    genre={genre || "All"}
-                    genres={availableGenres}
-                    preferredYearRange={{
-                        from: 0,
-                        to: 0,
-                    }}
-                    onApplyFilters={(formData) => applyFilters(formData)}
-                />
             </Flex>
-            <Flex
-                direction="column"
-                position="relative"
-                top={20}
-                opacity={settingsOpen ? 0.3 : 1}
-                pointerEvents={settingsOpen ? "none" : "auto"}
-            >
+            <Flex direction="column" position="relative" top={20}>
                 {currentTrack && (
                     <TrackReviewCard
                         currentTrack={currentTrack}

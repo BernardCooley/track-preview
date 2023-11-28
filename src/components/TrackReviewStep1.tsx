@@ -1,14 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { genres } from "../../data/genres";
-import {
-    Box,
-    Collapse,
-    Flex,
-    Modal,
-    ModalContent,
-    ModalOverlay,
-    useToast,
-} from "@chakra-ui/react";
+import { Box, Flex, useToast } from "@chakra-ui/react";
 import { useLocalStorage } from "usehooks-ts";
 import { StoredTrack, SearchedTrack, Track } from "../../types";
 import {
@@ -23,7 +15,7 @@ import TrackReviewCard from "./TrackReviewCard";
 import Loading from "./Loading";
 import FilterTags from "./FilterTags";
 import { getCurrentYear } from "../../utils";
-import GenreSelector from "./GenreSelector";
+import GenreModal from "./GenreModal";
 
 const TrackReviewStep1 = () => {
     const [genre, setGenre] = useLocalStorage("genre", "All");
@@ -44,7 +36,6 @@ const TrackReviewStep1 = () => {
     const toast = useToast();
     const id = "step1-toast";
     const [tracks, setTracks] = useState<StoredTrack[]>([]);
-    const [settingsOpen, setSettingsOpen] = useState<boolean>(false);
     const [preferredAutoPlay, setPreferredAutoPlay] = useLocalStorage(
         "preferredAutoPlay",
         false
@@ -266,47 +257,30 @@ const TrackReviewStep1 = () => {
     return (
         <Box h="90vh" position="relative">
             {loading && <Loading imageSrc="/logo_1x.png" />}
-            <Modal
-                isCentered={true}
-                isOpen={showGenreSelect}
-                onClose={() => setShowGenreSelect(false)}
-            >
-                <ModalOverlay />
-                <ModalContent rounded="3xl" mx={4}>
-                    <Flex
-                        h="full"
-                        w="full"
-                        bg="brand.backgroundSecondary"
-                        rounded="3xl"
-                        p={showGenreSelect ? 4 : 0}
-                    >
-                        <Collapse in={showGenreSelect} animateOpacity>
-                            <GenreSelector
-                                onFavouriteClearClick={() => {
-                                    setFavouriteGenres([genre]);
-                                }}
-                                favouriteGenres={favouriteGenres}
-                                genres={availableGenres}
-                                selectedGenre={genre}
-                                onClick={(gen) => {
-                                    if (gen !== genre) {
-                                        setFavouriteGenres((prev) =>
-                                            Array.from(new Set([...prev, gen]))
-                                        );
-                                        setGenre(gen);
-                                        setTracks([]);
-                                        setCurrentTrack(null);
-                                        setQueuedTrack(null);
-                                        setListened(false);
-                                        setIsPlaying(false);
-                                    }
-                                    setShowGenreSelect(false);
-                                }}
-                            />
-                        </Collapse>
-                    </Flex>
-                </ModalContent>
-            </Modal>
+            <GenreModal
+                showGenreSelect={showGenreSelect}
+                setShowGenreSelect={() => setShowGenreSelect(false)}
+                genre={genre}
+                onGenreSelect={(gen: string) => {
+                    if (gen !== genre) {
+                        setFavouriteGenres((prev) =>
+                            Array.from(new Set([...prev, gen]))
+                        );
+                        setGenre(gen);
+                        setTracks([]);
+                        setCurrentTrack(null);
+                        setQueuedTrack(null);
+                        setListened(false);
+                        setIsPlaying(false);
+                    }
+                    setShowGenreSelect(false);
+                }}
+                availableGenres={availableGenres}
+                onFavouriteClearClick={() => {
+                    setFavouriteGenres([genre]);
+                }}
+                favouriteGenres={favouriteGenres}
+            />
             <Flex
                 w="full"
                 alignItems="baseline"
@@ -315,11 +289,8 @@ const TrackReviewStep1 = () => {
                 p={4}
                 pt={2}
                 gap={2}
-                mx={settingsOpen ? [4, 0] : 0}
                 transition="ease-in-out 200ms"
-                shadow={settingsOpen ? "2xl" : "none"}
                 rounded="3xl"
-                // position="absolute"
                 zIndex={200}
             >
                 <FilterTags
@@ -328,18 +299,12 @@ const TrackReviewStep1 = () => {
                         setPreferredAutoPlay((prev) => !prev)
                     }
                     showDates={true}
-                    settingsOpen={settingsOpen}
                     genre={genre}
                     preferredYearRange={preferredYearRange}
                     preferredAutoPlay={preferredAutoPlay}
                 />
             </Flex>
-            <Flex
-                direction="column"
-                position="relative"
-                opacity={settingsOpen ? 0.3 : 1}
-                pointerEvents={settingsOpen ? "none" : "auto"}
-            >
+            <Flex direction="column" position="relative">
                 {currentTrack && (
                     <TrackReviewCard
                         currentTrack={currentTrack.searchedTrack}

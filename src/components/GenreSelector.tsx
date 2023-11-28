@@ -5,15 +5,15 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 interface Props {
     genres: string[];
     selectedGenre: string;
-    onClick: (genre: string) => void;
-    favouriteGenres: string[];
-    onFavouriteClearClick: () => void;
+    onGenreSelect: (genre: string) => void;
+    favouriteGenres?: string[];
+    onFavouriteClearClick?: () => void;
 }
 
 const GenreSelector = ({
     genres,
     selectedGenre,
-    onClick,
+    onGenreSelect,
     favouriteGenres,
     onFavouriteClearClick,
 }: Props) => {
@@ -22,7 +22,7 @@ const GenreSelector = ({
             <Text fontSize="xl" textAlign="center">
                 Select Genre
             </Text>
-            {favouriteGenres.length > 0 && (
+            {favouriteGenres && favouriteGenres.length > 0 && (
                 <Flex
                     direction="column"
                     border="1px solid"
@@ -51,7 +51,7 @@ const GenreSelector = ({
                     <Flex flexWrap="wrap" gap={4}>
                         {favouriteGenres.map((genre) => (
                             <Button
-                                onClick={() => onClick(genre)}
+                                onClick={() => onGenreSelect(genre)}
                                 isActive={selectedGenre === genre}
                                 variant="filter"
                                 key={genre}
@@ -68,7 +68,7 @@ const GenreSelector = ({
             <Flex flexWrap="wrap" h="300px" overflow="scroll" gap={4}>
                 {genres.sort().map((genre, index) => (
                     <Button
-                        onClick={() => onClick(genre)}
+                        onClick={() => onGenreSelect(genre)}
                         isActive={selectedGenre === genre}
                         variant="filter"
                         key={genre}

@@ -2,8 +2,7 @@ import { Button, Flex } from "@chakra-ui/react";
 import React from "react";
 
 interface Props {
-    settingsOpen: boolean;
-    genre: string;
+    genre?: string;
     preferredYearRange?: {
         from: number;
         to: number;
@@ -11,11 +10,10 @@ interface Props {
     preferredAutoPlay: boolean;
     showDates: boolean;
     onAutoPlayToggle: () => void;
-    onGenreClick: () => void;
+    onGenreClick?: () => void;
 }
 
 const FilterTags = ({
-    settingsOpen,
     genre,
     preferredYearRange,
     preferredAutoPlay,
@@ -24,11 +22,13 @@ const FilterTags = ({
     onGenreClick,
 }: Props) => {
     return (
-        <Flex opacity={settingsOpen ? 0 : 1} transition="opacity 200ms">
+        <Flex transition="opacity 200ms">
             <Flex gap={2} w="full" flexWrap="wrap">
-                <Button variant="filter" onClick={onGenreClick}>
-                    {genre.toLowerCase() === "all" ? "All genres" : genre}
-                </Button>
+                {genre && (
+                    <Button variant="filter" onClick={onGenreClick}>
+                        {genre.toLowerCase() === "all" ? "All genres" : genre}
+                    </Button>
+                )}
                 {preferredYearRange && showDates && (
                     <Button variant="filter">
                         {Number(preferredYearRange?.from) === 0
