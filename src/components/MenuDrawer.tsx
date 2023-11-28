@@ -61,4 +61,6 @@ const MenuDrawer = forwardRef<HTMLButtonElement | undefined, Props>(
     }
 );
 
+MenuDrawer.displayName = "MenuDrawer";
+
 export default MenuDrawer;
