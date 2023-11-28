@@ -40,7 +40,6 @@ const TrackList = () => {
     const [noTracks, setNoTracks] = useState<boolean>(false);
     const toast = useToast();
     const id = "step4-toast";
-    const ref = React.useRef<HTMLButtonElement>(null);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const cancelRef = useRef<HTMLButtonElement>(null);
     const [trackToDelete, setTrackToDelete] = useState<number | null>(null);
