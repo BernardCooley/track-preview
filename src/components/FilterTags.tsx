@@ -1,5 +1,5 @@
 import { Button, Flex } from "@chakra-ui/react";
-import React from "react";
+import React, { useEffect, useRef } from "react";
 
 interface Props {
     genre?: string;
@@ -21,6 +21,12 @@ const FilterTags = ({
     onAutoPlayToggle,
     onGenreClick,
 }: Props) => {
+    const autoPlayRef = useRef<HTMLButtonElement | null>(null);
+
+    useEffect(() => {
+        autoPlayRef.current?.blur();
+    }, [preferredAutoPlay]);
+
     return (
         <Flex transition="opacity 200ms">
             <Flex gap={2} w="full" flexWrap="wrap">
@@ -39,6 +45,7 @@ const FilterTags = ({
                 )}
 
                 <Button
+                    ref={autoPlayRef}
                     onClick={onAutoPlayToggle}
                     bg={
                         preferredAutoPlay
