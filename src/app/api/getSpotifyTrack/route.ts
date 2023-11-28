@@ -70,10 +70,8 @@ export async function POST(req: Request) {
                 return response;
             }
         } else {
-            console.log("Spotify track doesnt exist");
-
             const response = NextResponse.json(null, {
-                status: 200,
+                status: 404,
             });
 
             return response;

@@ -67,15 +67,19 @@ export const fetchSpotifyTrack = async ({
     trackToSearch,
     releaseYear,
 }: FetchSpotifyTrackProps): Promise<SearchedTrack | null> => {
-    const spotifyTrack: SearchedTrack | null = await fetchWithErrorHandling(
-        "/api/getSpotifyTrack",
-        "POST",
-        {
-            trackToSearch,
-            releaseYear,
-        }
-    );
-    return spotifyTrack;
+    try {
+        const spotifyTrack: SearchedTrack | null = await fetchWithErrorHandling(
+            "/api/getSpotifyTrack",
+            "POST",
+            {
+                trackToSearch,
+                releaseYear,
+            }
+        );
+        return spotifyTrack;
+    } catch (error) {
+        throw error;
+    }
 };
 
 interface FetchDeezerTrackProps {
@@ -87,15 +91,20 @@ export const fetchDeezerTrack = async ({
     trackToSearch,
     releaseYear,
 }: FetchDeezerTrackProps): Promise<SearchedTrack | null> => {
-    const deezerTrack: SearchedTrack | null = await fetchWithErrorHandling(
-        "/api/getDeezerTrack",
-        "POST",
-        {
-            trackToSearch,
-            releaseYear,
-        }
-    );
-    return deezerTrack;
+    try {
+        const deezerTrack: SearchedTrack | null = await fetchWithErrorHandling(
+            "/api/getDeezerTrack",
+            "POST",
+            {
+                trackToSearch,
+                releaseYear,
+            }
+        );
+        return deezerTrack;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
 };
 
 interface FetchITunesTracksProps {
@@ -107,15 +116,19 @@ export const fetchITunesTrack = async ({
     trackToSearch,
     releaseYear,
 }: FetchITunesTracksProps): Promise<SearchedTrack | null> => {
-    const iTinesTrack: SearchedTrack | null = await fetchWithErrorHandling(
-        "/api/getITunesTracks",
-        "POST",
-        {
-            trackToSearch,
-            releaseYear,
-        }
-    );
-    return iTinesTrack;
+    try {
+        const iTinesTrack: SearchedTrack | null = await fetchWithErrorHandling(
+            "/api/getITunesTracks",
+            "POST",
+            {
+                trackToSearch,
+                releaseYear,
+            }
+        );
+        return iTinesTrack;
+    } catch (error) {
+        throw error;
+    }
 };
 
 export const scrapeJuno = async (): Promise<any[] | null> => {
@@ -278,3 +291,11 @@ export const createUser = async ({ userId }: CreateUserProps): Promise<any> => {
 
     return user;
 };
+
+interface DeleteStoredTrackProps {
+    id: string;
+}
+
+export const deleteStoredTrack = async ({ id }: DeleteStoredTrackProps) => {
+    await fetchWithErrorHandling("/api/deleteStoredTrack", "POST", { id });
+}; 

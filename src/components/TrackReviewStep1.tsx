@@ -4,6 +4,7 @@ import { Box, Flex, useToast } from "@chakra-ui/react";
 import { useLocalStorage } from "usehooks-ts";
 import { StoredTrack, SearchedTrack, Track } from "../../types";
 import {
+    deleteStoredTrack,
     fetchDeezerTrack,
     fetchITunesTrack,
     fetchSpotifyTrack,
@@ -136,27 +137,53 @@ const TrackReviewStep1 = () => {
         track: StoredTrack
     ): Promise<Track | null> => {
         let searchedTrack: SearchedTrack | null = null;
+        let notFound = false;
 
-        searchedTrack = await fetchDeezerTrack({
-            trackToSearch: `${track.artist} - ${track.title}`,
-            releaseYear: track.releaseYear,
-        });
-
-        if (!searchedTrack) {
-            searchedTrack = await fetchSpotifyTrack({
-                trackToSearch: {
-                    artist: track.artist,
-                    title: track.title,
-                },
-                releaseYear: track.releaseYear,
-            });
-        }
-
-        if (!searchedTrack) {
-            searchedTrack = await fetchITunesTrack({
+        try {
+            searchedTrack = await fetchDeezerTrack({
                 trackToSearch: `${track.artist} - ${track.title}`,
                 releaseYear: track.releaseYear,
             });
+            notFound = false;
+        } catch (error: any) {
+            if (error.statusCode === 404) {
+                notFound = true;
+            }
+        }
+
+        if (!searchedTrack) {
+            try {
+                searchedTrack = await fetchSpotifyTrack({
+                    trackToSearch: {
+                        artist: track.artist,
+                        title: track.title,
+                    },
+                    releaseYear: track.releaseYear,
+                });
+                notFound = false;
+            } catch (error: any) {
+                if (error.statusCode === 404) {
+                    notFound = true;
+                }
+            }
+        }
+
+        if (!searchedTrack) {
+            try {
+                searchedTrack = await fetchITunesTrack({
+                    trackToSearch: `${track.artist} - ${track.title}`,
+                    releaseYear: track.releaseYear,
+                });
+                notFound = false;
+            } catch (error: any) {
+                if (error.statusCode === 404) {
+                    notFound = true;
+                }
+            }
+        }
+
+        if (notFound) {
+            await deleteStoredTrack({ id: track.id });
         }
 
         if (searchedTrack) {

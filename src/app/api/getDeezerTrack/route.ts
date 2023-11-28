@@ -27,7 +27,7 @@ export async function POST(req: Request) {
             return response;
         } else {
             const response = NextResponse.json(null, {
-                status: 200,
+                status: 404,
             });
 
             return response;

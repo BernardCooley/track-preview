@@ -15,7 +15,7 @@ export async function POST(req: Request) {
 
         const iTunesResponse = await itunesAPI.searchItunes(searchOptions);
 
-        if (iTunesResponse) {
+        if (iTunesResponse && iTunesResponse.resultCount > 0) {
             const track: SearchedTrack = {
                 artist: iTunesResponse.results[0].artistName,
                 title: iTunesResponse.results[0].trackName,
@@ -33,7 +33,7 @@ export async function POST(req: Request) {
             return response;
         } else {
             const response = NextResponse.json(null, {
-                status: 200,
+                status: 404,
             });
 
             return response;
