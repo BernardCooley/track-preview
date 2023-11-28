@@ -138,6 +138,7 @@ export const theme = extendTheme({
                             _hover: {
                                 bg: "brand.backgroundTertiary",
                             },
+                            shadow: "none",
                         },
                     },
                     description: {
