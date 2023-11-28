@@ -185,7 +185,7 @@ const TrackReviewStep2And3 = ({ reviewStep }: Props) => {
                     )}
                 </Flex>
             </Flex>
-            <Flex direction="column" position="relative" top={20}>
+            <Flex direction="column" position="relative">
                 {currentTrack && (
                     <TrackReviewCard
                         currentTrack={currentTrack}
