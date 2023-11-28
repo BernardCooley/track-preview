@@ -43,6 +43,12 @@ const TrackReviewStep2And3 = ({ reviewStep }: Props) => {
         }
     }, [noTracks]);
 
+    useEffect(() => {
+        if (currentTrack && preferredAutoPlay) {
+            play();
+        }
+    }, [currentTrack]);
+
     const init = useCallback(async () => {
         setTracks([]);
         setCurrentTrack(null);
