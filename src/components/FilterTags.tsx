@@ -37,19 +37,9 @@ const FilterTags = ({
                          ${preferredYearRange?.to}`}
                     </Button>
                 )}
+
                 <Button
                     onClick={onAutoPlayToggle}
-                    _hover={
-                        preferredAutoPlay
-                            ? {
-                                  bg: "transparent",
-                                  borderColor: "brand.primaryOpaque",
-                              }
-                            : {
-                                  bg: "brand.primaryOpaque",
-                                  borderColor: "brand.primary",
-                              }
-                    }
                     bg={
                         preferredAutoPlay
                             ? "brand.primaryOpaque"
@@ -60,6 +50,14 @@ const FilterTags = ({
                             ? "brand.primaryLight"
                             : "brand.primaryOpaque"
                     }
+                    _hover={{
+                        bg: preferredAutoPlay
+                            ? "transparent"
+                            : "brand.primaryOpaque",
+                        borderColor: preferredAutoPlay
+                            ? "brand.primaryOpaque"
+                            : "brand.primaryLight",
+                    }}
                     variant="filter"
                 >
                     AutoPlay
