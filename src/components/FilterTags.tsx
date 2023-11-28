@@ -1,5 +1,6 @@
 import { Button, Flex } from "@chakra-ui/react";
-import React, { useEffect, useRef } from "react";
+import React from "react";
+import { isMobile } from "react-device-detect";
 
 interface Props {
     genre?: string;
@@ -21,14 +22,6 @@ const FilterTags = ({
     onAutoPlayToggle,
     onGenreClick,
 }: Props) => {
-    const autoPlayRef = useRef<HTMLButtonElement | null>(null);
-
-    useEffect(() => {
-        setTimeout(() => {
-            autoPlayRef.current?.blur();
-        }, 0);
-    }, [preferredAutoPlay]);
-
     return (
         <Flex transition="opacity 200ms">
             <Flex gap={2} w="full" flexWrap="wrap">
@@ -47,7 +40,6 @@ const FilterTags = ({
                 )}
 
                 <Button
-                    ref={autoPlayRef}
                     onClick={onAutoPlayToggle}
                     bg={
                         preferredAutoPlay
@@ -59,14 +51,18 @@ const FilterTags = ({
                             ? "brand.primaryLight"
                             : "brand.primaryOpaque"
                     }
-                    _hover={{
-                        bg: preferredAutoPlay
-                            ? "transparent"
-                            : "brand.primaryOpaque",
-                        borderColor: preferredAutoPlay
-                            ? "brand.primaryOpaque"
-                            : "brand.primaryLight",
-                    }}
+                    _hover={
+                        isMobile
+                            ? {}
+                            : {
+                                  bg: preferredAutoPlay
+                                      ? "transparent"
+                                      : "brand.primaryOpaque",
+                                  borderColor: preferredAutoPlay
+                                      ? "brand.primaryOpaque"
+                                      : "brand.primaryLight",
+                              }
+                    }
                     variant="filter"
                 >
                     AutoPlay
