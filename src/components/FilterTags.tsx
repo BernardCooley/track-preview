@@ -24,7 +24,9 @@ const FilterTags = ({
     const autoPlayRef = useRef<HTMLButtonElement | null>(null);
 
     useEffect(() => {
-        autoPlayRef.current?.blur();
+        setTimeout(() => {
+            autoPlayRef.current?.blur();
+        }, 0);
     }, [preferredAutoPlay]);
 
     return (
