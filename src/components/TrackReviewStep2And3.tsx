@@ -139,7 +139,7 @@ const TrackReviewStep2And3 = ({ reviewStep }: Props) => {
     };
 
     return (
-        <Box h="90vh" position="relative">
+        <Box position="relative">
             {loading && <Loading imageSrc="/logo_1x.png" />}
             {!loading && noTracks && (
                 <Center>
