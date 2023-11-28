@@ -85,6 +85,8 @@ const TrackReviewStep1 = () => {
         if (genre && user?.uid) {
             setAvailableGenres(genres);
             setLoading(true);
+            setCurrentTrack(null);
+            setQueuedTrack(null);
 
             try {
                 const storedTracks = await fetchStoredTracks({
