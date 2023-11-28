@@ -57,4 +57,6 @@ const Header = forwardRef<HTMLButtonElement | undefined>((menuButtonRef) => {
     );
 });
 
+Header.displayName = "Header";
+
 export default Header;
