@@ -1,4 +1,4 @@
-import { StoredTrack } from "@prisma/client";
+import { StoredTrack, User } from "@prisma/client";
 import { AccessToken, SearchedTrack, Track } from "../../types";
 
 export class GoneError extends Error {
@@ -298,4 +298,29 @@ interface DeleteStoredTrackProps {
 
 export const deleteStoredTrack = async ({ id }: DeleteStoredTrackProps) => {
     await fetchWithErrorHandling("/api/deleteStoredTrack", "POST", { id });
-}; 
+};
+
+interface UpdateUserAutoplayProps {
+    userId: string;
+    autoplay: boolean;
+}
+
+export const updateUserAutoplay = async ({
+    userId,
+    autoplay,
+}: UpdateUserAutoplayProps): Promise<User | null> => {
+    try {
+        const user = await fetchWithErrorHandling(
+            "/api/updateUserAutoplay",
+            "POST",
+            {
+                userId,
+                autoplay: autoplay,
+            }
+        );
+
+        return user as User;
+    } catch (error) {
+        throw error;
+    }
+};

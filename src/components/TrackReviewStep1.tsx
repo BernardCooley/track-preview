@@ -10,6 +10,7 @@ import {
     fetchSpotifyTrack,
     fetchStoredTracks,
     saveNewTrack,
+    updateUserAutoplay,
 } from "@/bff/bff";
 import { useAuthContext } from "../../Contexts/AuthContext";
 import TrackReviewCard from "./TrackReviewCard";
@@ -37,10 +38,7 @@ const TrackReviewStep1 = () => {
     const toast = useToast();
     const id = "step1-toast";
     const [tracks, setTracks] = useState<StoredTrack[]>([]);
-    const [preferredAutoPlay, setPreferredAutoPlay] = useLocalStorage(
-        "preferredAutoPlay",
-        false
-    );
+    const [autoplay, setAutoplay] = useState<boolean>(false);
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
     const [listened, setListened] = useState<boolean>(false);
     const audioElementRef = useRef<HTMLAudioElement>(null);
@@ -130,7 +128,7 @@ const TrackReviewStep1 = () => {
     }, [tracks, currentTrack, queuedTrack]);
 
     useEffect(() => {
-        if (currentTrack && preferredAutoPlay && !isPlaying) {
+        if (currentTrack && autoplay && !isPlaying) {
             play();
         }
     }, [currentTrack]);
@@ -322,16 +320,23 @@ const TrackReviewStep1 = () => {
                 rounded="3xl"
                 zIndex={200}
             >
-                <FilterTags
-                    onGenreClick={() => setShowGenreSelect((prev) => !prev)}
-                    onAutoPlayToggle={() =>
-                        setPreferredAutoPlay((prev) => !prev)
-                    }
-                    showDates={true}
-                    genre={genre}
-                    preferredYearRange={preferredYearRange}
-                    preferredAutoPlay={preferredAutoPlay}
-                />
+                {user?.uid && (
+                    <FilterTags
+                        onGenreClick={() => setShowGenreSelect((prev) => !prev)}
+                        onAutoPlayToggle={async () => {
+                            await updateUserAutoplay({
+                                userId: user.uid,
+                                autoplay: !autoplay,
+                            });
+
+                            setAutoplay(!autoplay);
+                        }}
+                        showDates={true}
+                        genre={genre}
+                        preferredYearRange={preferredYearRange}
+                        preferredAutoPlay={autoplay}
+                    />
+                )}
             </Flex>
             <Flex direction="column" position="relative">
                 {currentTrack && (

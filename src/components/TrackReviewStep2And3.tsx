@@ -8,12 +8,15 @@ import {
     useToast,
 } from "@chakra-ui/react";
 import TrackReviewCard from "./TrackReviewCard";
-import { useLocalStorage } from "usehooks-ts";
 import { SearchedTrack, Track } from "../../types";
 import { useAuthContext } from "../../Contexts/AuthContext";
 import Loading from "./Loading";
 import FilterTags from "./FilterTags";
-import { fetchUserTracks, updateTrackReviewStep } from "@/bff/bff";
+import {
+    fetchUserTracks,
+    updateTrackReviewStep,
+    updateUserAutoplay,
+} from "@/bff/bff";
 
 interface Props {
     reviewStep: number;
@@ -23,13 +26,10 @@ const TrackReviewStep2And3 = ({ reviewStep }: Props) => {
     const toast = useToast();
     const id = "step2And3-toast";
     const [loading, setLoading] = useState<boolean>(false);
-    const [preferredAutoPlay, setPreferredAutoPlay] = useLocalStorage(
-        "Step2And3preferredAutoPlay",
-        false
-    );
     const [currentTrack, setCurrentTrack] = useState<SearchedTrack | null>(
         null
     );
+    const [autoplay, setAutoplay] = useState<boolean>(false);
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
     const [listened, setListened] = useState<boolean>(false);
     const [tracks, setTracks] = useState<Track[]>([]);
@@ -44,7 +44,7 @@ const TrackReviewStep2And3 = ({ reviewStep }: Props) => {
     }, [noTracks]);
 
     useEffect(() => {
-        if (currentTrack && preferredAutoPlay) {
+        if (currentTrack && autoplay) {
             play();
         }
     }, [currentTrack]);
@@ -174,13 +174,18 @@ const TrackReviewStep2And3 = ({ reviewStep }: Props) => {
                     justifyContent="space-between"
                     w="full"
                 >
-                    {tracks && tracks.length > 0 && (
+                    {tracks && tracks.length > 0 && user?.uid && (
                         <FilterTags
-                            onAutoPlayToggle={() =>
-                                setPreferredAutoPlay((prev) => !prev)
-                            }
+                            onAutoPlayToggle={async () => {
+                                await updateUserAutoplay({
+                                    userId: user.uid,
+                                    autoplay: !autoplay,
+                                });
+
+                                setAutoplay(!autoplay);
+                            }}
                             showDates={true}
-                            preferredAutoPlay={preferredAutoPlay}
+                            preferredAutoPlay={autoplay}
                         />
                     )}
                 </Flex>
