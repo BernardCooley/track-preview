@@ -1,6 +1,7 @@
 import { Flex, Tag } from "@chakra-ui/react";
 import React from "react";
 import { isMobile } from "react-device-detect";
+import { getCurrentYear } from "../../utils";
 
 interface Props {
     genre?: string;
@@ -28,7 +29,11 @@ const FilterTags = ({
         <Flex transition="opacity 200ms">
             <Flex gap={2} w="full" flexWrap="wrap">
                 {genre && (
-                    <Tag variant="filter" onClick={onGenreClick}>
+                    <Tag
+                        key={`${genre}`}
+                        variant="filter"
+                        onClick={onGenreClick}
+                    >
                         {genre.toLowerCase() === "all" ? "All genres" : genre}
                     </Tag>
                 )}
@@ -39,7 +44,8 @@ const FilterTags = ({
                         variant="filter"
                         onClick={onYearClick}
                     >
-                        {yearRange.from === 1960
+                        {yearRange.from === 1960 &&
+                        yearRange.to === getCurrentYear()
                             ? "All years"
                             : `${yearRange.from} -
                          ${yearRange?.to}`}

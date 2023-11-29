@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { genres } from "../../data/genres";
-import { Box, Flex, useToast } from "@chakra-ui/react";
+import { Box, Flex, Text, useToast } from "@chakra-ui/react";
 import { useLocalStorage } from "usehooks-ts";
 import { StoredTrack, SearchedTrack, Track } from "../../types";
 import {
@@ -31,8 +31,9 @@ const TrackReviewStep1 = () => {
         updateStep1QueuedTrack,
         yearRange,
         updateYearRange,
+        genre,
+        updateGenre,
     } = useTrackContext();
-    const [genre, setGenre] = useState<string>("all");
     const [recentGenres, setRecentGenres] = useLocalStorage<string[]>(
         "recentGenres",
         []
@@ -49,6 +50,8 @@ const TrackReviewStep1 = () => {
     const [initCounter, setInitCounter] = useState<number>(0);
     const [showGenreSelector, setShowGenreSelector] = useState<boolean>(false);
     const [showYearSelector, setShowYearSelector] = useState<boolean>(false);
+    const [noTracks, setNoTracks] = useState<boolean>(false);
+    const [allowInit, setAllowInit] = useState<boolean>(false);
 
     const showToast = useCallback(
         ({ status, title, description }: ToastProps) => {
@@ -70,21 +73,34 @@ const TrackReviewStep1 = () => {
         if (initCounter < 10) {
             init();
         } else {
-            showToast({ status: "error" });
-            throw new Error("No tracks found");
+            showToast({
+                status: "error",
+                title: "Error loading tracks",
+                description: "Please try refreshing the page.",
+            });
         }
     }, [genre, user, yearRange]);
 
     useEffect(() => {
         if (user?.uid) {
             setAutoplay(userProfile?.autoplay || false);
-            setGenre(userProfile?.genre || "all");
+        }
+    }, [user, userProfile?.autoplay]);
+
+    useEffect(() => {
+        if (user?.uid) {
+            updateGenre(userProfile?.genre || "all");
+        }
+    }, [user, userProfile?.genre]);
+
+    useEffect(() => {
+        if (user?.uid) {
             updateYearRange({
                 from: userProfile?.yearFrom || 1960,
                 to: userProfile?.yearTo || getCurrentYear(),
             });
         }
-    }, [user, userProfile]);
+    }, [user, userProfile?.yearFrom, userProfile?.yearTo]);
 
     interface ToastProps {
         status: "error" | "success" | "info";
@@ -94,7 +110,8 @@ const TrackReviewStep1 = () => {
 
     const init = useCallback(async () => {
         setInitCounter((prev) => prev + 1);
-        if (genre && user?.uid && step1Tracks.length === 0) {
+        if (genre && user?.uid && (step1Tracks.length === 0 || allowInit)) {
+            setNoTracks(false);
             setAvailableGenres(genres);
             setLoading(true);
             updateStep1CurrentTrack(null);
@@ -118,6 +135,7 @@ const TrackReviewStep1 = () => {
                 setLoading(false);
                 showToast({ status: "error" });
             }
+            setAllowInit(false);
         }
     }, [genre, user]);
 
@@ -134,8 +152,8 @@ const TrackReviewStep1 = () => {
             if (initCounter < 10) {
                 init();
             } else {
-                showToast({ status: "error" });
-                throw new Error("No tracks found");
+                setLoading(false);
+                setNoTracks(true);
             }
         }
     }, [step1Tracks, step1CurrentTrack, step1QueuedTrack]);
@@ -242,7 +260,7 @@ const TrackReviewStep1 = () => {
         if (user?.uid && step1CurrentTrack && step1Tracks) {
             await saveNewTrack({
                 id: step1CurrentTrack.id,
-                genre,
+                genre: genre || "all",
                 userId: user.uid,
                 artist: step1CurrentTrack.artist,
                 title: step1CurrentTrack.title,
@@ -280,7 +298,6 @@ const TrackReviewStep1 = () => {
                     init();
                 } else {
                     showToast({ status: "error" });
-                    throw new Error("No tracks found");
                 }
             } else {
                 updateStep1Tracks(filteredTracks);
@@ -298,6 +315,20 @@ const TrackReviewStep1 = () => {
     return (
         <Box position="relative">
             {loading && <Loading imageSrc="/logo_1x.png" />}
+            {noTracks && (
+                <Text
+                    textAlign="center"
+                    mt={20}
+                    gap={4}
+                    top="100%"
+                    transform="translate(50%, 0)"
+                    right="50%"
+                    p={6}
+                    position="absolute"
+                >
+                    No tracks found. Please try again with different filters.
+                </Text>
+            )}
             <YearModal
                 showYearSelector={showYearSelector}
                 setShowYearSelector={setShowYearSelector}
@@ -308,7 +339,7 @@ const TrackReviewStep1 = () => {
                         yearFrom: Number(val.from),
                         yearTo: Number(val.to),
                     });
-
+                    setAllowInit(true);
                     updateUserProfile(newProfile);
                     setShowYearSelector(false);
                 }}
@@ -317,13 +348,14 @@ const TrackReviewStep1 = () => {
             <GenreModal
                 showGenreSelector={showGenreSelector}
                 setShowGenreSelector={() => setShowGenreSelector(false)}
-                genre={genre}
+                genre={genre || "all"}
                 onGenreSelect={async (gen: string) => {
                     if (user?.uid && gen !== genre) {
                         const newProfile = await mutateUserProfile({
                             userId: user.uid,
                             genre: gen,
                         });
+                        setAllowInit(true);
                         setRecentGenres((prev) =>
                             Array.from(new Set([...prev, gen]))
                         );
@@ -338,7 +370,7 @@ const TrackReviewStep1 = () => {
                 }}
                 availableGenres={availableGenres}
                 onFavouriteClearClick={() => {
-                    setRecentGenres([genre]);
+                    setRecentGenres([genre || "all"]);
                 }}
                 recentGenres={recentGenres}
             />
@@ -369,7 +401,7 @@ const TrackReviewStep1 = () => {
                             updateUserProfile(newProfile);
                         }}
                         showDates={true}
-                        genre={genre}
+                        genre={genre || "all"}
                         yearRange={
                             yearRange || {
                                 from: 1960,
