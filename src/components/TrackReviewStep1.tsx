@@ -330,15 +330,12 @@ const TrackReviewStep1 = () => {
                     <FilterTags
                         onGenreClick={() => setShowGenreSelect((prev) => !prev)}
                         onAutoPlayToggle={async () => {
-                            await updateUserAutoplay({
+                            const newProfile = await updateUserAutoplay({
                                 userId: user.uid,
                                 autoplay: !autoplay,
                             });
 
-                            updateUserProfile({
-                                ...userProfile!,
-                                autoplay: !autoplay,
-                            });
+                            updateUserProfile(newProfile);
                         }}
                         showDates={true}
                         genre={genre}

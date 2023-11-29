@@ -183,15 +183,12 @@ const TrackReviewStep2And3 = ({ reviewStep }: Props) => {
                     {tracks && tracks.length > 0 && user?.uid && (
                         <FilterTags
                             onAutoPlayToggle={async () => {
-                                await updateUserAutoplay({
+                                const newProfile = await updateUserAutoplay({
                                     userId: user.uid,
                                     autoplay: !autoplay,
                                 });
 
-                                updateUserProfile({
-                                    ...userProfile!,
-                                    autoplay: !autoplay,
-                                });
+                                updateUserProfile(newProfile);
                             }}
                             showDates={true}
                             preferredAutoPlay={autoplay}
