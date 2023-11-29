@@ -13,6 +13,7 @@ import TrackReviewStep1 from "@/components/TrackReviewStep1";
 import TrackReviewStep2And3 from "@/components/TrackReviewStep2And3";
 import TrackList from "@/components/TrackList";
 import Header from "@/components/Header";
+import { getUserProfile } from "@/bff/bff";
 
 export default function Home() {
     const router = useRouter();
@@ -21,8 +22,17 @@ export default function Home() {
     const { currentlyPlaying, updateCurrentlyPlaying } = useTrackContext();
     const audioElement = useRef<HTMLAudioElement>(null);
     const [currentStep, setCurrentStep] = useState<number>(0);
-    const { updateUser } = useAuthContext();
+    const { updateUser, user, updateUserProfile } = useAuthContext();
     const reviewStep = searchParams?.get("reviewStep");
+
+    useEffect(() => {
+        if (user?.uid) {
+            (async () => {
+                const userProf = await getUserProfile({ userId: user?.uid });
+                updateUserProfile(userProf);
+            })();
+        }
+    }, [user]);
 
     const isUserLoggedIn = useCallback(() => {
         onAuthStateChanged(auth, (user) => {

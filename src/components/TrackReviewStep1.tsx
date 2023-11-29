@@ -25,7 +25,7 @@ const TrackReviewStep1 = () => {
         "favouriteGenres",
         []
     );
-    const { user } = useAuthContext();
+    const { user, userProfile, updateUserProfile } = useAuthContext();
     const [availableGenres, setAvailableGenres] = useState<string[]>(genres);
     const [loading, setLoading] = useState<boolean>(false);
     const [preferredYearRange, setPreferredYearRange] = useLocalStorage<{
@@ -71,6 +71,12 @@ const TrackReviewStep1 = () => {
             throw new Error("No tracks found");
         }
     }, [genre, user]);
+
+    useEffect(() => {
+        if (user?.uid) {
+            setAutoplay(userProfile?.autoplay || false);
+        }
+    }, [user, userProfile]);
 
     interface ToastProps {
         status: "error" | "success" | "info";
@@ -329,7 +335,10 @@ const TrackReviewStep1 = () => {
                                 autoplay: !autoplay,
                             });
 
-                            setAutoplay(!autoplay);
+                            updateUserProfile({
+                                ...userProfile!,
+                                autoplay: !autoplay,
+                            });
                         }}
                         showDates={true}
                         genre={genre}

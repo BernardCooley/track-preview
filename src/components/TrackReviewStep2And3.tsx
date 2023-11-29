@@ -34,8 +34,14 @@ const TrackReviewStep2And3 = ({ reviewStep }: Props) => {
     const [listened, setListened] = useState<boolean>(false);
     const [tracks, setTracks] = useState<Track[]>([]);
     const audioElementRef = useRef<HTMLAudioElement>(null);
-    const { user } = useAuthContext();
+    const { user, userProfile, updateUserProfile } = useAuthContext();
     const [noTracks, setNoTracks] = useState<boolean>(false);
+
+    useEffect(() => {
+        if (user?.uid) {
+            setAutoplay(userProfile?.autoplay || false);
+        }
+    }, [user, userProfile]);
 
     useEffect(() => {
         if (noTracks) {
@@ -182,7 +188,10 @@ const TrackReviewStep2And3 = ({ reviewStep }: Props) => {
                                     autoplay: !autoplay,
                                 });
 
-                                setAutoplay(!autoplay);
+                                updateUserProfile({
+                                    ...userProfile!,
+                                    autoplay: !autoplay,
+                                });
                             }}
                             showDates={true}
                             preferredAutoPlay={autoplay}

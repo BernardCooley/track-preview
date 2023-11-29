@@ -324,3 +324,25 @@ export const updateUserAutoplay = async ({
         throw error;
     }
 };
+
+interface GetUserProps {
+    userId: string;
+}
+
+export const getUserProfile = async ({
+    userId,
+}: GetUserProps): Promise<User | null> => {
+    try {
+        const user = await fetchWithErrorHandling(
+            "/api/getUserProfile",
+            "POST",
+            {
+                userId,
+            }
+        );
+
+        return user as User;
+    } catch (error) {
+        throw error;
+    }
+};
