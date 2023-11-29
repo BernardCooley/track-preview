@@ -1,22 +1,18 @@
 "use client";
 
 import {
-    Box,
     Button,
+    Divider,
     Flex,
     Modal,
     ModalContent,
     ModalOverlay,
-    RangeSlider,
-    RangeSliderFilledTrack,
-    RangeSliderMark,
-    RangeSliderThumb,
-    RangeSliderTrack,
     Text,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
 import { YearRange } from "../../types";
-import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
+import RangeSlider from "react-range-slider-input";
+import "../app/styles/range-slider.css";
 
 interface Props {
     showYearSelector: boolean;
@@ -38,34 +34,7 @@ const YearModal = ({
         yearRange.to,
     ]);
 
-    const sliderMarks = [
-        {
-            value: 0,
-            label: "1960",
-        },
-        {
-            value: 25,
-            label: "1975",
-        },
-        {
-            value: 50,
-            label: "1990",
-        },
-        {
-            value: 75,
-            label: "2005",
-        },
-        {
-            value: 100,
-            label: "2023",
-        },
-    ];
-
-    const calculateYear = (value: number) => {
-        const yearDifference = new Date().getFullYear() - 1960;
-        const num = Math.round((value / 100) * yearDifference) + 1960;
-        return num;
-    };
+    const sliderMarks = ["1960", "1980", "2000", new Date().getFullYear()];
 
     return (
         <Modal
@@ -86,78 +55,46 @@ const YearModal = ({
                         <Text fontSize="xl" textAlign="center">
                             Select Year Range
                         </Text>
-                        <Box w="full" mt={10} px={8}>
+                        <Flex w="full" mt={6} px={8} direction="column" gap={6}>
+                            <Text
+                                fontSize="xl"
+                                textAlign="center"
+                            >{`${sliderValue[0]} - ${sliderValue[1]}`}</Text>
                             <RangeSlider
-                                w="full"
-                                aria-label={["min", "max"]}
-                                defaultValue={[30, 80]}
-                                onChange={(val) => setSliderValue(val)}
-                            >
-                                {sliderMarks.map((mark) => (
-                                    <RangeSliderMark
-                                        key={mark.value}
-                                        value={mark.value}
-                                        fontSize="sm"
-                                        mt={6}
-                                        ml={-4}
+                                min={1960}
+                                max={2023}
+                                defaultValue={[yearRange.from, yearRange.to]}
+                                value={sliderValue}
+                                onInput={(val: any) => {
+                                    setSliderValue(val as number[]);
+                                }}
+                            />
+                            <Flex justifyContent="space-between" h={8}>
+                                {sliderMarks.map((year) => (
+                                    <Flex
+                                        key={year}
+                                        direction="column"
+                                        alignItems="center"
                                     >
-                                        {mark.label}
-                                    </RangeSliderMark>
+                                        <Divider orientation="vertical" />
+                                        <Text>{year}</Text>
+                                    </Flex>
                                 ))}
-                                <RangeSliderMark
-                                    value={sliderValue[0]}
-                                    textAlign="center"
-                                    color="white"
-                                    w={10}
-                                    m={-10}
-                                    ml={-5}
-                                >
-                                    {calculateYear(sliderValue[0])}
-                                </RangeSliderMark>
-                                <RangeSliderMark
-                                    value={sliderValue[1]}
-                                    textAlign="center"
-                                    color="white"
-                                    w={10}
-                                    m={-10}
-                                    ml={-5}
-                                >
-                                    {calculateYear(sliderValue[1])}
-                                </RangeSliderMark>
-
-                                <RangeSliderTrack bg="brand.primaryOpaque">
-                                    <RangeSliderFilledTrack bg="brand.primary" />
-                                </RangeSliderTrack>
-                                <RangeSliderThumb boxSize={6} index={0}>
-                                    <FiberManualRecordIcon
-                                        sx={{
-                                            color: "#293533",
-                                        }}
-                                    />
-                                </RangeSliderThumb>
-                                <RangeSliderThumb boxSize={6} index={1}>
-                                    <FiberManualRecordIcon
-                                        sx={{
-                                            color: "#293533",
-                                        }}
-                                    />
-                                </RangeSliderThumb>
-                            </RangeSlider>
-                        </Box>
-                        <Flex gap={4}>
+                            </Flex>
+                        </Flex>
+                        <Flex gap={4} mt={6} justifyContent="flex-end">
                             <Button
                                 onClick={() =>
                                     onConfirm({
-                                        from: calculateYear(sliderValue[0]),
-                                        to: calculateYear(sliderValue[1]),
+                                        from: sliderValue[0],
+                                        to: sliderValue[1],
                                     })
                                 }
-                                mt={10}
                                 variant="primary"
                             >
                                 Confirm
                             </Button>
-                            <Button onClick={onCancel} mt={10} variant="cancel">
+                            <Button onClick={onCancel} variant="cancel">
                                 Cancel
                             </Button>
                         </Flex>
