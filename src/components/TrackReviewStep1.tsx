@@ -19,6 +19,7 @@ import FilterTags from "./FilterTags";
 import { getCurrentYear } from "../../utils";
 import GenreModal from "./GenreModal";
 import { useTrackContext } from "../../context/TrackContext";
+import YearModal from "./YearModal";
 
 const TrackReviewStep1 = () => {
     const {
@@ -51,7 +52,8 @@ const TrackReviewStep1 = () => {
     const [listened, setListened] = useState<boolean>(false);
     const audioElementRef = useRef<HTMLAudioElement>(null);
     const [initCounter, setInitCounter] = useState<number>(0);
-    const [showGenreSelect, setShowGenreSelect] = useState<boolean>(false);
+    const [showGenreSelector, setShowGenreSelector] = useState<boolean>(false);
+    const [showYearSelector, setShowYearSelector] = useState<boolean>(false);
 
     const showToast = useCallback(
         ({ status, title, description }: ToastProps) => {
@@ -76,7 +78,7 @@ const TrackReviewStep1 = () => {
             showToast({ status: "error" });
             throw new Error("No tracks found");
         }
-    }, [genre, user]);
+    }, [genre, user, preferredYearRange]);
 
     useEffect(() => {
         if (user?.uid) {
@@ -118,7 +120,7 @@ const TrackReviewStep1 = () => {
                 showToast({ status: "error" });
             }
         }
-    }, [genre, user, preferredYearRange]);
+    }, [genre, user]);
 
     useEffect(() => {
         if (step1Tracks?.length > 1) {
@@ -297,9 +299,19 @@ const TrackReviewStep1 = () => {
     return (
         <Box position="relative">
             {loading && <Loading imageSrc="/logo_1x.png" />}
+            <YearModal
+                showYearSelector={showYearSelector}
+                setShowYearSelector={setShowYearSelector}
+                yearRange={preferredYearRange}
+                onConfirm={(val) => {
+                    setPreferredYearRange(val);
+                    setShowYearSelector(false);
+                }}
+                onCancel={() => setShowYearSelector(false)}
+            />
             <GenreModal
-                showGenreSelect={showGenreSelect}
-                setShowGenreSelect={() => setShowGenreSelect(false)}
+                showGenreSelector={showGenreSelector}
+                setShowGenreSelector={() => setShowGenreSelector(false)}
                 genre={genre}
                 onGenreSelect={async (gen: string) => {
                     if (user?.uid && gen !== genre) {
@@ -317,7 +329,7 @@ const TrackReviewStep1 = () => {
                         setListened(false);
                         setIsPlaying(false);
                     }
-                    setShowGenreSelect(false);
+                    setShowGenreSelector(false);
                 }}
                 availableGenres={availableGenres}
                 onFavouriteClearClick={() => {
@@ -339,7 +351,10 @@ const TrackReviewStep1 = () => {
             >
                 {user?.uid && (
                     <FilterTags
-                        onGenreClick={() => setShowGenreSelect((prev) => !prev)}
+                        onYearClick={() => setShowYearSelector((prev) => !prev)}
+                        onGenreClick={() =>
+                            setShowGenreSelector((prev) => !prev)
+                        }
                         onAutoPlayToggle={async () => {
                             const newProfile = await mutateUserProfile({
                                 userId: user.uid,

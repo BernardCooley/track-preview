@@ -41,3 +41,8 @@ export interface AccessToken {
     expires_in: number;
     token_type: string;
 }
+
+export interface YearRange {
+    from: number;
+    to: number;
+}

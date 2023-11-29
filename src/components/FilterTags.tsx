@@ -12,6 +12,7 @@ interface Props {
     showDates: boolean;
     onAutoPlayToggle: () => void;
     onGenreClick?: () => void;
+    onYearClick?: () => void;
 }
 
 const FilterTags = ({
@@ -21,6 +22,7 @@ const FilterTags = ({
     showDates,
     onAutoPlayToggle,
     onGenreClick,
+    onYearClick,
 }: Props) => {
     return (
         <Flex transition="opacity 200ms">
@@ -32,7 +34,7 @@ const FilterTags = ({
                 )}
 
                 {preferredYearRange && showDates && (
-                    <Tag variant="filter">
+                    <Tag variant="filter" onClick={onYearClick}>
                         {Number(preferredYearRange?.from) === 0
                             ? "All years"
                             : `${Number(preferredYearRange?.from)} -
