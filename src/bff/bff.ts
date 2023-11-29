@@ -304,12 +304,16 @@ interface UpdateUserAutoplayProps {
     userId: string;
     autoplay?: boolean;
     genre?: string;
+    yearFrom?: number;
+    yearTo?: number;
 }
 
 export const mutateUserProfile = async ({
     userId,
     autoplay,
     genre,
+    yearFrom,
+    yearTo,
 }: UpdateUserAutoplayProps): Promise<User> => {
     try {
         const user = await fetchWithErrorHandling(
@@ -319,6 +323,8 @@ export const mutateUserProfile = async ({
                 userId,
                 autoplay,
                 genre,
+                yearFrom,
+                yearTo,
             }
         );
 

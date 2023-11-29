@@ -9,10 +9,11 @@ import {
     ModalOverlay,
     Text,
 } from "@chakra-ui/react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { YearRange } from "../../types";
 import RangeSlider from "react-range-slider-input";
 import "../app/styles/range-slider.css";
+import { getCurrentYear } from "../../utils";
 
 interface Props {
     showYearSelector: boolean;
@@ -34,7 +35,11 @@ const YearModal = ({
         yearRange.to,
     ]);
 
-    const sliderMarks = ["1960", "1980", "2000", new Date().getFullYear()];
+    useEffect(() => {
+        setSliderValue([yearRange?.from, yearRange?.to]);
+    }, [yearRange]);
+
+    const sliderMarks = ["1960", "1980", "2000", getCurrentYear()];
 
     return (
         <Modal
@@ -63,7 +68,7 @@ const YearModal = ({
                             <RangeSlider
                                 min={1960}
                                 max={2023}
-                                defaultValue={[yearRange.from, yearRange.to]}
+                                defaultValue={[yearRange?.from, yearRange?.to]}
                                 value={sliderValue}
                                 onInput={(val: any) => {
                                     setSliderValue(val as number[]);
@@ -86,8 +91,8 @@ const YearModal = ({
                             <Button
                                 onClick={() =>
                                     onConfirm({
-                                        from: sliderValue[0],
-                                        to: sliderValue[1],
+                                        from: sliderValue[0] as number,
+                                        to: sliderValue[1] as number,
                                     })
                                 }
                                 variant="primary"

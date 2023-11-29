@@ -29,6 +29,8 @@ const TrackReviewStep1 = () => {
         updateStep1CurrentTrack,
         step1QueuedTrack,
         updateStep1QueuedTrack,
+        yearRange,
+        updateYearRange,
     } = useTrackContext();
     const [genre, setGenre] = useState<string>("all");
     const [recentGenres, setRecentGenres] = useLocalStorage<string[]>(
@@ -38,13 +40,6 @@ const TrackReviewStep1 = () => {
     const { user, userProfile, updateUserProfile } = useAuthContext();
     const [availableGenres, setAvailableGenres] = useState<string[]>(genres);
     const [loading, setLoading] = useState<boolean>(false);
-    const [preferredYearRange, setPreferredYearRange] = useLocalStorage<{
-        from: number;
-        to: number;
-    }>("preferredYearRange", {
-        from: 0,
-        to: getCurrentYear(),
-    });
     const toast = useToast();
     const id = "step1-toast";
     const [autoplay, setAutoplay] = useState<boolean>(false);
@@ -78,12 +73,16 @@ const TrackReviewStep1 = () => {
             showToast({ status: "error" });
             throw new Error("No tracks found");
         }
-    }, [genre, user, preferredYearRange]);
+    }, [genre, user, yearRange]);
 
     useEffect(() => {
         if (user?.uid) {
             setAutoplay(userProfile?.autoplay || false);
             setGenre(userProfile?.genre || "all");
+            updateYearRange({
+                from: userProfile?.yearFrom || 1960,
+                to: userProfile?.yearTo || getCurrentYear(),
+            });
         }
     }, [user, userProfile]);
 
@@ -104,8 +103,8 @@ const TrackReviewStep1 = () => {
             try {
                 const storedTracks = await fetchStoredTracks({
                     genre,
-                    startYear: Number(preferredYearRange.from),
-                    endYear: Number(preferredYearRange.to),
+                    startYear: Number(yearRange?.from || 1960),
+                    endYear: Number(yearRange?.to || getCurrentYear()),
                     userId: user.uid,
                 });
 
@@ -302,9 +301,15 @@ const TrackReviewStep1 = () => {
             <YearModal
                 showYearSelector={showYearSelector}
                 setShowYearSelector={setShowYearSelector}
-                yearRange={preferredYearRange}
-                onConfirm={(val) => {
-                    setPreferredYearRange(val);
+                yearRange={yearRange || { from: 1960, to: getCurrentYear() }}
+                onConfirm={async (val) => {
+                    const newProfile = await mutateUserProfile({
+                        userId: user?.uid || "",
+                        yearFrom: Number(val.from),
+                        yearTo: Number(val.to),
+                    });
+
+                    updateUserProfile(newProfile);
                     setShowYearSelector(false);
                 }}
                 onCancel={() => setShowYearSelector(false)}
@@ -365,7 +370,12 @@ const TrackReviewStep1 = () => {
                         }}
                         showDates={true}
                         genre={genre}
-                        preferredYearRange={preferredYearRange}
+                        yearRange={
+                            yearRange || {
+                                from: 1960,
+                                to: getCurrentYear(),
+                            }
+                        }
                         preferredAutoPlay={autoplay}
                     />
                 )}

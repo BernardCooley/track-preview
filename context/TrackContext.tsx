@@ -2,7 +2,7 @@
 
 import { StoredTrack } from "@prisma/client";
 import React, { createContext, ReactNode, useContext, useState } from "react";
-import { Track } from "../types";
+import { Track, YearRange } from "../types";
 
 interface TrackContextProps {
     currentlyPlaying: string | undefined;
@@ -13,6 +13,8 @@ interface TrackContextProps {
     updateStep1CurrentTrack: (track: Track | null) => void;
     step1QueuedTrack: Track | null;
     updateStep1QueuedTrack: (track: Track | null) => void;
+    yearRange: YearRange | null;
+    updateYearRange: (yearRange: YearRange) => void;
 }
 
 export const TrackContext = createContext<TrackContextProps | null>(null);
@@ -38,6 +40,7 @@ export const TrackContextProvider = ({ children }: { children: ReactNode }) => {
     const [step1QueuedTrack, setStep1QueuedTrack] = useState<Track | null>(
         null
     );
+    const [yearRange, setYearRange] = useState<YearRange | null>(null);
 
     const updateCurrentlyPlaying = (trackId: string | undefined) => {
         setCurrentlyPlaying(trackId || "");
@@ -55,6 +58,10 @@ export const TrackContextProvider = ({ children }: { children: ReactNode }) => {
         setStep1QueuedTrack(track);
     };
 
+    const updateYearRange = (yearRange: YearRange) => {
+        setYearRange(yearRange);
+    };
+
     return (
         <TrackContext.Provider
             value={{
@@ -66,6 +73,8 @@ export const TrackContextProvider = ({ children }: { children: ReactNode }) => {
                 updateStep1CurrentTrack,
                 step1QueuedTrack,
                 updateStep1QueuedTrack,
+                yearRange,
+                updateYearRange,
             }}
         >
             {children}

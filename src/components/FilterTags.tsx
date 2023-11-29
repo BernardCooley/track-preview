@@ -4,7 +4,7 @@ import { isMobile } from "react-device-detect";
 
 interface Props {
     genre?: string;
-    preferredYearRange?: {
+    yearRange: {
         from: number;
         to: number;
     };
@@ -17,7 +17,7 @@ interface Props {
 
 const FilterTags = ({
     genre,
-    preferredYearRange,
+    yearRange,
     preferredAutoPlay,
     showDates,
     onAutoPlayToggle,
@@ -33,12 +33,16 @@ const FilterTags = ({
                     </Tag>
                 )}
 
-                {preferredYearRange && showDates && (
-                    <Tag variant="filter" onClick={onYearClick}>
-                        {Number(preferredYearRange?.from) === 0
+                {yearRange && showDates && (
+                    <Tag
+                        key={`${yearRange.from}-${yearRange.to}`}
+                        variant="filter"
+                        onClick={onYearClick}
+                    >
+                        {yearRange.from === 1960
                             ? "All years"
-                            : `${Number(preferredYearRange?.from)} -
-                         ${preferredYearRange?.to}`}
+                            : `${yearRange.from} -
+                         ${yearRange?.to}`}
                     </Tag>
                 )}
 
