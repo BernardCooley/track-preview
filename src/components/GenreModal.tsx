@@ -15,7 +15,7 @@ interface Props {
     onGenreSelect: (genre: string) => void;
     availableGenres: string[];
     onFavouriteClearClick?: () => void;
-    favouriteGenres?: string[];
+    recentGenres?: string[];
 }
 
 const GenreModal = ({
@@ -25,7 +25,7 @@ const GenreModal = ({
     onGenreSelect,
     availableGenres,
     onFavouriteClearClick,
-    favouriteGenres,
+    recentGenres,
 }: Props) => {
     return (
         <Modal
@@ -45,7 +45,7 @@ const GenreModal = ({
                     <Collapse in={showGenreSelect} animateOpacity>
                         <GenreSelector
                             onFavouriteClearClick={onFavouriteClearClick}
-                            favouriteGenres={favouriteGenres}
+                            recentGenres={recentGenres}
                             genres={availableGenres}
                             selectedGenre={genre}
                             onGenreSelect={(gen) => onGenreSelect(gen)}

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { genres } from "../../data/genres";
-import { Box, Flex, useToast } from "@chakra-ui/react";
+import { Box, Button, Flex, Text, useToast } from "@chakra-ui/react";
 import { useLocalStorage } from "usehooks-ts";
 import { StoredTrack, SearchedTrack, Track } from "../../types";
 import {
@@ -10,7 +10,7 @@ import {
     fetchSpotifyTrack,
     fetchStoredTracks,
     saveNewTrack,
-    updateUserAutoplay,
+    mutateUserProfile,
 } from "@/bff/bff";
 import { useAuthContext } from "../../Contexts/AuthContext";
 import TrackReviewCard from "./TrackReviewCard";
@@ -20,9 +20,9 @@ import { getCurrentYear } from "../../utils";
 import GenreModal from "./GenreModal";
 
 const TrackReviewStep1 = () => {
-    const [genre, setGenre] = useLocalStorage("genre", "All");
-    const [favouriteGenres, setFavouriteGenres] = useLocalStorage<string[]>(
-        "favouriteGenres",
+    const [genre, setGenre] = useState<string>("all");
+    const [recentGenres, setRecentGenres] = useLocalStorage<string[]>(
+        "recentGenres",
         []
     );
     const { user, userProfile, updateUserProfile } = useAuthContext();
@@ -75,6 +75,7 @@ const TrackReviewStep1 = () => {
     useEffect(() => {
         if (user?.uid) {
             setAutoplay(userProfile?.autoplay || false);
+            setGenre(userProfile?.genre || "all");
         }
     }, [user, userProfile]);
 
@@ -294,12 +295,16 @@ const TrackReviewStep1 = () => {
                 showGenreSelect={showGenreSelect}
                 setShowGenreSelect={() => setShowGenreSelect(false)}
                 genre={genre}
-                onGenreSelect={(gen: string) => {
-                    if (gen !== genre) {
-                        setFavouriteGenres((prev) =>
+                onGenreSelect={async (gen: string) => {
+                    if (user?.uid && gen !== genre) {
+                        const newProfile = await mutateUserProfile({
+                            userId: user.uid,
+                            genre: gen,
+                        });
+                        setRecentGenres((prev) =>
                             Array.from(new Set([...prev, gen]))
                         );
-                        setGenre(gen);
+                        updateUserProfile(newProfile);
                         setTracks([]);
                         setCurrentTrack(null);
                         setQueuedTrack(null);
@@ -310,9 +315,9 @@ const TrackReviewStep1 = () => {
                 }}
                 availableGenres={availableGenres}
                 onFavouriteClearClick={() => {
-                    setFavouriteGenres([genre]);
+                    setRecentGenres([genre]);
                 }}
-                favouriteGenres={favouriteGenres}
+                recentGenres={recentGenres}
             />
             <Flex
                 w="full"
@@ -330,7 +335,7 @@ const TrackReviewStep1 = () => {
                     <FilterTags
                         onGenreClick={() => setShowGenreSelect((prev) => !prev)}
                         onAutoPlayToggle={async () => {
-                            const newProfile = await updateUserAutoplay({
+                            const newProfile = await mutateUserProfile({
                                 userId: user.uid,
                                 autoplay: !autoplay,
                             });

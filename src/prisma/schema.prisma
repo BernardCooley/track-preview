@@ -14,6 +14,7 @@ model User {
   firebaseId String
   Track      Track[]
   autoplay   Boolean @default(false)
+  genre      String  @default("all")
 }
 
 model SearchedTrack {

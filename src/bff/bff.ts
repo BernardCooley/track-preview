@@ -302,20 +302,23 @@ export const deleteStoredTrack = async ({ id }: DeleteStoredTrackProps) => {
 
 interface UpdateUserAutoplayProps {
     userId: string;
-    autoplay: boolean;
+    autoplay?: boolean;
+    genre?: string;
 }
 
-export const updateUserAutoplay = async ({
+export const mutateUserProfile = async ({
     userId,
     autoplay,
-}: UpdateUserAutoplayProps): Promise<User | null> => {
+    genre,
+}: UpdateUserAutoplayProps): Promise<User> => {
     try {
         const user = await fetchWithErrorHandling(
-            "/api/updateUserAutoplay",
+            "/api/mutateUserProfile",
             "POST",
             {
                 userId,
-                autoplay: autoplay,
+                autoplay,
+                genre,
             }
         );
 

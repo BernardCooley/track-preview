@@ -1,4 +1,4 @@
-import { Button, Flex } from "@chakra-ui/react";
+import { Flex, Tag } from "@chakra-ui/react";
 import React from "react";
 import { isMobile } from "react-device-detect";
 
@@ -26,20 +26,21 @@ const FilterTags = ({
         <Flex transition="opacity 200ms">
             <Flex gap={2} w="full" flexWrap="wrap">
                 {genre && (
-                    <Button variant="filter" onClick={onGenreClick}>
+                    <Tag variant="filter" onClick={onGenreClick}>
                         {genre.toLowerCase() === "all" ? "All genres" : genre}
-                    </Button>
+                    </Tag>
                 )}
+
                 {preferredYearRange && showDates && (
-                    <Button variant="filter">
+                    <Tag variant="filter">
                         {Number(preferredYearRange?.from) === 0
                             ? "All years"
                             : `${Number(preferredYearRange?.from)} -
                          ${preferredYearRange?.to}`}
-                    </Button>
+                    </Tag>
                 )}
 
-                <Button
+                <Tag
                     onClick={onAutoPlayToggle}
                     bg={
                         preferredAutoPlay
@@ -55,6 +56,7 @@ const FilterTags = ({
                         isMobile
                             ? {}
                             : {
+                                  cursor: "pointer",
                                   bg: preferredAutoPlay
                                       ? "transparent"
                                       : "brand.primaryOpaque",
@@ -66,7 +68,7 @@ const FilterTags = ({
                     variant="filter"
                 >
                     AutoPlay
-                </Button>
+                </Tag>
             </Flex>
         </Flex>
     );

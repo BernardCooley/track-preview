@@ -2,16 +2,19 @@ import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
-    const { userId, autoplay } = await req.json();
+    const { userId, autoplay, genre } = await req.json();
+
+    const data = {
+        ...(autoplay !== undefined && { autoplay }),
+        ...(genre && { genre }),
+    };
 
     try {
         const updateUser = await prisma?.user.update({
             where: {
                 id: userId,
             },
-            data: {
-                autoplay,
-            },
+            data,
         });
 
         const response = NextResponse.json(updateUser, {
@@ -23,7 +26,7 @@ export async function POST(req: Request) {
         console.log(error);
 
         return NextResponse.json(
-            { error: "Failed to update user's autoplay" },
+            { error: "Failed to update user's profile" },
             {
                 status: 500,
             }

@@ -1,12 +1,13 @@
-import { Button, Divider, Flex, IconButton, Text } from "@chakra-ui/react";
+import { Divider, Flex, IconButton, Tag, Text } from "@chakra-ui/react";
 import React from "react";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import { isMobile } from "react-device-detect";
 
 interface Props {
     genres: string[];
     selectedGenre: string;
     onGenreSelect: (genre: string) => void;
-    favouriteGenres?: string[];
+    recentGenres?: string[];
     onFavouriteClearClick?: () => void;
 }
 
@@ -14,7 +15,7 @@ const GenreSelector = ({
     genres,
     selectedGenre,
     onGenreSelect,
-    favouriteGenres,
+    recentGenres,
     onFavouriteClearClick,
 }: Props) => {
     return (
@@ -22,7 +23,7 @@ const GenreSelector = ({
             <Text fontSize="xl" textAlign="center">
                 Select Genre
             </Text>
-            {favouriteGenres && favouriteGenres.length > 0 && (
+            {recentGenres && recentGenres.length > 0 && (
                 <Flex
                     direction="column"
                     border="1px solid"
@@ -47,19 +48,44 @@ const GenreSelector = ({
                             bg: "brand.textPrimary",
                         }}
                     />
-                    <Text>Favourites</Text>
+                    <Text>Recent</Text>
                     <Flex flexWrap="wrap" gap={4}>
-                        {favouriteGenres.map((genre) => (
-                            <Button
+                        {recentGenres.map((genre) => (
+                            <Tag
+                                padding={2}
                                 onClick={() => onGenreSelect(genre)}
-                                isActive={selectedGenre === genre}
+                                bg={
+                                    selectedGenre === genre
+                                        ? "brand.primaryOpaque"
+                                        : "transparent"
+                                }
+                                borderColor={
+                                    selectedGenre === genre
+                                        ? "brand.primaryLight"
+                                        : "brand.primaryOpaque"
+                                }
+                                _hover={
+                                    isMobile
+                                        ? {}
+                                        : {
+                                              cursor: "pointer",
+                                              bg:
+                                                  selectedGenre === genre
+                                                      ? "transparent"
+                                                      : "brand.primaryOpaque",
+                                              borderColor:
+                                                  selectedGenre === genre
+                                                      ? "brand.primaryOpaque"
+                                                      : "brand.primaryLight",
+                                          }
+                                }
                                 variant="filter"
                                 key={genre}
                                 size="xs"
-                                fontSize="14px"
+                                fontSize="12px"
                             >
                                 {genre}
-                            </Button>
+                            </Tag>
                         ))}
                     </Flex>
                 </Flex>
@@ -67,14 +93,40 @@ const GenreSelector = ({
             <Divider orientation="horizontal" />
             <Flex flexWrap="wrap" h="300px" overflow="scroll" gap={4}>
                 {genres.sort().map((genre, index) => (
-                    <Button
+                    <Tag
                         onClick={() => onGenreSelect(genre)}
-                        isActive={selectedGenre === genre}
+                        bg={
+                            selectedGenre === genre
+                                ? "brand.primaryOpaque"
+                                : "transparent"
+                        }
+                        borderColor={
+                            selectedGenre === genre
+                                ? "brand.primaryLight"
+                                : "brand.primaryOpaque"
+                        }
+                        _hover={
+                            isMobile
+                                ? {}
+                                : {
+                                      cursor: "pointer",
+                                      bg:
+                                          selectedGenre === genre
+                                              ? "transparent"
+                                              : "brand.primaryOpaque",
+                                      borderColor:
+                                          selectedGenre === genre
+                                              ? "brand.primaryOpaque"
+                                              : "brand.primaryLight",
+                                  }
+                        }
                         variant="filter"
                         key={genre}
+                        size="xs"
+                        fontSize="14px"
                     >
                         {genre}
-                    </Button>
+                    </Tag>
                 ))}
             </Flex>
         </Flex>

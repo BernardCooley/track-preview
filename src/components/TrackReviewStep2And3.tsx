@@ -15,7 +15,7 @@ import FilterTags from "./FilterTags";
 import {
     fetchUserTracks,
     updateTrackReviewStep,
-    updateUserAutoplay,
+    mutateUserProfile,
 } from "@/bff/bff";
 
 interface Props {
@@ -183,7 +183,7 @@ const TrackReviewStep2And3 = ({ reviewStep }: Props) => {
                     {tracks && tracks.length > 0 && user?.uid && (
                         <FilterTags
                             onAutoPlayToggle={async () => {
-                                const newProfile = await updateUserAutoplay({
+                                const newProfile = await mutateUserProfile({
                                     userId: user.uid,
                                     autoplay: !autoplay,
                                 });
