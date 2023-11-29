@@ -5,7 +5,7 @@ import { getCurrentYear } from "../../utils";
 
 interface Props {
     genre?: string;
-    yearRange: {
+    yearRange?: {
         from: number;
         to: number;
     };
