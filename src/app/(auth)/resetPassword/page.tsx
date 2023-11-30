@@ -57,7 +57,6 @@ const PasswordReset = ({}: Props) => {
             backgroundSize="90%"
             backgroundRepeat="no-repeat"
             backgroundPosition="center 300px"
-            padding={4}
             height="100vh"
         >
             <IconButton
@@ -82,12 +81,16 @@ const PasswordReset = ({}: Props) => {
             <Text
                 py={10}
                 textAlign="center"
-                fontSize={["3xl", "6xl"]}
+                fontSize={["3xl", "4xl", "5xl", "6xl"]}
                 fontFamily="brand"
             >
                 PHONIQUEST
             </Text>
-            <Flex direction="column" w={["100%", "100%", "70%", "60%"]}>
+            <Flex
+                direction="column"
+                w={["100%", "100%", "70%", "60%"]}
+                padding={4}
+            >
                 <form
                     onSubmit={handleSubmit(performPasswordReset)}
                     style={{ height: "100%" }}

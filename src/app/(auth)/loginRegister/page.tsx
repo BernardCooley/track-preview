@@ -76,7 +76,7 @@ const AuthPage = () => {
             <Text
                 py={10}
                 textAlign="center"
-                fontSize={["3xl", "6xl"]}
+                fontSize={["3xl", "4xl", "5xl", "6xl"]}
                 fontFamily="brand"
             >
                 PHONIQUEST
