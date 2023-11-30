@@ -79,6 +79,17 @@ export const theme = extendTheme({
                     },
                     color: "brand.error",
                 },
+                warning: {
+                    border: "1px solid",
+                    borderColor: "transparent",
+                    backgroundColor: "brand.error",
+                    _hover: {
+                        shadow: "xl",
+                        border: "1px solid",
+                        borderColor: "brand.error",
+                    },
+                    color: "brand.textPrimary",
+                },
             },
         },
         Input: {

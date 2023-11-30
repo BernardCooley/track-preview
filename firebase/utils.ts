@@ -7,7 +7,7 @@ import {
     sendPasswordResetEmail,
 } from "firebase/auth";
 import { auth } from "./firebaseInit";
-import { createUser } from "@/bff/bff";
+import { createUser, deleteUserProfile } from "@/bff/bff";
 
 export const LoginUser = async (
     email: string,
@@ -59,6 +59,22 @@ export const RegisterUser = async (
 export const ResetPassword = async (email: string) => {
     try {
         await sendPasswordResetEmail(auth, email);
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const DeleteUser = async () => {
+    try {
+        const user = auth.currentUser;
+        await user?.delete();
+
+        if (user) {
+            await deleteUserProfile({
+                userId: user?.uid,
+            });
+        }
     } catch (error) {
         console.error(error);
         throw error;

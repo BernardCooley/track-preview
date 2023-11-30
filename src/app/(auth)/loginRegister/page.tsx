@@ -21,6 +21,7 @@ const AuthPage = () => {
     const searchParams = useSearchParams();
     const pathname = usePathname();
     const isPasswordReset = searchParams.get("passwordReset");
+    const isAccountDeleted = searchParams.get("accountDeleted");
     const toast = useToast();
     const id = "passwordResetToast";
 
@@ -49,7 +50,19 @@ const AuthPage = () => {
             });
             router.push(pathname);
         }
-    });
+    }, [isPasswordReset]);
+
+    useEffect(() => {
+        if (isAccountDeleted) {
+            showToast({
+                status: "success",
+                title: "Account deleted",
+                description:
+                    "Your account has been deleted. We are sorry to see you go.",
+            });
+            router.push(pathname);
+        }
+    }, [isAccountDeleted]);
 
     const Container = ({ children }: { children: React.ReactNode }) => {
         return (

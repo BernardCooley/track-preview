@@ -355,3 +355,25 @@ export const getUserProfile = async ({
         throw error;
     }
 };
+
+interface DeleteUserProps {
+    userId: string;
+}
+
+export const deleteUserProfile = async ({
+    userId,
+}: DeleteUserProps): Promise<User | null> => {
+    try {
+        const user = await fetchWithErrorHandling(
+            "/api/deleteUserProfile",
+            "POST",
+            {
+                userId,
+            }
+        );
+
+        return user as User;
+    } catch (error) {
+        throw error;
+    }
+};

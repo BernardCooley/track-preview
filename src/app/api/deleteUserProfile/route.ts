@@ -5,14 +5,13 @@ export async function POST(req: Request) {
     const { userId } = await req.json();
 
     try {
-        const user = await prisma?.user.create({
-            data: {
+        const deleteUsers = await prisma?.user.delete({
+            where: {
                 id: userId,
-                firebaseId: userId,
             },
         });
 
-        const response = NextResponse.json(user, {
+        const response = NextResponse.json(deleteUsers, {
             status: 200,
         });
 
@@ -20,7 +19,7 @@ export async function POST(req: Request) {
     } catch (error) {
         console.error(error);
         return NextResponse.json(
-            { error: "Failed to create user" },
+            { error: "Failed to delete user" },
             {
                 status: 500,
             }
