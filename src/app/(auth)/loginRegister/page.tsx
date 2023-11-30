@@ -70,7 +70,8 @@ const AuthPage = () => {
             backgroundImage={"url(/logo_background_4x.png)"}
             backgroundSize="90%"
             backgroundRepeat="no-repeat"
-            backgroundPosition="center 25%"
+            backgroundPosition="center 300px"
+            height="100vh"
         >
             <Text
                 py={10}
