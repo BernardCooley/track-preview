@@ -13,6 +13,8 @@ import {
     Flex,
     FormErrorMessage,
     IconButton,
+    Link,
+    Text,
 } from "@chakra-ui/react";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -117,6 +119,15 @@ const SignIn = () => {
                         >
                             Sign In
                         </Button>
+                        <Flex gap={2}>
+                            <Link
+                                href="/resetPassword"
+                                variant="link"
+                                colorScheme="primary"
+                            >
+                                <Text>Forgot password</Text>
+                            </Link>
+                        </Flex>
                     </Flex>
                 </Flex>
             </form>

@@ -8,12 +8,49 @@ import {
     TabPanels,
     Tabs,
     Text,
+    ToastProps,
+    useToast,
 } from "@chakra-ui/react";
-import React from "react";
-import SignIn from "../signin/page";
-import SignUp from "../signup/page";
+import React, { useCallback, useEffect } from "react";
+import SignIn from "../../signin/page";
+import SignUp from "../../signup/page";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 const AuthPage = () => {
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const pathname = usePathname();
+    const isPasswordReset = searchParams.get("passwordReset");
+    const toast = useToast();
+    const id = "passwordResetToast";
+
+    const showToast = useCallback(
+        ({ status, title, description }: ToastProps) => {
+            if (!toast.isActive(id)) {
+                toast({
+                    id,
+                    title: title || "An error has occured.",
+                    description: description || "Please try again later.",
+                    status: status,
+                    duration: 5000,
+                    isClosable: true,
+                });
+            }
+        },
+        [toast]
+    );
+
+    useEffect(() => {
+        if (isPasswordReset) {
+            showToast({
+                status: "success",
+                title: "Password reset",
+                description: "Please check your email to reset your password.",
+            });
+            router.push(pathname);
+        }
+    });
+
     const Container = ({ children }: { children: React.ReactNode }) => {
         return (
             <Flex

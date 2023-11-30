@@ -4,6 +4,7 @@ import {
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
     signOut,
+    sendPasswordResetEmail,
 } from "firebase/auth";
 import { auth } from "./firebaseInit";
 import { createUser } from "@/bff/bff";
@@ -25,7 +26,7 @@ export const LoginUser = async (
 export const LogOut = async (router: AppRouterInstance) => {
     try {
         await signOut(auth);
-        router.push("/auth");
+        router.push("/loginRegister");
     } catch (error) {
         console.error(error);
         throw error;
@@ -49,6 +50,15 @@ export const RegisterUser = async (
         });
 
         router.push("/");
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const ResetPassword = async (email: string) => {
+    try {
+        await sendPasswordResetEmail(auth, email);
     } catch (error) {
         console.error(error);
         throw error;

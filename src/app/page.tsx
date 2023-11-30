@@ -40,7 +40,7 @@ export default function Home() {
                 updateUser({ email: user.email, uid: user.uid });
                 return router.push(`/?reviewStep=${reviewStep || 1}`);
             } else {
-                return router.push("/auth");
+                return router.push("/loginRegister");
             }
         });
     }, [router]);
