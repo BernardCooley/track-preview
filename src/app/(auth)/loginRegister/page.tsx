@@ -82,7 +82,7 @@ const AuthPage = () => {
                 PHONIQUEST
             </Text>
             <Tabs isFitted variant="solid-rounded" colorScheme="primary">
-                <TabList>
+                <TabList px={10} gap={2}>
                     <Tab>Sign in</Tab>
                     <Tab>Register</Tab>
                 </TabList>
