@@ -57,6 +57,7 @@ const PasswordReset = ({}: Props) => {
             backgroundSize="90%"
             backgroundRepeat="no-repeat"
             backgroundPosition="center 25%"
+            padding={4}
         >
             <IconButton
                 _hover={{
