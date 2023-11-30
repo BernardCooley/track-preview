@@ -97,6 +97,16 @@ const SignUp = () => {
                             error={errors.password?.message}
                             rightIcon={
                                 <IconButton
+                                    _hover={{
+                                        bg: "transparent",
+                                        color: "brand.primary",
+                                        transform: "scale(1.2)",
+                                    }}
+                                    shadow="lg"
+                                    height="30px"
+                                    position="absolute"
+                                    right={2}
+                                    top={8}
                                     onClick={() =>
                                         setShowPassword((prev) => !prev)
                                     }
@@ -124,6 +134,16 @@ const SignUp = () => {
                             error={errors.confirmPassword?.message}
                             rightIcon={
                                 <IconButton
+                                    _hover={{
+                                        bg: "transparent",
+                                        color: "brand.primary",
+                                        transform: "scale(1.2)",
+                                    }}
+                                    shadow="lg"
+                                    height="30px"
+                                    position="absolute"
+                                    right={2}
+                                    top={8}
                                     onClick={() =>
                                         setShowPassword((prev) => !prev)
                                     }

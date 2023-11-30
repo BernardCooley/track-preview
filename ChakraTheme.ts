@@ -95,6 +95,9 @@ export const theme = extendTheme({
                             shadow: "xl",
                             borderColor: "brand.primary",
                         },
+                        _invalid: {
+                            borderColor: "brand.error",
+                        },
                     },
                 },
             },
