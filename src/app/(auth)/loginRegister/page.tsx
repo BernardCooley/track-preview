@@ -72,7 +72,12 @@ const AuthPage = () => {
             backgroundRepeat="no-repeat"
             backgroundPosition="center 25%"
         >
-            <Text py={10} textAlign="center" fontSize="6xl" fontFamily="brand">
+            <Text
+                py={10}
+                textAlign="center"
+                fontSize={["3xl", "6xl"]}
+                fontFamily="brand"
+            >
                 PHONIQUEST
             </Text>
             <Tabs isFitted variant="solid-rounded" colorScheme="primary">

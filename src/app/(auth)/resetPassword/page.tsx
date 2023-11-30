@@ -77,7 +77,12 @@ const PasswordReset = ({}: Props) => {
                 fontSize="3xl"
                 icon={<ArrowBackIosNewIcon fontSize="inherit" />}
             />
-            <Text py={10} textAlign="center" fontSize="6xl" fontFamily="brand">
+            <Text
+                py={10}
+                textAlign="center"
+                fontSize={["3xl", "6xl"]}
+                fontFamily="brand"
+            >
                 PHONIQUEST
             </Text>
             <Flex direction="column" w={["100%", "100%", "70%", "60%"]}>
