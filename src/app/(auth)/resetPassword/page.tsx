@@ -105,6 +105,7 @@ const PasswordReset = ({}: Props) => {
                     >
                         <Flex direction="column" gap={8}>
                             <TextInput
+                                helperText="Please enter your email address and we will send you a link to reset your password."
                                 required={true}
                                 title="Email"
                                 size="md"
