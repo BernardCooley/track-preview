@@ -41,3 +41,7 @@ next-env.d.ts
 
 # prisma
 /src/prisma/migrations
+
+# amplify
+.amplify
+amplifyconfiguration*
