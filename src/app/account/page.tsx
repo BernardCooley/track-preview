@@ -98,6 +98,9 @@ const Settings = ({}: Props) => {
                     Log out
                 </Button>
                 <Button
+                    position="absolute"
+                    bottom={8}
+                    right={8}
                     colorScheme="teal"
                     size="sm"
                     type="button"
