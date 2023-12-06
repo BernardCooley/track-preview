@@ -12,8 +12,8 @@ import {
     useToast,
 } from "@chakra-ui/react";
 import React, { useCallback, useEffect } from "react";
-import SignIn from "../../signin/page";
 import SignUp from "../../signup/page";
+import SignIn from "../../signin/page";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 const AuthPage = () => {
