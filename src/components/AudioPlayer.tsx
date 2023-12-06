@@ -1,6 +1,6 @@
 import React, { forwardRef } from "react";
-import { useTrackContext } from "../../context/TrackContext";
 import { Box } from "@chakra-ui/react";
+import { useTrackContext } from "../../context/TrackContext";
 
 const AudioPlayer = forwardRef<HTMLAudioElement>((props, ref) => {
     const { currentlyPlaying } = useTrackContext();
