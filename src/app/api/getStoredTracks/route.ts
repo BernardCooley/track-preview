@@ -37,11 +37,11 @@ export async function POST(req: Request) {
         });
 
         return response;
-    } catch (error) {
+    } catch (error: any) {
         console.error(error);
 
         return NextResponse.json(
-            { error: "Failed to get data" },
+            { error: error},
             {
                 status: 500,
             }
