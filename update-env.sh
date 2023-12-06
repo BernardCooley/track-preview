@@ -1,0 +1,1 @@
+echo "DATABASE_URL=$(aws ssm get-parameter --name 'phoniquest-test-database-url' --with-decryption | jq '.Parameter.Value')" >> .env
