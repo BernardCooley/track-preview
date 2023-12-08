@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -15,6 +15,8 @@ import {
     IconButton,
     Link,
     Text,
+    ToastProps,
+    useToast,
 } from "@chakra-ui/react";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -36,6 +38,24 @@ const SignIn = () => {
     const [submitting, setSubmitting] = useState(false);
     const router = useRouter();
     const [authError, setAuthError] = useState<string | null>(null);
+    const toast = useToast();
+    const id = "loginToast";
+
+    const showToast = useCallback(
+        ({ status, title, description }: ToastProps) => {
+            if (!toast.isActive(id)) {
+                toast({
+                    id,
+                    title: title || "An error has occured.",
+                    description: description || "Please try again later.",
+                    status: status,
+                    duration: 5000,
+                    isClosable: true,
+                });
+            }
+        },
+        [toast]
+    );
 
     const {
         register,
@@ -52,9 +72,27 @@ const SignIn = () => {
     const performLogin = async (formData: FormData) => {
         setSubmitting(true);
         try {
-            LoginUser(formData.email, formData.password, router);
+            const user = await LoginUser(formData.email, formData.password);
+
+            if (user?.user.emailVerified) {
+                router.push("/");
+            } else {
+                showToast({
+                    status: "error",
+                    title: "Email not verified",
+                    description:
+                        "Please check your email to verify your account.",
+                });
+            }
+            setSubmitting(false);
             setAuthError(null);
         } catch (error) {
+            showToast({
+                title: "Error signing in.",
+                description:
+                    "Please check your email and password and try again.",
+                status: "error",
+            });
             // TODO error not being thrown or caught - FIX
             setAuthError(
                 "Error signing in. Please check your email and password and try again."

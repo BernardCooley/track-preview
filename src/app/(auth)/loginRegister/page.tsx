@@ -20,10 +20,11 @@ const AuthPage = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
     const pathname = usePathname();
+    const isLogin = searchParams.get("login");
     const isPasswordReset = searchParams.get("passwordReset");
     const isAccountDeleted = searchParams.get("accountDeleted");
     const toast = useToast();
-    const id = "passwordResetToast";
+    const id = "loginRegisterToast";
 
     const showToast = useCallback(
         ({ status, title, description }: ToastProps) => {
@@ -94,7 +95,19 @@ const AuthPage = () => {
             >
                 PHONIQUEST
             </Text>
-            <Tabs isFitted variant="solid-rounded" colorScheme="primary">
+            <Tabs
+                onChange={(index) => {
+                    if (index === 0) {
+                        router.push("/loginRegister?login=true");
+                    } else {
+                        router.push("/loginRegister");
+                    }
+                }}
+                index={isLogin ? 0 : 1}
+                isFitted
+                variant="solid-rounded"
+                colorScheme="primary"
+            >
                 <TabList px={[10, 16, 60, 80]} gap={2}>
                     <Tab>Sign in</Tab>
                     <Tab>Register</Tab>

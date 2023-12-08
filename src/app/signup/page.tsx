@@ -1,11 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ZodType, z } from "zod";
-import { RegisterUser } from "../../../firebase/utils";
+import { RegisterUser, SendVerificationEmail } from "../../../firebase/utils";
 import { TextInput } from "@/components/TextInput";
 import {
     Box,
@@ -13,9 +13,12 @@ import {
     Flex,
     FormErrorMessage,
     IconButton,
+    ToastProps,
+    useToast,
 } from "@chakra-ui/react";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import { UserCredential } from "firebase/auth";
 
 interface FormData {
     email: string;
@@ -43,6 +46,24 @@ const SignUp = () => {
     const [submitting, setSubmitting] = useState(false);
     const router = useRouter();
     const [authError, setAuthError] = useState<string | null>(null);
+    const toast = useToast();
+    const id = "registerToast";
+
+    const showToast = useCallback(
+        ({ status, title, description }: ToastProps) => {
+            if (!toast.isActive(id)) {
+                toast({
+                    id,
+                    title: title || "An error has occured.",
+                    description: description || "Please try again later.",
+                    status: status,
+                    duration: 5000,
+                    isClosable: true,
+                });
+            }
+        },
+        [toast]
+    );
 
     const {
         register,
@@ -59,15 +80,45 @@ const SignUp = () => {
 
     const performRegister = async (formData: FormData) => {
         setSubmitting(true);
+        let newUser: UserCredential | null = null;
+
         try {
-            RegisterUser(formData.email, formData.password, router);
-            setAuthError(null);
+            newUser = await RegisterUser(formData.email, formData.password);
         } catch (error) {
+            showToast({
+                title: "Error registering.",
+                description:
+                    "Please check your email and password and try again.",
+                status: "error",
+            });
             // TODO error not being thrown or caught - FIX
             setAuthError(
                 "Error registering. Please check your email and password and try again."
             );
         }
+
+        if (newUser) {
+            try {
+                await SendVerificationEmail(newUser.user);
+
+                showToast({
+                    title: "Verification email sent.",
+                    description: "Please check your inbox.",
+                    status: "info",
+                });
+
+                router.push("/loginRegister?login=true");
+                setAuthError(null);
+            } catch (error) {
+                showToast({
+                    title: "Error sending verification email.",
+                    description:
+                        "Please check your email and password and try again.",
+                    status: "error",
+                });
+            }
+        }
+        setSubmitting(false);
     };
 
     return (

@@ -5,18 +5,20 @@ import {
     signInWithEmailAndPassword,
     signOut,
     sendPasswordResetEmail,
+    sendEmailVerification,
+    User,
+    UserCredential,
 } from "firebase/auth";
 import { auth } from "./firebaseInit";
 import { createUser, deleteUserProfile } from "@/bff/bff";
 
 export const LoginUser = async (
     email: string,
-    password: string,
-    router: AppRouterInstance
-) => {
+    password: string
+): Promise<UserCredential | null> => {
     try {
-        await signInWithEmailAndPassword(auth, email, password);
-        router.push("/");
+        const user = await signInWithEmailAndPassword(auth, email, password);
+        return user;
     } catch (error) {
         console.error(error);
         throw error;
@@ -35,9 +37,8 @@ export const LogOut = async (router: AppRouterInstance) => {
 
 export const RegisterUser = async (
     email: string,
-    password: string,
-    router: AppRouterInstance
-) => {
+    password: string
+): Promise<UserCredential | null> => {
     try {
         const user = await createUserWithEmailAndPassword(
             auth,
@@ -49,7 +50,7 @@ export const RegisterUser = async (
             userId: user.user.uid,
         });
 
-        router.push("/");
+        return user;
     } catch (error) {
         console.error(error);
         throw error;
@@ -77,6 +78,14 @@ export const DeleteUser = async () => {
         }
     } catch (error) {
         console.error(error);
+        throw error;
+    }
+};
+
+export const SendVerificationEmail = async (user: User) => {
+    try {
+        await sendEmailVerification(user);
+    } catch (error) {
         throw error;
     }
 };
