@@ -32,6 +32,7 @@ interface Props {
     styles?: CSSProperties;
     type?: string;
     variant?: string;
+    isReadOnly?: boolean;
 }
 
 export const TextInput = forwardRef(
@@ -50,6 +51,7 @@ export const TextInput = forwardRef(
             styles = {},
             type = "text",
             variant = "primary",
+            isReadOnly = false,
         }: Props,
         ref: LegacyRef<HTMLInputElement>
     ) => {
@@ -78,6 +80,7 @@ export const TextInput = forwardRef(
                         <InputLeftElement>{leftIcon}</InputLeftElement>
                     )}
                     <Input
+                        isReadOnly={isReadOnly}
                         variant={variant}
                         ref={ref}
                         type={type}

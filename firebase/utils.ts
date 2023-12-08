@@ -8,6 +8,8 @@ import {
     sendEmailVerification,
     User,
     UserCredential,
+    getAuth,
+    updateEmail,
 } from "firebase/auth";
 import { auth } from "./firebaseInit";
 import { createUser, deleteUserProfile } from "@/bff/bff";
@@ -25,10 +27,13 @@ export const LoginUser = async (
     }
 };
 
-export const LogOut = async (router: AppRouterInstance) => {
+export const LogOut = async (
+    router: AppRouterInstance,
+    redirect: string = "/loginRegister"
+) => {
     try {
         await signOut(auth);
-        router.push("/loginRegister");
+        router.push(redirect);
     } catch (error) {
         console.error(error);
         throw error;
@@ -86,6 +91,30 @@ export const SendVerificationEmail = async (user: User) => {
     try {
         await sendEmailVerification(user);
     } catch (error) {
+        throw error;
+    }
+};
+
+export const GetCurrentUser = async (): Promise<User | null> => {
+    try {
+        const auth = getAuth();
+
+        if (auth) {
+            return auth.currentUser;
+        }
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+
+    return null;
+};
+
+export const UpdateUserEmail = async (email: string, user: User) => {
+    try {
+        await updateEmail(user, email);
+    } catch (error: any) {
+        console.error(error);
         throw error;
     }
 };

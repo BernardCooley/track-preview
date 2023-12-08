@@ -21,6 +21,7 @@ const AuthPage = () => {
     const searchParams = useSearchParams();
     const pathname = usePathname();
     const isLogin = searchParams.get("login");
+    const isAttemptingAccountEdit = searchParams.get("isAttemptingAccountEdit");
     const isPasswordReset = searchParams.get("passwordReset");
     const isAccountDeleted = searchParams.get("accountDeleted");
     const toast = useToast();
@@ -116,7 +117,11 @@ const AuthPage = () => {
                 <TabPanels>
                     <TabPanel>
                         <Container>
-                            <SignIn />
+                            <SignIn
+                                isAttemptingAccountEdit={
+                                    isAttemptingAccountEdit
+                                }
+                            />
                         </Container>
                     </TabPanel>
                     <TabPanel>

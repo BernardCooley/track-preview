@@ -30,7 +30,7 @@
         "deezer-public-api": "1.0.4",
         "eslint": "8.48.0",
         "eslint-config-next": "13.4.19",
-        "firebase": "10.3.0",
+        "firebase": "10.6.0",
         "framer-motion": "10.16.1",
         "next": "13.4.19",
         "node-fetch": "^3.3.2",

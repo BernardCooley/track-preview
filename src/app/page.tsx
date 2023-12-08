@@ -14,6 +14,7 @@ import TrackReviewStep2And3 from "@/components/TrackReviewStep2And3";
 import TrackList from "@/components/TrackList";
 import Header from "@/components/Header";
 import { getUserProfile } from "@/bff/bff";
+import { GetCurrentUser } from "../../firebase/utils";
 
 export default function Home() {
     const router = useRouter();
@@ -34,7 +35,11 @@ export default function Home() {
         }
     }, [user]);
 
-    const isUserLoggedIn = useCallback(() => {
+    const isUserLoggedIn = useCallback(async () => {
+        const user = await GetCurrentUser();
+        if (user?.email && user?.uid) {
+            updateUser({ email: user.email, uid: user.uid });
+        }
         onAuthStateChanged(auth, (user) => {
             if (user && user.email && user.uid) {
                 updateUser({ email: user.email, uid: user.uid });

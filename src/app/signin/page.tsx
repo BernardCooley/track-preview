@@ -21,6 +21,10 @@ import {
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 
+interface Props {
+    isAttemptingAccountEdit: string | null;
+}
+
 interface FormData {
     email: string;
     password: string;
@@ -33,7 +37,7 @@ const schema: ZodType<FormData> = z.object({
         .min(6, { message: "Password must be 6 characters or more." }),
 });
 
-const SignIn = () => {
+const SignIn = ({ isAttemptingAccountEdit = "false" }: Props) => {
     const [showPassword, setShowPassword] = useState<boolean>(false);
     const [submitting, setSubmitting] = useState(false);
     const router = useRouter();
@@ -75,7 +79,11 @@ const SignIn = () => {
             const user = await LoginUser(formData.email, formData.password);
 
             if (user?.user.emailVerified) {
-                router.push("/");
+                if (isAttemptingAccountEdit === "true") {
+                    router.push("/account");
+                } else {
+                    router.push("/");
+                }
             } else {
                 showToast({
                     status: "error",
@@ -93,6 +101,11 @@ const SignIn = () => {
                     "Please check your email and password and try again.",
                 status: "error",
             });
+
+            setTimeout(() => {
+                setSubmitting(false);
+            }, 5000);
+
             // TODO error not being thrown or caught - FIX
             setAuthError(
                 "Error signing in. Please check your email and password and try again."
