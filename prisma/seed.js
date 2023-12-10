@@ -4,7 +4,8 @@ const fs = require("fs");
 const path = require("path");
 
 async function main() {
-    const dir = "./juno_scraped_tracks/uploaded";
+    // const dir = "./juno_scraped_tracks/uploaded";
+    const dir = "./juno_scraped_tracks/to_upload";
 
     fs.readdir(dir, (err, files) => {
         files.map(async (file) => {
