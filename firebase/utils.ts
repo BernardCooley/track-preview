@@ -10,6 +10,7 @@ import {
     UserCredential,
     getAuth,
     updateEmail,
+    updatePassword,
 } from "firebase/auth";
 import { auth } from "./firebaseInit";
 import { createUser, deleteUserProfile } from "@/bff/bff";
@@ -113,6 +114,15 @@ export const GetCurrentUser = async (): Promise<User | null> => {
 export const UpdateUserEmail = async (email: string, user: User) => {
     try {
         await updateEmail(user, email);
+    } catch (error: any) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const UpdateUserPassword = async (password: string, user: User) => {
+    try {
+        await updatePassword(user, password);
     } catch (error: any) {
         console.error(error);
         throw error;

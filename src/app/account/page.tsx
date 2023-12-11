@@ -6,7 +6,6 @@ import {
     AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogOverlay,
-    Box,
     Button,
     Flex,
     Heading,
@@ -22,6 +21,7 @@ import {
     LogOut,
     SendVerificationEmail,
     UpdateUserEmail,
+    UpdateUserPassword,
 } from "../../../firebase/utils";
 import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
@@ -36,21 +36,28 @@ import { auth } from "../../../firebase/firebaseInit";
 import { User } from "../../../types";
 import CloseIcon from "@mui/icons-material/Close";
 import { TextInput } from "@/components/TextInput";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 
 const Settings = () => {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const cancelRef = useRef<HTMLButtonElement>(null);
     const router = useRouter();
     const [editingEmail, setEditingEmail] = useState<boolean>(false);
+    const [editingPassword, setEditingPassword] = useState<boolean>(false);
     const [emailTouched, setEmailTouched] = useState<boolean>(false);
+    const [passwordTouched, setPasswordTouched] = useState<boolean>(false);
     const [user, setUser] = useState<User | null>(null);
     const [newEmail, setNewEmail] = useState<string>("");
+    const [newPassword, setNewPassword] = useState<string>("");
     const [errors, setErrors] = useState<{
         email: string;
-    }>({ email: "" });
+        password: string;
+    }>({ email: "", password: "" });
     const toast = useToast();
     const id = "accountToast";
     const [userAccount, setUserAccount] = useState<UserAccount | null>(null);
+    const [showPassword, setShowPassword] = useState<boolean>(false);
 
     const showToast = useCallback(
         ({ status, title, description, duration }: ToastProps) => {
@@ -118,7 +125,7 @@ const Settings = () => {
                 if (error.code === "auth/requires-recent-login") {
                     showToast({
                         title: "Please log in again to make changes to your account.",
-                        description: "Redirecting you to the login page.",
+                        description: "Redirecting you to the login page...",
                         status: "info",
                     });
                     setTimeout(() => {
@@ -137,69 +144,131 @@ const Settings = () => {
         }
     };
 
-    const EmailIcon = (): JSX.Element => {
-        const BaseIcon = (
-            onClick: () => void,
-            icon: JSX.Element,
-            isDisabled?: boolean
-        ) => (
-            <IconButton
-                isDisabled={isDisabled || false}
-                _hover={{
-                    bg: "transparent",
-                    color: "brand.primary",
-                    transform: "scale(1.2)",
-                }}
-                shadow="lg"
-                height="30px"
-                onClick={onClick}
-                variant="ghost"
-                h={1 / 2}
-                colorScheme="teal"
-                aria-label="Show password"
-                fontSize="3xl"
-                icon={icon}
-            />
-        );
+    const updatePassword = async (newPassword: string) => {
+        if (userAccount) {
+            try {
+                await UpdateUserPassword(newPassword, userAccount);
 
-        let icon = BaseIcon(() => {
-            setEditingEmail(true);
-        }, <EditIcon fontSize="inherit" />);
+                showToast({
+                    title: "Password updated.",
+                    description:
+                        "Your password has been updated. Please log in again with your new password.",
+                    status: "success",
+                });
 
-        if (editingEmail) {
-            icon = (
-                <Flex
-                    direction="column"
-                    justifyContent={emailTouched ? "space-between" : "center"}
-                    h="60px"
-                >
-                    <Box>
-                        {emailTouched &&
-                            BaseIcon(
-                                () => {
-                                    updateEmailAddress(newEmail);
-                                    setEditingEmail((prev) => !prev);
-                                },
-                                <SaveIcon fontSize="inherit" />,
-                                errors.email !== ""
-                            )}
-                    </Box>
-                    <Box>
-                        {BaseIcon(() => {
-                            resetEmailState();
-                        }, <CloseIcon fontSize="inherit" />)}
-                    </Box>
-                </Flex>
-            );
+                setTimeout(async () => {
+                    await LogOut(router, "/loginRegister?login=true");
+                }, 5000);
+            } catch (error: any) {
+                if (error.code === "auth/requires-recent-login") {
+                    showToast({
+                        title: "Please log in again to make changes to your account.",
+                        description: "Redirecting you to the login page...",
+                        status: "info",
+                    });
+                    setTimeout(() => {
+                        router.push(
+                            "/loginRegister?login=true&isAttemptingAccountEdit=true"
+                        );
+                    }, 5000);
+                } else {
+                    showToast({
+                        title: "Error updating email.",
+                        description: "Please try again later.",
+                        status: "error",
+                    });
+                }
+            }
         }
-
-        return icon;
     };
 
     const resetEmailState = () => {
         setEmailTouched(false);
         setEditingEmail(false);
         setErrors((prev) => ({ ...prev, email: "" }));
+    };
+
+    const resetPasswordState = () => {
+        setPasswordTouched(false);
+        setEditingPassword(false);
+        setErrors((prev) => ({ ...prev, password: "" }));
+    };
+
+    interface FieldIconsProps {
+        isEditing: boolean;
+        touched: boolean;
+        isErrors: boolean;
+        onSaveClick: () => void;
+        onEditClick: () => void;
+        onCancelClick: () => void;
+    }
+
+    const FieldIcons = ({
+        isEditing,
+        touched,
+        isErrors,
+        onSaveClick,
+        onEditClick,
+        onCancelClick,
+    }: FieldIconsProps) => {
+        return (
+            <Flex
+                direction="column"
+                h="40px"
+                justifyContent={
+                    touched && !isErrors ? "space-between" : "center"
+                }
+            >
+                <IconButton
+                    _hover={{
+                        bg: "transparent",
+                        color: "brand.primary",
+                        transform: "scale(1.2)",
+                    }}
+                    shadow="lg"
+                    height="30px"
+                    onClick={onSaveClick}
+                    variant="ghost"
+                    h={1 / 2}
+                    colorScheme="teal"
+                    aria-label="Show password"
+                    fontSize="3xl"
+                    icon={
+                        touched && !isErrors ? (
+                            <SaveIcon fontSize="inherit" />
+                        ) : undefined
+                    }
+                />
+                <IconButton
+                    _hover={{
+                        bg: "transparent",
+                        color: "brand.primary",
+                        transform: "scale(1.2)",
+                    }}
+                    shadow="lg"
+                    height="30px"
+                    onClick={() => {
+                        if (!isEditing) {
+                            onEditClick();
+                        } else {
+                            onCancelClick();
+                        }
+                    }}
+                    variant="ghost"
+                    h={1 / 2}
+                    colorScheme="teal"
+                    aria-label="Show password"
+                    fontSize="3xl"
+                    icon={
+                        !isEditing ? (
+                            <EditIcon fontSize="inherit" />
+                        ) : (
+                            <CloseIcon fontSize="inherit" />
+                        )
+                    }
+                />
+            </Flex>
+        );
     };
 
     return (
@@ -251,8 +320,14 @@ const Settings = () => {
                 alignItems="center"
                 direction="column"
                 w={["full", "80%", "70%", "60%", "50%"]}
+                gap={10}
             >
-                <Flex w="full" direction="column">
+                <Flex
+                    w="full"
+                    direction="column"
+                    opacity={editingPassword ? 0.3 : 1}
+                    pointerEvents={editingPassword ? "none" : "auto"}
+                >
                     <Heading size="xs" textTransform="uppercase">
                         Email address
                     </Heading>
@@ -304,7 +379,119 @@ const Settings = () => {
                                 {user?.email}
                             </Text>
                         )}
-                        <EmailIcon />
+                        <FieldIcons
+                            isEditing={editingEmail}
+                            touched={emailTouched}
+                            isErrors={
+                                errors.email !== "" &&
+                                errors.email !== undefined
+                            }
+                            onSaveClick={() => {
+                                updateEmailAddress(newEmail);
+                                setEditingEmail(false);
+                                setEmailTouched(false);
+                            }}
+                            onEditClick={() => setEditingEmail(true)}
+                            onCancelClick={() => {
+                                resetEmailState();
+                            }}
+                        />
+                    </Flex>
+                </Flex>
+                <Flex
+                    w="full"
+                    direction="column"
+                    opacity={editingEmail ? 0.3 : 1}
+                    pointerEvents={editingEmail ? "none" : "auto"}
+                >
+                    <Heading size="xs" textTransform="uppercase">
+                        Password
+                    </Heading>
+                    <Flex
+                        w="full"
+                        justifyContent="space-between"
+                        alignItems="center"
+                    >
+                        {editingPassword ? (
+                            <TextInput
+                                type={showPassword ? "text" : "password"}
+                                error={errors.password}
+                                helperText="Please enter your new password"
+                                title=""
+                                size="md"
+                                fieldProps={{
+                                    onChange: (e) => {
+                                        if (e.target.value.length > 6) {
+                                            setErrors((prev) => ({
+                                                ...prev,
+                                                password: "",
+                                            }));
+
+                                            setNewPassword(e.target.value);
+                                            setPasswordTouched(true);
+                                        } else {
+                                            setErrors((prev) => ({
+                                                ...prev,
+                                                password:
+                                                    "Password must be more than 6 characters long.",
+                                            }));
+                                            setPasswordTouched(false);
+                                        }
+                                    },
+                                    defaultValue: "",
+                                }}
+                                rightIcon={
+                                    <IconButton
+                                        _hover={{
+                                            bg: "transparent",
+                                            color: "brand.primary",
+                                            transform: "scale(1.2)",
+                                        }}
+                                        shadow="lg"
+                                        height="30px"
+                                        position="absolute"
+                                        right={2}
+                                        top={8}
+                                        onClick={() =>
+                                            setShowPassword((prev) => !prev)
+                                        }
+                                        variant="ghost"
+                                        h={1 / 2}
+                                        colorScheme="teal"
+                                        aria-label="Show password"
+                                        fontSize="3xl"
+                                        icon={
+                                            showPassword ? (
+                                                <VisibilityIcon fontSize="inherit" />
+                                            ) : (
+                                                <VisibilityOffIcon fontSize="inherit" />
+                                            )
+                                        }
+                                    />
+                                }
+                            />
+                        ) : (
+                            <Text pt="2" fontSize="xl">
+                                **********
+                            </Text>
+                        )}
+                        <FieldIcons
+                            isEditing={editingPassword}
+                            touched={passwordTouched}
+                            isErrors={
+                                errors.password !== "" &&
+                                errors.password !== undefined
+                            }
+                            onSaveClick={() => {
+                                updatePassword(newPassword);
+                                setEditingPassword(false);
+                                setPasswordTouched(false);
+                            }}
+                            onEditClick={() => setEditingPassword(true)}
+                            onCancelClick={() => {
+                                resetPasswordState();
+                            }}
+                        />
                     </Flex>
                 </Flex>
             </Flex>

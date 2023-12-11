@@ -132,10 +132,6 @@ const TrackReviewStep1 = () => {
                     setInitCounter(0);
                 }
             } catch (error) {
-                console.error(
-                    "🚀 ~ file: TrackReviewStep1.tsx:135 ~ init ~ error:",
-                    error
-                );
                 setLoading(false);
                 showToast({ status: "error" });
             }
