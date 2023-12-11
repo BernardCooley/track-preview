@@ -4,11 +4,11 @@ import { isMobile } from "react-device-detect";
 import { getCurrentYear } from "../../utils";
 
 interface Props {
-    genre?: string;
+    genre?: string | null;
     yearRange?: {
         from: number;
         to: number;
-    };
+    } | null;
     preferredAutoPlay: boolean;
     showDates: boolean;
     onAutoPlayToggle: () => void;
@@ -28,7 +28,7 @@ const FilterTags = ({
     return (
         <Flex transition="opacity 200ms">
             <Flex gap={2} w="full" flexWrap="wrap">
-                {genre && (
+                {genre ? (
                     <Tag
                         key={`${genre}`}
                         variant="filter"
@@ -36,9 +36,9 @@ const FilterTags = ({
                     >
                         {genre.toLowerCase() === "all" ? "All genres" : genre}
                     </Tag>
-                )}
+                ) : null}
 
-                {yearRange && showDates && (
+                {yearRange && showDates ? (
                     <Tag
                         key={`${yearRange.from}-${yearRange.to}`}
                         variant="filter"
@@ -50,7 +50,7 @@ const FilterTags = ({
                             : `${yearRange.from} -
                          ${yearRange?.to}`}
                     </Tag>
-                )}
+                ) : null}
 
                 <Tag
                     onClick={onAutoPlayToggle}

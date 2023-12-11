@@ -82,25 +82,15 @@ const TrackReviewStep1 = () => {
     }, [genre, user, yearRange]);
 
     useEffect(() => {
-        if (user?.uid) {
+        if (userProfile) {
             setAutoplay(userProfile?.autoplay || false);
-        }
-    }, [user, userProfile?.autoplay]);
-
-    useEffect(() => {
-        if (user?.uid) {
             updateGenre(userProfile?.genre || "all");
-        }
-    }, [user, userProfile?.genre]);
-
-    useEffect(() => {
-        if (user?.uid) {
             updateYearRange({
                 from: userProfile?.yearFrom || 1960,
                 to: userProfile?.yearTo || getCurrentYear(),
             });
         }
-    }, [user, userProfile?.yearFrom, userProfile?.yearTo]);
+    }, [userProfile]);
 
     interface ToastProps {
         status: "error" | "success" | "info";
@@ -401,13 +391,8 @@ const TrackReviewStep1 = () => {
                             updateUserProfile(newProfile);
                         }}
                         showDates={true}
-                        genre={genre || "all"}
-                        yearRange={
-                            yearRange || {
-                                from: 1960,
-                                to: getCurrentYear(),
-                            }
-                        }
+                        genre={genre}
+                        yearRange={yearRange}
                         preferredAutoPlay={autoplay}
                     />
                 )}
