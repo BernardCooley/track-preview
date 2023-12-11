@@ -22,7 +22,7 @@ import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 
 interface Props {
-    isAttemptingAccountEdit: string | null;
+    isAttemptingAccountEdit: string;
 }
 
 interface FormData {

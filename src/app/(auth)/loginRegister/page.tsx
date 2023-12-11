@@ -119,7 +119,7 @@ const AuthPage = () => {
                         <Container>
                             <SignIn
                                 isAttemptingAccountEdit={
-                                    isAttemptingAccountEdit
+                                    isAttemptingAccountEdit || "false"
                                 }
                             />
                         </Container>
