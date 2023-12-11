@@ -41,9 +41,9 @@ export async function POST(req: Request) {
         console.error(error);
 
         return NextResponse.json(
-            { error: error},
+            { error: error },
             {
-                status: 500,
+                status: error.status || 500,
             }
         );
     }

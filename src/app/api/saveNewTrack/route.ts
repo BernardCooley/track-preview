@@ -40,13 +40,13 @@ export async function POST(req: Request) {
         });
 
         return response;
-    } catch (error) {
+    } catch (error: any) {
         console.error(error);
-        
+
         return NextResponse.json(
-            { error: "Failed to save data" },
+            { error: error },
             {
-                status: 500,
+                status: error.status || 500,
             }
         );
     }

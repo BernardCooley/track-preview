@@ -24,13 +24,13 @@ export async function POST(req: Request) {
         });
 
         return response;
-    } catch (error) {
-        console.log(error);
+    } catch (error: any) {
+        console.error(error);
 
         return NextResponse.json(
-            { error: "Failed to update user's profile" },
+            { error: error },
             {
-                status: 500,
+                status: error.status || 500,
             }
         );
     }

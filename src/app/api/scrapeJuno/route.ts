@@ -480,13 +480,13 @@ export async function GET() {
 
             return response;
         }
-    } catch (error) {
+    } catch (error: any) {
         console.error(error);
 
         return NextResponse.json(
-            { error: "Failed to scrape data" },
+            { error: error },
             {
-                status: 500,
+                status: error.status || 500,
             }
         );
     }

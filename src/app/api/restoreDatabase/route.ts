@@ -15,13 +15,13 @@ export async function GET() {
         });
 
         return response;
-    } catch (error) {
+    } catch (error: any) {
         console.error(error);
 
         return NextResponse.json(
-            { error: "Failed to get data" },
+            { error: error },
             {
-                status: 500,
+                status: error.status || 500,
             }
         );
     }
@@ -44,14 +44,15 @@ export async function GET() {
     //             });
 
     //             return response;
-    //         } catch (error) {
-    //             console.log("🚀 ~ file: route.ts:17 ~ GET ~ error:", error);
-    //             return NextResponse.json(
-    //                 { error: "Failed to get data" },
-    //                 {
-    //                     status: 500,
-    //                 }
-    //             );
+    //         } catch (error: any) {
+    // console.error(error);
+
+    // return NextResponse.json(
+    //     { error: error },
+    //     {
+    //         status: error.status || 500,
+    //     }
+    // );
     //         }
     //     });
     // });
