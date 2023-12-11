@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 import React, { useCallback, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ZodType, z } from "zod";
@@ -21,10 +21,6 @@ import {
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 
-interface Props {
-    isAttemptingAccountEdit: string;
-}
-
 interface FormData {
     email: string;
     password: string;
@@ -37,7 +33,9 @@ const schema: ZodType<FormData> = z.object({
         .min(6, { message: "Password must be 6 characters or more." }),
 });
 
-const SignIn = ({ isAttemptingAccountEdit = "false" }: Props) => {
+const SignIn = () => {
+    const searchParams = useSearchParams();
+    const isAttemptingAccountEdit = searchParams.get("isAttemptingAccountEdit");
     const [showPassword, setShowPassword] = useState<boolean>(false);
     const [submitting, setSubmitting] = useState(false);
     const router = useRouter();
