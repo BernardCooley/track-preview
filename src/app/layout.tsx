@@ -4,7 +4,7 @@ import { Providers } from "./providers";
 
 export const metadata: Metadata = {
     title: "Phoniquest",
-    description: "Phoniquest",
+    description: "Discover new music",
 };
 
 export default function RootLayout({
