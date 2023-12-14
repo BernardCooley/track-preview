@@ -48,7 +48,7 @@ const TrackReviewStep1NoQueuedTrack = () => {
     const [showGenreSelector, setShowGenreSelector] = useState<boolean>(false);
     const [showYearSelector, setShowYearSelector] = useState<boolean>(false);
     const [noTracks, setNoTracks] = useState<boolean>(false);
-    const [allowInit, setAllowInit] = useState<boolean>(false);
+    const [allowGetTracks, setAllowGetTracks] = useState<boolean>(false);
     const [loadingProgress, setLoadingProgress] = useState<number>(0);
     const [loadingMessage, setLoadingMessage] = useState<string>("");
 
@@ -121,7 +121,7 @@ const TrackReviewStep1NoQueuedTrack = () => {
 
     const getTracks = useCallback(async () => {
         setInitCounter((prev) => prev + 1);
-        if (genre && user?.uid && (tracks?.length === 0 || allowInit)) {
+        if (genre && user?.uid && (tracks?.length === 0 || allowGetTracks)) {
             setNoTracks(false);
             setAvailableGenres(genres);
             setCurrentTrack(null);
@@ -157,7 +157,7 @@ const TrackReviewStep1NoQueuedTrack = () => {
             } catch (error) {
                 showToast({ status: "error" });
             }
-            setAllowInit(false);
+            setAllowGetTracks(false);
         }
     }, [genre, user]);
 
@@ -165,6 +165,8 @@ const TrackReviewStep1NoQueuedTrack = () => {
         if (tracks.length > 0) {
             setCurrentTrack(tracks[0]);
             setLoadingMessage("");
+        } else {
+            getTracks();
         }
     }, [tracks]);
 
@@ -313,7 +315,7 @@ const TrackReviewStep1NoQueuedTrack = () => {
                         yearFrom: Number(val.from),
                         yearTo: Number(val.to),
                     });
-                    setAllowInit(true);
+                    setAllowGetTracks(true);
                     updateUserProfile(newProfile);
                     setShowYearSelector(false);
                 }}
@@ -329,7 +331,7 @@ const TrackReviewStep1NoQueuedTrack = () => {
                             userId: user.uid,
                             genre: gen,
                         });
-                        setAllowInit(true);
+                        setAllowGetTracks(true);
                         setRecentGenres((prev) =>
                             Array.from(new Set([...prev, gen]))
                         );
