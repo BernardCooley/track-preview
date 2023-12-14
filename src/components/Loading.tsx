@@ -12,7 +12,6 @@ interface Props {
 const Loading = ({ imageSrc, progress }: Props) => {
     return (
         <Flex
-            className="loading"
             gap={2}
             direction="column"
             alignItems="center"

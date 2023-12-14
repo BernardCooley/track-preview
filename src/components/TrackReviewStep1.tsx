@@ -50,6 +50,7 @@ const TrackReviewStep1NoQueuedTrack = () => {
     const [noTracks, setNoTracks] = useState<boolean>(false);
     const [allowInit, setAllowInit] = useState<boolean>(false);
     const [loadingProgress, setLoadingProgress] = useState<number>(0);
+    const [loadingMessage, setLoadingMessage] = useState<string>("");
 
     const showToast = useCallback(
         ({ status, title, description }: ToastProps) => {
@@ -163,6 +164,7 @@ const TrackReviewStep1NoQueuedTrack = () => {
     useEffect(() => {
         if (tracks.length > 0) {
             setCurrentTrack(tracks[0]);
+            setLoadingMessage("");
         }
     }, [tracks]);
 
@@ -260,6 +262,7 @@ const TrackReviewStep1NoQueuedTrack = () => {
     };
 
     const likeOrDislike = async (like: boolean) => {
+        setLoadingMessage(like ? "Liking track" : "Disliking track");
         try {
             if (currentTrack) {
                 const track = { ...currentTrack };
@@ -380,6 +383,7 @@ const TrackReviewStep1NoQueuedTrack = () => {
             <Flex direction="column" position="relative">
                 {currentTrack && (
                     <TrackReviewCard
+                        loadingMessage={loadingMessage}
                         currentTrack={currentTrack.searchedTrack}
                         isPlaying={isPlaying}
                         listened={listened}
