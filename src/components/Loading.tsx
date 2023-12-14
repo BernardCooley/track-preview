@@ -2,12 +2,14 @@ import { Flex, Text } from "@chakra-ui/react";
 import Image from "next/image";
 import React from "react";
 import BouncingDotsLoader from "./BouncingLoaderDots";
+import { Line } from "rc-progress";
 
 interface Props {
     imageSrc: string;
+    progress?: number;
 }
 
-const Loading = ({ imageSrc }: Props) => {
+const Loading = ({ imageSrc, progress }: Props) => {
     return (
         <Flex
             className="loading"
@@ -26,6 +28,14 @@ const Loading = ({ imageSrc }: Props) => {
                 </Text>
                 <BouncingDotsLoader />
             </Flex>
+            {progress !== undefined && (
+                <Line
+                    style={{ height: "10px" }}
+                    percent={progress}
+                    strokeWidth={4}
+                    strokeColor="#11999e"
+                />
+            )}
         </Flex>
     );
 };

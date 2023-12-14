@@ -49,6 +49,7 @@ const TrackReviewStep1NoQueuedTrack = () => {
     const [showYearSelector, setShowYearSelector] = useState<boolean>(false);
     const [noTracks, setNoTracks] = useState<boolean>(false);
     const [allowInit, setAllowInit] = useState<boolean>(false);
+    const [loadingProgress, setLoadingProgress] = useState<number>(0);
 
     const showToast = useCallback(
         ({ status, title, description }: ToastProps) => {
@@ -105,6 +106,18 @@ const TrackReviewStep1NoQueuedTrack = () => {
         description?: string;
     }
 
+    const allProgress = (proms: any, progress_cb: any) => {
+        let d = 0;
+        progress_cb(0);
+        for (const p of proms) {
+            p.then(() => {
+                d++;
+                progress_cb((d * 100) / proms.length);
+            });
+        }
+        return Promise.all(proms);
+    };
+
     const getTracks = useCallback(async () => {
         setInitCounter((prev) => prev + 1);
         if (genre && user?.uid && (tracks?.length === 0 || allowInit)) {
@@ -126,7 +139,12 @@ const TrackReviewStep1NoQueuedTrack = () => {
                     return searchForTrack(track);
                 });
 
-                const newTracks = await Promise.all(searchTrackPromises);
+                const newTracks = await allProgress(
+                    searchTrackPromises,
+                    (progress: any) => {
+                        setLoadingProgress(progress);
+                    }
+                );
 
                 setTracks(
                     newTracks.filter((track) => track !== null) as Track[]
@@ -265,7 +283,9 @@ const TrackReviewStep1NoQueuedTrack = () => {
 
     return (
         <Box position="relative">
-            {!currentTrack && <Loading imageSrc="/logo_1x.png" />}
+            {!currentTrack && (
+                <Loading progress={loadingProgress} imageSrc="/logo_1x.png" />
+            )}
             {noTracks && (
                 <Text
                     textAlign="center"
