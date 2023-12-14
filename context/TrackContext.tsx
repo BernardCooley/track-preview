@@ -11,8 +11,6 @@ interface TrackContextProps {
     updateStep1Tracks: (tracks: StoredTrack[]) => void;
     step1CurrentTrack: Track | null;
     updateStep1CurrentTrack: (track: Track | null) => void;
-    step1QueuedTrack: Track | null;
-    updateStep1QueuedTrack: (track: Track | null) => void;
     yearRange: YearRange | null;
     updateYearRange: (yearRange: YearRange) => void;
     genre: string | null;
@@ -39,9 +37,6 @@ export const TrackContextProvider = ({ children }: { children: ReactNode }) => {
     const [step1CurrentTrack, setStep1CurrentTrack] = useState<Track | null>(
         null
     );
-    const [step1QueuedTrack, setStep1QueuedTrack] = useState<Track | null>(
-        null
-    );
     const [yearRange, setYearRange] = useState<YearRange | null>(null);
     const [genre, setGenre] = useState<string | null>(null);
 
@@ -55,10 +50,6 @@ export const TrackContextProvider = ({ children }: { children: ReactNode }) => {
 
     const updateStep1CurrentTrack = (track: Track | null) => {
         setStep1CurrentTrack(track);
-    };
-
-    const updateStep1QueuedTrack = (track: Track | null) => {
-        setStep1QueuedTrack(track);
     };
 
     const updateYearRange = (yearRange: YearRange) => {
@@ -78,8 +69,6 @@ export const TrackContextProvider = ({ children }: { children: ReactNode }) => {
                 updateStep1Tracks,
                 step1CurrentTrack,
                 updateStep1CurrentTrack,
-                step1QueuedTrack,
-                updateStep1QueuedTrack,
                 yearRange,
                 updateYearRange,
                 genre,
