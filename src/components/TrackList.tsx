@@ -124,7 +124,7 @@ const TrackList = () => {
 
     return (
         <Box h="90vh" position="relative">
-            {loading && <Loading imageSrc="/logo_1x.png" />}
+            {loading && <Loading />}
             {!loading && noTracks && (
                 <Center>
                     <Badge

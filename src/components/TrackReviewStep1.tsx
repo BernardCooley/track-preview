@@ -151,6 +151,8 @@ const TrackReviewStep1NoQueuedTrack = () => {
                     newTracks.filter((track) => track !== null) as Track[]
                 );
 
+                setLoadingProgress(0);
+
                 if (storedTracks && storedTracks.length > 1) {
                     setInitCounter(0);
                 }
@@ -288,9 +290,7 @@ const TrackReviewStep1NoQueuedTrack = () => {
 
     return (
         <Box position="relative">
-            {!currentTrack && (
-                <Loading progress={loadingProgress} imageSrc="/logo_1x.png" />
-            )}
+            {!currentTrack && <Loading progress={loadingProgress} />}
             {noTracks && (
                 <Text
                     textAlign="center"
