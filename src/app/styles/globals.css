@@ -45,3 +45,11 @@ a {
 .bouncing-loader > div:nth-child(3) {
   animation-delay: 0.4s;
 }
+
+.app-wrapper {
+  background-image: url(/logo_background_4x_gradient.png);
+  background-size: 90%;
+  background-repeat: no-repeat;
+  background-position: center;
+  height: 100vh;
+}

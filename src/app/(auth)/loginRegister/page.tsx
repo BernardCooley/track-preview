@@ -65,7 +65,7 @@ const AuthPage = () => {
         }
     }, [isAccountDeleted]);
 
-    const Container = ({ children }: { children: React.ReactNode }) => {
+    const TabContainer = ({ children }: { children: React.ReactNode }) => {
         return (
             <Flex
                 direction="column"
@@ -80,13 +80,7 @@ const AuthPage = () => {
     };
 
     return (
-        <Box
-            backgroundImage={"url(/logo_background_4x.png)"}
-            backgroundSize="90%"
-            backgroundRepeat="no-repeat"
-            backgroundPosition="center 300px"
-            height="100vh"
-        >
+        <Box>
             <Text
                 py={10}
                 textAlign="center"
@@ -113,14 +107,14 @@ const AuthPage = () => {
 
                 <TabPanels>
                     <TabPanel>
-                        <Container>
+                        <TabContainer>
                             <SignIn />
-                        </Container>
+                        </TabContainer>
                     </TabPanel>
                     <TabPanel>
-                        <Container>
+                        <TabContainer>
                             <SignUp />
-                        </Container>
+                        </TabContainer>
                     </TabPanel>
                 </TabPanels>
             </Tabs>
