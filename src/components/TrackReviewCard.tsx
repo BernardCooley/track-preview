@@ -15,9 +15,6 @@ import { SearchedTrack } from "../../types";
 
 interface Props {
     currentTrack: SearchedTrack;
-    queueTrack: SearchedTrack | null;
-    ignoreQueuedTrack: boolean;
-    loading: boolean;
     isPlaying: boolean;
     listened: boolean;
     onLikeOrDislike: (liked: boolean) => Promise<void>;
@@ -30,9 +27,6 @@ const TrackReviewCard = forwardRef(
     (
         {
             currentTrack,
-            queueTrack,
-            ignoreQueuedTrack,
-            loading,
             isPlaying,
             listened,
             onLikeOrDislike,
@@ -43,13 +37,7 @@ const TrackReviewCard = forwardRef(
         ref: LegacyRef<HTMLAudioElement> | undefined
     ) => {
         return (
-            <Card
-                size="md"
-                h="auto"
-                opacity={loading ? "0.4" : "1"}
-                mt={2}
-                backgroundColor="transparent"
-            >
+            <Card size="md" h="auto" mt={2} backgroundColor="transparent">
                 <CardHeader
                     color="brand.textPrimary"
                     backgroundColor="brand.primaryOpaque"
@@ -140,9 +128,8 @@ const TrackReviewCard = forwardRef(
                                     onPlay={onAudioPlay}
                                     onTimeUpdate={(e) => {
                                         onListenedToggle(
-                                            (e.currentTarget.currentTime > 2 &&
-                                                (queueTrack ||
-                                                    ignoreQueuedTrack)) as boolean
+                                            (e.currentTarget.currentTime >
+                                                2) as boolean
                                         );
                                     }}
                                     ref={ref}

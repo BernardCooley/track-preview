@@ -21,14 +21,12 @@ import GenreModal from "./GenreModal";
 import { useTrackContext } from "../../context/TrackContext";
 import YearModal from "./YearModal";
 
-const TrackReviewStep1 = () => {
+const TrackReviewStep1NoQueuedTrack = () => {
     const {
-        step1Tracks,
-        updateStep1Tracks,
-        step1CurrentTrack,
-        updateStep1CurrentTrack,
-        step1QueuedTrack,
-        updateStep1QueuedTrack,
+        step1Tracks: tracks,
+        updateStep1Tracks: setTracks,
+        step1CurrentTrack: currentTrack,
+        updateStep1CurrentTrack: setCurrentTrack,
         yearRange,
         updateYearRange,
         genre,
@@ -40,7 +38,6 @@ const TrackReviewStep1 = () => {
     );
     const { user, userProfile, updateUserProfile } = useAuthContext();
     const [availableGenres, setAvailableGenres] = useState<string[]>(genres);
-    const [loading, setLoading] = useState<boolean>(false);
     const toast = useToast();
     const id = "step1-toast";
     const [autoplay, setAutoplay] = useState<boolean>(false);
@@ -100,12 +97,10 @@ const TrackReviewStep1 = () => {
 
     const init = useCallback(async () => {
         setInitCounter((prev) => prev + 1);
-        if (genre && user?.uid && (step1Tracks.length === 0 || allowInit)) {
+        if (genre && user?.uid && (tracks?.length === 0 || allowInit)) {
             setNoTracks(false);
             setAvailableGenres(genres);
-            setLoading(true);
-            updateStep1CurrentTrack(null);
-            updateStep1QueuedTrack(null);
+            setCurrentTrack(null);
 
             try {
                 const storedTracks = await fetchStoredTracks({
@@ -116,13 +111,12 @@ const TrackReviewStep1 = () => {
                 });
 
                 setListened(false);
-                updateStep1Tracks(storedTracks);
+                setTracks(storedTracks);
 
                 if (storedTracks && storedTracks.length > 1) {
                     setInitCounter(0);
                 }
             } catch (error) {
-                setLoading(false);
                 showToast({ status: "error" });
             }
             setAllowInit(false);
@@ -130,29 +124,14 @@ const TrackReviewStep1 = () => {
     }, [genre, user]);
 
     useEffect(() => {
-        if (step1Tracks?.length > 1) {
-            if (!step1CurrentTrack) {
-                handleSearchedTrack(step1Tracks[0], step1Tracks, true);
-            } else if (!step1QueuedTrack) {
-                handleSearchedTrack(step1Tracks[1], step1Tracks, false);
-            }
-        } else {
-            updateStep1CurrentTrack(null);
-            updateStep1QueuedTrack(null);
-            if (initCounter < 10) {
-                init();
-            } else {
-                setLoading(false);
-                setNoTracks(true);
-            }
-        }
-    }, [step1Tracks, step1CurrentTrack, step1QueuedTrack]);
+        handleSearchedTrack();
+    }, [tracks]);
 
     useEffect(() => {
-        if (step1CurrentTrack && autoplay && !isPlaying) {
+        if (currentTrack && autoplay && !isPlaying) {
             play();
         }
-    }, [step1CurrentTrack]);
+    }, [currentTrack]);
 
     const searchForTrack = async (
         track: StoredTrack
@@ -225,51 +204,49 @@ const TrackReviewStep1 = () => {
         return null;
     };
 
-    const handleSearchedTrack = async (
-        track: StoredTrack,
-        storedTracks: StoredTrack[],
-        isCurrentTrack: boolean
-    ) => {
-        const searchedTrack = await searchForTrack(track);
+    const handleSearchedTrack = useCallback(async () => {
+        setCurrentTrack(null);
+        if (tracks && tracks.length > 0) {
+            const searchedTrack = await searchForTrack(tracks[0]);
 
-        if (searchedTrack) {
-            if (isCurrentTrack) {
-                updateStep1CurrentTrack(searchedTrack);
-                setLoading(false);
-                handleSearchedTrack(storedTracks[1], storedTracks, false);
+            if (searchedTrack) {
+                setCurrentTrack(searchedTrack);
             } else {
-                updateStep1QueuedTrack(searchedTrack);
+                setTracks(tracks?.slice(1) || []);
             }
         } else {
-            const newTracksList = step1Tracks.filter((t) => t.id !== track.id);
-            updateStep1Tracks(newTracksList);
+            if (initCounter < 10) {
+                init();
+            } else {
+                setNoTracks(true);
+                showToast({ status: "error" });
+            }
         }
-    };
+    }, [tracks]);
 
     const storeTrack = async (like: boolean) => {
-        if (user?.uid && step1CurrentTrack && step1Tracks) {
+        if (user?.uid && currentTrack && tracks) {
             await saveNewTrack({
-                id: step1CurrentTrack.id,
+                id: currentTrack.id,
                 genre: genre || "all",
                 userId: user.uid,
-                artist: step1CurrentTrack.artist,
-                title: step1CurrentTrack.title,
-                currentReviewStep: (step1CurrentTrack.currentReviewStep = like
+                artist: currentTrack.artist,
+                title: currentTrack.title,
+                currentReviewStep: (currentTrack.currentReviewStep = like
                     ? 2
                     : 0),
-                furthestReviewStep: (step1CurrentTrack.furthestReviewStep = like
+                furthestReviewStep: (currentTrack.furthestReviewStep = like
                     ? 2
                     : 1),
-                purchaseUrl: step1CurrentTrack.purchaseUrl,
-                searchedTrack: step1CurrentTrack.searchedTrack,
+                purchaseUrl: currentTrack.purchaseUrl,
+                searchedTrack: currentTrack.searchedTrack,
             });
         }
     };
 
     const likeOrDislike = async (like: boolean) => {
-        setIsPlaying(false);
         try {
-            storeTrack(like);
+            await storeTrack(like);
         } catch (error) {
             showToast({
                 status: "error",
@@ -277,25 +254,10 @@ const TrackReviewStep1 = () => {
             });
         }
         setListened(false);
+        setCurrentTrack(null);
+        setIsPlaying(false);
 
-        if (step1CurrentTrack) {
-            const filteredTracks = step1Tracks.filter(
-                (t) => t.id !== step1CurrentTrack.id
-            );
-
-            if (filteredTracks.length < 2) {
-                if (initCounter < 10) {
-                    init();
-                } else {
-                    showToast({ status: "error" });
-                }
-            } else {
-                updateStep1Tracks(filteredTracks);
-                updateStep1CurrentTrack(step1QueuedTrack);
-                updateStep1QueuedTrack(null);
-                handleSearchedTrack(filteredTracks[1], step1Tracks, false);
-            }
-        }
+        setTracks(tracks?.slice(1) || []);
     };
 
     const play = () => {
@@ -304,7 +266,7 @@ const TrackReviewStep1 = () => {
 
     return (
         <Box position="relative">
-            {loading && <Loading imageSrc="/logo_1x.png" />}
+            {!currentTrack && <Loading imageSrc="/logo_1x.png" />}
             {noTracks && (
                 <Text
                     textAlign="center"
@@ -350,9 +312,8 @@ const TrackReviewStep1 = () => {
                             Array.from(new Set([...prev, gen]))
                         );
                         updateUserProfile(newProfile);
-                        updateStep1Tracks([]);
-                        updateStep1CurrentTrack(null);
-                        updateStep1QueuedTrack(null);
+                        setTracks([]);
+                        setCurrentTrack(null);
                         setListened(false);
                         setIsPlaying(false);
                     }
@@ -398,12 +359,9 @@ const TrackReviewStep1 = () => {
                 )}
             </Flex>
             <Flex direction="column" position="relative">
-                {step1CurrentTrack && (
+                {currentTrack && (
                     <TrackReviewCard
-                        currentTrack={step1CurrentTrack.searchedTrack}
-                        queueTrack={step1QueuedTrack?.searchedTrack || null}
-                        ignoreQueuedTrack={false}
-                        loading={loading}
+                        currentTrack={currentTrack.searchedTrack}
                         isPlaying={isPlaying}
                         listened={listened}
                         onLikeOrDislike={async (val) =>
@@ -422,4 +380,4 @@ const TrackReviewStep1 = () => {
     );
 };
 
-export default TrackReviewStep1;
+export default TrackReviewStep1NoQueuedTrack;

@@ -200,9 +200,6 @@ const TrackReviewStep2And3 = ({ reviewStep }: Props) => {
                 {currentTrack && (
                     <TrackReviewCard
                         currentTrack={currentTrack}
-                        queueTrack={null}
-                        ignoreQueuedTrack={true}
-                        loading={loading}
                         isPlaying={isPlaying}
                         listened={listened}
                         onLikeOrDislike={async (val) =>
