@@ -30,7 +30,7 @@ export const LoginUser = async (
 
 export const LogOut = async (
     router: AppRouterInstance,
-    redirect: string = "/loginRegister"
+    redirect: string = "/loginRegister?login=true"
 ) => {
     try {
         await signOut(auth);

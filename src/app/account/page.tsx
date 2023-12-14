@@ -95,7 +95,7 @@ const Settings = () => {
     const deleteAccount = async () => {
         try {
             await DeleteUser();
-            router.push("/loginRegister?accountDeleted=true");
+            router.push("/loginRegister?login=false?accountDeleted=true");
         } catch (error) {
             console.log(error);
         }

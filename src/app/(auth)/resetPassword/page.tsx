@@ -42,7 +42,7 @@ const PasswordReset = ({}: Props) => {
             await ResetPassword(formData.email);
             setAuthError(null);
             setSubmitting(false);
-            router.push("/loginRegister?passwordReset=true");
+            router.push("/loginRegister?login=true?passwordReset=true");
         } catch (error) {
             // TODO error not being thrown or caught - FIX
             setAuthError(
@@ -70,7 +70,7 @@ const PasswordReset = ({}: Props) => {
                 position="absolute"
                 left={6}
                 top={12}
-                onClick={() => router.push("/loginRegister")}
+                onClick={() => router.push("/loginRegister?login=true")}
                 variant="ghost"
                 h={1 / 2}
                 colorScheme="teal"

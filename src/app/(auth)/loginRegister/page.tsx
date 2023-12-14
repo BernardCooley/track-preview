@@ -96,14 +96,12 @@ const AuthPage = () => {
                 PHONIQUEST
             </Text>
             <Tabs
+                defaultIndex={isLogin === "true" ? 0 : 1}
                 onChange={(index) => {
-                    if (index === 0) {
-                        router.push("/loginRegister?login=true");
-                    } else {
-                        router.push("/loginRegister");
-                    }
+                    router.push(
+                        `/loginRegister?login=${index === 0 ? "true" : "false"}`
+                    );
                 }}
-                index={isLogin ? 0 : 1}
                 isFitted
                 variant="solid-rounded"
                 colorScheme="primary"
