@@ -79,18 +79,24 @@ const TrackReviewStep1NoQueuedTrack = () => {
     }, [genre, user, yearRange]);
 
     useEffect(() => {
-        setAutoplay(userProfile?.autoplay || false);
+        if (userProfile) {
+            setAutoplay(userProfile?.autoplay || false);
+        }
     }, [userProfile?.autoplay]);
 
     useEffect(() => {
-        updateGenre(userProfile?.genre || "all");
+        if (userProfile) {
+            updateGenre(userProfile?.genre || "all");
+        }
     }, [userProfile?.genre]);
 
     useEffect(() => {
-        updateYearRange({
-            from: userProfile?.yearFrom || 1960,
-            to: userProfile?.yearTo || getCurrentYear(),
-        });
+        if (userProfile) {
+            updateYearRange({
+                from: userProfile?.yearFrom || 1960,
+                to: userProfile?.yearTo || getCurrentYear(),
+            });
+        }
     }, [userProfile?.yearFrom, userProfile?.yearTo]);
 
     interface ToastProps {
