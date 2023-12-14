@@ -68,7 +68,7 @@ const TrackReviewStep1NoQueuedTrack = () => {
 
     useEffect(() => {
         if (initCounter < 10) {
-            init();
+            getTracks();
         } else {
             showToast({
                 status: "error",
@@ -79,15 +79,19 @@ const TrackReviewStep1NoQueuedTrack = () => {
     }, [genre, user, yearRange]);
 
     useEffect(() => {
-        if (userProfile) {
-            setAutoplay(userProfile?.autoplay || false);
-            updateGenre(userProfile?.genre || "all");
-            updateYearRange({
-                from: userProfile?.yearFrom || 1960,
-                to: userProfile?.yearTo || getCurrentYear(),
-            });
-        }
-    }, [userProfile]);
+        setAutoplay(userProfile?.autoplay || false);
+    }, [userProfile?.autoplay]);
+
+    useEffect(() => {
+        updateGenre(userProfile?.genre || "all");
+    }, [userProfile?.genre]);
+
+    useEffect(() => {
+        updateYearRange({
+            from: userProfile?.yearFrom || 1960,
+            to: userProfile?.yearTo || getCurrentYear(),
+        });
+    }, [userProfile?.yearFrom, userProfile?.yearTo]);
 
     interface ToastProps {
         status: "error" | "success" | "info";
@@ -95,7 +99,7 @@ const TrackReviewStep1NoQueuedTrack = () => {
         description?: string;
     }
 
-    const init = useCallback(async () => {
+    const getTracks = useCallback(async () => {
         setInitCounter((prev) => prev + 1);
         if (genre && user?.uid && (tracks?.length === 0 || allowInit)) {
             setNoTracks(false);
@@ -111,7 +115,16 @@ const TrackReviewStep1NoQueuedTrack = () => {
                 });
 
                 setListened(false);
-                setTracks(storedTracks);
+
+                const searchTrackPromises = storedTracks.map(async (track) => {
+                    return searchForTrack(track);
+                });
+
+                const newTracks = await Promise.all(searchTrackPromises);
+
+                setTracks(
+                    newTracks.filter((track) => track !== null) as Track[]
+                );
 
                 if (storedTracks && storedTracks.length > 1) {
                     setInitCounter(0);
@@ -124,7 +137,9 @@ const TrackReviewStep1NoQueuedTrack = () => {
     }, [genre, user]);
 
     useEffect(() => {
-        handleSearchedTrack();
+        if (tracks.length > 0) {
+            setCurrentTrack(tracks[0]);
+        }
     }, [tracks]);
 
     useEffect(() => {
@@ -204,28 +219,8 @@ const TrackReviewStep1NoQueuedTrack = () => {
         return null;
     };
 
-    const handleSearchedTrack = useCallback(async () => {
-        setCurrentTrack(null);
-        if (tracks && tracks.length > 0) {
-            const searchedTrack = await searchForTrack(tracks[0]);
-
-            if (searchedTrack) {
-                setCurrentTrack(searchedTrack);
-            } else {
-                setTracks(tracks?.slice(1) || []);
-            }
-        } else {
-            if (initCounter < 10) {
-                init();
-            } else {
-                setNoTracks(true);
-                showToast({ status: "error" });
-            }
-        }
-    }, [tracks]);
-
     const storeTrack = async (track: Track, like: boolean) => {
-        if (user?.uid && tracks) {
+        if (user?.uid) {
             await saveNewTrack({
                 id: track.id,
                 genre: genre || "all",
@@ -244,7 +239,6 @@ const TrackReviewStep1NoQueuedTrack = () => {
         try {
             if (currentTrack) {
                 const track = { ...currentTrack };
-                setCurrentTrack(null);
                 await storeTrack(track, like);
             }
         } catch (error) {

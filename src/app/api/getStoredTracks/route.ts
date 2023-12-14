@@ -24,7 +24,7 @@ export async function POST(req: Request) {
             ${genre.toLowerCase() === "all" ? "" : `AND "genre" = '${genre}'`}
             ${notInUserIds.length > 0 ? `AND "id" NOT IN(${notInUserIds})` : ""}
             ORDER BY RANDOM() ASC
-            LIMIT 100
+            LIMIT 30
         `;
 
         const tracks: StoredTrack[] =

@@ -1,14 +1,13 @@
 'use client';
 
-import { StoredTrack } from "@prisma/client";
 import React, { createContext, ReactNode, useContext, useState } from "react";
 import { Track, YearRange } from "../types";
 
 interface TrackContextProps {
     currentlyPlaying: string | undefined;
     updateCurrentlyPlaying: (trackId: string | undefined) => void;
-    step1Tracks: StoredTrack[];
-    updateStep1Tracks: (tracks: StoredTrack[]) => void;
+    step1Tracks: Track[];
+    updateStep1Tracks: (tracks: Track[]) => void;
     step1CurrentTrack: Track | null;
     updateStep1CurrentTrack: (track: Track | null) => void;
     yearRange: YearRange | null;
@@ -33,7 +32,7 @@ export const useTrackContext = () => {
 
 export const TrackContextProvider = ({ children }: { children: ReactNode }) => {
     const [currentlyPlaying, setCurrentlyPlaying] = useState<string>("");
-    const [step1Tracks, setStep1Tracks] = useState<StoredTrack[]>([]);
+    const [step1Tracks, setStep1Tracks] = useState<Track[]>([]);
     const [step1CurrentTrack, setStep1CurrentTrack] = useState<Track | null>(
         null
     );
@@ -44,7 +43,7 @@ export const TrackContextProvider = ({ children }: { children: ReactNode }) => {
         setCurrentlyPlaying(trackId || "");
     };
 
-    const updateStep1Tracks = (tracks: StoredTrack[]) => {
+    const updateStep1Tracks = (tracks: Track[]) => {
         setStep1Tracks(tracks);
     };
 
