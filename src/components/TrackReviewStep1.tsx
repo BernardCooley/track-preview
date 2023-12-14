@@ -224,29 +224,29 @@ const TrackReviewStep1NoQueuedTrack = () => {
         }
     }, [tracks]);
 
-    const storeTrack = async (like: boolean) => {
-        if (user?.uid && currentTrack && tracks) {
+    const storeTrack = async (track: Track, like: boolean) => {
+        if (user?.uid && tracks) {
             await saveNewTrack({
-                id: currentTrack.id,
+                id: track.id,
                 genre: genre || "all",
                 userId: user.uid,
-                artist: currentTrack.artist,
-                title: currentTrack.title,
-                currentReviewStep: (currentTrack.currentReviewStep = like
-                    ? 2
-                    : 0),
-                furthestReviewStep: (currentTrack.furthestReviewStep = like
-                    ? 2
-                    : 1),
-                purchaseUrl: currentTrack.purchaseUrl,
-                searchedTrack: currentTrack.searchedTrack,
+                artist: track.artist,
+                title: track.title,
+                currentReviewStep: (track.currentReviewStep = like ? 2 : 0),
+                furthestReviewStep: (track.furthestReviewStep = like ? 2 : 1),
+                purchaseUrl: track.purchaseUrl,
+                searchedTrack: track.searchedTrack,
             });
         }
     };
 
     const likeOrDislike = async (like: boolean) => {
         try {
-            await storeTrack(like);
+            if (currentTrack) {
+                const track = { ...currentTrack };
+                setCurrentTrack(null);
+                await storeTrack(track, like);
+            }
         } catch (error) {
             showToast({
                 status: "error",
@@ -254,7 +254,6 @@ const TrackReviewStep1NoQueuedTrack = () => {
             });
         }
         setListened(false);
-        setCurrentTrack(null);
         setIsPlaying(false);
 
         setTracks(tracks?.slice(1) || []);
