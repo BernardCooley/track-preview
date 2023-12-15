@@ -78,7 +78,7 @@ const TrackReviewStep1NoQueuedTrack = () => {
                 description: "Please try refreshing the page.",
             });
         }
-    }, [genre, user, yearRange]);
+    }, [genre, user, yearRange?.from, yearRange?.to]);
 
     useEffect(() => {
         if (userProfile) {
@@ -328,6 +328,10 @@ const TrackReviewStep1NoQueuedTrack = () => {
                     });
                     setAllowGetTracks(true);
                     updateUserProfile(newProfile);
+                    setTracks([]);
+                    setCurrentTrack(null);
+                    setListened(false);
+                    setIsPlaying(false);
                     setShowYearSelector(false);
                 }}
                 onCancel={() => setShowYearSelector(false)}
