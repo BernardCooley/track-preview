@@ -306,7 +306,7 @@ const TrackReviewStep1NoQueuedTrack = () => {
                     borderColor="brand.primary"
                 >
                     <Loading
-                        showLoadingBar={user ? true : false}
+                        showLoadingBar={genre && yearRange ? true : false}
                         progress={loadingProgress}
                         loadingText={
                             !user
