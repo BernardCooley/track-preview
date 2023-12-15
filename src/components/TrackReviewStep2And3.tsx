@@ -151,7 +151,7 @@ const TrackReviewStep2And3 = ({ reviewStep }: Props) => {
                 <Center>
                     <Badge
                         zIndex={150}
-                        top="50%"
+                        top="200px"
                         position="absolute"
                         variant="outline"
                         colorScheme="teal"

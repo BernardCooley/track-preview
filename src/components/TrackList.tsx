@@ -123,13 +123,13 @@ const TrackList = () => {
     };
 
     return (
-        <Box h="90vh" position="relative">
+        <Box position="relative">
             {loading && <Loading />}
             {!loading && noTracks && (
                 <Center>
                     <Badge
                         zIndex={150}
-                        top="50%"
+                        top="200px"
                         position="absolute"
                         variant="outline"
                         colorScheme="teal"
