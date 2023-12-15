@@ -266,7 +266,7 @@ const TrackReviewStep1NoQueuedTrack = () => {
     };
 
     const likeOrDislike = async (like: boolean) => {
-        setLoadingMessage(like ? "Liking track" : "Disliking track");
+        setLoadingMessage("Saving selection");
         try {
             if (currentTrack) {
                 const track = { ...currentTrack };
