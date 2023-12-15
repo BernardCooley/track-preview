@@ -38,7 +38,7 @@ const Loading = ({
                 </Text>
                 <BouncingDotsLoader />
             </Flex>
-            {progress && showLoadingBar && (
+            {progress !== undefined && showLoadingBar && (
                 <Flex
                     direction="column"
                     alignItems="center"

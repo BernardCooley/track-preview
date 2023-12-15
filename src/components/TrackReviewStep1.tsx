@@ -292,11 +292,7 @@ const TrackReviewStep1NoQueuedTrack = () => {
         <Box position="relative">
             {!currentTrack && (
                 <Loading
-                    showLoadingBar={
-                        genre && yearRange && loadingProgress !== undefined
-                            ? true
-                            : false
-                    }
+                    showLoadingBar={genre && yearRange ? true : false}
                     progress={loadingProgress}
                     loadingText={
                         !user ? "Loading user profile" : "Loading new track"
