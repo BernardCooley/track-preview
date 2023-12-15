@@ -36,7 +36,7 @@ const TrackList = () => {
     const [trackToDelete, setTrackToDelete] = useState<number | null>(null);
 
     useEffect(() => {
-        init();
+        getTracks();
     }, [user]);
 
     useEffect(() => {
@@ -92,12 +92,11 @@ const TrackList = () => {
         [toast]
     );
 
-    const init = useCallback(async () => {
+    const getTracks = useCallback(async () => {
         setTracks([]);
         setNoTracks(false);
+        setLoading(true);
         if (user?.uid) {
-            setLoading(true);
-
             try {
                 const userTracks = await fetchUserTracks({
                     userId: user.uid,
