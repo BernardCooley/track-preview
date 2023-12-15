@@ -295,7 +295,9 @@ const TrackReviewStep1NoQueuedTrack = () => {
                     showLoadingBar={genre && yearRange ? true : false}
                     progress={loadingProgress}
                     loadingText={
-                        !user ? "Loading user profile" : "Loading new track"
+                        genre && yearRange
+                            ? "Loading new track"
+                            : "Loading user profile"
                     }
                 />
             )}
