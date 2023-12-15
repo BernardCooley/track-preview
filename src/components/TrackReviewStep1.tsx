@@ -292,6 +292,7 @@ const TrackReviewStep1NoQueuedTrack = () => {
         <Box position="relative">
             {!currentTrack && (
                 <Box
+                    w={["full", "70%", "50%", "400px"]}
                     position="absolute"
                     top="100%"
                     transform="translate(50%, 0)"
@@ -304,7 +305,15 @@ const TrackReviewStep1NoQueuedTrack = () => {
                     border="1px solid"
                     borderColor="brand.primary"
                 >
-                    <Loading progress={loadingProgress} />
+                    <Loading
+                        showLoadingBar={user ? true : false}
+                        progress={loadingProgress}
+                        loadingText={
+                            !user
+                                ? "Loading user profile"
+                                : "Loading new tracks"
+                        }
+                    />
                 </Box>
             )}
 

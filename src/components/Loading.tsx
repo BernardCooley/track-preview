@@ -5,18 +5,24 @@ import { Circle } from "rc-progress";
 
 interface Props {
     progress?: number;
+    loadingText?: string;
+    showLoadingBar?: boolean;
 }
 
-const Loading = ({ progress }: Props) => {
+const Loading = ({
+    progress,
+    loadingText = "Loading",
+    showLoadingBar = false,
+}: Props) => {
     return (
         <Flex gap={2} direction="column" alignItems="center">
-            <Flex alignItems="center" gap={2}>
+            <Flex alignItems="center" gap={2} direction="column">
                 <Text color="brand.primary" fontSize="xl">
-                    Loading
+                    {loadingText}
                 </Text>
                 <BouncingDotsLoader />
             </Flex>
-            {progress !== undefined && (
+            {progress !== undefined && showLoadingBar && (
                 <Flex
                     direction="column"
                     alignItems="center"
