@@ -220,8 +220,10 @@ export async function GET() {
                     }
                 );
 
+                const d = new Date();
+
                 fs.writeFileSync(
-                    "juno_scraped_tracks/new.json",
+                    `juno_scraped_tracks/${d.getFullYear()}-${d.getMonth()}-${d.getDay()}.json`,
                     JSON.stringify(tracksWithIds, null, 4),
                     (err: any) => {
                         if (err) console.log(err);
@@ -464,8 +466,8 @@ export async function GET() {
     // await util();
 
     try {
-        const tracks: any = [];
-        // const tracks = await getTracks();
+        // const tracks: any = [];
+        const tracks = await getTracks();
 
         if (tracks) {
             const response = NextResponse.json(tracks, {

@@ -10,7 +10,8 @@
         "tsc": "tsc --noEmit",
         "postinstall": "prisma generate",
         "migrateprod": "dotenv -e npx prisma db push npx prisma migrate deploy",
-        "migratedev": "dotenv -e npx prisma db push npx prisma migrate dev"
+        "migratedev": "dotenv -e npx prisma db push npx prisma migrate dev",
+        "scrapejuno": "node juno_scraped_tracks/scrapejuno.js"
     },
     "dependencies": {
         "@chakra-ui/icons": "2.1.0",
