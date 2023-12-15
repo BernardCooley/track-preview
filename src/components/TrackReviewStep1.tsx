@@ -290,7 +290,24 @@ const TrackReviewStep1NoQueuedTrack = () => {
 
     return (
         <Box position="relative">
-            {!currentTrack && <Loading progress={loadingProgress} />}
+            {!currentTrack && (
+                <Box
+                    position="absolute"
+                    top="100%"
+                    transform="translate(50%, 0)"
+                    right="50%"
+                    bg="brand.backgroundTertiaryOpaque2"
+                    p={10}
+                    pt={6}
+                    rounded="3xl"
+                    shadow="2xl"
+                    border="1px solid"
+                    borderColor="brand.primary"
+                >
+                    <Loading progress={loadingProgress} />
+                </Box>
+            )}
+
             {noTracks && (
                 <Text
                     textAlign="center"
@@ -357,9 +374,9 @@ const TrackReviewStep1NoQueuedTrack = () => {
                 p={4}
                 pt={2}
                 gap={2}
-                transition="ease-in-out 200ms"
                 rounded="3xl"
                 zIndex={200}
+                minH="66px"
             >
                 {user?.uid && (
                     <FilterTags

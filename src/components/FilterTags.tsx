@@ -1,4 +1,4 @@
-import { Flex, Tag } from "@chakra-ui/react";
+import { Flex, Spinner, Tag, Text } from "@chakra-ui/react";
 import React from "react";
 import { isMobile } from "react-device-detect";
 import { getCurrentYear } from "../../utils";
@@ -28,27 +28,31 @@ const FilterTags = ({
     return (
         <Flex transition="opacity 200ms">
             <Flex gap={2} w="full" flexWrap="wrap">
-                {genre ? (
-                    <Tag
-                        key={`${genre}`}
-                        variant="filter"
-                        onClick={onGenreClick}
-                    >
-                        {genre.toLowerCase() === "all" ? "All genres" : genre}
-                    </Tag>
-                ) : null}
+                <Tag key={`${genre}`} variant="filter" onClick={onGenreClick}>
+                    {genre ? (
+                        <Text>
+                            {genre.toLowerCase() === "all"
+                                ? "All genres"
+                                : genre}
+                        </Text>
+                    ) : (
+                        <Spinner color="brand.primary" size="xs" />
+                    )}
+                </Tag>
 
-                {yearRange && showDates ? (
-                    <Tag
-                        key={`${yearRange.from}-${yearRange.to}`}
-                        variant="filter"
-                        onClick={onYearClick}
-                    >
-                        {yearRange.from === 1960 &&
-                        yearRange.to === getCurrentYear()
-                            ? "All years"
-                            : `${yearRange.from} -
+                {showDates ? (
+                    <Tag variant="filter" onClick={onYearClick}>
+                        {yearRange ? (
+                            <Text>
+                                {yearRange.from === 1960 &&
+                                yearRange.to === getCurrentYear()
+                                    ? "All years"
+                                    : `${yearRange.from} -
                          ${yearRange?.to}`}
+                            </Text>
+                        ) : (
+                            <Spinner color="brand.primary" size="xs" />
+                        )}
                     </Tag>
                 ) : null}
 
