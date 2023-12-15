@@ -291,30 +291,17 @@ const TrackReviewStep1NoQueuedTrack = () => {
     return (
         <Box position="relative">
             {!currentTrack && (
-                <Box
-                    w={["full", "70%", "50%", "400px"]}
-                    position="absolute"
-                    top="100%"
-                    transform="translate(50%, 0)"
-                    right="50%"
-                    bg="brand.backgroundTertiaryOpaque2"
-                    p={10}
-                    pt={6}
-                    rounded="3xl"
-                    shadow="2xl"
-                    border="1px solid"
-                    borderColor="brand.primary"
-                >
-                    <Loading
-                        showLoadingBar={genre && yearRange ? true : false}
-                        progress={loadingProgress}
-                        loadingText={
-                            !user
-                                ? "Loading user profile"
-                                : "Loading new tracks"
-                        }
-                    />
-                </Box>
+                <Loading
+                    showLoadingBar={
+                        genre && yearRange && loadingProgress !== undefined
+                            ? true
+                            : false
+                    }
+                    progress={loadingProgress}
+                    loadingText={
+                        !user ? "Loading user profile" : "Loading new track"
+                    }
+                />
             )}
 
             {noTracks && (

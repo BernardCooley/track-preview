@@ -124,23 +124,7 @@ const TrackList = () => {
 
     return (
         <Box h="90vh" position="relative">
-            {loading && (
-                <Box
-                    position="absolute"
-                    top="100%"
-                    transform="translate(50%, 0)"
-                    right="50%"
-                    bg="brand.backgroundTertiaryOpaque2"
-                    p={10}
-                    pt={6}
-                    rounded="3xl"
-                    shadow="2xl"
-                    border="1px solid"
-                    borderColor="brand.primary"
-                >
-                    <Loading />
-                </Box>
-            )}
+            {loading && <Loading />}
             {!loading && noTracks && (
                 <Center>
                     <Badge

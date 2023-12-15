@@ -15,14 +15,30 @@ const Loading = ({
     showLoadingBar = false,
 }: Props) => {
     return (
-        <Flex gap={2} direction="column" alignItems="center">
+        <Flex
+            gap={2}
+            direction="column"
+            alignItems="center"
+            w={["full", "70%", "50%", "400px"]}
+            position="absolute"
+            top="100%"
+            transform="translate(50%, 0)"
+            right="50%"
+            bg="brand.backgroundTertiaryOpaque2"
+            p={10}
+            pt={6}
+            rounded="3xl"
+            shadow="2xl"
+            border="1px solid"
+            borderColor="brand.primary"
+        >
             <Flex alignItems="center" gap={2} direction="column">
                 <Text color="brand.primary" fontSize="xl">
                     {loadingText}
                 </Text>
                 <BouncingDotsLoader />
             </Flex>
-            {progress !== undefined && showLoadingBar && (
+            {showLoadingBar && (
                 <Flex
                     direction="column"
                     alignItems="center"
