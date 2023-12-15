@@ -11,6 +11,7 @@ interface Props {
     } | null;
     preferredAutoPlay: boolean;
     showDates: boolean;
+    showGenre: boolean;
     onAutoPlayToggle: () => void;
     onGenreClick?: () => void;
     onYearClick?: () => void;
@@ -21,6 +22,7 @@ const FilterTags = ({
     yearRange,
     preferredAutoPlay,
     showDates,
+    showGenre,
     onAutoPlayToggle,
     onGenreClick,
     onYearClick,
@@ -28,17 +30,23 @@ const FilterTags = ({
     return (
         <Flex transition="opacity 200ms">
             <Flex gap={2} w="full" flexWrap="wrap">
-                <Tag key={`${genre}`} variant="filter" onClick={onGenreClick}>
-                    {genre ? (
-                        <Text>
-                            {genre.toLowerCase() === "all"
-                                ? "All genres"
-                                : genre}
-                        </Text>
-                    ) : (
-                        <Spinner color="brand.primary" size="xs" />
-                    )}
-                </Tag>
+                {showGenre && (
+                    <Tag
+                        key={`${genre}`}
+                        variant="filter"
+                        onClick={onGenreClick}
+                    >
+                        {genre ? (
+                            <Text>
+                                {genre.toLowerCase() === "all"
+                                    ? "All genres"
+                                    : genre}
+                            </Text>
+                        ) : (
+                            <Spinner color="brand.primary" size="xs" />
+                        )}
+                    </Tag>
+                )}
 
                 {showDates ? (
                     <Tag variant="filter" onClick={onYearClick}>
