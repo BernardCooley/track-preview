@@ -46,10 +46,13 @@ a {
   animation-delay: 0.4s;
 }
 
-.app-wrapper {
-  background-image: url(/logo_background_4x_gradient.png);
-  background-size: 90%;
-  background-repeat: no-repeat;
-  background-position: center;
-  height: 100vh;
+.page-background {
+  opacity: 0.5;
+  position: fixed;
+  left: 10px;
+  top: 150px;
+  width: 100%;
+  height: auto;
+  z-index: -1;
+  padding: 0 50px;
 }
