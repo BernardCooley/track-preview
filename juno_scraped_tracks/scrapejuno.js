@@ -249,6 +249,6 @@ const getTracks = async () => {
     }
     await browser.close();
     console.log("DONE");
-    return allTracks;
 };
-const tracks = getTracks();
+
+getTracks();
