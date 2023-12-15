@@ -10,11 +10,11 @@ import {
     Tag,
     Text,
 } from "@chakra-ui/react";
-import ThumbDownIcon from "@mui/icons-material/ThumbDown";
-import ThumbUpIcon from "@mui/icons-material/ThumbUp";
-import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import { SearchedTrack } from "../../types";
 import BouncingDotsLoader from "./BouncingLoaderDots";
+import PlayArrowTwoToneIcon from "@mui/icons-material/PlayArrowTwoTone";
+import ThumbDownAltTwoToneIcon from "@mui/icons-material/ThumbDownAltTwoTone";
+import ThumbUpAltTwoToneIcon from "@mui/icons-material/ThumbUpAltTwoTone";
 
 interface Props {
     loadingMessage?: string;
@@ -104,52 +104,83 @@ const TrackReviewCard = forwardRef(
                             h="full"
                             justifyContent="space-between"
                         >
-                            <Flex w="full" pb={10} h="full">
+                            <Flex
+                                w="full"
+                                pb={10}
+                                h="full"
+                                justifyContent="center"
+                            >
                                 {isPlaying ? (
-                                    <>
+                                    <Flex
+                                        w="full"
+                                        justifyContent="space-around"
+                                    >
                                         <IconButton
+                                            shadow="none"
+                                            p={[4, 6]}
                                             isDisabled={!listened}
                                             onClick={async () =>
                                                 onLikeOrDislike(false)
                                             }
                                             variant="ghost"
-                                            w="full"
-                                            h="full"
+                                            w="auto"
+                                            h="auto"
                                             colorScheme="red"
                                             aria-label="Call Segun"
-                                            fontSize={["100px", "200px"]}
+                                            fontSize={["100px", "150px"]}
                                             icon={
-                                                <ThumbDownIcon fontSize="inherit" />
+                                                <ThumbDownAltTwoToneIcon fontSize="inherit" />
                                             }
+                                            _selected={{
+                                                transform: "scale(1.2)",
+                                            }}
+                                            _hover={{
+                                                transform: "scale(1.2)",
+                                            }}
                                         />
                                         <IconButton
+                                            shadow="none"
+                                            p={[4, 6]}
                                             isDisabled={!listened}
                                             onClick={async () =>
                                                 onLikeOrDislike(true)
                                             }
                                             variant="ghost"
-                                            w="full"
-                                            h="full"
+                                            w="auto"
+                                            h="auto"
                                             colorScheme="green"
                                             aria-label="Call Segun"
-                                            fontSize={["100px", "200px"]}
+                                            fontSize={["100px", "150px"]}
                                             icon={
-                                                <ThumbUpIcon fontSize="inherit" />
+                                                <ThumbUpAltTwoToneIcon fontSize="inherit" />
                                             }
+                                            _selected={{
+                                                transform: "scale(1.2)",
+                                            }}
+                                            _hover={{
+                                                transform: "scale(1.2)",
+                                            }}
                                         />
-                                    </>
+                                    </Flex>
                                 ) : (
                                     <IconButton
+                                        shadow="none"
                                         onClick={onPlayButtonClicked}
                                         variant="ghost"
-                                        w="full"
-                                        h="full"
+                                        w="auto"
+                                        h="auto"
                                         colorScheme="black"
                                         aria-label="Call Segun"
                                         fontSize={["100px", "200px"]}
                                         icon={
-                                            <PlayArrowIcon fontSize="inherit" />
+                                            <PlayArrowTwoToneIcon fontSize="inherit" />
                                         }
+                                        _selected={{
+                                            transform: "scale(1.2)",
+                                        }}
+                                        _hover={{
+                                            transform: "scale(1.2)",
+                                        }}
                                     />
                                 )}
                             </Flex>
