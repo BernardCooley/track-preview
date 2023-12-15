@@ -194,6 +194,7 @@ const TrackReviewStep2And3 = ({ reviewStep }: Props) => {
                             }}
                             showDates={false}
                             showGenre={false}
+                            profileLoaded={userProfile ? true : false}
                             preferredAutoPlay={autoplay}
                         />
                     )}

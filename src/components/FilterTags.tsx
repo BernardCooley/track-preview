@@ -12,6 +12,7 @@ interface Props {
     preferredAutoPlay: boolean;
     showDates: boolean;
     showGenre: boolean;
+    profileLoaded: boolean;
     onAutoPlayToggle: () => void;
     onGenreClick?: () => void;
     onYearClick?: () => void;
@@ -23,6 +24,7 @@ const FilterTags = ({
     preferredAutoPlay,
     showDates,
     showGenre,
+    profileLoaded,
     onAutoPlayToggle,
     onGenreClick,
     onYearClick,
@@ -91,7 +93,11 @@ const FilterTags = ({
                     }
                     variant="filter"
                 >
-                    AutoPlay
+                    {profileLoaded ? (
+                        <Text>AutoPlay</Text>
+                    ) : (
+                        <Spinner color="brand.primary" size="xs" />
+                    )}
                 </Tag>
             </Flex>
         </Flex>

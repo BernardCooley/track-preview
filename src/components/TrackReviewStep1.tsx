@@ -388,6 +388,7 @@ const TrackReviewStep1NoQueuedTrack = () => {
                         }}
                         showDates={true}
                         showGenre={true}
+                        profileLoaded={userProfile ? true : false}
                         genre={genre}
                         yearRange={yearRange}
                         preferredAutoPlay={autoplay}
