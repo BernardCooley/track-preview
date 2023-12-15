@@ -146,7 +146,9 @@ const TrackReviewStep2And3 = ({ reviewStep }: Props) => {
 
     return (
         <Box position="relative">
-            {loading && <Loading />}
+            {loading && (
+                <Loading loadingText={`Loading step ${reviewStep} track`} />
+            )}
             {!loading && noTracks && (
                 <Center>
                     <Badge

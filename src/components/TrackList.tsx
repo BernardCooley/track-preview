@@ -123,7 +123,7 @@ const TrackList = () => {
 
     return (
         <Box position="relative">
-            {loading && <Loading />}
+            {loading && <Loading loadingText={`Loading step 4 tracks`} />}
             {!loading && noTracks && (
                 <Center>
                     <Badge
