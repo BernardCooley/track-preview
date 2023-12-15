@@ -27,7 +27,8 @@
         "**/*.ts",
         "**/*.tsx",
         ".next/types/**/*.ts",
-        "prisma/seed.js"
+        "prisma/seed.js",
+        "juno_scraped_tracks/scrapeJuno.js"
     ],
     "exclude": ["node_modules"],
     "typeRoots": ["./typings", "./node_modules/@types/"]
