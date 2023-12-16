@@ -176,8 +176,8 @@ const GenreModal = ({
                                         bg="transparent"
                                         shadow="none"
                                         onClick={() => {
-                                            setIsSearching(false);
                                             setSearchValue("");
+                                            setIsSearching(false);
                                         }}
                                         left={1}
                                         rounded="full"
@@ -228,7 +228,11 @@ const GenreModal = ({
                         >
                             {genres.sort().map((gen) => (
                                 <Tag
-                                    onClick={() => onGenreSelect(gen)}
+                                    onClick={() => {
+                                        onGenreSelect(gen);
+                                        setSearchValue("");
+                                        setIsSearching(false);
+                                    }}
                                     bg={
                                         genre === gen
                                             ? "brand.primaryOpaque"
