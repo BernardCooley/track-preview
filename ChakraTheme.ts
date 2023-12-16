@@ -216,6 +216,28 @@ export const theme = extendTheme({
                 },
             },
         },
+        Menu: {
+            variants: {
+                primary: {
+                    list: {
+                        bg: "brand.backgroundPrimary",
+                        color: "brand.textPrimary",
+                        padding: "0",
+                        border: "1px solid",
+                        borderColor: "brand.primary",
+                        shadow: "md",
+                    },
+                    item: {
+                        rounded: "md",
+                        bg: "brand.backgroundPrimary",
+                        color: "brand.textPrimary",
+                        _hover: {
+                            bg: "brand.backgroundTertiaryOpaque",
+                        },
+                    },
+                },
+            },
+        },
     },
     styles: {
         global: () => ({

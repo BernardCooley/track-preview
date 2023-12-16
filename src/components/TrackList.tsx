@@ -10,8 +10,10 @@ import {
     Box,
     Button,
     Center,
+    Flex,
     Stack,
     StackDivider,
+    Text,
     ToastProps,
     useDisclosure,
     useToast,
@@ -122,7 +124,7 @@ const TrackList = () => {
     };
 
     return (
-        <Box position="relative">
+        <Box position="relative" pb={20}>
             {loading && <Loading loadingText={`Loading step 4 tracks`} />}
             {!loading && noTracks && (
                 <Center>
@@ -142,16 +144,43 @@ const TrackList = () => {
             <AlertDialog
                 isOpen={isOpen}
                 leastDestructiveRef={cancelRef}
-                onClose={onClose}
+                onClose={() => {
+                    onClose();
+                    closeDialog();
+                }}
             >
                 <AlertDialogOverlay>
-                    <AlertDialogContent>
+                    <AlertDialogContent
+                        m={6}
+                        bg="brand.backgroundPrimary"
+                        shadow="2xl"
+                        border="1px solid"
+                        borderColor="brand.primary"
+                    >
                         <AlertDialogHeader fontSize="lg" fontWeight="bold">
                             Delete Track
                         </AlertDialogHeader>
 
                         <AlertDialogBody>
-                            {`Are you sure? You can't undo this action afterwards.`}
+                            <Flex direction="column" gap={2}>
+                                <Text>Are you sure you want to delete...</Text>
+                                <Flex
+                                    direction="column"
+                                    bg="brand.backgroundTertiaryOpaque"
+                                    p={2}
+                                    rounded="md"
+                                >
+                                    <Text fontSize="xl" fontWeight="bold">
+                                        {tracks[trackToDelete!]?.artist}
+                                    </Text>
+                                    <Text fontSize="md" fontWeight="bold">
+                                        {tracks[trackToDelete!]?.title}
+                                    </Text>
+                                </Flex>
+                                <Text>
+                                    You cannot undo this action afterwards.
+                                </Text>
+                            </Flex>
                         </AlertDialogBody>
 
                         <AlertDialogFooter>
@@ -173,7 +202,9 @@ const TrackList = () => {
                 p={[2, 4, 8]}
                 h="full"
                 overflowY="scroll"
-                divider={<StackDivider />}
+                divider={
+                    <StackDivider borderColor="brand.backgroundTertiaryOpaque" />
+                }
                 spacing="4"
                 css={{
                     "&::-webkit-scrollbar": {

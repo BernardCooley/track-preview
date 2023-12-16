@@ -4,15 +4,15 @@ import {
     CardBody,
     Flex,
     IconButton,
-    Link,
+    Menu,
+    MenuButton,
+    MenuItem,
+    MenuList,
     Text,
 } from "@chakra-ui/react";
 import React from "react";
-import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import PlayArrowIcon from "@mui/icons-material/PlayArrow";
-import StopIcon from "@mui/icons-material/Stop";
 import { Track } from "../../types";
+import MoreHorizTwoToneIcon from "@mui/icons-material/MoreHorizTwoTone";
 
 interface Props {
     track: Track;
@@ -29,82 +29,90 @@ const ListTrack = ({
     trackIndex,
     onCurrentlyPlayingUpdate,
 }: Props) => {
-    console.log("🚀 ~ file: ListTrack.tsx:32 ~ track:", track);
     return (
         <Card
+            shadow="none"
             key={track.searchedTrack.previewUrl}
-            bg={
-                currentlyPlaying === track.searchedTrack.previewUrl
-                    ? "lightgrey"
-                    : "white"
-            }
+            bg="transparent"
         >
-            <CardBody>
+            <CardBody p={0}>
                 <Flex
-                    gap={8}
+                    gap={[0, 8]}
                     justifyContent={["center", "space-between"]}
                     direction={["column", "row"]}
+                    alignItems="flex-end"
                 >
-                    <Box>
-                        <Text fontSize={["2xl", "xl", "3xl"]} fontWeight="bold">
+                    <Box
+                        rounded="md"
+                        color="brand.textPrimary"
+                        w="full"
+                        py={[2, 4]}
+                        px={[1, 2]}
+                        outline={
+                            currentlyPlaying === track.searchedTrack.previewUrl
+                                ? "1px solid"
+                                : "none"
+                        }
+                        outlineColor={
+                            currentlyPlaying === track.searchedTrack.previewUrl
+                                ? "brand.primary"
+                                : "transparent"
+                        }
+                        _hover={{
+                            outline: "1px solid",
+                            outlineColor: "brand.primaryOpaque",
+                            cursor: "pointer",
+                        }}
+                        onClick={() => {
+                            if (
+                                currentlyPlaying ===
+                                track.searchedTrack.previewUrl
+                            ) {
+                                onCurrentlyPlayingUpdate(undefined);
+                            } else {
+                                onCurrentlyPlayingUpdate(
+                                    track.searchedTrack.previewUrl
+                                );
+                            }
+                        }}
+                    >
+                        <Text fontSize={["xl", "2xl"]} fontWeight="bold">
                             {track.artist}
                         </Text>
-                        <Text fontSize={["xl", "md", "xl"]}>{track.title}</Text>
+                        <Text fontSize={["md", "xl"]}>{track.title}</Text>
                     </Box>
-                    <Flex gap={2}>
-                        <IconButton
-                            onClick={() => onTrackDelete(trackIndex)}
-                            variant="ghost"
-                            w="full"
-                            h="full"
-                            colorScheme="red"
-                            aria-label="Call Segun"
-                            fontSize={["3xl", "4xl", "5xl"]}
-                            icon={<DeleteForeverIcon fontSize="inherit" />}
-                        />
-                        <Link href={track.purchaseUrl} isExternal>
-                            <IconButton
-                                onClick={() => {}}
-                                className={track.purchaseUrl}
-                                variant="ghost"
-                                w="full"
-                                h="full"
-                                colorScheme="green"
-                                aria-label="Call Segun"
-                                fontSize={["3xl", "4xl", "5xl"]}
-                                icon={<ShoppingCartIcon fontSize="inherit" />}
-                            />
-                        </Link>
-                        {currentlyPlaying !== track.searchedTrack.previewUrl ? (
-                            <IconButton
-                                onClick={() =>
-                                    onCurrentlyPlayingUpdate(
-                                        track.searchedTrack.previewUrl
-                                    )
+                    <Box w="50px">
+                        <Menu variant="primary">
+                            <MenuButton
+                                color="brand.primaryOpaque"
+                                fontSize="3xl"
+                                bg="transparent"
+                                _active={{
+                                    bg: "transparent",
+                                    color: "brand.primary",
+                                    transform: "scale(1.2)",
+                                }}
+                                as={IconButton}
+                                shadow="none"
+                                _hover={{
+                                    bg: "transparent",
+                                    color: "brand.primary",
+                                    transform: "scale(1.2)",
+                                }}
+                                icon={
+                                    <MoreHorizTwoToneIcon fontSize="inherit" />
                                 }
-                                variant="ghost"
-                                w="full"
-                                h="full"
-                                colorScheme="black"
-                                aria-label="Call Segun"
-                                fontSize={["3xl", "4xl", "5xl"]}
-                                icon={<PlayArrowIcon fontSize="inherit" />}
-                            />
-                        ) : (
-                            <IconButton
-                                onClick={() =>
-                                    onCurrentlyPlayingUpdate(undefined)
-                                }
-                                variant="ghost"
-                                w="full"
-                                h="full"
-                                colorScheme="black"
-                                aria-label="Call Segun"
-                                fontSize={["3xl", "4xl", "5xl"]}
-                                icon={<StopIcon fontSize="inherit" />}
-                            />
-                        )}
-                    </Flex>
+                            ></MenuButton>
+                            <MenuList>
+                                <MenuItem
+                                    onClick={() => onTrackDelete(trackIndex)}
+                                >
+                                    Delete track
+                                </MenuItem>
+                                <MenuItem>Buy</MenuItem>
+                            </MenuList>
+                        </Menu>
+                    </Box>
                 </Flex>
             </CardBody>
         </Card>
