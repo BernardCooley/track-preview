@@ -59,7 +59,6 @@ const GenreModal = ({
 
     return (
         <Modal
-            isCentered={true}
             isOpen={showGenreSelector}
             onClose={() => setShowGenreSelector(false)}
         >
