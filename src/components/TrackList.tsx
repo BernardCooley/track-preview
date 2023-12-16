@@ -65,7 +65,7 @@ const TrackList = () => {
                 updateCurrentlyPlaying(undefined);
 
                 const filteredTracks: Track[] = tracks.filter(
-                    (t) => t.id !== tracks[0].id
+                    (t) => t.id !== tracks[trackToDelete].id
                 );
 
                 if (filteredTracks.length > 0) {
