@@ -60,7 +60,12 @@ const GenreModal = ({
     return (
         <Modal
             isOpen={showGenreSelector}
-            onClose={() => setShowGenreSelector(false)}
+            onClose={() => {
+                setShowGenreSelector(false);
+                setSearchValue("");
+                setIsSearching(false);
+                setFilteredGenres([]);
+            }}
         >
             <ModalOverlay />
             <ModalContent rounded="3xl" mx={4}>
