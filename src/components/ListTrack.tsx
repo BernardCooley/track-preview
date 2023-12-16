@@ -4,6 +4,7 @@ import {
     CardBody,
     Flex,
     IconButton,
+    Link,
     Menu,
     MenuButton,
     MenuItem,
@@ -108,7 +109,18 @@ const ListTrack = ({
                                 >
                                     Delete track
                                 </MenuItem>
-                                <MenuItem>Buy</MenuItem>
+                                <MenuItem
+                                    _hover={{
+                                        textDecoration: "none",
+                                        bg: "brand.backgroundTertiaryOpaque",
+                                    }}
+                                    as={Link}
+                                    href={track.purchaseUrl}
+                                    isExternal
+                                    variant="unstyled"
+                                >
+                                    Buy track
+                                </MenuItem>
                             </MenuList>
                         </Menu>
                     </Box>
