@@ -39,7 +39,6 @@ const ListTrack = ({
                 <Flex
                     gap={[0, 8]}
                     justifyContent={["center", "space-between"]}
-                    direction={["column", "row"]}
                     alignItems="flex-end"
                 >
                     <Box
