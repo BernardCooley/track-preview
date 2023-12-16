@@ -76,76 +76,80 @@ const GenreModal = ({
                             Select genre
                         </Text>
 
-                        {recentGenres && recentGenres.length > 0 && (
-                            <Flex
-                                direction="column"
-                                border="1px solid"
-                                borderColor="brand.backgroundTertiary"
-                                p={2}
-                                gap={3}
-                                position="relative"
-                            >
-                                <Flex justifyContent="space-between">
-                                    <Text>Recent</Text>
-                                    {recentGenres.length > 1 && (
-                                        <Button
-                                            onClick={onFavouriteClearClick}
-                                            variant="unstyled"
-                                            shadow="none"
-                                            color="brand.primary"
-                                            p={0}
-                                            pr={2}
-                                            h="auto"
-                                            _hover={{
-                                                bg: "transparent",
-                                                transform: "scale(1.2)",
-                                            }}
-                                        >
-                                            clear
-                                        </Button>
-                                    )}
+                        {!isSearching &&
+                            recentGenres &&
+                            recentGenres.length > 0 && (
+                                <Flex
+                                    direction="column"
+                                    border="1px solid"
+                                    borderColor="brand.backgroundTertiary"
+                                    p={2}
+                                    gap={3}
+                                    position="relative"
+                                >
+                                    <Flex justifyContent="space-between">
+                                        <Text>Recent</Text>
+                                        {recentGenres.length > 1 && (
+                                            <Button
+                                                onClick={onFavouriteClearClick}
+                                                variant="unstyled"
+                                                shadow="none"
+                                                color="brand.primary"
+                                                p={0}
+                                                pr={2}
+                                                h="auto"
+                                                _hover={{
+                                                    bg: "transparent",
+                                                    transform: "scale(1.2)",
+                                                }}
+                                            >
+                                                clear
+                                            </Button>
+                                        )}
+                                    </Flex>
+                                    <Flex flexWrap="wrap" gap={4}>
+                                        {recentGenres.map((gen) => (
+                                            <Tag
+                                                padding={2}
+                                                onClick={() =>
+                                                    onGenreSelect(gen)
+                                                }
+                                                bg={
+                                                    genre === gen
+                                                        ? "brand.primaryOpaque"
+                                                        : "transparent"
+                                                }
+                                                borderColor={
+                                                    genre === gen
+                                                        ? "brand.primaryLight"
+                                                        : "brand.primaryOpaque"
+                                                }
+                                                _hover={
+                                                    isMobile
+                                                        ? {}
+                                                        : {
+                                                              cursor: "pointer",
+                                                              bg:
+                                                                  genre === gen
+                                                                      ? "transparent"
+                                                                      : "brand.primaryOpaque",
+                                                              borderColor:
+                                                                  genre === gen
+                                                                      ? "brand.primaryOpaque"
+                                                                      : "brand.primaryLight",
+                                                          }
+                                                }
+                                                variant="filter"
+                                                key={genre}
+                                                size="xs"
+                                                fontSize="12px"
+                                            >
+                                                {gen}
+                                            </Tag>
+                                        ))}
+                                    </Flex>
                                 </Flex>
-                                <Flex flexWrap="wrap" gap={4}>
-                                    {recentGenres.map((gen) => (
-                                        <Tag
-                                            padding={2}
-                                            onClick={() => onGenreSelect(gen)}
-                                            bg={
-                                                genre === gen
-                                                    ? "brand.primaryOpaque"
-                                                    : "transparent"
-                                            }
-                                            borderColor={
-                                                genre === gen
-                                                    ? "brand.primaryLight"
-                                                    : "brand.primaryOpaque"
-                                            }
-                                            _hover={
-                                                isMobile
-                                                    ? {}
-                                                    : {
-                                                          cursor: "pointer",
-                                                          bg:
-                                                              genre === gen
-                                                                  ? "transparent"
-                                                                  : "brand.primaryOpaque",
-                                                          borderColor:
-                                                              genre === gen
-                                                                  ? "brand.primaryOpaque"
-                                                                  : "brand.primaryLight",
-                                                      }
-                                            }
-                                            variant="filter"
-                                            key={genre}
-                                            size="xs"
-                                            fontSize="12px"
-                                        >
-                                            {gen}
-                                        </Tag>
-                                    ))}
-                                </Flex>
-                            </Flex>
-                        )}
+                            )}
                         {isSearching ? (
                             <TextInput
                                 allowHelperText={false}
