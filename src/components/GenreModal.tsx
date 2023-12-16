@@ -44,7 +44,7 @@ const GenreModal = ({
         } else {
             setGenres(availableGenres);
         }
-    }, [searchValue]);
+    }, [filteredGenres]);
 
     useEffect(() => {
         if (searchValue.length > 0) {
@@ -75,7 +75,6 @@ const GenreModal = ({
                         <Text fontSize="xl" textAlign="center">
                             Select genre
                         </Text>
-
                         {!isSearching &&
                             recentGenres &&
                             recentGenres.length > 0 && (
@@ -178,6 +177,7 @@ const GenreModal = ({
                                         onClick={() => {
                                             setSearchValue("");
                                             setIsSearching(false);
+                                            setFilteredGenres([]);
                                         }}
                                         left={1}
                                         rounded="full"
@@ -219,7 +219,6 @@ const GenreModal = ({
                                 />
                             </Flex>
                         )}
-
                         <Flex
                             flexWrap="wrap"
                             maxH="300px"
@@ -232,6 +231,7 @@ const GenreModal = ({
                                         onGenreSelect(gen);
                                         setSearchValue("");
                                         setIsSearching(false);
+                                        setFilteredGenres([]);
                                     }}
                                     bg={
                                         genre === gen
