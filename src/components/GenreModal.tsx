@@ -161,6 +161,7 @@ const GenreModal = ({
                                 }}
                                 rightIcon={
                                     <IconButton
+                                        pr={4}
                                         position="absolute"
                                         right={6}
                                         top={9}
@@ -207,6 +208,9 @@ const GenreModal = ({
                                     _hover={{
                                         bg: "transparent",
                                         transform: "scale(1.2)",
+                                    }}
+                                    _focusVisible={{
+                                        outline: "none",
                                     }}
                                 />
                             </Flex>
