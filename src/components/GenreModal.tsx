@@ -1,5 +1,5 @@
 import {
-    Divider,
+    Button,
     Flex,
     IconButton,
     Modal,
@@ -8,9 +8,11 @@ import {
     Tag,
     Text,
 } from "@chakra-ui/react";
-import React from "react";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import React, { useEffect, useState } from "react";
 import { isMobile } from "react-device-detect";
+import { TextInput } from "./TextInput";
+import CloseTwoToneIcon from "@mui/icons-material/CloseTwoTone";
+import SearchTwoToneIcon from "@mui/icons-material/SearchTwoTone";
 
 interface Props {
     showGenreSelector: boolean;
@@ -31,6 +33,30 @@ const GenreModal = ({
     onFavouriteClearClick,
     recentGenres,
 }: Props) => {
+    const [searchValue, setSearchValue] = useState<string>("");
+    const [filteredGenres, setFilteredGenres] = useState<string[]>([]);
+    const [genres, setGenres] = useState<string[]>([]);
+    const [isSearching, setIsSearching] = useState<boolean>(false);
+
+    useEffect(() => {
+        if (searchValue.length > 0 && filteredGenres.length > 0) {
+            setGenres(filteredGenres);
+        } else {
+            setGenres(availableGenres);
+        }
+    }, [searchValue]);
+
+    useEffect(() => {
+        if (searchValue.length > 0) {
+            const searchValueLower = searchValue.toLowerCase();
+            setFilteredGenres(
+                availableGenres.filter((gen) =>
+                    gen.toLowerCase().includes(searchValueLower)
+                )
+            );
+        }
+    }, [searchValue]);
+
     return (
         <Modal
             isCentered={true}
@@ -48,8 +74,9 @@ const GenreModal = ({
                 >
                     <Flex width="full" direction="column" gap={4}>
                         <Text fontSize="xl" textAlign="center">
-                            Select Genre
+                            Select genre
                         </Text>
+
                         {recentGenres && recentGenres.length > 0 && (
                             <Flex
                                 direction="column"
@@ -59,25 +86,26 @@ const GenreModal = ({
                                 gap={3}
                                 position="relative"
                             >
-                                <IconButton
-                                    onClick={onFavouriteClearClick}
-                                    top={1}
-                                    right={1}
-                                    position="absolute"
-                                    rounded="full"
-                                    variant="ghost"
-                                    aria-label="settings page"
-                                    fontSize="xl"
-                                    icon={
-                                        <DeleteOutlineIcon fontSize="inherit" />
-                                    }
-                                    color="brand.textPrimary"
-                                    _hover={{
-                                        color: "brand.backgroundPrimary",
-                                        bg: "brand.textPrimary",
-                                    }}
-                                />
-                                <Text>Recent</Text>
+                                <Flex justifyContent="space-between">
+                                    <Text>Recent</Text>
+                                    {recentGenres.length > 1 && (
+                                        <Button
+                                            onClick={onFavouriteClearClick}
+                                            variant="unstyled"
+                                            shadow="none"
+                                            color="brand.primary"
+                                            p={0}
+                                            pr={2}
+                                            h="auto"
+                                            _hover={{
+                                                bg: "transparent",
+                                                transform: "scale(1.2)",
+                                            }}
+                                        >
+                                            clear
+                                        </Button>
+                                    )}
+                                </Flex>
                                 <Flex flexWrap="wrap" gap={4}>
                                     {recentGenres.map((gen) => (
                                         <Tag
@@ -119,14 +147,79 @@ const GenreModal = ({
                                 </Flex>
                             </Flex>
                         )}
-                        <Divider orientation="horizontal" />
+                        {isSearching ? (
+                            <TextInput
+                                allowHelperText={false}
+                                allowErrors={false}
+                                title=""
+                                size="lg"
+                                placeholder="Search genres"
+                                fieldProps={{
+                                    defaultValue: "",
+                                    value: searchValue,
+                                    onChange: (e) =>
+                                        setSearchValue(e.target.value),
+                                }}
+                                rightIcon={
+                                    <IconButton
+                                        position="absolute"
+                                        right={6}
+                                        top={9}
+                                        height="30px"
+                                        fontSize="3xl"
+                                        h={1 / 2}
+                                        color="brand.primary"
+                                        bg="transparent"
+                                        shadow="none"
+                                        onClick={() => {
+                                            setIsSearching(false);
+                                            setSearchValue("");
+                                        }}
+                                        left={1}
+                                        rounded="full"
+                                        variant="ghost"
+                                        aria-label="settings page"
+                                        icon={
+                                            <CloseTwoToneIcon fontSize="inherit" />
+                                        }
+                                        _hover={{
+                                            bg: "transparent",
+                                            transform: "scale(1.2)",
+                                        }}
+                                    />
+                                }
+                            />
+                        ) : (
+                            <Flex justifyContent="flex-start">
+                                <IconButton
+                                    color="brand.primary"
+                                    fontSize="2xl"
+                                    bg="transparent"
+                                    shadow="none"
+                                    onClick={() => setIsSearching(true)}
+                                    left={1}
+                                    position="relative"
+                                    rounded="full"
+                                    variant="ghost"
+                                    aria-label="settings page"
+                                    icon={
+                                        <SearchTwoToneIcon fontSize="inherit" />
+                                    }
+                                    _hover={{
+                                        bg: "transparent",
+                                        transform: "scale(1.2)",
+                                    }}
+                                />
+                            </Flex>
+                        )}
+
                         <Flex
                             flexWrap="wrap"
-                            h="300px"
+                            maxH="300px"
                             overflow="scroll"
                             gap={4}
                         >
-                            {availableGenres.sort().map((gen) => (
+                            {genres.sort().map((gen) => (
                                 <Tag
                                     onClick={() => onGenreSelect(gen)}
                                     bg={

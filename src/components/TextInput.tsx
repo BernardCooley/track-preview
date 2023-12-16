@@ -33,6 +33,8 @@ interface Props {
     type?: string;
     variant?: string;
     isReadOnly?: boolean;
+    allowErrors?: boolean;
+    allowHelperText?: boolean;
 }
 
 export const TextInput = forwardRef(
@@ -52,6 +54,8 @@ export const TextInput = forwardRef(
             type = "text",
             variant = "primary",
             isReadOnly = false,
+            allowErrors = true,
+            allowHelperText = true,
         }: Props,
         ref: LegacyRef<HTMLInputElement>
     ) => {
@@ -67,14 +71,16 @@ export const TextInput = forwardRef(
                         )}
                     </Flex>
                 </FormLabel>
-                <FormHelperText
-                    fontSize="sm"
-                    py={2}
-                    mt={0}
-                    color="brand.lightTitle"
-                >
-                    {helperText}
-                </FormHelperText>
+                {allowHelperText && (
+                    <FormHelperText
+                        fontSize="sm"
+                        py={2}
+                        mt={0}
+                        color="brand.lightTitle"
+                    >
+                        {helperText}
+                    </FormHelperText>
+                )}
                 <InputGroup>
                     {leftIcon && (
                         <InputLeftElement>{leftIcon}</InputLeftElement>
@@ -95,9 +101,11 @@ export const TextInput = forwardRef(
                         <InputRightElement>{rightIcon}</InputRightElement>
                     )}
                 </InputGroup>
-                <Box h="16px" mt="8px">
-                    <FormErrorMessage>{error}</FormErrorMessage>
-                </Box>
+                {allowErrors && (
+                    <Box h="16px" mt="8px">
+                        <FormErrorMessage>{error}</FormErrorMessage>
+                    </Box>
+                )}
             </FormControl>
         );
     }
