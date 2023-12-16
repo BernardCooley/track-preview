@@ -62,6 +62,8 @@ const TrackList = () => {
                     like: false,
                 });
 
+                updateCurrentlyPlaying(undefined);
+
                 const filteredTracks: Track[] = tracks.filter(
                     (t) => t.id !== tracks[0].id
                 );
