@@ -114,6 +114,25 @@ export const theme = extendTheme({
                 },
             },
         },
+        Textarea: {
+            variants: {
+                primary: {
+                    height: "70px",
+                    border: "1px solid",
+                    borderColor: "brand.backgroundPrimary",
+                    shadow: "md",
+                    backgroundColor: "brand.backgroundTertiaryOpaque",
+                    color: "white",
+                    _focus: {
+                        shadow: "xl",
+                        borderColor: "brand.primary",
+                    },
+                    _invalid: {
+                        borderColor: "brand.error",
+                    },
+                },
+            },
+        },
         Stepper: {
             variants: {
                 primary: {

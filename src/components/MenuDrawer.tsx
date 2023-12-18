@@ -54,7 +54,15 @@ const MenuDrawer = forwardRef<HTMLButtonElement | undefined, Props>(
                         </Flex>
                     </DrawerBody>
 
-                    <DrawerFooter></DrawerFooter>
+                    <Divider />
+
+                    <DrawerFooter>
+                        <MenuDrawerItem
+                            pathname={pathname}
+                            linkText="Contact"
+                            href="/contact"
+                        />
+                    </DrawerFooter>
                 </DrawerContent>
             </Drawer>
         );

@@ -377,3 +377,28 @@ export const deleteUserProfile = async ({
         throw error;
     }
 };
+
+interface AddCommentProps {
+    name: string;
+    userId: string;
+    comment: string;
+    email: string;
+}
+
+export const addComment = async ({
+    name,
+    userId,
+    comment,
+    email,
+}: AddCommentProps) => {
+    try {
+        await fetchWithErrorHandling("/api/addComment", "POST", {
+            name,
+            userId,
+            comment,
+            email,
+        });
+    } catch (error) {
+        throw error;
+    }
+};
