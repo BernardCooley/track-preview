@@ -39,7 +39,7 @@ const FilterTags = ({
                         onClick={onGenreClick}
                     >
                         {genre ? (
-                            <Text>
+                            <Text userSelect="none">
                                 {genre.toLowerCase() === "all"
                                     ? "All genres"
                                     : genre}
@@ -53,7 +53,7 @@ const FilterTags = ({
                 {showDates ? (
                     <Tag variant="filter" onClick={onYearClick}>
                         {yearRange ? (
-                            <Text>
+                            <Text userSelect="none">
                                 {yearRange.from === 1960 &&
                                 yearRange.to === getCurrentYear()
                                     ? "All years"
@@ -94,7 +94,7 @@ const FilterTags = ({
                     variant="filter"
                 >
                     {profileLoaded ? (
-                        <Text>AutoPlay</Text>
+                        <Text userSelect="none">AutoPlay</Text>
                     ) : (
                         <Spinner color="brand.primary" size="xs" />
                     )}
