@@ -36,6 +36,7 @@ const FilterTags = ({
                     <Tag
                         key={`${genre}`}
                         variant="filter"
+                        pointerEvents={genre ? "auto" : "none"}
                         onClick={onGenreClick}
                     >
                         {genre ? (
@@ -51,7 +52,11 @@ const FilterTags = ({
                 )}
 
                 {showDates ? (
-                    <Tag variant="filter" onClick={onYearClick}>
+                    <Tag
+                        variant="filter"
+                        onClick={onYearClick}
+                        pointerEvents={yearRange ? "auto" : "none"}
+                    >
                         {yearRange ? (
                             <Text userSelect="none">
                                 {yearRange.from === 1960 &&
@@ -68,6 +73,7 @@ const FilterTags = ({
 
                 <Tag
                     onClick={onAutoPlayToggle}
+                    pointerEvents={profileLoaded ? "auto" : "none"}
                     bg={
                         preferredAutoPlay
                             ? "brand.primaryOpaque"
