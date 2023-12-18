@@ -94,19 +94,28 @@ const TrackReviewCard = forwardRef(
                     </CardHeader>
                     <CardBody
                         w="full"
-                        h="full"
+                        minH={["unset", "364px"]}
+                        h={["full", "unset"]}
                         bgImage={currentTrack.thumbnail}
                         bgSize="cover"
                         borderBottomRadius={40}
+                        p={0}
+                        as={Flex}
+                        direction="column"
+                        alignItems="center"
+                        justifyContent="space-between"
                     >
                         <Flex
                             direction="column"
                             h="full"
+                            w="full"
                             justifyContent="space-between"
+                            className="bernard"
+                            p={10}
                         >
                             <Flex
                                 w="full"
-                                pb={10}
+                                pb={isPlaying ? 8 : 0}
                                 h="full"
                                 justifyContent="center"
                             >
@@ -126,7 +135,7 @@ const TrackReviewCard = forwardRef(
                                             w="auto"
                                             h="auto"
                                             colorScheme="red"
-                                            aria-label="Call Segun"
+                                            aria-label="dislike button"
                                             fontSize={["100px", "150px"]}
                                             icon={
                                                 <ThumbDownAltTwoToneIcon fontSize="inherit" />
@@ -149,7 +158,7 @@ const TrackReviewCard = forwardRef(
                                             w="auto"
                                             h="auto"
                                             colorScheme="green"
-                                            aria-label="Call Segun"
+                                            aria-label="like button"
                                             fontSize={["100px", "150px"]}
                                             icon={
                                                 <ThumbUpAltTwoToneIcon fontSize="inherit" />
@@ -164,16 +173,24 @@ const TrackReviewCard = forwardRef(
                                     </Flex>
                                 ) : (
                                     <IconButton
+                                        p={[4, 6]}
                                         shadow="none"
                                         onClick={onPlayButtonClicked}
                                         variant="ghost"
                                         w="auto"
                                         h="auto"
                                         colorScheme="black"
-                                        aria-label="Call Segun"
-                                        fontSize={["100px", "200px"]}
+                                        aria-label="play button"
+                                        fontSize={["150px"]}
                                         icon={
-                                            <PlayArrowTwoToneIcon fontSize="inherit" />
+                                            <PlayArrowTwoToneIcon
+                                                fontSize="inherit"
+                                                sx={{
+                                                    backgroundColor:
+                                                        "rgba(86, 108, 104, 0.46)",
+                                                    borderRadius: "50%",
+                                                }}
+                                            />
                                         }
                                         _selected={{
                                             transform: "scale(1.2)",
@@ -185,7 +202,13 @@ const TrackReviewCard = forwardRef(
                                 )}
                             </Flex>
 
-                            <Flex direction="column" h="auto">
+                            <Flex
+                                direction="column"
+                                h="54px"
+                                opacity={isPlaying ? 1 : 0}
+                                position={isPlaying ? "relative" : "absolute"}
+                                pointerEvents={isPlaying ? "auto" : "none"}
+                            >
                                 <Flex w="full">
                                     <audio
                                         onPlay={onAudioPlay}

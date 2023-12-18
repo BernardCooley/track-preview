@@ -103,7 +103,7 @@ const ListTrack = ({
                                     <MoreHorizTwoToneIcon fontSize="inherit" />
                                 }
                             ></MenuButton>
-                            <MenuList>
+                            <MenuList fontSize="lg">
                                 <MenuItem
                                     onClick={() => onTrackDelete(trackIndex)}
                                 >
