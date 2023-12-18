@@ -21,7 +21,7 @@ import GenreModal from "./GenreModal";
 import { useTrackContext } from "../../context/TrackContext";
 import YearModal from "./YearModal";
 
-const TrackReviewStep1NoQueuedTrack = () => {
+const TrackReviewStep1 = () => {
     const {
         step1Tracks: tracks,
         updateStep1Tracks: setTracks,
@@ -422,4 +422,4 @@ const TrackReviewStep1NoQueuedTrack = () => {
     );
 };
 
-export default TrackReviewStep1NoQueuedTrack;
+export default TrackReviewStep1;
