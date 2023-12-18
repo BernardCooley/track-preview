@@ -52,10 +52,6 @@ export const RegisterUser = async (
             password
         );
 
-        await createUser({
-            userId: user.user.uid,
-        });
-
         return user;
     } catch (error) {
         console.error(error);

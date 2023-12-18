@@ -13,7 +13,6 @@ import {
 } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
 import { auth } from "../../firebase/firebaseInit";
-import { useEffect } from "react";
 
 export default function Home() {
     const router = useRouter();

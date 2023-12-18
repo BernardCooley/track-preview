@@ -18,7 +18,12 @@ import {
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { UserCredential } from "firebase/auth";
-import { RegisterUser, SendVerificationEmail } from "../../firebase/utils";
+import {
+    DeleteUser,
+    RegisterUser,
+    SendVerificationEmail,
+} from "../../firebase/utils";
+import { createUser } from "@/bff/bff";
 
 interface FormData {
     email: string;
@@ -91,13 +96,26 @@ const SignUp = () => {
                     "Please check your email and password and try again.",
                 status: "error",
             });
-            // TODO error not being thrown or caught - FIX
             setAuthError(
                 "Error registering. Please check your email and password and try again."
             );
         }
 
         if (newUser) {
+            try {
+                await createUser({
+                    userId: newUser.user.uid,
+                });
+            } catch (error) {
+                await DeleteUser();
+                showToast({
+                    title: "Error registering.",
+                    description:
+                        "Please check your email and password and try again.",
+                    status: "error",
+                });
+            }
+
             try {
                 await SendVerificationEmail(newUser.user);
 
