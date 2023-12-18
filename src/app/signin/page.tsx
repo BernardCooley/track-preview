@@ -80,7 +80,7 @@ const SignIn = () => {
                 if (isAttemptingAccountEdit === "true") {
                     router.push("/account");
                 } else {
-                    router.push("/");
+                    router.push("/explore");
                 }
             } else {
                 showToast({

@@ -50,7 +50,7 @@ const Header = forwardRef<HTMLButtonElement | undefined>((menuButtonRef) => {
                     backgroundSize="100% 100%"
                     backgroundRepeat="no-repeat"
                 >
-                    <Link href={pathname !== "/" ? "/" : ""}>
+                    <Link href={pathname !== "/explore" ? "/explore" : ""}>
                         <Text
                             userSelect="none"
                             fontSize="2xl"

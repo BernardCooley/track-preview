@@ -39,7 +39,7 @@ const MenuDrawer = forwardRef<HTMLButtonElement | undefined, Props>(
                             <MenuDrawerItem
                                 pathname={pathname}
                                 linkText="Home"
-                                href="/"
+                                href="/explore"
                             />
                             <MenuDrawerItem
                                 pathname={pathname}
