@@ -16,7 +16,7 @@ import { useAuthContext } from "../../../Contexts/AuthContext";
 import { GetCurrentUser } from "../../../firebase/utils";
 import { auth } from "../../../firebase/firebaseInit";
 
-export default function Home() {
+export default function Explore() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const pathname = usePathname();
