@@ -82,7 +82,7 @@ const YearModal = ({
                                         alignItems="center"
                                     >
                                         <Divider orientation="vertical" />
-                                        <Text>{year}</Text>
+                                        <Text userSelect="none">{year}</Text>
                                     </Flex>
                                 ))}
                             </Flex>

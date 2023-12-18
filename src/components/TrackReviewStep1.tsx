@@ -337,6 +337,7 @@ const TrackReviewStep1 = () => {
                 onCancel={() => setShowYearSelector(false)}
             />
             <GenreModal
+                onCancel={() => setShowGenreSelector(false)}
                 showGenreSelector={showGenreSelector}
                 setShowGenreSelector={() => setShowGenreSelector(false)}
                 genre={genre || "all"}

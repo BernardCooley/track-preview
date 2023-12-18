@@ -22,6 +22,7 @@ interface Props {
     availableGenres: string[];
     onFavouriteClearClick?: () => void;
     recentGenres?: string[];
+    onCancel: () => void;
 }
 
 const GenreModal = ({
@@ -32,6 +33,7 @@ const GenreModal = ({
     availableGenres,
     onFavouriteClearClick,
     recentGenres,
+    onCancel,
 }: Props) => {
     const [searchValue, setSearchValue] = useState<string>("");
     const [filteredGenres, setFilteredGenres] = useState<string[]>([]);
@@ -75,6 +77,9 @@ const GenreModal = ({
                     bg="brand.backgroundSecondary"
                     rounded="3xl"
                     p={showGenreSelector ? 4 : 0}
+                    direction="column"
+                    gap={8}
+                    alignItems="flex-end"
                 >
                     <Flex width="full" direction="column" gap={4}>
                         <Text fontSize="xl" textAlign="center">
@@ -114,6 +119,7 @@ const GenreModal = ({
                                     <Flex flexWrap="wrap" gap={4}>
                                         {recentGenres.map((gen) => (
                                             <Tag
+                                                userSelect="none"
                                                 padding={2}
                                                 onClick={() =>
                                                     onGenreSelect(gen)
@@ -273,6 +279,9 @@ const GenreModal = ({
                             ))}
                         </Flex>
                     </Flex>
+                    <Button w="100px" onClick={onCancel} variant="cancel">
+                        Cancel
+                    </Button>
                 </Flex>
             </ModalContent>
         </Modal>
