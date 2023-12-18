@@ -24,12 +24,6 @@ export default function Home() {
         "A new track is loaded after each like or dislike",
     ];
 
-    useEffect(() => {
-        if (auth) {
-            router.push("/explore");
-        }
-    }, []);
-
     return (
         <Flex h="full" m={0} px={[4, 8]} direction="column" alignItems="center">
             <Flex
