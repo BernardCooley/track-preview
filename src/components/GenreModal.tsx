@@ -78,7 +78,7 @@ const GenreModal = ({
                     rounded="3xl"
                     p={showGenreSelector ? 4 : 0}
                     direction="column"
-                    gap={8}
+                    gap={4}
                     alignItems="flex-end"
                 >
                     <Flex width="full" direction="column" gap={4}>
@@ -92,6 +92,7 @@ const GenreModal = ({
                                     direction="column"
                                     border="1px solid"
                                     borderColor="brand.backgroundTertiary"
+                                    rounded="md"
                                     p={2}
                                     gap={3}
                                     position="relative"
@@ -235,6 +236,10 @@ const GenreModal = ({
                             maxH="300px"
                             overflow="scroll"
                             gap={4}
+                            border="1px solid"
+                            borderColor="brand.backgroundTertiary"
+                            rounded="md"
+                            p={2}
                         >
                             {genres.sort().map((gen) => (
                                 <Tag
