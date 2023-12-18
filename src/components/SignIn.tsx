@@ -5,7 +5,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ZodType, z } from "zod";
-import { LoginUser } from "../../../firebase/utils";
 import { TextInput } from "@/components/TextInput";
 import {
     Box,
@@ -20,6 +19,7 @@ import {
 } from "@chakra-ui/react";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import { LoginUser } from "../../firebase/utils";
 
 interface FormData {
     email: string;

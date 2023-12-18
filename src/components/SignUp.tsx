@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ZodType, z } from "zod";
-import { RegisterUser, SendVerificationEmail } from "../../../firebase/utils";
 import { TextInput } from "@/components/TextInput";
 import {
     Box,
@@ -19,6 +18,7 @@ import {
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { UserCredential } from "firebase/auth";
+import { RegisterUser, SendVerificationEmail } from "../../firebase/utils";
 
 interface FormData {
     email: string;
