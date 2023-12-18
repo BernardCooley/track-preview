@@ -13,6 +13,7 @@ import {
 } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
 import { auth } from "../../firebase/firebaseInit";
+import { useEffect } from "react";
 
 export default function Home() {
     const router = useRouter();
@@ -22,6 +23,12 @@ export default function Home() {
         "Dislikes are never seen again. Likes are moved to the next review step",
         "A new track is loaded after each like or dislike",
     ];
+
+    useEffect(() => {
+        if (auth) {
+            router.push("/explore");
+        }
+    }, []);
 
     return (
         <Flex h="full" m={0} px={[4, 8]} direction="column" alignItems="center">
