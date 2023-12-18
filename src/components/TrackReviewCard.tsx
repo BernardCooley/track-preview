@@ -6,7 +6,6 @@ import {
     CardHeader,
     Flex,
     Heading,
-    IconButton,
     Tag,
     Text,
 } from "@chakra-ui/react";
@@ -15,6 +14,7 @@ import BouncingDotsLoader from "./BouncingLoaderDots";
 import PlayArrowTwoToneIcon from "@mui/icons-material/PlayArrowTwoTone";
 import ThumbDownAltTwoToneIcon from "@mui/icons-material/ThumbDownAltTwoTone";
 import ThumbUpAltTwoToneIcon from "@mui/icons-material/ThumbUpAltTwoTone";
+import TrackCardIcon from "./TrackCardIcon";
 
 interface Props {
     loadingMessage?: string;
@@ -110,7 +110,6 @@ const TrackReviewCard = forwardRef(
                             h="full"
                             w="full"
                             justifyContent="space-between"
-                            className="bernard"
                             p={10}
                         >
                             <Flex
@@ -124,80 +123,33 @@ const TrackReviewCard = forwardRef(
                                         w="full"
                                         justifyContent="space-around"
                                     >
-                                        <IconButton
-                                            shadow="none"
-                                            p={[4, 6]}
+                                        <TrackCardIcon
+                                            canHover={listened}
                                             isDisabled={!listened}
+                                            ariaLabel="dislike button"
                                             onClick={async () =>
                                                 onLikeOrDislike(false)
                                             }
-                                            variant="ghost"
-                                            w="auto"
-                                            h="auto"
                                             colorScheme="red"
-                                            aria-label="dislike button"
-                                            fontSize={["100px", "150px"]}
-                                            icon={
-                                                <ThumbDownAltTwoToneIcon fontSize="inherit" />
-                                            }
-                                            _selected={{
-                                                transform: "scale(1.2)",
-                                            }}
-                                            _hover={{
-                                                transform: "scale(1.2)",
-                                            }}
+                                            Icon={ThumbDownAltTwoToneIcon}
                                         />
-                                        <IconButton
-                                            shadow="none"
-                                            p={[4, 6]}
+                                        <TrackCardIcon
+                                            canHover={listened}
                                             isDisabled={!listened}
+                                            ariaLabel="like button"
                                             onClick={async () =>
                                                 onLikeOrDislike(true)
                                             }
-                                            variant="ghost"
-                                            w="auto"
-                                            h="auto"
                                             colorScheme="green"
-                                            aria-label="like button"
-                                            fontSize={["100px", "150px"]}
-                                            icon={
-                                                <ThumbUpAltTwoToneIcon fontSize="inherit" />
-                                            }
-                                            _selected={{
-                                                transform: "scale(1.2)",
-                                            }}
-                                            _hover={{
-                                                transform: "scale(1.2)",
-                                            }}
+                                            Icon={ThumbUpAltTwoToneIcon}
                                         />
                                     </Flex>
                                 ) : (
-                                    <IconButton
-                                        p={[4, 6]}
-                                        shadow="none"
+                                    <TrackCardIcon
+                                        ariaLabel="play button"
                                         onClick={onPlayButtonClicked}
-                                        variant="ghost"
-                                        w="auto"
-                                        h="auto"
                                         colorScheme="black"
-                                        aria-label="play button"
-                                        fontSize={["150px"]}
-                                        icon={
-                                            <PlayArrowTwoToneIcon
-                                                fontSize="inherit"
-                                                sx={{
-                                                    backgroundColor:
-                                                        "rgba(86, 108, 104, 0.46)",
-                                                    borderRadius: "50%",
-                                                }}
-                                            />
-                                        }
-                                        _selected={{
-                                            transform: "scale(1.2)",
-                                        }}
-                                        _hover={{
-                                            transform: "scale(1.2)",
-                                        }}
+                                        Icon={PlayArrowTwoToneIcon}
                                     />
                                 )}
                             </Flex>
