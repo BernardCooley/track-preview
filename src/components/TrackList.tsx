@@ -203,7 +203,6 @@ const TrackList = () => {
             <Stack
                 p={[2, 4, 8]}
                 h="full"
-                overflowY="scroll"
                 divider={
                     <StackDivider borderColor="brand.backgroundTertiaryOpaque" />
                 }
