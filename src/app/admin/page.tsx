@@ -5,6 +5,7 @@ import {
     Box,
     Flex,
     IconButton,
+    Spinner,
     Tab,
     TabList,
     TabPanel,
@@ -14,6 +15,7 @@ import {
     Tabs,
     Tbody,
     Td,
+    Text,
     Th,
     Thead,
     Tr,
@@ -26,6 +28,7 @@ interface Props {}
 
 const Contact = ({}: Props) => {
     const [comments, setComments] = useState<Comments[] | null>(null);
+    const [deleting, setDeleting] = useState(false);
 
     useEffect(() => {
         fetchComments();
@@ -37,7 +40,10 @@ const Contact = ({}: Props) => {
             if (comms) {
                 setComments(comms);
             }
-        } catch (error) {}
+            setDeleting(false);
+        } catch (error) {
+            setDeleting(false);
+        }
     };
 
     const TabContainer = ({ children }: { children: React.ReactNode }) => {
@@ -59,12 +65,14 @@ const Contact = ({}: Props) => {
     };
 
     const removeComment = async (id: string) => {
+        setDeleting(true);
         try {
             await deleteComment({
                 id,
             });
             fetchComments();
         } catch (error) {
+            setDeleting(false);
             console.log(error);
         }
     };
@@ -72,106 +80,119 @@ const Contact = ({}: Props) => {
     return (
         <Box h="full" m={0} px={[4, 8]}>
             <Header />
-            <Tabs
-                pt={10}
-                defaultIndex={0}
-                isFitted
-                variant="solid-rounded"
-                colorScheme="primary"
-            >
-                <TabList px={[10, 16, 60, 80]} gap={2}>
-                    <Tab>Comments</Tab>
-                </TabList>
+            {comments && comments.length > 0 ? (
+                <Tabs
+                    pt={10}
+                    defaultIndex={0}
+                    isFitted
+                    variant="solid-rounded"
+                    colorScheme="primary"
+                >
+                    <TabList px={[10, 16, 60, 80]} gap={2}>
+                        <Tab>Comments</Tab>
+                    </TabList>
 
-                <TabPanels>
-                    <TabPanel>
-                        <TabContainer>
-                            <TableContainer w="full">
-                                <Table variant="primary" size="lg">
-                                    <Thead>
-                                        <Tr>
-                                            <Th>Name</Th>
-                                            <Th>Email</Th>
-                                            <Th>Comment</Th>
-                                            <Th>Date</Th>
-                                            <Th>Actions</Th>
-                                        </Tr>
-                                    </Thead>
-                                    <Tbody>
-                                        {comments &&
-                                            comments.map((comment) => (
-                                                <Tr key={comment.id}>
-                                                    <Td
-                                                        sx={{
-                                                            whiteSpace:
-                                                                "pre-wrap",
-                                                            wordWrap:
-                                                                "break-word",
-                                                        }}
-                                                    >
-                                                        {comment.name}
-                                                    </Td>
-                                                    <Td
-                                                        sx={{
-                                                            whiteSpace:
-                                                                "pre-wrap",
-                                                            wordWrap:
-                                                                "break-word",
-                                                        }}
-                                                    >
-                                                        {comment.email}
-                                                    </Td>
-                                                    <Td
-                                                        sx={{
-                                                            whiteSpace:
-                                                                "pre-wrap",
-                                                            wordWrap:
-                                                                "break-word",
-                                                        }}
-                                                    >
-                                                        {comment.comment}
-                                                    </Td>
-                                                    <Td>
-                                                        {formatDate(
-                                                            new Date(
-                                                                comment.createdAt
-                                                            )
-                                                        )}
-                                                    </Td>
-                                                    <Td>
-                                                        <IconButton
-                                                            _hover={{
-                                                                bg: "transparent",
-                                                                color: "brand.primary",
-                                                                transform:
-                                                                    "scale(1.2)",
+                    <TabPanels>
+                        <TabPanel>
+                            <TabContainer>
+                                <TableContainer w="full">
+                                    <Table variant="primary" size="lg">
+                                        <Thead>
+                                            <Tr>
+                                                <Th>Name</Th>
+                                                <Th>Email</Th>
+                                                <Th>Comment</Th>
+                                                <Th>Date</Th>
+                                                <Th>Actions</Th>
+                                            </Tr>
+                                        </Thead>
+                                        <Tbody>
+                                            {comments &&
+                                                comments.map((comment) => (
+                                                    <Tr key={comment.id}>
+                                                        <Td
+                                                            sx={{
+                                                                whiteSpace:
+                                                                    "pre-wrap",
+                                                                wordWrap:
+                                                                    "break-word",
                                                             }}
-                                                            shadow="lg"
-                                                            height="30px"
-                                                            onClick={() =>
-                                                                removeComment(
-                                                                    comment.id
+                                                        >
+                                                            {comment.name}
+                                                        </Td>
+                                                        <Td
+                                                            sx={{
+                                                                whiteSpace:
+                                                                    "pre-wrap",
+                                                                wordWrap:
+                                                                    "break-word",
+                                                            }}
+                                                        >
+                                                            {comment.email}
+                                                        </Td>
+                                                        <Td
+                                                            sx={{
+                                                                whiteSpace:
+                                                                    "pre-wrap",
+                                                                wordWrap:
+                                                                    "break-word",
+                                                            }}
+                                                        >
+                                                            {comment.comment}
+                                                        </Td>
+                                                        <Td>
+                                                            {formatDate(
+                                                                new Date(
+                                                                    comment.createdAt
                                                                 )
-                                                            }
-                                                            variant="ghost"
-                                                            h={1 / 2}
-                                                            colorScheme="teal"
-                                                            aria-label="Show password"
-                                                            fontSize="3xl"
-                                                            icon={
-                                                                <DeleteIcon fontSize="inherit" />
-                                                            }
-                                                        />
-                                                    </Td>
-                                                </Tr>
-                                            ))}
-                                    </Tbody>
-                                </Table>
-                            </TableContainer>
-                        </TabContainer>
-                    </TabPanel>
-                </TabPanels>
-            </Tabs>
+                                                            )}
+                                                        </Td>
+                                                        <Td>
+                                                            <IconButton
+                                                                _hover={{
+                                                                    bg: "transparent",
+                                                                    color: "brand.primary",
+                                                                    transform:
+                                                                        "scale(1.2)",
+                                                                }}
+                                                                shadow="lg"
+                                                                height="30px"
+                                                                onClick={() =>
+                                                                    removeComment(
+                                                                        comment.id
+                                                                    )
+                                                                }
+                                                                variant="ghost"
+                                                                h={1 / 2}
+                                                                colorScheme="teal"
+                                                                aria-label="Show password"
+                                                                fontSize="3xl"
+                                                                icon={
+                                                                    deleting ? (
+                                                                        <Spinner
+                                                                            color="brand.primary"
+                                                                            size="xs"
+                                                                        />
+                                                                    ) : (
+                                                                        <DeleteIcon fontSize="inherit" />
+                                                                    )
+                                                                }
+                                                            />
+                                                        </Td>
+                                                    </Tr>
+                                                ))}
+                                        </Tbody>
+                                    </Table>
+                                </TableContainer>
+                            </TabContainer>
+                        </TabPanel>
+                    </TabPanels>
+                </Tabs>
+            ) : (
+                <Text mt={20} fontSize="3xl" textAlign="center">
+                    No comments
+                </Text>
+            )}
         </Box>
     );
 };
