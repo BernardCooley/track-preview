@@ -407,7 +407,7 @@ export const getComments = async (): Promise<Comments[] | null> => {
     try {
         const comments = await fetchWithErrorHandling(
             "/api/getComments",
-            "GET"
+            "POST"
         );
         return comments as Comments[];
     } catch (error) {
