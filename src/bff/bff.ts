@@ -426,3 +426,22 @@ export const deleteComment = async ({ id }: DeleteCommentProps) => {
         throw error;
     }
 };
+
+interface UpdateCommentProps {
+    id: string;
+    replied: boolean;
+}
+
+export const updateCommentReplied = async ({
+    id,
+    replied,
+}: UpdateCommentProps) => {
+    try {
+        await fetchWithErrorHandling("/api/updateCommentReplied", "POST", {
+            id,
+            replied,
+        });
+    } catch (error) {
+        throw error;
+    }
+};

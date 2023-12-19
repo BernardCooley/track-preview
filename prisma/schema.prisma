@@ -57,11 +57,12 @@ model StoredTrack {
 }
 
 model Comments {
-  id        String @id @default(cuid())
+  id        String   @id @default(cuid())
   name      String
   userId    String
   comment   String
   email     String
+  replied   Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

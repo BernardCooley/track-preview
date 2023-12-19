@@ -1,10 +1,12 @@
 "use client";
-import { deleteComment, getComments } from "@/bff/bff";
+import { deleteComment, getComments, updateCommentReplied } from "@/bff/bff";
 import Header from "@/components/Header";
 import {
     Box,
+    Checkbox,
     Flex,
     IconButton,
+    Link,
     Spinner,
     Tab,
     TabList,
@@ -23,12 +25,14 @@ import {
 import { Comments } from "@prisma/client";
 import React, { useEffect, useState } from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
+import ReplyIcon from "@mui/icons-material/Reply";
 
 interface Props {}
 
 const Contact = ({}: Props) => {
     const [comments, setComments] = useState<Comments[] | null>(null);
     const [deletingId, setDeletingId] = useState<string | null>(null);
+    const [updatingId, setUpdatingId] = useState<string | null>(null);
 
     useEffect(() => {
         fetchComments();
@@ -41,8 +45,24 @@ const Contact = ({}: Props) => {
                 setComments(comms);
             }
             setDeletingId(null);
+            setUpdatingId(null);
         } catch (error) {
             setDeletingId(null);
+            setUpdatingId(null);
+        }
+    };
+
+    const setReplied = async (id: string, replied: boolean) => {
+        setUpdatingId(id);
+        try {
+            await updateCommentReplied({
+                id,
+                replied,
+            });
+            fetchComments();
+        } catch (error) {
+            setUpdatingId(null);
+            console.log(error);
         }
     };
 
@@ -156,37 +176,74 @@ const Contact = ({}: Props) => {
                                                             )}
                                                         </Td>
                                                         <Td>
-                                                            <IconButton
-                                                                _hover={{
-                                                                    bg: "transparent",
-                                                                    color: "brand.primary",
-                                                                    transform:
-                                                                        "scale(1.2)",
-                                                                }}
-                                                                shadow="lg"
-                                                                height="30px"
-                                                                onClick={() =>
-                                                                    removeComment(
-                                                                        comment.id
-                                                                    )
-                                                                }
-                                                                variant="ghost"
-                                                                h={1 / 2}
-                                                                colorScheme="teal"
-                                                                aria-label="Show password"
-                                                                fontSize="3xl"
-                                                                icon={
-                                                                    deletingId ===
-                                                                    comment.id ? (
-                                                                        <Spinner
-                                                                            color="brand.primary"
-                                                                            size="xs"
-                                                                        />
-                                                                    ) : (
-                                                                        <DeleteIcon fontSize="inherit" />
-                                                                    )
-                                                                }
-                                                            />
+                                                            <Flex
+                                                                justifyContent="space-between"
+                                                                alignItems="center"
+                                                            >
+                                                                <IconButton
+                                                                    _hover={{
+                                                                        bg: "transparent",
+                                                                        color: "brand.primary",
+                                                                        transform:
+                                                                            "scale(1.2)",
+                                                                    }}
+                                                                    shadow="lg"
+                                                                    height="30px"
+                                                                    onClick={() =>
+                                                                        removeComment(
+                                                                            comment.id
+                                                                        )
+                                                                    }
+                                                                    variant="ghost"
+                                                                    h={1 / 2}
+                                                                    colorScheme="teal"
+                                                                    aria-label="Show password"
+                                                                    fontSize="3xl"
+                                                                    icon={
+                                                                        deletingId ===
+                                                                        comment.id ? (
+                                                                            <Spinner size="xs" />
+                                                                        ) : (
+                                                                            <DeleteIcon fontSize="inherit" />
+                                                                        )
+                                                                    }
+                                                                />
+                                                                <IconButton
+                                                                    as={Link}
+                                                                    href={`mailto:${comment.email}`}
+                                                                    _hover={{
+                                                                        bg: "transparent",
+                                                                        color: "brand.primary",
+                                                                        transform:
+                                                                            "scale(1.2)",
+                                                                    }}
+                                                                    shadow="lg"
+                                                                    height="30px"
+                                                                    variant="ghost"
+                                                                    h={1 / 2}
+                                                                    colorScheme="teal"
+                                                                    aria-label="Show password"
+                                                                    fontSize="3xl"
+                                                                    icon={
+                                                                        <ReplyIcon fontSize="inherit" />
+                                                                    }
+                                                                />
+
+                                                                <Checkbox
+                                                                    colorScheme="teal"
+                                                                    defaultChecked={
+                                                                        comment.replied
+                                                                    }
+                                                                    onChange={() => {
+                                                                        setReplied(
+                                                                            comment.id,
+                                                                            !comment.replied
+                                                                        );
+                                                                    }}
+                                                                >
+                                                                    Replied
+                                                                </Checkbox>
+                                                            </Flex>
                                                         </Td>
                                                     </Tr>
                                                 ))}
