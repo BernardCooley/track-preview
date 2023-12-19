@@ -1,4 +1,4 @@
-import { StoredTrack, User } from "@prisma/client";
+import { Comments, StoredTrack, User } from "@prisma/client";
 import { AccessToken, SearchedTrack, Track } from "../../types";
 
 export class GoneError extends Error {
@@ -398,6 +398,30 @@ export const addComment = async ({
             comment,
             email,
         });
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const getComments = async (): Promise<Comments[] | null> => {
+    try {
+        const comments = await fetchWithErrorHandling(
+            "/api/getComments",
+            "GET"
+        );
+        return comments as Comments[];
+    } catch (error) {
+        throw error;
+    }
+};
+
+interface DeleteCommentProps {
+    id: string;
+}
+
+export const deleteComment = async ({ id }: DeleteCommentProps) => {
+    try {
+        await fetchWithErrorHandling("/api/deleteComment", "POST", { id });
     } catch (error) {
         throw error;
     }

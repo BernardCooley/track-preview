@@ -12,6 +12,7 @@ import {
 } from "@chakra-ui/react";
 import { usePathname } from "next/navigation";
 import MenuDrawerItem from "./MenuDrawerItem";
+import { auth } from "../../firebase/firebaseInit";
 
 interface Props {
     isOpen: boolean;
@@ -51,6 +52,14 @@ const MenuDrawer = forwardRef<HTMLButtonElement | undefined, Props>(
                                 linkText="Settings"
                                 href="/settings"
                             />
+                            {auth?.currentUser?.uid ===
+                                "JZj7Y57oCpU3QfNaSu6wVJpODAR2" && (
+                                <MenuDrawerItem
+                                    pathname={pathname}
+                                    linkText="Admin"
+                                    href="/admin"
+                                />
+                            )}
                         </Flex>
                     </DrawerBody>
 

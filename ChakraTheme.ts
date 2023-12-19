@@ -257,6 +257,33 @@ export const theme = extendTheme({
                 },
             },
         },
+        Table: {
+            variants: {
+                primary: {
+                    table: {
+                        bg: "brand.backgroundPrimary",
+                        color: "brand.textPrimary",
+                        border: "1px solid",
+                        borderColor: "brand.primary",
+                        shadow: "md",
+                    },
+                    th: {
+                        bg: "brand.backgroundPrimary",
+                        color: "brand.textPrimary",
+                        border: "1px solid",
+                        borderColor: "brand.primary",
+                        shadow: "md",
+                    },
+                    td: {
+                        bg: "brand.backgroundPrimary",
+                        color: "brand.textPrimary",
+                        border: "1px solid",
+                        borderColor: "brand.primary",
+                        shadow: "md",
+                    },
+                },
+            },
+        },
     },
     styles: {
         global: () => ({
