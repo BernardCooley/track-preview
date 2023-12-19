@@ -28,7 +28,7 @@ interface Props {}
 
 const Contact = ({}: Props) => {
     const [comments, setComments] = useState<Comments[] | null>(null);
-    const [deleting, setDeleting] = useState(false);
+    const [deletingId, setDeletingId] = useState<string | null>(null);
 
     useEffect(() => {
         fetchComments();
@@ -40,9 +40,9 @@ const Contact = ({}: Props) => {
             if (comms) {
                 setComments(comms);
             }
-            setDeleting(false);
+            setDeletingId(null);
         } catch (error) {
-            setDeleting(false);
+            setDeletingId(null);
         }
     };
 
@@ -65,14 +65,14 @@ const Contact = ({}: Props) => {
     };
 
     const removeComment = async (id: string) => {
-        setDeleting(true);
+        setDeletingId(id);
         try {
             await deleteComment({
                 id,
             });
             fetchComments();
         } catch (error) {
-            setDeleting(false);
+            setDeletingId(null);
             console.log(error);
         }
     };
@@ -168,7 +168,8 @@ const Contact = ({}: Props) => {
                                                                 aria-label="Show password"
                                                                 fontSize="3xl"
                                                                 icon={
-                                                                    deleting ? (
+                                                                    deletingId ===
+                                                                    comment.id ? (
                                                                         <Spinner
                                                                             color="brand.primary"
                                                                             size="xs"
