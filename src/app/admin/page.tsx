@@ -59,8 +59,6 @@ const Contact = ({}: Props) => {
     };
 
     const removeComment = async (id: string) => {
-        console.log("🚀 ~ file: page.tsx:63 ~ deleteComment ~ id:", id);
-        console.log("delete");
         try {
             await deleteComment({
                 id,
