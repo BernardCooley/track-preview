@@ -109,7 +109,15 @@ const Contact = ({}: Props) => {
                                         <Tbody>
                                             {comments &&
                                                 comments.map((comment) => (
-                                                    <Tr key={comment.id}>
+                                                    <Tr
+                                                        opacity={
+                                                            deletingId ===
+                                                            comment.id
+                                                                ? 0.3
+                                                                : 1
+                                                        }
+                                                        key={comment.id}
+                                                    >
                                                         <Td
                                                             sx={{
                                                                 whiteSpace:
