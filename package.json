@@ -11,7 +11,10 @@
         "postinstall": "prisma generate",
         "migrateprod": "dotenv -e npx prisma db push npx prisma migrate deploy",
         "migratedev": "dotenv -e npx prisma db push npx prisma migrate dev",
-        "scrapejuno": "node juno_scraped_tracks/scrapejuno.js",
+        "scrapejuno": "node scraping_tracks/scrapejuno.js",
+        "scrape7digital": "node scraping_tracks/scrape7digital.js",
+        "scrape7digitaltracks": "node scraping_tracks/scrape7digitaltracks.js",
+        "addslugtotracks": "node scraping_tracks/addslugtotracks.js",
         "test": "jest --watch"
     },
     "dependencies": {

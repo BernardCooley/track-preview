@@ -1,6 +1,6 @@
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
-// import newTracks from "../../../../juno_scraped_tracks/uploaded/38.json";
+// import newTracks from "../../../../scraping_tracks/uploaded/38.json";
 const fs = require("fs");
 const path = require("path");
 
@@ -26,7 +26,7 @@ export async function GET() {
         );
     }
 
-    const dir = "./juno_scraped_tracks/uploaded";
+    const dir = "./scraping_tracks/uploaded";
 
     // await fs.readdir(dir, (err: any, files: any[]) => {
     //     files.map(async (file) => {

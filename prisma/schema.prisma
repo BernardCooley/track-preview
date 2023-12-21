@@ -54,6 +54,7 @@ model StoredTrack {
   title        String
   releaseDate  String
   releaseYear  Int
+  slug         String @unique
 }
 
 model Comments {

@@ -13,7 +13,7 @@ export async function GET() {
         const allTracks = [];
 
         const latestRelease = fs.readFileSync(
-            "juno_scraped_tracks/latestRelease.txt",
+            "scraping_tracks/latestRelease.txt",
             "utf-8"
         );
 
@@ -188,7 +188,7 @@ export async function GET() {
                 return [];
             });
 
-            var data = fs.readFileSync("juno_scraped_tracks/new.json");
+            var data = fs.readFileSync("scraping_tracks/new.json");
             var myObject = JSON.parse(data);
 
             myObject.push(...pageTracks);
@@ -213,7 +213,7 @@ export async function GET() {
                 });
 
                 fs.writeFileSync(
-                    "juno_scraped_tracks/latestRelease.txt",
+                    "scraping_tracks/latestRelease.txt",
                     tracksWithIds[0].purchaseUrl,
                     (err: any) => {
                         if (err) console.log(err);
@@ -223,7 +223,7 @@ export async function GET() {
                 const d = new Date();
 
                 fs.writeFileSync(
-                    `juno_scraped_tracks/${d.getFullYear()}-${d.getMonth()}-${d.getDay()}.json`,
+                    `scraping_tracks/${d.getFullYear()}-${d.getMonth()}-${d.getDay()}.json`,
                     JSON.stringify(tracksWithIds, null, 4),
                     (err: any) => {
                         if (err) console.log(err);
@@ -298,14 +298,14 @@ export async function GET() {
     // let notTouchedTracks: StoredTrack[] = [];
     // const foundTracks: StoredTrack[] = JSON.parse(
     //     await fs.readFileSync(
-    //         `juno_scraped_tracks/found-tracks/${fileName}.json`
+    //         `scraping_tracks/found-tracks/${fileName}.json`
     //     )
     // );
     // let slicedNotTouchedTracks: StoredTrack[] = [];
 
     // const checkIfTrackExists = async () => {
     //     var data = await fs.readFileSync(
-    //         `juno_scraped_tracks/stillToUpload/${fileName}.json`
+    //         `scraping_tracks/stillToUpload/${fileName}.json`
     //     );
 
     //     const storedTracks: StoredTrack[] = JSON.parse(data);
@@ -400,7 +400,7 @@ export async function GET() {
     //         const mergedTracks = [...foundTracks, ...updatedTracks];
 
     //         await fs.writeFile(
-    //             `juno_scraped_tracks/found-tracks/${fileName}.json`,
+    //             `scraping_tracks/found-tracks/${fileName}.json`,
     //             JSON.stringify(mergedTracks, null, 4),
     //             (err: any) => {
     //                 if (err) console.log(err);
@@ -433,11 +433,11 @@ export async function GET() {
         for (let i = 1; i < 67; i++) {
             try {
                 var data = await fs.readFileSync(
-                    `juno_scraped_tracks/stillToUpload/${i}.json`
+                    `scraping_tracks/stillToUpload/${i}.json`
                 );
                 console.log(
-                    "🚀 ~ file: route.ts:245 ~ util ~ `juno_scraped_tracks/stillToUpload/${i}.json`:",
-                    `juno_scraped_tracks/stillToUpload/${i}.json`
+                    "🚀 ~ file: route.ts:245 ~ util ~ `scraping_tracks/stillToUpload/${i}.json`:",
+                    `scraping_tracks/stillToUpload/${i}.json`
                 );
                 const tracks = JSON.parse(data);
                 console.log(
@@ -453,7 +453,7 @@ export async function GET() {
                 // });
 
                 // fs.writeFileSync(
-                //     `juno_scraped_tracks/stillToUpload/withYear/${i}.json`,
+                //     `scraping_tracks/stillToUpload/withYear/${i}.json`,
                 //     JSON.stringify(tracksWithUpdatedDates, null, 4),
                 //     (err: any) => {
                 //         if (err) console.log(err);
