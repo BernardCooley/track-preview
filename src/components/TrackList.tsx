@@ -18,7 +18,7 @@ import {
     useDisclosure,
     useToast,
 } from "@chakra-ui/react";
-import { Track } from "../../types";
+import { UserTrack } from "../../types";
 import { useTrackContext } from "../../context/TrackContext";
 import { fetchUserTracks, updateTrackReviewStep } from "@/bff/bff";
 import { useAuthContext } from "../../Contexts/AuthContext";
@@ -28,7 +28,7 @@ import ListTrack from "./ListTrack";
 const TrackList = () => {
     const { user } = useAuthContext();
     const { currentlyPlaying, updateCurrentlyPlaying } = useTrackContext();
-    const [tracks, setTracks] = useState<Track[]>([]);
+    const [tracks, setTracks] = useState<UserTrack[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const [noTracks, setNoTracks] = useState<boolean>(false);
     const toast = useToast();
@@ -54,17 +54,18 @@ const TrackList = () => {
     }, [noTracks]);
 
     const deleteTrack = async () => {
-        if (trackToDelete || trackToDelete === 0) {
+        if (user && (trackToDelete || trackToDelete === 0)) {
             try {
                 await updateTrackReviewStep({
-                    id: tracks[trackToDelete].id,
+                    userTrackId: tracks[trackToDelete].id,
                     reviewStep: 4,
                     like: false,
+                    userId: user.uid,
                 });
 
                 updateCurrentlyPlaying(undefined);
 
-                const filteredTracks: Track[] = tracks.filter(
+                const filteredTracks: UserTrack[] = tracks.filter(
                     (t) => t.id !== tracks[trackToDelete].id
                 );
 
@@ -102,11 +103,12 @@ const TrackList = () => {
         setLoading(true);
         if (user?.uid) {
             try {
-                const userTracks = await fetchUserTracks({
+                const reviews = await fetchUserTracks({
                     userId: user.uid,
-                    genre: "All",
                     reviewStep: 4,
                 });
+
+                const userTracks = reviews?.map((r) => r.userTrack);
 
                 if (userTracks && userTracks.length > 0) {
                     setTracks(userTracks);

@@ -8,7 +8,7 @@ import {
     useToast,
 } from "@chakra-ui/react";
 import TrackReviewCard from "./TrackReviewCard";
-import { SearchedTrack, Track } from "../../types";
+import { SearchedTrack, UserTrack } from "../../types";
 import { useAuthContext } from "../../Contexts/AuthContext";
 import Loading from "./Loading";
 import FilterTags from "./FilterTags";
@@ -32,7 +32,7 @@ const TrackReviewStep2And3 = ({ reviewStep }: Props) => {
     const [autoplay, setAutoplay] = useState<boolean>(false);
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
     const [listened, setListened] = useState<boolean>(false);
-    const [tracks, setTracks] = useState<Track[]>([]);
+    const [tracks, setTracks] = useState<UserTrack[]>([]);
     const audioElementRef = useRef<HTMLAudioElement>(null);
     const { user, userProfile, updateUserProfile } = useAuthContext();
     const [noTracks, setNoTracks] = useState<boolean>(false);
@@ -63,11 +63,12 @@ const TrackReviewStep2And3 = ({ reviewStep }: Props) => {
             setLoading(true);
 
             try {
-                const userTracks = await fetchUserTracks({
+                const reviews = await fetchUserTracks({
                     userId: user.uid,
-                    genre: "All",
                     reviewStep,
                 });
+
+                const userTracks = reviews?.map((r) => r.userTrack);
 
                 if (userTracks && userTracks.length > 0) {
                     setTracks(userTracks);
@@ -113,11 +114,12 @@ const TrackReviewStep2And3 = ({ reviewStep }: Props) => {
     };
 
     const storeTrack = async (like: boolean) => {
-        if (currentTrack) {
+        if (currentTrack && user) {
             await updateTrackReviewStep({
-                id: tracks[0].id,
+                userTrackId: tracks[0].id,
                 reviewStep,
                 like,
+                userId: user.uid,
             });
         }
     };
@@ -129,7 +131,7 @@ const TrackReviewStep2And3 = ({ reviewStep }: Props) => {
             setListened(false);
 
             if (currentTrack) {
-                const filteredTracks: Track[] = tracks.filter(
+                const filteredTracks: UserTrack[] = tracks.filter(
                     (t) => t.id !== tracks[0].id
                 );
 

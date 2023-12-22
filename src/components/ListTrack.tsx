@@ -12,11 +12,11 @@ import {
     Text,
 } from "@chakra-ui/react";
 import React from "react";
-import { Track } from "../../types";
+import { UserTrack } from "../../types";
 import MoreHorizTwoToneIcon from "@mui/icons-material/MoreHorizTwoTone";
 
 interface Props {
-    track: Track;
+    track: UserTrack;
     currentlyPlaying: string | undefined;
     onTrackDelete: (index: number) => void;
     trackIndex: number;

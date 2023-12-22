@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { genres } from "../../data/genres";
 import { Box, Flex, Text, useToast } from "@chakra-ui/react";
 import { useLocalStorage } from "usehooks-ts";
-import { StoredTrack, SearchedTrack, Track } from "../../types";
+import { StoredTrack, SearchedTrack, UserTrack } from "../../types";
 import {
     deleteStoredTrack,
     fetchDeezerTrack,
@@ -148,7 +148,7 @@ const TrackReviewStep1 = () => {
                 );
 
                 setTracks(
-                    newTracks.filter((track) => track !== null) as Track[]
+                    newTracks.filter((track) => track !== null) as UserTrack[]
                 );
 
                 setLoadingProgress(0);
@@ -180,7 +180,7 @@ const TrackReviewStep1 = () => {
 
     const searchForTrack = async (
         track: StoredTrack
-    ): Promise<Track | null> => {
+    ): Promise<UserTrack | null> => {
         let searchedTrack: SearchedTrack | null = null;
         let notFound = false;
 
@@ -233,14 +233,12 @@ const TrackReviewStep1 = () => {
 
         if (searchedTrack) {
             searchedTrack.id = searchedTrack.id.toString();
+
             return {
                 searchedTrack,
                 artist: track.artist,
-                furthestReviewStep: 1,
-                currentReviewStep: 1,
                 genre: track.genre,
                 title: track.title,
-                userId: user!.uid,
                 id: track.id,
                 purchaseUrl: track.purchaseUrl,
             };
@@ -249,16 +247,16 @@ const TrackReviewStep1 = () => {
         return null;
     };
 
-    const storeTrack = async (track: Track, like: boolean) => {
+    const storeTrack = async (track: UserTrack, like: boolean) => {
         if (user?.uid) {
             await saveNewTrack({
                 id: track.id,
-                genre: genre || "all",
+                genre: track.genre,
                 userId: user.uid,
                 artist: track.artist,
                 title: track.title,
-                currentReviewStep: (track.currentReviewStep = like ? 2 : 0),
-                furthestReviewStep: (track.furthestReviewStep = like ? 2 : 1),
+                currentReviewStep: like ? 2 : 0,
+                furthestReviewStep: like ? 2 : 1,
                 purchaseUrl: track.purchaseUrl,
                 searchedTrack: track.searchedTrack,
             });

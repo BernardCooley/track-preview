@@ -7,16 +7,21 @@ export interface SearchedTrack {
     url: string;
     releaseYear: number;
 }
-export interface Track {
+export interface UserTrack {
     artist: string;
-    furthestReviewStep: number;
-    currentReviewStep: number;
     genre: string;
     searchedTrack: SearchedTrack;
     title: string;
-    userId: string;
     id: string;
     purchaseUrl: string;
+}
+
+export interface Review {
+    currentReviewStep: number;
+    furthestReviewStep: number;
+    id: string;
+    userId: string;
+    userTrack: UserTrack;
 }
 
 export interface StoredTrack {
@@ -29,6 +34,7 @@ export interface StoredTrack {
     releaseDate: string;
     id: string;
     releaseYear: number;
+    slug: string;
 }
 
 export interface User {

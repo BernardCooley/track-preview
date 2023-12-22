@@ -2,21 +2,24 @@ import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
-    const { genre, userId, reviewStep } = await req.json();
+    const { userId, reviewStep } = await req.json();
 
     try {
-        const tracks = await prisma?.track.findMany({
+        const reviews = await prisma?.review.findMany({
             where: {
-                genre: genre.toLowerCase() === "all" ? undefined : genre,
-                userId,
+                userId: userId,
                 currentReviewStep: Number(reviewStep),
             },
             include: {
-                searchedTrack: true,
+                userTrack: {
+                    include: {
+                        searchedTrack: true,
+                    },
+                },
             },
         });
 
-        const response = NextResponse.json(tracks, {
+        const response = NextResponse.json(reviews, {
             status: 200,
         });
 

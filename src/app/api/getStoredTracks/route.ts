@@ -6,14 +6,19 @@ export async function POST(req: Request) {
     const { genre, startYear, endYear, userId } = await req.json();
 
     try {
-        const userTrackstracks = await prisma?.track.findMany({
+        const reviews = await prisma?.review.findMany({
             where: {
-                genre,
-                userId,
+                userId: userId,
+            },
+            include: {
+                userTrack: true,
             },
         });
 
-        const userTrackIds = userTrackstracks?.map((track) => track.id) || [];
+        const userTrackIds =
+            reviews
+                ?.map((review) => review.userTrack)
+                .map((track) => track.id) || [];
 
         const notInUserIds = userTrackIds.map((id) => `'${id}'`).join(", ");
 

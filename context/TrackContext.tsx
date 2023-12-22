@@ -1,15 +1,15 @@
 'use client';
 
 import React, { createContext, ReactNode, useContext, useState } from "react";
-import { Track, YearRange } from "../types";
+import { UserTrack, YearRange } from "../types";
 
 interface TrackContextProps {
     currentlyPlaying: string | undefined;
     updateCurrentlyPlaying: (trackId: string | undefined) => void;
-    step1Tracks: Track[];
-    updateStep1Tracks: (tracks: Track[]) => void;
-    step1CurrentTrack: Track | null;
-    updateStep1CurrentTrack: (track: Track | null) => void;
+    step1Tracks: UserTrack[];
+    updateStep1Tracks: (tracks: UserTrack[]) => void;
+    step1CurrentTrack: UserTrack | null;
+    updateStep1CurrentTrack: (track: UserTrack | null) => void;
     yearRange: YearRange | null;
     updateYearRange: (yearRange: YearRange) => void;
     genre: string | null;
@@ -32,10 +32,9 @@ export const useTrackContext = () => {
 
 export const TrackContextProvider = ({ children }: { children: ReactNode }) => {
     const [currentlyPlaying, setCurrentlyPlaying] = useState<string>("");
-    const [step1Tracks, setStep1Tracks] = useState<Track[]>([]);
-    const [step1CurrentTrack, setStep1CurrentTrack] = useState<Track | null>(
-        null
-    );
+    const [step1Tracks, setStep1Tracks] = useState<UserTrack[]>([]);
+    const [step1CurrentTrack, setStep1CurrentTrack] =
+        useState<UserTrack | null>(null);
     const [yearRange, setYearRange] = useState<YearRange | null>(null);
     const [genre, setGenre] = useState<string | null>(null);
 
@@ -43,11 +42,11 @@ export const TrackContextProvider = ({ children }: { children: ReactNode }) => {
         setCurrentlyPlaying(trackId || "");
     };
 
-    const updateStep1Tracks = (tracks: Track[]) => {
+    const updateStep1Tracks = (tracks: UserTrack[]) => {
         setStep1Tracks(tracks);
     };
 
-    const updateStep1CurrentTrack = (track: Track | null) => {
+    const updateStep1CurrentTrack = (track: UserTrack | null) => {
         setStep1CurrentTrack(track);
     };
 

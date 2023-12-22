@@ -1,5 +1,5 @@
 import { Comments, StoredTrack, User } from "@prisma/client";
-import { AccessToken, SearchedTrack, Track } from "../../types";
+import { AccessToken, Review, SearchedTrack } from "../../types";
 
 export class GoneError extends Error {
     statusCode = 410;
@@ -190,27 +190,24 @@ export const fetchStoredTracks = async ({
 };
 
 interface FetchUserTracksProps {
-    genre: string;
     userId: string;
     reviewStep: number;
 }
 
 export const fetchUserTracks = async ({
-    genre,
     userId,
     reviewStep,
-}: FetchUserTracksProps): Promise<Track[]> => {
+}: FetchUserTracksProps): Promise<Review[]> => {
     try {
         const userTracks = await fetchWithErrorHandling(
             "/api/getUserTracks",
             "POST",
             {
-                genre,
                 userId,
                 reviewStep,
             }
         );
-        return userTracks as Track[];
+        return userTracks as Review[];
     } catch (error) {
         throw error;
     }
@@ -238,7 +235,7 @@ export const saveNewTrack = async ({
     furthestReviewStep,
     purchaseUrl,
     searchedTrack,
-}: SaveNewTrackProps): Promise<Track[] | null> => {
+}: SaveNewTrackProps): Promise<Review[] | null> => {
     const userTracks: any[] | null = await fetchWithErrorHandling(
         "/api/saveNewTrack",
         "POST",
@@ -258,23 +255,26 @@ export const saveNewTrack = async ({
 };
 
 interface UpdateTrackReviewStepProps {
-    id: string;
+    userTrackId: string;
     like: boolean;
     reviewStep: number;
+    userId: string;
 }
 
 export const updateTrackReviewStep = async ({
-    id,
+    userTrackId,
     like,
     reviewStep,
-}: UpdateTrackReviewStepProps): Promise<Track[] | null> => {
+    userId,
+}: UpdateTrackReviewStepProps): Promise<Review[] | null> => {
     const userTracks: any[] | null = await fetchWithErrorHandling(
         "/api/updateTrackReviewStep",
         "POST",
         {
-            id,
+            userTrackId,
             like,
             reviewStep,
+            userId,
         }
     );
     return userTracks;
