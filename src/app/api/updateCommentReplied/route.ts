@@ -5,7 +5,7 @@ export async function POST(req: Request) {
     const { id, replied } = await req.json();
 
     try {
-        const comment = await prisma?.comments.update({
+        const comment = await prisma?.comment.update({
             where: {
                 id,
             },

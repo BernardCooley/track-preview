@@ -2,24 +2,16 @@ import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
-    const { userId, reviewStep } = await req.json();
+    const { id } = await req.json();
 
     try {
-        const reviews = await prisma?.review.findMany({
+        const deleteTrack = await prisma?.track.delete({
             where: {
-                userId: userId,
-                currentReviewStep: Number(reviewStep),
-            },
-            include: {
-                userTrack: {
-                    include: {
-                        searchedTrack: true,
-                    },
-                },
+                id,
             },
         });
 
-        const response = NextResponse.json(reviews, {
+        const response = NextResponse.json(deleteTrack, {
             status: 200,
         });
 

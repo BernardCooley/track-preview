@@ -5,7 +5,7 @@ export async function POST(req: Request) {
     const { id } = await req.json();
 
     try {
-        const deleteComment = await prisma?.comments.delete({
+        const deleteComment = await prisma?.comment.delete({
             where: {
                 id,
             },

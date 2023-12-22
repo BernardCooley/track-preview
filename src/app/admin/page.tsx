@@ -22,7 +22,7 @@ import {
     Thead,
     Tr,
 } from "@chakra-ui/react";
-import { Comments } from "@prisma/client";
+import { Comment } from "@prisma/client";
 import React, { useEffect, useState } from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ReplyIcon from "@mui/icons-material/Reply";
@@ -30,7 +30,7 @@ import ReplyIcon from "@mui/icons-material/Reply";
 interface Props {}
 
 const Contact = ({}: Props) => {
-    const [comments, setComments] = useState<Comments[] | null>(null);
+    const [comments, setComments] = useState<Comment[] | null>(null);
     const [deletingId, setDeletingId] = useState<string | null>(null);
     const [updatingId, setUpdatingId] = useState<string | null>(null);
 

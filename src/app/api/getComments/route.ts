@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 
 export async function POST() {
     try {
-        const comments = await prisma?.comments.findMany({
+        const comments = await prisma?.comment.findMany({
             orderBy: {
                 createdAt: "desc",
             },

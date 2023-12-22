@@ -5,7 +5,7 @@ export async function POST(req: Request) {
     const { name, userId, comment, email } = await req.json();
 
     try {
-        const comm = await prisma?.comments.create({
+        const comm = await prisma?.comment.create({
             data: {
                 name,
                 userId,
