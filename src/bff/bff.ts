@@ -352,10 +352,6 @@ export const updateCommentReplied = async ({
     }
 };
 
-export const cleanSeedData = async () => {
-    await fetchWithErrorHandling("/api/cleanSeedData", "GET");
-};
-
 interface GetTracksProps {
     genre?: string;
     startYear?: number;

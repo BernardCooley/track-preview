@@ -15,6 +15,7 @@
         "scrape7digital": "node scraping_tracks/scrape7digital.js",
         "scrape7digitaltracks": "node scraping_tracks/scrape7digitaltracks.js",
         "addslugtotracks": "node scraping_tracks/addslugtotracks.js",
+        "searchTracks": "node scraping_tracks/searchTracks.js",
         "test": "jest --watch"
     },
     "dependencies": {
