@@ -2,13 +2,11 @@ import { Flex, Spinner, Tag, Text } from "@chakra-ui/react";
 import React from "react";
 import { isMobile } from "react-device-detect";
 import { getCurrentYear } from "../../utils";
+import { YearRange } from "../../types";
 
 interface Props {
     genre?: string | null;
-    yearRange?: {
-        from: number;
-        to: number;
-    } | null;
+    yearRange?: YearRange | null;
     preferredAutoPlay: boolean;
     showDates: boolean;
     showGenre: boolean;

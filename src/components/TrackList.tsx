@@ -18,9 +18,9 @@ import {
     useDisclosure,
     useToast,
 } from "@chakra-ui/react";
-import { UserTrack } from "../../types";
+import { Track } from "../../types";
 import { useTrackContext } from "../../context/TrackContext";
-import { fetchUserTracks, updateTrackReviewStep } from "@/bff/bff";
+import { fetchTracks, updateTrackReviewStep } from "@/bff/bff";
 import { useAuthContext } from "../../Contexts/AuthContext";
 import Loading from "./Loading";
 import ListTrack from "./ListTrack";
@@ -28,7 +28,7 @@ import ListTrack from "./ListTrack";
 const TrackList = () => {
     const { user } = useAuthContext();
     const { currentlyPlaying, updateCurrentlyPlaying } = useTrackContext();
-    const [tracks, setTracks] = useState<UserTrack[]>([]);
+    const [tracks, setTracks] = useState<Track[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const [noTracks, setNoTracks] = useState<boolean>(false);
     const toast = useToast();
@@ -57,7 +57,7 @@ const TrackList = () => {
         if (user && (trackToDelete || trackToDelete === 0)) {
             try {
                 await updateTrackReviewStep({
-                    userTrackId: tracks[trackToDelete].id,
+                    trackId: tracks[trackToDelete].id,
                     reviewStep: 4,
                     like: false,
                     userId: user.uid,
@@ -65,7 +65,7 @@ const TrackList = () => {
 
                 updateCurrentlyPlaying(undefined);
 
-                const filteredTracks: UserTrack[] = tracks.filter(
+                const filteredTracks: Track[] = tracks.filter(
                     (t) => t.id !== tracks[trackToDelete].id
                 );
 
@@ -103,15 +103,13 @@ const TrackList = () => {
         setLoading(true);
         if (user?.uid) {
             try {
-                const reviews = await fetchUserTracks({
+                const tracks = await fetchTracks({
                     userId: user.uid,
                     reviewStep: 4,
                 });
 
-                const userTracks = reviews?.map((r) => r.userTrack);
-
-                if (userTracks && userTracks.length > 0) {
-                    setTracks(userTracks);
+                if (tracks && tracks.length > 0) {
+                    setTracks(tracks);
                     setLoading(false);
                 } else {
                     setNoTracks(true);
@@ -224,7 +222,7 @@ const TrackList = () => {
             >
                 {tracks.map((track, index) => (
                     <ListTrack
-                        key={track.searchedTrack.previewUrl}
+                        key={track.previewUrl}
                         track={track}
                         currentlyPlaying={currentlyPlaying}
                         onTrackDelete={() => setTrackToDelete(index)}

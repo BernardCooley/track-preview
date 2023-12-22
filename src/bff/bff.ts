@@ -1,5 +1,6 @@
-import { Comments, StoredTrack, User } from "@prisma/client";
-import { AccessToken, Review, SearchedTrack } from "../../types";
+import { Comment, User } from "@prisma/client";
+import { AccessToken, Review, SearchedTrack, Track } from "../../types";
+import { getCurrentYear } from "../../utils";
 
 export class GoneError extends Error {
     statusCode = 410;
@@ -159,110 +160,15 @@ export const restoreDatabase = async () => {
     await fetchWithErrorHandling("/api/restoreDatabase", "GET");
 };
 
-interface FetchStoredTracksProps {
-    genre: string;
-    startYear: number;
-    endYear: number;
-    userId: string;
-}
-
-export const fetchStoredTracks = async ({
-    genre,
-    startYear,
-    endYear,
-    userId,
-}: FetchStoredTracksProps): Promise<StoredTrack[]> => {
-    try {
-        const userTracks = await fetchWithErrorHandling(
-            "/api/getStoredTracks",
-            "POST",
-            {
-                genre,
-                startYear,
-                endYear,
-                userId,
-            }
-        );
-        return userTracks as StoredTrack[];
-    } catch (error) {
-        throw error;
-    }
-};
-
-interface FetchUserTracksProps {
-    userId: string;
-    reviewStep: number;
-}
-
-export const fetchUserTracks = async ({
-    userId,
-    reviewStep,
-}: FetchUserTracksProps): Promise<Review[]> => {
-    try {
-        const userTracks = await fetchWithErrorHandling(
-            "/api/getUserTracks",
-            "POST",
-            {
-                userId,
-                reviewStep,
-            }
-        );
-        return userTracks as Review[];
-    } catch (error) {
-        throw error;
-    }
-};
-
-interface SaveNewTrackProps {
-    id: string;
-    genre: string;
-    userId: string;
-    artist: string;
-    title: string;
-    currentReviewStep: number;
-    furthestReviewStep: number;
-    purchaseUrl: string;
-    searchedTrack: SearchedTrack;
-}
-
-export const saveNewTrack = async ({
-    id,
-    genre,
-    userId,
-    artist,
-    title,
-    currentReviewStep,
-    furthestReviewStep,
-    purchaseUrl,
-    searchedTrack,
-}: SaveNewTrackProps): Promise<Review[] | null> => {
-    const userTracks: any[] | null = await fetchWithErrorHandling(
-        "/api/saveNewTrack",
-        "POST",
-        {
-            id,
-            genre,
-            userId,
-            artist,
-            title,
-            currentReviewStep,
-            furthestReviewStep,
-            purchaseUrl,
-            searchedTrack,
-        }
-    );
-    return userTracks;
-};
-
 interface UpdateTrackReviewStepProps {
-    userTrackId: string;
+    trackId: string;
     like: boolean;
     reviewStep: number;
     userId: string;
 }
 
 export const updateTrackReviewStep = async ({
-    userTrackId,
+    trackId,
     like,
     reviewStep,
     userId,
@@ -271,7 +177,7 @@ export const updateTrackReviewStep = async ({
         "/api/updateTrackReviewStep",
         "POST",
         {
-            userTrackId,
+            trackId,
             like,
             reviewStep,
             userId,
@@ -403,13 +309,13 @@ export const addComment = async ({
     }
 };
 
-export const getComments = async (): Promise<Comments[] | null> => {
+export const getComments = async (): Promise<Comment[] | null> => {
     try {
         const comments = await fetchWithErrorHandling(
             "/api/getComments",
             "POST"
         );
-        return comments as Comments[];
+        return comments as Comment[];
     } catch (error) {
         throw error;
     }
@@ -441,6 +347,42 @@ export const updateCommentReplied = async ({
             id,
             replied,
         });
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const cleanSeedData = async () => {
+    await fetchWithErrorHandling("/api/cleanSeedData", "GET");
+};
+
+interface GetTracksProps {
+    genre?: string;
+    startYear?: number;
+    endYear?: number;
+    userId: string;
+    limit?: number;
+    reviewStep?: number;
+}
+
+export const fetchTracks = async ({
+    genre = "all",
+    startYear = 1960,
+    endYear = getCurrentYear(),
+    userId,
+    limit = 1,
+    reviewStep = 1,
+}: GetTracksProps): Promise<Track[] | null> => {
+    try {
+        const tracks = await fetchWithErrorHandling("/api/getTracks", "POST", {
+            genre,
+            startYear,
+            endYear,
+            userId,
+            limit,
+            reviewStep,
+        });
+        return tracks as Track[];
     } catch (error) {
         throw error;
     }

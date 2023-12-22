@@ -1,5 +1,5 @@
 import prisma from "@/lib/prisma";
-import { Prisma, StoredTrack } from "@prisma/client";
+import { Prisma, Track } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -11,19 +11,18 @@ export async function POST(req: Request) {
                 userId: userId,
             },
             include: {
-                userTrack: true,
+                Track: true,
             },
         });
 
         const userTrackIds =
-            reviews
-                ?.map((review) => review.userTrack)
-                .map((track) => track.id) || [];
+            reviews?.map((review) => review.Track).map((track) => track.id) ||
+            [];
 
         const notInUserIds = userTrackIds.map((id) => `'${id}'`).join(", ");
 
         const sql = `
-            SELECT * FROM "StoredTrack"
+            SELECT * FROM "Track"
             WHERE "releaseYear" >= ${startYear}
             ${endYear ? `AND "releaseYear" <= ${endYear}` : ""}
             ${genre.toLowerCase() === "all" ? "" : `AND "genre" = '${genre}'`}
@@ -32,7 +31,7 @@ export async function POST(req: Request) {
             LIMIT 30
         `;
 
-        const tracks: StoredTrack[] =
+        const tracks: Track[] =
             (await prisma?.$queryRaw(Prisma.raw(sql))) || [];
 
         tracks?.sort(() => Math.random() - 0.5);

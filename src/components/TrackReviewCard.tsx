@@ -9,7 +9,7 @@ import {
     Tag,
     Text,
 } from "@chakra-ui/react";
-import { SearchedTrack } from "../../types";
+import { Track } from "../../types";
 import BouncingDotsLoader from "./BouncingLoaderDots";
 import PlayArrowTwoToneIcon from "@mui/icons-material/PlayArrowTwoTone";
 import ThumbDownAltTwoToneIcon from "@mui/icons-material/ThumbDownAltTwoTone";
@@ -18,7 +18,7 @@ import TrackCardIcon from "./TrackCardIcon";
 
 interface Props {
     loadingMessage?: string;
-    currentTrack: SearchedTrack;
+    currentTrack: Track;
     isPlaying: boolean;
     listened: boolean;
     onLikeOrDislike: (liked: boolean) => Promise<void>;

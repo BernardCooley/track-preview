@@ -12,11 +12,11 @@ import {
     Text,
 } from "@chakra-ui/react";
 import React from "react";
-import { UserTrack } from "../../types";
+import { Track } from "../../types";
 import MoreHorizTwoToneIcon from "@mui/icons-material/MoreHorizTwoTone";
 
 interface Props {
-    track: UserTrack;
+    track: Track;
     currentlyPlaying: string | undefined;
     onTrackDelete: (index: number) => void;
     trackIndex: number;
@@ -31,11 +31,7 @@ const ListTrack = ({
     onCurrentlyPlayingUpdate,
 }: Props) => {
     return (
-        <Card
-            shadow="none"
-            key={track.searchedTrack.previewUrl}
-            bg="transparent"
-        >
+        <Card shadow="none" key={track.previewUrl} bg="transparent">
             <CardBody p={0}>
                 <Flex
                     gap={[0, 8]}
@@ -49,12 +45,12 @@ const ListTrack = ({
                         py={[2, 4]}
                         px={[1, 2]}
                         outline={
-                            currentlyPlaying === track.searchedTrack.previewUrl
+                            currentlyPlaying === track.previewUrl
                                 ? "1px solid"
                                 : "none"
                         }
                         outlineColor={
-                            currentlyPlaying === track.searchedTrack.previewUrl
+                            currentlyPlaying === track.previewUrl
                                 ? "brand.primary"
                                 : "transparent"
                         }
@@ -64,15 +60,10 @@ const ListTrack = ({
                             cursor: "pointer",
                         }}
                         onClick={() => {
-                            if (
-                                currentlyPlaying ===
-                                track.searchedTrack.previewUrl
-                            ) {
+                            if (currentlyPlaying === track.previewUrl) {
                                 onCurrentlyPlayingUpdate(undefined);
                             } else {
-                                onCurrentlyPlayingUpdate(
-                                    track.searchedTrack.previewUrl
-                                );
+                                onCurrentlyPlayingUpdate(track.previewUrl);
                             }
                         }}
                     >

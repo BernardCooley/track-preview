@@ -4,7 +4,7 @@ const fs = require("fs");
 const path = require("path");
 
 async function main() {
-    const dir = "./scraping_tracks/seed";
+    const dir = "./scraping_tracks/seedCleaned/found";
 
     fs.readdir(dir, (err, files) => {
         files.map(async (file) => {
@@ -16,7 +16,7 @@ async function main() {
                 const main = async () => {
                     for (let record of records) {
                         await prisma.$executeRawUnsafe(
-                            `INSERT INTO "StoredTrack" (platform, "purchaseUrl", artist, "releaseTitle", genre, title, "releaseDate", "releaseYear", id, slug) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) ON CONFLICT DO NOTHING`,
+                            `INSERT INTO "Track" (platform, "purchaseUrl", artist, "releaseTitle", genre, title, "releaseDate", "releaseYear", id, slug, "platformId", "previewUrl", url, thumbnail) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) ON CONFLICT DO NOTHING`,
                             record.platform,
                             record.purchaseUrl,
                             record.artist,
@@ -26,7 +26,11 @@ async function main() {
                             record.releaseDate,
                             record.releaseYear,
                             record.id,
-                            record.slug
+                            record.slug,
+                            record.platformId,
+                            record.previewUrl,
+                            record.url,
+                            record.thumbnail
                         );
                     }
                 };

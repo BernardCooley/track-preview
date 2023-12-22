@@ -6,8 +6,6 @@ import ProgressStepper from "@/components/ProgressStepper";
 import AudioPlayer from "@/components/AudioPlayer";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { onAuthStateChanged } from "firebase/auth";
-import TrackReviewStep1 from "@/components/TrackReviewStep1";
-import TrackReviewStep2And3 from "@/components/TrackReviewStep2And3";
 import TrackList from "@/components/TrackList";
 import Header from "@/components/Header";
 import { getUserProfile } from "@/bff/bff";
@@ -15,6 +13,7 @@ import { useTrackContext } from "../../../context/TrackContext";
 import { useAuthContext } from "../../../Contexts/AuthContext";
 import { GetCurrentUser } from "../../../firebase/utils";
 import { auth } from "../../../firebase/firebaseInit";
+import TrackReview from "@/components/TrackReview";
 
 export default function Explore() {
     const router = useRouter();
@@ -92,15 +91,11 @@ export default function Explore() {
                                 router.push(`${pathname}?reviewStep=${step}`);
                             }}
                         />
-                        {reviewStep && Number(reviewStep) === 1 && (
-                            <TrackReviewStep1 />
-                        )}
                         {reviewStep &&
-                            (Number(reviewStep) === 2 ||
-                                Number(reviewStep) === 3) && (
-                                <TrackReviewStep2And3
-                                    reviewStep={Number(reviewStep)}
-                                />
+                            Number(reviewStep) >= 1 &&
+                            reviewStep &&
+                            Number(reviewStep) <= 3 && (
+                                <TrackReview reviewStep={Number(reviewStep)} />
                             )}
                         {reviewStep && Number(reviewStep) === 4 && (
                             <TrackList />

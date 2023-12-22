@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import puppeteer from "puppeteer";
 const fs = require("fs");
 import { v4 as uuidv4 } from "uuid";
-import { SearchedTrack, StoredTrack } from "../../../../types";
+import { Track } from "../../../../types";
 
 export async function GET() {
     const getTracks = async () => {
@@ -293,22 +293,22 @@ export async function GET() {
     };
 
     // let currentTrackIndex = 0;
-    // const updatedTracks: StoredTrack[] = [];
+    // const updatedTracks: Track[] = [];
     // let fileName = 2;
-    // let notTouchedTracks: StoredTrack[] = [];
-    // const foundTracks: StoredTrack[] = JSON.parse(
+    // let notTouchedTracks: Track[] = [];
+    // const foundTracks: Track[] = JSON.parse(
     //     await fs.readFileSync(
     //         `scraping_tracks/found-tracks/${fileName}.json`
     //     )
     // );
-    // let slicedNotTouchedTracks: StoredTrack[] = [];
+    // let slicedNotTouchedTracks: Track[] = [];
 
     // const checkIfTrackExists = async () => {
     //     var data = await fs.readFileSync(
     //         `scraping_tracks/stillToUpload/${fileName}.json`
     //     );
 
-    //     const storedTracks: StoredTrack[] = JSON.parse(data);
+    //     const storedTracks: Track[] = JSON.parse(data);
 
     //     storedTracks.forEach((t) => {
     //         if (!foundTracks.map((t) => t.id).includes(t.id)) {
@@ -331,7 +331,7 @@ export async function GET() {
     //     const title = slicedNotTouchedTracks[currentTrackIndex].title;
     //     let platform = "deezer";
     //     // console.log(`${currentTrackIndex} of ${slicedNotTouchedTracks.length}`);
-    //     let searchedTrack: SearchedTrack | null = null;
+    //     let searchedTrack: Track | null = null;
     //     let trackToSearch: string | null = `${artist} - ${title}`;
 
     //     const timeLeft = Math.round(
@@ -365,7 +365,7 @@ export async function GET() {
     //         console.log("Not found");
     //     }
 
-    //     const storedTrack: StoredTrack = {
+    //     const storedTrack: Track = {
     //         ...slicedNotTouchedTracks[currentTrackIndex],
     //         found: tracksMatch(
     //             slicedNotTouchedTracks[currentTrackIndex],
@@ -411,7 +411,7 @@ export async function GET() {
 
     // await checkIfTrackExists();
 
-    const tracksMatch = (t1: StoredTrack, t2: SearchedTrack) => {
+    const tracksMatch = (t1: Track, t2: Track) => {
         return (
             t1.artist.toLowerCase().replaceAll(")", "").replaceAll("(", "") ===
             t2?.artist.toLowerCase().replaceAll(")", "").replaceAll("(", "")
