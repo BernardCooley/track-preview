@@ -50,6 +50,7 @@ const TrackReview = ({ reviewStep }: Props) => {
 
     const getTracks = useCallback(async () => {
         if (userProfile?.genre && user?.uid) {
+            setLoading(true);
             return await fetchTracks({
                 genre:
                     userProfile?.genre && reviewStep === 1
@@ -205,7 +206,7 @@ const TrackReview = ({ reviewStep }: Props) => {
                 </Center>
             )}
 
-            {noTracks && reviewStep === 1 && (
+            {noTracks && !loading && reviewStep === 1 && (
                 <Text
                     textAlign="center"
                     mt={20}
@@ -219,29 +220,6 @@ const TrackReview = ({ reviewStep }: Props) => {
                     No tracks found. Please try again with different filters.
                 </Text>
             )}
-            <YearModal
-                showYearSelector={showYearSelector}
-                setShowYearSelector={setShowYearSelector}
-                yearRange={
-                    {
-                        from: userProfile?.yearFrom || 1960,
-                        to: userProfile?.yearTo || getCurrentYear(),
-                    } || { from: 1960, to: getCurrentYear() }
-                }
-                onConfirm={async (val) => {
-                    const newProfile = await mutateUserProfile({
-                        userId: user?.uid || "",
-                        yearFrom: Number(val.from),
-                        yearTo: Number(val.to),
-                    });
-                    updateUserProfile(newProfile);
-                    setCurrentTrack(null);
-                    setListened(false);
-                    setIsPlaying(false);
-                    setShowYearSelector(false);
-                }}
-                onCancel={() => setShowYearSelector(false)}
-            />
             <GenreModal
                 onCancel={() => setShowGenreSelector(false)}
                 showGenreSelector={showGenreSelector}
@@ -268,6 +246,29 @@ const TrackReview = ({ reviewStep }: Props) => {
                     setRecentGenres([userProfile?.genre || "all"]);
                 }}
                 recentGenres={recentGenres}
+            />
+            <YearModal
+                showYearSelector={showYearSelector}
+                setShowYearSelector={setShowYearSelector}
+                yearRange={
+                    {
+                        from: userProfile?.yearFrom || 1960,
+                        to: userProfile?.yearTo || getCurrentYear(),
+                    } || { from: 1960, to: getCurrentYear() }
+                }
+                onConfirm={async (val) => {
+                    const newProfile = await mutateUserProfile({
+                        userId: user?.uid || "",
+                        yearFrom: Number(val.from),
+                        yearTo: Number(val.to),
+                    });
+                    updateUserProfile(newProfile);
+                    setCurrentTrack(null);
+                    setListened(false);
+                    setIsPlaying(false);
+                    setShowYearSelector(false);
+                }}
+                onCancel={() => setShowYearSelector(false)}
             />
             <Flex
                 w="full"

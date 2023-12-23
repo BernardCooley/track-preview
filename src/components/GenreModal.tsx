@@ -8,7 +8,7 @@ import {
     Tag,
     Text,
 } from "@chakra-ui/react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { isMobile } from "react-device-detect";
 import { TextInput } from "./TextInput";
 import CloseTwoToneIcon from "@mui/icons-material/CloseTwoTone";
@@ -35,10 +35,17 @@ const GenreModal = ({
     recentGenres,
     onCancel,
 }: Props) => {
+    const searchRef = useRef<HTMLInputElement>(null);
     const [searchValue, setSearchValue] = useState<string>("");
     const [filteredGenres, setFilteredGenres] = useState<string[]>([]);
     const [genres, setGenres] = useState<string[]>([]);
     const [isSearching, setIsSearching] = useState<boolean>(false);
+
+    useEffect(() => {
+        if (isSearching) {
+            searchRef.current?.focus();
+        }
+    }, [isSearching]);
 
     useEffect(() => {
         if (searchValue.length > 0 && filteredGenres.length > 0) {
@@ -85,6 +92,77 @@ const GenreModal = ({
                         <Text fontSize="xl" textAlign="center">
                             Select genre
                         </Text>
+                        {isSearching ? (
+                            <TextInput
+                                ref={searchRef}
+                                allowHelperText={false}
+                                allowErrors={false}
+                                title=""
+                                size="lg"
+                                placeholder="Search genres"
+                                fieldProps={{
+                                    defaultValue: "",
+                                    value: searchValue,
+                                    onChange: (e) =>
+                                        setSearchValue(e.target.value),
+                                }}
+                                rightIcon={
+                                    <IconButton
+                                        pr={4}
+                                        position="absolute"
+                                        right={6}
+                                        top={9}
+                                        height="30px"
+                                        fontSize="3xl"
+                                        h={1 / 2}
+                                        color="brand.primary"
+                                        bg="transparent"
+                                        shadow="none"
+                                        onClick={() => {
+                                            setSearchValue("");
+                                            setIsSearching(false);
+                                            setFilteredGenres([]);
+                                        }}
+                                        left={1}
+                                        rounded="full"
+                                        variant="ghost"
+                                        aria-label="settings page"
+                                        icon={
+                                            <CloseTwoToneIcon fontSize="inherit" />
+                                        }
+                                        _hover={{
+                                            bg: "transparent",
+                                            transform: "scale(1.2)",
+                                        }}
+                                    />
+                                }
+                            />
+                        ) : (
+                            <Flex justifyContent="flex-start">
+                                <IconButton
+                                    color="brand.primary"
+                                    fontSize="2xl"
+                                    bg="transparent"
+                                    shadow="none"
+                                    onClick={() => setIsSearching(true)}
+                                    left={1}
+                                    position="relative"
+                                    rounded="full"
+                                    variant="ghost"
+                                    aria-label="settings page"
+                                    icon={
+                                        <SearchTwoToneIcon fontSize="inherit" />
+                                    }
+                                    _hover={{
+                                        bg: "transparent",
+                                        transform: "scale(1.2)",
+                                    }}
+                                    _focusVisible={{
+                                        outline: "none",
+                                    }}
+                                />
+                            </Flex>
+                        )}
                         {!isSearching &&
                             recentGenres &&
                             recentGenres.length > 0 && (
@@ -161,76 +239,7 @@ const GenreModal = ({
                                     </Flex>
                                 </Flex>
                             )}
-                        {isSearching ? (
-                            <TextInput
-                                allowHelperText={false}
-                                allowErrors={false}
-                                title=""
-                                size="lg"
-                                placeholder="Search genres"
-                                fieldProps={{
-                                    defaultValue: "",
-                                    value: searchValue,
-                                    onChange: (e) =>
-                                        setSearchValue(e.target.value),
-                                }}
-                                rightIcon={
-                                    <IconButton
-                                        pr={4}
-                                        position="absolute"
-                                        right={6}
-                                        top={9}
-                                        height="30px"
-                                        fontSize="3xl"
-                                        h={1 / 2}
-                                        color="brand.primary"
-                                        bg="transparent"
-                                        shadow="none"
-                                        onClick={() => {
-                                            setSearchValue("");
-                                            setIsSearching(false);
-                                            setFilteredGenres([]);
-                                        }}
-                                        left={1}
-                                        rounded="full"
-                                        variant="ghost"
-                                        aria-label="settings page"
-                                        icon={
-                                            <CloseTwoToneIcon fontSize="inherit" />
-                                        }
-                                        _hover={{
-                                            bg: "transparent",
-                                            transform: "scale(1.2)",
-                                        }}
-                                    />
-                                }
-                            />
-                        ) : (
-                            <Flex justifyContent="flex-start">
-                                <IconButton
-                                    color="brand.primary"
-                                    fontSize="2xl"
-                                    bg="transparent"
-                                    shadow="none"
-                                    onClick={() => setIsSearching(true)}
-                                    left={1}
-                                    position="relative"
-                                    rounded="full"
-                                    variant="ghost"
-                                    aria-label="settings page"
-                                    icon={
-                                        <SearchTwoToneIcon fontSize="inherit" />
-                                    }
-                                    _hover={{
-                                        bg: "transparent",
-                                        transform: "scale(1.2)",
-                                    }}
-                                    _focusVisible={{
-                                        outline: "none",
-                                    }}
-                                />
-                            </Flex>
-                        )}
+
                         <Flex
                             flexWrap="wrap"
                             maxH="300px"
