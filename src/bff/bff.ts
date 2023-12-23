@@ -198,14 +198,6 @@ export const createUser = async ({ userId }: CreateUserProps): Promise<any> => {
     return user;
 };
 
-interface DeleteTrackProps {
-    id: string;
-}
-
-export const deleteTrack = async ({ id }: DeleteTrackProps) => {
-    await fetchWithErrorHandling("/api/deleteTrack", "POST", { id });
-};
-
 interface UpdateUserAutoplayProps {
     userId: string;
     autoplay?: boolean;
@@ -366,7 +358,7 @@ export const fetchTracks = async ({
     startYear = 1960,
     endYear = getCurrentYear(),
     userId,
-    limit = 1,
+    limit,
     reviewStep = 1,
 }: GetTracksProps): Promise<Track[] | null> => {
     try {

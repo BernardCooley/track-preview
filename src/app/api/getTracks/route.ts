@@ -20,7 +20,7 @@ export async function POST(req: Request) {
                 },
             },
         },
-        take: limit,
+        ...(limit ? { take: limit } : {}),
     };
 
     const q2 = {
@@ -32,7 +32,7 @@ export async function POST(req: Request) {
                 },
             },
         },
-        take: limit,
+        ...(limit ? { take: limit } : {}),
     };
 
     try {

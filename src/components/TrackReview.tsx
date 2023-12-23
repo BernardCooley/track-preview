@@ -2,7 +2,15 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useAuthContext } from "../../Contexts/AuthContext";
 import { getCurrentYear } from "../../utils";
 import { Track } from "../../types";
-import { Box, Flex, Text, ToastProps, useToast } from "@chakra-ui/react";
+import {
+    Badge,
+    Box,
+    Center,
+    Flex,
+    Text,
+    ToastProps,
+    useToast,
+} from "@chakra-ui/react";
 import Loading from "./Loading";
 import YearModal from "./YearModal";
 import GenreModal from "./GenreModal";
@@ -37,14 +45,52 @@ const TrackReview = ({ reviewStep }: Props) => {
     const [triggerGetTracks, setTriggerGetTracks] = useState<boolean>(false);
     const toast = useToast();
     const id = "review-toast";
+    const [loading, setLoading] = useState<boolean>(true);
+
+    const getTracks = useCallback(async () => {
+        if (userProfile?.genre && user?.uid) {
+            return await fetchTracks({
+                genre: userProfile?.genre || "all",
+                startYear: Number(userProfile?.yearFrom || 1960),
+                endYear: Number(userProfile?.yearTo || getCurrentYear()),
+                userId: user.uid,
+                reviewStep,
+                limit: 1,
+            });
+        }
+
+        return null;
+    }, [
+        userProfile?.genre,
+        user?.uid,
+        userProfile?.yearFrom,
+        userProfile?.yearTo,
+        reviewStep,
+    ]);
 
     useEffect(() => {
-        (async () => {
-            const track = await getTracks();
-            if (track) {
-                setCurrentTrack(track[0]);
-            }
-        })();
+        setCurrentTrack(null);
+        setLoading(true);
+        setNoTracks(false);
+    }, [reviewStep]);
+
+    const onGetTracks = useCallback(async () => {
+        const tracks = await getTracks();
+        if (tracks && tracks.length > 0) {
+            setCurrentTrack(tracks[0]);
+            setLoading(false);
+            setLoadingMessage("");
+        } else {
+            setCurrentTrack(null);
+            setNoTracks(true);
+            setLoading(false);
+        }
+    }, [getTracks]);
+
+    useEffect(() => {
+        if (userProfile?.genre && userProfile.yearFrom && userProfile.yearTo) {
+            onGetTracks();
+        }
     }, [
         userProfile?.genre,
         user,
@@ -52,6 +98,7 @@ const TrackReview = ({ reviewStep }: Props) => {
         userProfile?.yearTo,
         reviewStep,
         triggerGetTracks,
+        onGetTracks,
     ]);
 
     const showToast = useCallback(
@@ -70,22 +117,8 @@ const TrackReview = ({ reviewStep }: Props) => {
         [toast]
     );
 
-    const getTracks = async () => {
-        if (userProfile?.genre && user?.uid) {
-            setNoTracks(false);
-            return await fetchTracks({
-                genre: userProfile?.genre || "all",
-                startYear: Number(userProfile?.yearFrom || 1960),
-                endYear: Number(userProfile?.yearTo || getCurrentYear()),
-                userId: user.uid,
-                reviewStep,
-            });
-        }
-
-        return null;
-    };
-
     const likeOrDislike = async (like: boolean) => {
+        setLoadingMessage("Saving track...");
         try {
             if (currentTrack && user?.uid) {
                 const track = { ...currentTrack };
@@ -114,7 +147,7 @@ const TrackReview = ({ reviewStep }: Props) => {
 
     return (
         <Box position="relative">
-            {!currentTrack && (
+            {loading && (
                 <Loading
                     showLoadingBar={
                         userProfile?.genre &&
@@ -132,8 +165,23 @@ const TrackReview = ({ reviewStep }: Props) => {
                     }
                 />
             )}
+            {noTracks && reviewStep > 1 && (
+                <Center>
+                    <Badge
+                        zIndex={150}
+                        top="200px"
+                        position="absolute"
+                        variant="outline"
+                        colorScheme="teal"
+                        fontSize={["24px", "36px"]}
+                        px={4}
+                    >
+                        All done on this step
+                    </Badge>
+                </Center>
+            )}
 
-            {noTracks && (
+            {noTracks && reviewStep === 1 && (
                 <Text
                     textAlign="center"
                     mt={20}
