@@ -245,7 +245,7 @@ const TrackReview = ({ reviewStep }: Props) => {
                 onFavouriteClearClick={() => {
                     setRecentGenres([userProfile?.genre || "all"]);
                 }}
-                recentGenres={recentGenres}
+                recentGenres={recentGenres.filter((gen) => gen !== "all")}
             />
             <YearModal
                 showYearSelector={showYearSelector}
