@@ -84,6 +84,7 @@ const TrackReview = ({ reviewStep }: Props) => {
         if (tracks && tracks.length > 0) {
             setTracks(tracks);
             setLoading(false);
+            setNoTracks(false);
         } else {
             setCurrentTrack(null);
             setNoTracks(true);
@@ -190,7 +191,7 @@ const TrackReview = ({ reviewStep }: Props) => {
                     }
                 />
             )}
-            {noTracks && reviewStep > 1 && (
+            {noTracks && !loading && reviewStep > 1 && (
                 <Center>
                     <Badge
                         zIndex={150}

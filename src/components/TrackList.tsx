@@ -11,10 +11,18 @@ import {
     Button,
     Center,
     Flex,
+    Link,
     Stack,
     StackDivider,
+    Table,
+    TableContainer,
+    Tbody,
+    Td,
     Text,
+    Th,
+    Thead,
     ToastProps,
+    Tr,
     useDisclosure,
     useToast,
 } from "@chakra-ui/react";
@@ -23,7 +31,8 @@ import { useTrackContext } from "../../context/TrackContext";
 import { fetchTracks, updateTrackReviewStep } from "@/bff/bff";
 import { useAuthContext } from "../../Contexts/AuthContext";
 import Loading from "./Loading";
-import ListTrack from "./ListTrack";
+import Image from "next/image";
+import { getFormattedDate } from "../../utils";
 
 const TrackList = () => {
     const { user } = useAuthContext();
@@ -220,16 +229,115 @@ const TrackList = () => {
                     },
                 }}
             >
-                {tracks.map((track, index) => (
-                    <ListTrack
-                        key={track.previewUrl}
-                        track={track}
-                        currentlyPlaying={currentlyPlaying}
-                        onTrackDelete={() => setTrackToDelete(index)}
-                        trackIndex={index}
-                        onCurrentlyPlayingUpdate={updateCurrentlyPlaying}
-                    />
-                ))}
+                <TableContainer>
+                    <Table variant="unstyled">
+                        <Thead>
+                            <Tr>
+                                <Th>Artwork</Th>
+                                <Th>Artist</Th>
+                                <Th>Title</Th>
+                                <Th>Release</Th>
+                                <Th>Genre</Th>
+                                <Th>Buy</Th>
+                                <Th>Release date</Th>
+                            </Tr>
+                        </Thead>
+                        <Tbody>
+                            {tracks.map((track, index) => (
+                                <Tr
+                                    key={track.id}
+                                    rounded={10}
+                                    outlineOffset={-2}
+                                    outline={
+                                        currentlyPlaying === track.previewUrl
+                                            ? "1px solid"
+                                            : "none"
+                                    }
+                                    outlineColor={
+                                        currentlyPlaying === track.previewUrl
+                                            ? "brand.primary"
+                                            : "transparent"
+                                    }
+                                    color={
+                                        currentlyPlaying === track.previewUrl
+                                            ? "brand.textPrimary"
+                                            : "brand.primary"
+                                    }
+                                    _hover={{
+                                        cursor: "pointer",
+                                        backgroundColor:
+                                            "brand.backgroundTertiaryOpaque",
+                                    }}
+                                    onClick={() => {
+                                        if (
+                                            currentlyPlaying ===
+                                            track.previewUrl
+                                        ) {
+                                            updateCurrentlyPlaying(undefined);
+                                        } else {
+                                            updateCurrentlyPlaying(
+                                                track.previewUrl
+                                            );
+                                        }
+                                    }}
+                                >
+                                    <Td w={6}>
+                                        <Image
+                                            src={track.thumbnail}
+                                            alt=""
+                                            width={300}
+                                            height={300}
+                                        ></Image>
+                                    </Td>
+                                    <Td>
+                                        <Text
+                                            maxW={32}
+                                            sx={{ textWrap: "wrap" }}
+                                        >
+                                            {track.artist}
+                                        </Text>
+                                    </Td>
+                                    <Td>
+                                        <Text
+                                            maxW={48}
+                                            sx={{ textWrap: "wrap" }}
+                                        >
+                                            {track.title}
+                                        </Text>
+                                    </Td>
+                                    <Td>
+                                        <Text
+                                            maxW={48}
+                                            sx={{ textWrap: "wrap" }}
+                                        >
+                                            {track.releaseTitle}
+                                        </Text>
+                                    </Td>
+                                    <Td>
+                                        <Text
+                                            maxW={28}
+                                            sx={{ textWrap: "wrap" }}
+                                        >
+                                            {track.genre}
+                                        </Text>
+                                    </Td>
+                                    <Td>
+                                        <Link
+                                            variant="primary"
+                                            href={track.purchaseUrl}
+                                            isExternal
+                                        >
+                                            Buy
+                                        </Link>
+                                    </Td>
+                                    <Td>
+                                        {getFormattedDate(track.releaseDate)}{" "}
+                                    </Td>
+                                </Tr>
+                            ))}
+                        </Tbody>
+                    </Table>
+                </TableContainer>
             </Stack>
         </Box>
     );
