@@ -1,4 +1,5 @@
 import {
+    Box,
     Button,
     Flex,
     IconButton,
@@ -65,6 +66,21 @@ const GenreModal = ({
             );
         }
     }, [searchValue]);
+
+    const getFormattedGenres = (genres: string[]) => {
+        const firstCharacters = Array.from(
+            new Set(genres.map((gen) => gen.charAt(0)))
+        );
+
+        return firstCharacters
+            .map((char) => {
+                return {
+                    letter: char,
+                    genres: genres.filter((g) => g.charAt(0) === char),
+                };
+            })
+            .sort((a, b) => a.letter.localeCompare(b.letter));
+    };
 
     return (
         <Modal
@@ -250,47 +266,111 @@ const GenreModal = ({
                             rounded="md"
                             p={2}
                         >
-                            {genres.sort().map((gen) => (
-                                <Tag
-                                    onClick={() => {
-                                        onGenreSelect(gen);
-                                        setSearchValue("");
-                                        setIsSearching(false);
-                                        setFilteredGenres([]);
-                                    }}
-                                    bg={
-                                        genre === gen
-                                            ? "brand.primaryOpaque"
-                                            : "transparent"
-                                    }
-                                    borderColor={
-                                        genre === gen
-                                            ? "brand.primaryLight"
-                                            : "brand.primaryOpaque"
-                                    }
-                                    _hover={
-                                        isMobile
-                                            ? {}
-                                            : {
-                                                  cursor: "pointer",
-                                                  bg:
-                                                      genre === gen
-                                                          ? "transparent"
-                                                          : "brand.primaryOpaque",
-                                                  borderColor:
-                                                      genre === gen
-                                                          ? "brand.primaryOpaque"
-                                                          : "brand.primaryLight",
-                                              }
-                                    }
-                                    variant="filter"
-                                    key={genre}
-                                    size="xs"
-                                    fontSize="14px"
-                                >
-                                    {gen}
-                                </Tag>
-                            ))}
+                            <Tag
+                                onClick={() => {
+                                    onGenreSelect("all");
+                                    setSearchValue("");
+                                    setIsSearching(false);
+                                    setFilteredGenres([]);
+                                }}
+                                bg={
+                                    genre === "all"
+                                        ? "brand.primaryOpaque"
+                                        : "transparent"
+                                }
+                                borderColor={
+                                    genre === "all"
+                                        ? "brand.primaryLight"
+                                        : "brand.primaryOpaque"
+                                }
+                                _hover={
+                                    isMobile
+                                        ? {}
+                                        : {
+                                              cursor: "pointer",
+                                              bg:
+                                                  genre === "all"
+                                                      ? "transparent"
+                                                      : "brand.primaryOpaque",
+                                              borderColor:
+                                                  genre === "all"
+                                                      ? "brand.primaryOpaque"
+                                                      : "brand.primaryLight",
+                                          }
+                                }
+                                variant="filter"
+                                key={genre}
+                                size="xs"
+                                fontSize="14px"
+                                m={1}
+                            >
+                                All genres
+                            </Tag>
+                            <Flex gap={4} direction="column">
+                                {getFormattedGenres(genres).map(
+                                    (genreSection) => (
+                                        <Box key={genreSection.letter}>
+                                            <Box>{genreSection.letter}</Box>
+                                            <Box>
+                                                {genreSection.genres.map(
+                                                    (gen) => (
+                                                        <Tag
+                                                            onClick={() => {
+                                                                onGenreSelect(
+                                                                    gen
+                                                                );
+                                                                setSearchValue(
+                                                                    ""
+                                                                );
+                                                                setIsSearching(
+                                                                    false
+                                                                );
+                                                                setFilteredGenres(
+                                                                    []
+                                                                );
+                                                            }}
+                                                            bg={
+                                                                genre === gen
+                                                                    ? "brand.primaryOpaque"
+                                                                    : "transparent"
+                                                            }
+                                                            borderColor={
+                                                                genre === gen
+                                                                    ? "brand.primaryLight"
+                                                                    : "brand.primaryOpaque"
+                                                            }
+                                                            _hover={
+                                                                isMobile
+                                                                    ? {}
+                                                                    : {
+                                                                          cursor: "pointer",
+                                                                          bg:
+                                                                              genre ===
+                                                                              gen
+                                                                                  ? "transparent"
+                                                                                  : "brand.primaryOpaque",
+                                                                          borderColor:
+                                                                              genre ===
+                                                                              gen
+                                                                                  ? "brand.primaryOpaque"
+                                                                                  : "brand.primaryLight",
+                                                                      }
+                                                            }
+                                                            variant="filter"
+                                                            key={genre}
+                                                            size="xs"
+                                                            fontSize="14px"
+                                                            m={1}
+                                                        >
+                                                            {gen}
+                                                        </Tag>
+                                                    )
+                                                )}
+                                            </Box>
+                                        </Box>
+                                    )
+                                )}
+                            </Flex>
                         </Flex>
                     </Flex>
                     <Button w="100px" onClick={onCancel} variant="cancel">
