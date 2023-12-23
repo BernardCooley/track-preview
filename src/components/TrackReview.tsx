@@ -46,16 +46,20 @@ const TrackReview = ({ reviewStep }: Props) => {
     const toast = useToast();
     const id = "review-toast";
     const [loading, setLoading] = useState<boolean>(true);
+    const [tracks, setTracks] = useState<Track[]>([]);
 
     const getTracks = useCallback(async () => {
         if (userProfile?.genre && user?.uid) {
             return await fetchTracks({
-                genre: userProfile?.genre || "all",
+                genre:
+                    userProfile?.genre && reviewStep === 1
+                        ? userProfile?.genre
+                        : "all",
                 startYear: Number(userProfile?.yearFrom || 1960),
                 endYear: Number(userProfile?.yearTo || getCurrentYear()),
                 userId: user.uid,
                 reviewStep,
-                limit: 1,
+                limit: reviewStep === 1 ? 1 : null,
             });
         }
 
@@ -77,9 +81,8 @@ const TrackReview = ({ reviewStep }: Props) => {
     const onGetTracks = useCallback(async () => {
         const tracks = await getTracks();
         if (tracks && tracks.length > 0) {
-            setCurrentTrack(tracks[0]);
+            setTracks(tracks);
             setLoading(false);
-            setLoadingMessage("");
         } else {
             setCurrentTrack(null);
             setNoTracks(true);
@@ -88,7 +91,24 @@ const TrackReview = ({ reviewStep }: Props) => {
     }, [getTracks]);
 
     useEffect(() => {
-        if (userProfile?.genre && userProfile.yearFrom && userProfile.yearTo) {
+        setLoadingMessage("");
+        if (tracks.length > 0) {
+            setLoadingMessage("");
+            setLoading(false);
+            setCurrentTrack(tracks[0]);
+        } else {
+            setCurrentTrack(null);
+            setNoTracks(true);
+            setLoading(true);
+        }
+    }, [tracks]);
+
+    useEffect(() => {
+        if (
+            userProfile?.genre &&
+            userProfile?.yearFrom &&
+            userProfile?.yearTo
+        ) {
             onGetTracks();
         }
     }, [
@@ -129,7 +149,11 @@ const TrackReview = ({ reviewStep }: Props) => {
                     userId: user.uid,
                 });
 
-                setTriggerGetTracks((prev) => !prev);
+                if (reviewStep === 1) {
+                    setTriggerGetTracks((prev) => !prev);
+                } else {
+                    setTracks((prev) => prev.slice(1));
+                }
             }
         } catch (error) {
             showToast({
@@ -151,15 +175,15 @@ const TrackReview = ({ reviewStep }: Props) => {
                 <Loading
                     showLoadingBar={
                         userProfile?.genre &&
-                        userProfile.yearFrom &&
-                        userProfile.yearTo
+                        userProfile?.yearFrom &&
+                        userProfile?.yearTo
                             ? true
                             : false
                     }
                     loadingText={
                         userProfile?.genre &&
-                        userProfile.yearFrom &&
-                        userProfile.yearTo
+                        userProfile?.yearFrom &&
+                        userProfile?.yearTo
                             ? "Loading new track"
                             : "Loading user profile"
                     }
@@ -271,8 +295,8 @@ const TrackReview = ({ reviewStep }: Props) => {
 
                             updateUserProfile(newProfile);
                         }}
-                        showDates={true}
-                        showGenre={true}
+                        showDates={reviewStep === 1 ? true : false}
+                        showGenre={reviewStep === 1 ? true : false}
                         profileLoaded={userProfile ? true : false}
                         genre={userProfile?.genre}
                         yearRange={

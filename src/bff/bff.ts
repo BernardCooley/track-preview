@@ -349,7 +349,7 @@ interface GetTracksProps {
     startYear?: number;
     endYear?: number;
     userId: string;
-    limit?: number;
+    limit?: number | null;
     reviewStep?: number;
 }
 
