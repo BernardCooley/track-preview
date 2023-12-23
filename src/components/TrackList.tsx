@@ -234,7 +234,10 @@ const TrackList = () => {
             >
                 {!loading && !noTracks && (
                     <TableContainer>
-                        <Table variant="unstyled">
+                        <Table
+                            variant="unstyled"
+                            display={["none", "none", "table"]}
+                        >
                             <Thead>
                                 <Tr>
                                     <Th>Artwork</Th>
@@ -346,6 +349,122 @@ const TrackList = () => {
                                             {getFormattedDate(
                                                 track.releaseDate
                                             )}{" "}
+                                        </Td>
+                                        <Td>
+                                            <Flex
+                                                w="full"
+                                                justifyContent="space-between"
+                                            >
+                                                <IconButton
+                                                    onMouseEnter={() =>
+                                                        setClickDisabled(true)
+                                                    }
+                                                    onMouseLeave={() =>
+                                                        setClickDisabled(false)
+                                                    }
+                                                    _hover={{
+                                                        bg: "transparent",
+                                                        transform: "scale(1.2)",
+                                                    }}
+                                                    shadow="lg"
+                                                    height="30px"
+                                                    onClick={() =>
+                                                        setTrackToDelete(index)
+                                                    }
+                                                    variant="ghost"
+                                                    h={1 / 2}
+                                                    colorScheme="red"
+                                                    aria-label="Show password"
+                                                    fontSize="3xl"
+                                                    icon={<DeleteForeverIcon />}
+                                                />
+                                            </Flex>
+                                        </Td>
+                                    </Tr>
+                                ))}
+                            </Tbody>
+                        </Table>
+                        <Table
+                            variant="unstyled"
+                            display={["table", "table", "none"]}
+                        >
+                            <Thead>
+                                <Tr>
+                                    <Th>Artwork</Th>
+                                    <Th>Artist/Title</Th>
+                                    <Th>Actions</Th>
+                                </Tr>
+                            </Thead>
+                            <Tbody>
+                                {tracks.map((track, index) => (
+                                    <Tr
+                                        key={track.id}
+                                        rounded={10}
+                                        outlineOffset={-2}
+                                        outline={
+                                            currentlyPlaying ===
+                                            track.previewUrl
+                                                ? "1px solid"
+                                                : "none"
+                                        }
+                                        outlineColor={
+                                            currentlyPlaying ===
+                                            track.previewUrl
+                                                ? "brand.primary"
+                                                : "transparent"
+                                        }
+                                        color={
+                                            currentlyPlaying ===
+                                            track.previewUrl
+                                                ? "brand.textPrimary"
+                                                : "brand.primary"
+                                        }
+                                        _hover={{
+                                            cursor: "pointer",
+                                            backgroundColor:
+                                                "brand.backgroundTertiaryOpaque",
+                                        }}
+                                        onClick={() => {
+                                            if (!clickDisabled) {
+                                                if (
+                                                    currentlyPlaying ===
+                                                    track.previewUrl
+                                                ) {
+                                                    updateCurrentlyPlaying(
+                                                        undefined
+                                                    );
+                                                } else {
+                                                    updateCurrentlyPlaying(
+                                                        track.previewUrl
+                                                    );
+                                                }
+                                            }
+                                        }}
+                                    >
+                                        <Td w={6}>
+                                            <Image
+                                                src={track.thumbnail}
+                                                alt=""
+                                                width={300}
+                                                height={300}
+                                            ></Image>
+                                        </Td>
+                                        <Td>
+                                            <Flex direction="column">
+                                                <Text
+                                                    maxW={32}
+                                                    sx={{ textWrap: "wrap" }}
+                                                >
+                                                    {track.artist}
+                                                </Text>
+                                                <Text
+                                                    fontSize="sm"
+                                                    maxW={32}
+                                                    sx={{ textWrap: "wrap" }}
+                                                >
+                                                    {track.title}
+                                                </Text>
+                                            </Flex>
                                         </Td>
                                         <Td>
                                             <Flex
