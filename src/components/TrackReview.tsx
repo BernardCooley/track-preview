@@ -79,6 +79,18 @@ const TrackReview = ({ reviewStep }: Props) => {
         setNoTracks(false);
     }, [reviewStep]);
 
+    useEffect(() => {
+        if (userProfile?.autoplay) {
+            if (audioElementRef.current) {
+                audioElementRef.current.autoplay = true;
+            }
+        } else {
+            if (audioElementRef.current) {
+                audioElementRef.current.autoplay = false;
+            }
+        }
+    }, [userProfile?.autoplay]);
+
     const onGetTracks = useCallback(async () => {
         const tracks = await getTracks();
         if (tracks && tracks.length > 0) {
@@ -173,7 +185,7 @@ const TrackReview = ({ reviewStep }: Props) => {
 
     return (
         <Box position="relative">
-            {loading && (
+            {loading && loadingMessage.length === 0 && (
                 <Loading
                     showLoadingBar={
                         userProfile?.genre &&
