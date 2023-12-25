@@ -509,10 +509,18 @@ const TrackList = () => {
                                                         {track.title}
                                                     </Text>
                                                     <Text
+                                                        isTruncated={
+                                                            currentlyPlaying !==
+                                                            track.previewUrl
+                                                        }
                                                         fontSize="sm"
                                                         maxW={24}
                                                         sx={{
-                                                            textWrap: "wrap",
+                                                            textWrap:
+                                                                currentlyPlaying !==
+                                                                track.previewUrl
+                                                                    ? "nowrap"
+                                                                    : "wrap",
                                                         }}
                                                     >
                                                         {track.artist}
