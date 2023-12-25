@@ -17,7 +17,7 @@ const steps = [
     { title: "First", description: "Review" },
     { title: "Second", description: "Review" },
     { title: "Final", description: "Review" },
-    { title: "Buy", description: "" },
+    { title: "Library", description: "" },
 ];
 
 interface Props {
@@ -26,7 +26,6 @@ interface Props {
 }
 
 const ProgressStepper = ({ onStepChange, currentStep }: Props) => {
-
     return (
         <Stepper
             variant="primary"

@@ -287,6 +287,8 @@ export const theme = extendTheme({
                     th: {
                         color: "textPrimaryLight",
                         padding: "10px",
+                        paddingLeft: "0",
+                        paddingRight: "0",
                     },
                     td: {
                         color: "textPrimaryLight",

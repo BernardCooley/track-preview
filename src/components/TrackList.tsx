@@ -193,6 +193,7 @@ const TrackList = () => {
         updateCurrentlyPlaying: (url: string | undefined) => void
     ) => {
         return {
+            fontSize: "md",
             rounded: 10,
             outlineOffset: -2,
             outline:
