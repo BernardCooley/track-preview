@@ -39,7 +39,7 @@ const YearModal = ({
     const [setButtonLoading, setSetButtonLoading] = useState<boolean>(false);
 
     useEffect(() => {
-        if (decadeIndex) {
+        if (decadeIndex !== null) {
             setSliderValue([
                 decades[decadeIndex].from,
                 decades[decadeIndex].to,
