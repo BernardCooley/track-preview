@@ -107,7 +107,7 @@ const TrackReview = ({ reviewStep }: Props) => {
         } else {
             setCurrentTrack(null);
             setNoTracks(true);
-            setLoading(true);
+            setLoading(false);
         }
     }, [tracks]);
 
@@ -146,7 +146,6 @@ const TrackReview = ({ reviewStep }: Props) => {
     );
 
     const likeOrDislike = async (like: boolean) => {
-        setLoading(true);
         try {
             if (currentTrack && user?.uid) {
                 const track = { ...currentTrack };
@@ -159,9 +158,13 @@ const TrackReview = ({ reviewStep }: Props) => {
                 });
 
                 if (reviewStep === 1) {
+                    setLoading(true);
                     setTriggerGetTracks((prev) => !prev);
                 } else {
-                    setTracks((prev) => prev.slice(1));
+                    setLoading(true);
+                    if (tracks.length > 0) {
+                        setTracks((prev) => prev.slice(1));
+                    }
                 }
             }
         } catch (error) {
