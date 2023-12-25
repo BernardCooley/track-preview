@@ -497,7 +497,7 @@ const TrackList = () => {
                                                         color={
                                                             "brand.textPrimary"
                                                         }
-                                                        maxW={24}
+                                                        maxW={[24, 40]}
                                                         sx={{
                                                             textWrap:
                                                                 currentlyPlaying !==
@@ -510,7 +510,7 @@ const TrackList = () => {
                                                     </Text>
                                                     <Text
                                                         fontSize="sm"
-                                                        maxW={32}
+                                                        maxW={24}
                                                         sx={{
                                                             textWrap: "wrap",
                                                         }}
