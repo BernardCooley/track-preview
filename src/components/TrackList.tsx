@@ -201,10 +201,7 @@ const TrackList = () => {
                 currentlyPlaying === track.previewUrl
                     ? "brand.primary"
                     : "transparent",
-            color:
-                currentlyPlaying === track.previewUrl
-                    ? "brand.textPrimary"
-                    : "brand.textPrimaryLight",
+            color: "brand.textPrimaryLight",
             _hover: {
                 cursor: "pointer",
                 backgroundColor:
