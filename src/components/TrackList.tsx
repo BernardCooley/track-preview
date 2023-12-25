@@ -490,7 +490,7 @@ const TrackList = () => {
                                                             currentlyPlaying !==
                                                             track.previewUrl
                                                         }
-                                                        fontSize={"sm"}
+                                                        fontSize="sm"
                                                         color={
                                                             "brand.textPrimary"
                                                         }
@@ -510,7 +510,7 @@ const TrackList = () => {
                                                             currentlyPlaying !==
                                                             track.previewUrl
                                                         }
-                                                        fontSize="sm"
+                                                        fontSize="xs"
                                                         maxW={24}
                                                         sx={{
                                                             textWrap:
