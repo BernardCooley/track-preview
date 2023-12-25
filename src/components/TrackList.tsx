@@ -531,7 +531,7 @@ const TrackList = () => {
                                                     currentlyPlaying !==
                                                     track.previewUrl
                                                 }
-                                                maxW={20}
+                                                maxW={24}
                                                 sx={{
                                                     textWrap:
                                                         currentlyPlaying !==
