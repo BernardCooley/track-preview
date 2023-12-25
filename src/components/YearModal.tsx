@@ -139,6 +139,18 @@ const YearModal = ({
                         <Flex gap={4} mt={6} justifyContent="flex-end">
                             <Button
                                 isDisabled={
+                                    sliderValue[0] === 1960 &&
+                                    sliderValue[1] === getCurrentYear()
+                                }
+                                onClick={() => {
+                                    setSliderValue([1960, getCurrentYear()]);
+                                }}
+                                variant="primary"
+                            >
+                                All years
+                            </Button>
+                            <Button
+                                isDisabled={
                                     sliderValue[0] === yearRange.from &&
                                     sliderValue[1] === yearRange.to
                                 }
