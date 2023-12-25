@@ -94,6 +94,8 @@ const YearModal = ({
                                     outlineColor={
                                         decadeIndex === index
                                             ? "brand.primary"
+                                            : decadeIndex === null
+                                            ? "transparent"
                                             : "brand.backgroundSecondary"
                                     }
                                     key={decade.title}
