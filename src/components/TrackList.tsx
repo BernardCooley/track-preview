@@ -454,7 +454,7 @@ const TrackList = () => {
                             <Thead>
                                 <Tr>
                                     <Th>
-                                        <TableHeading title="artist" />
+                                        <TableHeading title="title" />
                                     </Th>
                                     <Th>
                                         <TableHeading title="genre" />
