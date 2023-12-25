@@ -12,6 +12,7 @@ import {
     Center,
     Flex,
     IconButton,
+    Image,
     Link,
     Stack,
     StackDivider,
@@ -32,9 +33,9 @@ import { useTrackContext } from "../../context/TrackContext";
 import { fetchTracks, updateTrackReviewStep } from "@/bff/bff";
 import { useAuthContext } from "../../Contexts/AuthContext";
 import Loading from "./Loading";
-import Image from "next/image";
-import { getFormattedDate } from "../../utils";
+import { camelcaseToTitleCase, getFormattedDate } from "../../utils";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 
 const TrackList = () => {
     const { user } = useAuthContext();
@@ -48,6 +49,12 @@ const TrackList = () => {
     const cancelRef = useRef<HTMLButtonElement>(null);
     const [trackToDelete, setTrackToDelete] = useState<number | null>(null);
     const [clickDisabled, setClickDisabled] = useState<boolean>(false);
+    const [sortBy, setSortBy] = useState<string>("artist");
+    const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+
+    useEffect(() => {
+        console.log(sortBy);
+    }, [sortBy]);
 
     useEffect(() => {
         getTracks();
@@ -135,6 +142,59 @@ const TrackList = () => {
     const closeDialog = () => {
         onClose();
         setTrackToDelete(null);
+    };
+
+    type TrackKeys = keyof Track;
+
+    const sortTracks = (field: TrackKeys) => {
+        const order = sortBy === field ? sortDirection : "asc";
+        console.log(field, order);
+        const sortedTracks = [...tracks].sort((a, b) => {
+            if (a[field] < b[field]) return order === "asc" ? -1 : 1;
+            if (a[field] > b[field]) return order === "asc" ? 1 : -1;
+            return 0;
+        });
+
+        setTracks(sortedTracks);
+
+        setSortBy(field);
+        setSortDirection(order === "asc" ? "desc" : "asc");
+    };
+
+    interface TableHeadingProps {
+        title: TrackKeys;
+    }
+
+    const TableHeading = ({ title }: TableHeadingProps) => {
+        return (
+            <Flex
+                as={Button}
+                variant="unstyled"
+                border="none"
+                shadow="none"
+                onClick={() => {
+                    sortTracks(title as TrackKeys);
+                }}
+                textDecoration={sortBy === title ? "underline" : "none"}
+            >
+                <Text>
+                    {camelcaseToTitleCase(title) === "Artist"
+                        ? "Artist/Title"
+                        : camelcaseToTitleCase(title)}
+                </Text>
+                {sortBy === title && (
+                    <Box
+                        transform={
+                            sortBy === title && sortDirection === "asc"
+                                ? ""
+                                : "rotate(180deg)"
+                        }
+                    >
+                        <KeyboardArrowUpIcon />
+                    </Box>
+                )}
+            </Flex>
+        );
     };
 
     return (
@@ -240,14 +300,31 @@ const TrackList = () => {
                         >
                             <Thead>
                                 <Tr>
-                                    <Th>Artwork</Th>
-                                    <Th>Artist</Th>
-                                    <Th>Title</Th>
-                                    <Th>Release</Th>
-                                    <Th>Genre</Th>
-                                    <Th>Buy</Th>
-                                    <Th>Release date</Th>
-                                    <Th>Actions</Th>
+                                    <Th>
+                                        <TableHeading title="artist" />
+                                    </Th>
+                                    <Th>
+                                        <TableHeading title="releaseTitle" />
+                                    </Th>
+                                    <Th>
+                                        <TableHeading title="genre" />
+                                    </Th>
+                                    <Th>
+                                        <TableHeading title="releaseDate" />
+                                    </Th>
+                                    <Th>
+                                        <Box
+                                            as={Button}
+                                            variant="unstyled"
+                                            border="none"
+                                            shadow="none"
+                                            _hover={{
+                                                cursor: "default",
+                                            }}
+                                        >
+                                            Actions
+                                        </Box>
+                                    </Th>
                                 </Tr>
                             </Thead>
                             <Tbody>
@@ -296,30 +373,40 @@ const TrackList = () => {
                                             }
                                         }}
                                     >
-                                        <Td w={6}>
-                                            <Image
-                                                src={track.thumbnail}
-                                                alt=""
-                                                width={300}
-                                                height={300}
-                                            ></Image>
-                                        </Td>
                                         <Td>
-                                            <Text
-                                                maxW={32}
-                                                sx={{ textWrap: "wrap" }}
+                                            <Flex
+                                                alignItems="center"
+                                                gap={6}
+                                                justifyContent="flex-start"
                                             >
-                                                {track.artist}
-                                            </Text>
+                                                <Image
+                                                    maxW={16}
+                                                    maxH={16}
+                                                    src={track.thumbnail}
+                                                    alt=""
+                                                ></Image>
+                                                <Flex direction="column">
+                                                    <Text
+                                                        maxW={32}
+                                                        sx={{
+                                                            textWrap: "wrap",
+                                                        }}
+                                                    >
+                                                        {track.title}
+                                                    </Text>
+                                                    <Text
+                                                        fontSize="sm"
+                                                        maxW={32}
+                                                        sx={{
+                                                            textWrap: "wrap",
+                                                        }}
+                                                    >
+                                                        {track.artist}
+                                                    </Text>
+                                                </Flex>
+                                            </Flex>
                                         </Td>
-                                        <Td>
-                                            <Text
-                                                maxW={48}
-                                                sx={{ textWrap: "wrap" }}
-                                            >
-                                                {track.title}
-                                            </Text>
-                                        </Td>
+
                                         <Td>
                                             <Text
                                                 maxW={48}
@@ -330,31 +417,32 @@ const TrackList = () => {
                                         </Td>
                                         <Td>
                                             <Text
-                                                maxW={28}
+                                                maxW={20}
                                                 sx={{ textWrap: "wrap" }}
                                             >
                                                 {track.genre}
                                             </Text>
                                         </Td>
-                                        <Td>
-                                            <Link
-                                                variant="primary"
-                                                href={track.purchaseUrl}
-                                                isExternal
-                                            >
-                                                Buy
-                                            </Link>
-                                        </Td>
+
                                         <Td>
                                             {getFormattedDate(
                                                 track.releaseDate
-                                            )}{" "}
+                                            ) || track.releaseYear}
                                         </Td>
                                         <Td>
                                             <Flex
                                                 w="full"
                                                 justifyContent="space-between"
+                                                alignItems="center"
+                                                gap={2}
                                             >
+                                                <Link
+                                                    variant="primary"
+                                                    href={track.purchaseUrl}
+                                                    isExternal
+                                                >
+                                                    Buy
+                                                </Link>
                                                 <IconButton
                                                     onMouseEnter={() =>
                                                         setClickDisabled(true)
@@ -390,8 +478,12 @@ const TrackList = () => {
                         >
                             <Thead>
                                 <Tr>
-                                    <Th>Artwork</Th>
-                                    <Th>Artist/Title</Th>
+                                    <Th>
+                                        <TableHeading title="artist" />
+                                    </Th>
+                                    <Th>
+                                        <TableHeading title="genre" />
+                                    </Th>
                                     <Th>Actions</Th>
                                 </Tr>
                             </Thead>
@@ -441,30 +533,46 @@ const TrackList = () => {
                                             }
                                         }}
                                     >
-                                        <Td w={6}>
-                                            <Image
-                                                src={track.thumbnail}
-                                                alt=""
-                                                width={300}
-                                                height={300}
-                                            ></Image>
+                                        <Td>
+                                            <Flex
+                                                alignItems="center"
+                                                gap={6}
+                                                justifyContent="flex-start"
+                                            >
+                                                <Image
+                                                    maxW={16}
+                                                    maxH={16}
+                                                    src={track.thumbnail}
+                                                    alt=""
+                                                ></Image>
+                                                <Flex direction="column">
+                                                    <Text
+                                                        maxW={32}
+                                                        sx={{
+                                                            textWrap: "wrap",
+                                                        }}
+                                                    >
+                                                        {track.title}
+                                                    </Text>
+                                                    <Text
+                                                        fontSize="sm"
+                                                        maxW={32}
+                                                        sx={{
+                                                            textWrap: "wrap",
+                                                        }}
+                                                    >
+                                                        {track.artist}
+                                                    </Text>
+                                                </Flex>
+                                            </Flex>
                                         </Td>
                                         <Td>
-                                            <Flex direction="column">
-                                                <Text
-                                                    maxW={32}
-                                                    sx={{ textWrap: "wrap" }}
-                                                >
-                                                    {track.artist}
-                                                </Text>
-                                                <Text
-                                                    fontSize="sm"
-                                                    maxW={32}
-                                                    sx={{ textWrap: "wrap" }}
-                                                >
-                                                    {track.title}
-                                                </Text>
-                                            </Flex>
+                                            <Text
+                                                maxW={20}
+                                                sx={{ textWrap: "wrap" }}
+                                            >
+                                                {track.genre}
+                                            </Text>
                                         </Td>
                                         <Td>
                                             <Flex
