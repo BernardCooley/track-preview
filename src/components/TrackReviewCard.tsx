@@ -69,7 +69,7 @@ const TrackReviewCard = forwardRef(
                     <CardHeader
                         color="brand.textPrimary"
                         backgroundColor="brand.primaryOpaque"
-                        borderTopRadius={40}
+                        borderTopRadius={20}
                         p={[2, 4]}
                     >
                         <Heading size="md">
@@ -99,7 +99,7 @@ const TrackReviewCard = forwardRef(
                         h={["full", "unset"]}
                         bgImage={currentTrack.thumbnail}
                         bgSize="cover"
-                        borderBottomRadius={40}
+                        borderBottomRadius={20}
                         p={0}
                         as={Flex}
                         direction="column"

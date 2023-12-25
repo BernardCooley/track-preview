@@ -49,6 +49,7 @@ const TrackReview = ({ reviewStep }: Props) => {
     const [loading, setLoading] = useState<boolean>(true);
     const [tracks, setTracks] = useState<Track[]>([]);
     const [loadMoreTracks, setLoadMoreTracks] = useState<boolean>(false);
+    const [fetchAttempted, setFetchAttempted] = useState<boolean>(false);
 
     useEffect(() => {
         if (currentTrack && audioElementRef.current && userProfile?.autoplay) {
@@ -89,6 +90,7 @@ const TrackReview = ({ reviewStep }: Props) => {
 
     const onGetTracks = useCallback(async () => {
         const tracks = await getTracks();
+        setFetchAttempted(true);
         if (tracks && tracks.length > 0) {
             setTracks(tracks);
             setLoading(false);
@@ -187,7 +189,7 @@ const TrackReview = ({ reviewStep }: Props) => {
 
     return (
         <Box position="relative">
-            {!noTracks && !loading && loadMoreTracks && (
+            {fetchAttempted && !noTracks && !loading && loadMoreTracks && (
                 <Center
                     zIndex={150}
                     top="200px"
