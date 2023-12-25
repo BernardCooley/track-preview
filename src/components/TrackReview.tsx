@@ -187,7 +187,7 @@ const TrackReview = ({ reviewStep }: Props) => {
 
     return (
         <Box position="relative">
-            {!loading && loadMoreTracks && (
+            {!noTracks && !loading && loadMoreTracks && (
                 <Center
                     zIndex={150}
                     top="200px"

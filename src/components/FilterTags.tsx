@@ -34,7 +34,7 @@ const FilterTags = ({
                     <Tag
                         key={`${genre}`}
                         variant="filter"
-                        pointerEvents={genre ? "auto" : "none"}
+                        pointerEvents={profileLoaded ? "auto" : "none"}
                         onClick={onGenreClick}
                     >
                         {genre ? (
@@ -53,9 +53,9 @@ const FilterTags = ({
                     <Tag
                         variant="filter"
                         onClick={onYearClick}
-                        pointerEvents={yearRange ? "auto" : "none"}
+                        pointerEvents={profileLoaded ? "auto" : "none"}
                     >
-                        {yearRange ? (
+                        {yearRange && profileLoaded ? (
                             <Text userSelect="none">
                                 {yearRange.from === 1960 &&
                                 yearRange.to === getCurrentYear()
