@@ -23,6 +23,7 @@ const TrackMenuOptions = ({
     return (
         <Menu variant="primary">
             <MenuButton
+                onClick={(e) => e.stopPropagation()}
                 variant="menuButton"
                 onMouseEnter={onMouseEnter}
                 onMouseLeave={onMouseLeave}
