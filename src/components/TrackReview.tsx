@@ -309,7 +309,6 @@ const TrackReview = ({ reviewStep }: Props) => {
                 p={4}
                 pt={2}
                 gap={2}
-                rounded="3xl"
                 zIndex={200}
                 minH="66px"
             >

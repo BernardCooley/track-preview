@@ -93,12 +93,12 @@ const GenreModal = ({
             }}
         >
             <ModalOverlay />
-            <ModalContent rounded="3xl" mx={4}>
+            <ModalContent rounded={20} mx={4}>
                 <Flex
                     h="full"
                     w="full"
                     bg="brand.backgroundSecondary"
-                    rounded="3xl"
+                    rounded={20}
                     p={showGenreSelector ? 4 : 0}
                     direction="column"
                     gap={4}
@@ -186,7 +186,7 @@ const GenreModal = ({
                                     direction="column"
                                     border="1px solid"
                                     borderColor="brand.backgroundTertiary"
-                                    rounded="md"
+                                    rounded={6}
                                     p={2}
                                     gap={3}
                                     position="relative"
@@ -263,7 +263,7 @@ const GenreModal = ({
                             gap={4}
                             border="1px solid"
                             borderColor="brand.backgroundTertiary"
-                            rounded="md"
+                            rounded={6}
                             p={2}
                         >
                             {!isSearching && (
