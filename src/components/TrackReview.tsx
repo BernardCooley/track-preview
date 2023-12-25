@@ -48,6 +48,12 @@ const TrackReview = ({ reviewStep }: Props) => {
     const [loading, setLoading] = useState<boolean>(true);
     const [tracks, setTracks] = useState<Track[]>([]);
 
+    useEffect(() => {
+        if (currentTrack && audioElementRef.current && userProfile?.autoplay) {
+            play();
+        }
+    }, [currentTrack]);
+
     const getTracks = useCallback(async () => {
         if (userProfile?.genre && user?.uid) {
             setLoading(true);
@@ -78,18 +84,6 @@ const TrackReview = ({ reviewStep }: Props) => {
         setLoading(true);
         setNoTracks(false);
     }, [reviewStep]);
-
-    useEffect(() => {
-        if (userProfile?.autoplay) {
-            if (audioElementRef.current) {
-                audioElementRef.current.autoplay = true;
-            }
-        } else {
-            if (audioElementRef.current) {
-                audioElementRef.current.autoplay = false;
-            }
-        }
-    }, [userProfile?.autoplay]);
 
     const onGetTracks = useCallback(async () => {
         const tracks = await getTracks();
