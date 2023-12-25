@@ -79,6 +79,9 @@ const YearModal = ({
                         >
                             {decades.map((decade, index) => (
                                 <Button
+                                    _focusVisible={{
+                                        boxShadow: "none",
+                                    }}
                                     fontSize={
                                         decadeIndex === index ? "lg" : "md"
                                     }
