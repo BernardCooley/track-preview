@@ -70,19 +70,20 @@ const TrackReviewCard = forwardRef(
                         color="brand.textPrimary"
                         backgroundColor="brand.primaryOpaque"
                         borderTopRadius={40}
+                        p={[2, 4]}
                     >
                         <Heading size="md">
                             <Flex
                                 alignItems="center"
                                 direction="column"
                                 position="relative"
-                                gap={2}
+                                gap={[1, 2]}
                             >
-                                <Text fontSize="3xl">
+                                <Text fontSize={["2xl", "3xl"]}>
                                     {currentTrack.artist}
                                 </Text>
                                 <Flex gap={1}>
-                                    <Text fontSize="xl">
+                                    <Text fontSize={["lg", "xl"]}>
                                         {currentTrack.title}
                                         {" ("}
                                         {currentTrack.releaseYear}
@@ -94,7 +95,7 @@ const TrackReviewCard = forwardRef(
                     </CardHeader>
                     <CardBody
                         w="full"
-                        minH={["unset", "364px"]}
+                        minH={[64, 80]}
                         h={["full", "unset"]}
                         bgImage={currentTrack.thumbnail}
                         bgSize="cover"
