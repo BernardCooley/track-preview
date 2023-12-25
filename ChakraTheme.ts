@@ -70,6 +70,17 @@ export const theme = extendTheme({
                     },
                     color: "white",
                 },
+                tertiary: {
+                    shadow: "none",
+                    backgroundColor: "transparent",
+                    _hover: {
+                        shadow: "lg",
+                        outline: "1px solid",
+                        outlineColor: "brand.primary",
+                    },
+                    color: "white",
+                    px: "0",
+                },
                 cancel: {
                     border: "1px solid",
                     borderColor: "transparent",
