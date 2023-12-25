@@ -478,20 +478,32 @@ const TrackList = () => {
                                         <Td>
                                             <Flex
                                                 alignItems="center"
-                                                gap={6}
+                                                gap={4}
                                                 justifyContent="flex-start"
                                             >
                                                 <Image
-                                                    maxW={16}
-                                                    maxH={16}
+                                                    maxW={14}
+                                                    maxH={14}
                                                     src={track.thumbnail}
                                                     alt=""
                                                 ></Image>
                                                 <Flex direction="column">
                                                     <Text
-                                                        maxW={32}
+                                                        isTruncated={
+                                                            currentlyPlaying !==
+                                                            track.previewUrl
+                                                        }
+                                                        fontSize={"sm"}
+                                                        color={
+                                                            "brand.textPrimary"
+                                                        }
+                                                        maxW={24}
                                                         sx={{
-                                                            textWrap: "wrap",
+                                                            textWrap:
+                                                                currentlyPlaying !==
+                                                                track.previewUrl
+                                                                    ? "nowrap"
+                                                                    : "wrap",
                                                         }}
                                                     >
                                                         {track.title}
@@ -510,8 +522,18 @@ const TrackList = () => {
                                         </Td>
                                         <Td>
                                             <Text
+                                                isTruncated={
+                                                    currentlyPlaying !==
+                                                    track.previewUrl
+                                                }
                                                 maxW={20}
-                                                sx={{ textWrap: "wrap" }}
+                                                sx={{
+                                                    textWrap:
+                                                        currentlyPlaying !==
+                                                        track.previewUrl
+                                                            ? "nowrap"
+                                                            : "wrap",
+                                                }}
                                             >
                                                 {track.genre}
                                             </Text>

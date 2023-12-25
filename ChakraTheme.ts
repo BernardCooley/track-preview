@@ -99,6 +99,7 @@ export const theme = extendTheme({
                         transform: "scale(1.3)",
                     },
                     color: "brand.primary",
+                    padding: "0",
                 },
             },
         },
