@@ -47,7 +47,7 @@ const TrackList = () => {
     const cancelRef = useRef<HTMLButtonElement>(null);
     const [trackToDelete, setTrackToDelete] = useState<number | null>(null);
     const [clickDisabled, setClickDisabled] = useState<boolean>(false);
-    const [sortBy, setSortBy] = useState<keyof Track>("artist");
+    const [sortBy, setSortBy] = useState<keyof Track | "">("");
     const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
 
     useEffect(() => {
@@ -170,11 +170,7 @@ const TrackList = () => {
                 }}
                 textDecoration={sortBy === title ? "underline" : "none"}
             >
-                <Text>
-                    {camelcaseToTitleCase(title) === "Artist"
-                        ? "Artist/Title"
-                        : camelcaseToTitleCase(title)}
-                </Text>
+                <Text>{camelcaseToTitleCase(title)}</Text>
                 {sortBy === title && (
                     <Box
                         transform={
@@ -208,7 +204,7 @@ const TrackList = () => {
             color:
                 currentlyPlaying === track.previewUrl
                     ? "brand.textPrimary"
-                    : "brand.primary",
+                    : "brand.textPrimaryLight",
             _hover: {
                 cursor: "pointer",
                 backgroundColor:
@@ -335,7 +331,7 @@ const TrackList = () => {
                             <Thead>
                                 <Tr>
                                     <Th>
-                                        <TableHeading title="artist" />
+                                        <TableHeading title="title" />
                                     </Th>
                                     <Th>
                                         <TableHeading title="releaseTitle" />
@@ -386,6 +382,10 @@ const TrackList = () => {
                                                 ></Image>
                                                 <Flex direction="column">
                                                     <Text
+                                                        fontSize={"md"}
+                                                        color={
+                                                            "brand.textPrimary"
+                                                        }
                                                         maxW={32}
                                                         sx={{
                                                             textWrap: "wrap",

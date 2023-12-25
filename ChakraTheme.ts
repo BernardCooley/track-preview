@@ -12,6 +12,7 @@ export const theme = extendTheme({
             primaryOpaque: "rgba(16, 152, 157, 0.47)",
             primaryLight: "#16c6cc",
             textPrimary: "#FFFFFF",
+            textPrimaryLight: "#b7c0c2",
             backgroundPrimary: "#293533",
             backgroundSecondary: "#40514e",
             backgroundTertiary: "#576d69",
@@ -272,12 +273,15 @@ export const theme = extendTheme({
                 primary: {
                     table: {},
                     th: {
+                        color: "textPrimaryLight",
                         padding: "10px",
                     },
                     td: {
+                        color: "textPrimaryLight",
                         padding: "10px",
                     },
                     tr: {
+                        color: "textPrimaryLight",
                         borderBottom: "1px solid",
                         borderBottomColor: "brand.backgroundTertiary",
                     },
