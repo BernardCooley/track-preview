@@ -257,7 +257,7 @@ const GenreModal = ({
                             )}
 
                         <Flex
-                            direction="column"
+                            flexWrap="wrap"
                             maxH="300px"
                             overflow="scroll"
                             gap={4}
