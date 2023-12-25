@@ -146,10 +146,11 @@ const TrackReview = ({ reviewStep }: Props) => {
     );
 
     const likeOrDislike = async (like: boolean) => {
-        setLoadingMessage("Saving track...");
+        setLoading(true);
         try {
             if (currentTrack && user?.uid) {
                 const track = { ...currentTrack };
+                setCurrentTrack(null);
                 await updateTrackReviewStep({
                     trackId: track.id,
                     reviewStep,
