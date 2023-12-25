@@ -257,7 +257,7 @@ const GenreModal = ({
                             )}
 
                         <Flex
-                            flexWrap="wrap"
+                            direction="column"
                             maxH="300px"
                             overflow="scroll"
                             gap={4}
@@ -266,46 +266,48 @@ const GenreModal = ({
                             rounded="md"
                             p={2}
                         >
-                            <Tag
-                                onClick={() => {
-                                    onGenreSelect("all");
-                                    setSearchValue("");
-                                    setIsSearching(false);
-                                    setFilteredGenres([]);
-                                }}
-                                bg={
-                                    genre === "all"
-                                        ? "brand.primaryOpaque"
-                                        : "transparent"
-                                }
-                                borderColor={
-                                    genre === "all"
-                                        ? "brand.primaryLight"
-                                        : "brand.primaryOpaque"
-                                }
-                                _hover={
-                                    isMobile
-                                        ? {}
-                                        : {
-                                              cursor: "pointer",
-                                              bg:
-                                                  genre === "all"
-                                                      ? "transparent"
-                                                      : "brand.primaryOpaque",
-                                              borderColor:
-                                                  genre === "all"
-                                                      ? "brand.primaryOpaque"
-                                                      : "brand.primaryLight",
-                                          }
-                                }
-                                variant="filter"
-                                key={genre}
-                                size="xs"
-                                fontSize="14px"
-                                m={1}
-                            >
-                                All genres
-                            </Tag>
+                            {!isSearching && (
+                                <Tag
+                                    onClick={() => {
+                                        onGenreSelect("all");
+                                        setSearchValue("");
+                                        setIsSearching(false);
+                                        setFilteredGenres([]);
+                                    }}
+                                    bg={
+                                        genre === "all"
+                                            ? "brand.primaryOpaque"
+                                            : "transparent"
+                                    }
+                                    borderColor={
+                                        genre === "all"
+                                            ? "brand.primaryLight"
+                                            : "brand.primaryOpaque"
+                                    }
+                                    _hover={
+                                        isMobile
+                                            ? {}
+                                            : {
+                                                  cursor: "pointer",
+                                                  bg:
+                                                      genre === "all"
+                                                          ? "transparent"
+                                                          : "brand.primaryOpaque",
+                                                  borderColor:
+                                                      genre === "all"
+                                                          ? "brand.primaryOpaque"
+                                                          : "brand.primaryLight",
+                                              }
+                                    }
+                                    variant="filter"
+                                    key={genre}
+                                    size="xs"
+                                    fontSize="14px"
+                                    m={1}
+                                >
+                                    All genres
+                                </Tag>
+                            )}
                             <Flex gap={4} direction="column">
                                 {getFormattedGenres(genres).map(
                                     (genreSection) => (
