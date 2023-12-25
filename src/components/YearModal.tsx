@@ -60,12 +60,12 @@ const YearModal = ({
             onClose={() => setShowYearSelector(false)}
         >
             <ModalOverlay />
-            <ModalContent rounded="3xl" mx={4}>
+            <ModalContent rounded={20} mx={4}>
                 <Flex
                     h="full"
                     w="full"
                     bg="brand.backgroundSecondary"
-                    rounded="3xl"
+                    rounded={20}
                     p={showYearSelector ? 4 : 0}
                 >
                     <Flex w="full" direction="column" gap={4}>
