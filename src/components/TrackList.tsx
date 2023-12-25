@@ -197,7 +197,6 @@ const TrackList = () => {
         updateCurrentlyPlaying: (url: string | undefined) => void
     ) => {
         return {
-            key: track.id,
             rounded: 10,
             outlineOffset: -2,
             outline:
@@ -365,6 +364,7 @@ const TrackList = () => {
                             <Tbody>
                                 {tracks.map((track, index) => (
                                     <Tr
+                                        key={track.id}
                                         {...getTrProps(
                                             track,
                                             currentlyPlaying,
@@ -467,6 +467,7 @@ const TrackList = () => {
                             <Tbody>
                                 {tracks.map((track, index) => (
                                     <Tr
+                                        key={track.id}
                                         {...getTrProps(
                                             track,
                                             currentlyPlaying,
