@@ -167,7 +167,7 @@ const TrackReviewCard = forwardRef(
                                         onTimeUpdate={(e) => {
                                             onListenedToggle(
                                                 (e.currentTarget.currentTime >
-                                                    2) as boolean
+                                                    1) as boolean
                                             );
                                         }}
                                         ref={ref}
