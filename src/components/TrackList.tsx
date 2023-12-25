@@ -11,9 +11,7 @@ import {
     Button,
     Center,
     Flex,
-    IconButton,
     Image,
-    Link,
     Stack,
     StackDivider,
     Table,
@@ -34,8 +32,8 @@ import { fetchTracks, updateTrackReviewStep } from "@/bff/bff";
 import { useAuthContext } from "../../Contexts/AuthContext";
 import Loading from "./Loading";
 import { camelcaseToTitleCase, getFormattedDate } from "../../utils";
-import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import TrackMenuOptions from "./TrackOptionsMenu";
 
 const TrackList = () => {
     const { user } = useAuthContext();
@@ -359,7 +357,7 @@ const TrackList = () => {
                                                 cursor: "default",
                                             }}
                                         >
-                                            Actions
+                                            <br />
                                         </Box>
                                     </Th>
                                 </Tr>
@@ -431,43 +429,19 @@ const TrackList = () => {
                                             ) || track.releaseYear}
                                         </Td>
                                         <Td>
-                                            <Flex
-                                                w="full"
-                                                justifyContent="space-between"
-                                                alignItems="center"
-                                                gap={2}
-                                            >
-                                                <Link
-                                                    variant="primary"
-                                                    href={track.purchaseUrl}
-                                                    isExternal
-                                                >
-                                                    Buy
-                                                </Link>
-                                                <IconButton
-                                                    onMouseEnter={() =>
-                                                        setClickDisabled(true)
-                                                    }
-                                                    onMouseLeave={() =>
-                                                        setClickDisabled(false)
-                                                    }
-                                                    _hover={{
-                                                        bg: "transparent",
-                                                        transform: "scale(1.2)",
-                                                    }}
-                                                    shadow="lg"
-                                                    height="30px"
-                                                    onClick={() =>
-                                                        setTrackToDelete(index)
-                                                    }
-                                                    variant="ghost"
-                                                    h={1 / 2}
-                                                    colorScheme="red"
-                                                    aria-label="Show password"
-                                                    fontSize="3xl"
-                                                    icon={<DeleteForeverIcon />}
-                                                />
-                                            </Flex>
+                                            <TrackMenuOptions
+                                                onMouseEnter={() =>
+                                                    setClickDisabled(true)
+                                                }
+                                                onMouseLeave={() =>
+                                                    setClickDisabled(false)
+                                                }
+                                                onTrackDelete={() =>
+                                                    setTrackToDelete(index)
+                                                }
+                                                track={track}
+                                                index={index}
+                                            />
                                         </Td>
                                     </Tr>
                                 ))}
@@ -485,7 +459,9 @@ const TrackList = () => {
                                     <Th>
                                         <TableHeading title="genre" />
                                     </Th>
-                                    <Th>Actions</Th>
+                                    <Th>
+                                        <br />
+                                    </Th>
                                 </Tr>
                             </Thead>
                             <Tbody>
@@ -540,34 +516,19 @@ const TrackList = () => {
                                             </Text>
                                         </Td>
                                         <Td>
-                                            <Flex
-                                                w="full"
-                                                justifyContent="space-between"
-                                            >
-                                                <IconButton
-                                                    onMouseEnter={() =>
-                                                        setClickDisabled(true)
-                                                    }
-                                                    onMouseLeave={() =>
-                                                        setClickDisabled(false)
-                                                    }
-                                                    _hover={{
-                                                        bg: "transparent",
-                                                        transform: "scale(1.2)",
-                                                    }}
-                                                    shadow="lg"
-                                                    height="30px"
-                                                    onClick={() =>
-                                                        setTrackToDelete(index)
-                                                    }
-                                                    variant="ghost"
-                                                    h={1 / 2}
-                                                    colorScheme="red"
-                                                    aria-label="Show password"
-                                                    fontSize="3xl"
-                                                    icon={<DeleteForeverIcon />}
-                                                />
-                                            </Flex>
+                                            <TrackMenuOptions
+                                                onMouseEnter={() =>
+                                                    setClickDisabled(true)
+                                                }
+                                                onMouseLeave={() =>
+                                                    setClickDisabled(false)
+                                                }
+                                                onTrackDelete={() =>
+                                                    setTrackToDelete(index)
+                                                }
+                                                track={track}
+                                                index={index}
+                                            />
                                         </Td>
                                     </Tr>
                                 ))}

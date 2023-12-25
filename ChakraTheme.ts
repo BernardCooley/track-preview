@@ -91,6 +91,14 @@ export const theme = extendTheme({
                     },
                     color: "brand.textPrimary",
                 },
+                menuButton: {
+                    shadow: "none",
+                    backgroundColor: "transparent",
+                    _hover: {
+                        transform: "scale(1.3)",
+                    },
+                    color: "brand.primary",
+                },
             },
         },
         Input: {
@@ -247,8 +255,10 @@ export const theme = extendTheme({
                         shadow: "md",
                     },
                     item: {
+                        px: 2,
+                        fontSize: "lg",
                         rounded: "md",
-                        bg: "brand.backgroundPrimary",
+                        bg: "transparent",
                         color: "brand.textPrimary",
                         _hover: {
                             bg: "brand.backgroundTertiaryOpaque",
