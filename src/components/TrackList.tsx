@@ -475,7 +475,7 @@ const TrackList = () => {
                                         <Td>
                                             <Flex
                                                 alignItems="center"
-                                                gap={4}
+                                                gap={3}
                                                 justifyContent="flex-start"
                                             >
                                                 <Image
@@ -484,7 +484,10 @@ const TrackList = () => {
                                                     src={track.thumbnail}
                                                     alt=""
                                                 ></Image>
-                                                <Flex direction="column">
+                                                <Flex
+                                                    direction="column"
+                                                    maxW={[32, 40]}
+                                                >
                                                     <Text
                                                         isTruncated={
                                                             currentlyPlaying !==
@@ -494,7 +497,6 @@ const TrackList = () => {
                                                         color={
                                                             "brand.textPrimary"
                                                         }
-                                                        maxW={[24, 40]}
                                                         sx={{
                                                             textWrap:
                                                                 currentlyPlaying !==
@@ -531,7 +533,7 @@ const TrackList = () => {
                                                     currentlyPlaying !==
                                                     track.previewUrl
                                                 }
-                                                maxW={24}
+                                                maxW={28}
                                                 sx={{
                                                     textWrap:
                                                         currentlyPlaying !==
