@@ -260,26 +260,16 @@ export const theme = extendTheme({
         Table: {
             variants: {
                 primary: {
-                    table: {
-                        bg: "brand.backgroundPrimary",
-                        color: "brand.textPrimary",
-                        border: "1px solid",
-                        borderColor: "brand.primary",
-                        shadow: "md",
-                    },
+                    table: {},
                     th: {
-                        bg: "brand.backgroundPrimary",
-                        color: "brand.textPrimary",
-                        border: "1px solid",
-                        borderColor: "brand.primary",
-                        shadow: "md",
+                        padding: "10px",
                     },
                     td: {
-                        bg: "brand.backgroundPrimary",
-                        color: "brand.textPrimary",
-                        border: "1px solid",
-                        borderColor: "brand.primary",
-                        shadow: "md",
+                        padding: "10px",
+                    },
+                    tr: {
+                        borderBottom: "1px solid",
+                        borderBottomColor: "brand.backgroundTertiary",
                     },
                 },
             },

@@ -49,12 +49,8 @@ const TrackList = () => {
     const cancelRef = useRef<HTMLButtonElement>(null);
     const [trackToDelete, setTrackToDelete] = useState<number | null>(null);
     const [clickDisabled, setClickDisabled] = useState<boolean>(false);
-    const [sortBy, setSortBy] = useState<string>("artist");
-    const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-
-    useEffect(() => {
-        console.log(sortBy);
-    }, [sortBy]);
+    const [sortBy, setSortBy] = useState<keyof Track>("artist");
+    const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
 
     useEffect(() => {
         getTracks();
@@ -148,7 +144,7 @@ const TrackList = () => {
 
     const sortTracks = (field: TrackKeys) => {
         const order = sortBy === field ? sortDirection : "asc";
-        console.log(field, order);
+
         const sortedTracks = [...tracks].sort((a, b) => {
             if (a[field] < b[field]) return order === "asc" ? -1 : 1;
             if (a[field] > b[field]) return order === "asc" ? 1 : -1;
@@ -156,7 +152,6 @@ const TrackList = () => {
         });
 
         setTracks(sortedTracks);
-
         setSortBy(field);
         setSortDirection(order === "asc" ? "desc" : "asc");
     };
@@ -195,6 +190,49 @@ const TrackList = () => {
                 )}
             </Flex>
         );
+    };
+
+    const getTrProps = (
+        track: Track,
+        currentlyPlaying: string | undefined,
+        clickDisabled: boolean,
+        updateCurrentlyPlaying: (url: string | undefined) => void
+    ) => {
+        return {
+            key: track.id,
+            rounded: 10,
+            outlineOffset: -2,
+            outline:
+                currentlyPlaying === track.previewUrl ? "1px solid" : "none",
+            outlineColor:
+                currentlyPlaying === track.previewUrl
+                    ? "brand.primary"
+                    : "transparent",
+            color:
+                currentlyPlaying === track.previewUrl
+                    ? "brand.textPrimary"
+                    : "brand.primary",
+            _hover: {
+                cursor: "pointer",
+                backgroundColor:
+                    currentlyPlaying === track.previewUrl
+                        ? "brand.backgroundTertiaryOpaque"
+                        : "brand.backgroundTertiaryOpaque2",
+            },
+            bg:
+                currentlyPlaying === track.previewUrl
+                    ? "brand.backgroundTertiaryOpaque"
+                    : "transparent",
+            onClick: () => {
+                if (!clickDisabled) {
+                    if (currentlyPlaying === track.previewUrl) {
+                        updateCurrentlyPlaying(undefined);
+                    } else {
+                        updateCurrentlyPlaying(track.previewUrl);
+                    }
+                }
+            },
+        };
     };
 
     return (
@@ -273,7 +311,6 @@ const TrackList = () => {
                 </AlertDialogOverlay>
             </AlertDialog>
             <Stack
-                p={[2, 4, 8]}
                 h="full"
                 divider={
                     <StackDivider borderColor="brand.backgroundTertiaryOpaque" />
@@ -295,7 +332,7 @@ const TrackList = () => {
                 {!loading && !noTracks && (
                     <TableContainer>
                         <Table
-                            variant="unstyled"
+                            variant="primary"
                             display={["none", "none", "table"]}
                         >
                             <Thead>
@@ -330,48 +367,12 @@ const TrackList = () => {
                             <Tbody>
                                 {tracks.map((track, index) => (
                                     <Tr
-                                        key={track.id}
-                                        rounded={10}
-                                        outlineOffset={-2}
-                                        outline={
-                                            currentlyPlaying ===
-                                            track.previewUrl
-                                                ? "1px solid"
-                                                : "none"
-                                        }
-                                        outlineColor={
-                                            currentlyPlaying ===
-                                            track.previewUrl
-                                                ? "brand.primary"
-                                                : "transparent"
-                                        }
-                                        color={
-                                            currentlyPlaying ===
-                                            track.previewUrl
-                                                ? "brand.textPrimary"
-                                                : "brand.primary"
-                                        }
-                                        _hover={{
-                                            cursor: "pointer",
-                                            backgroundColor:
-                                                "brand.backgroundTertiaryOpaque",
-                                        }}
-                                        onClick={() => {
-                                            if (!clickDisabled) {
-                                                if (
-                                                    currentlyPlaying ===
-                                                    track.previewUrl
-                                                ) {
-                                                    updateCurrentlyPlaying(
-                                                        undefined
-                                                    );
-                                                } else {
-                                                    updateCurrentlyPlaying(
-                                                        track.previewUrl
-                                                    );
-                                                }
-                                            }
-                                        }}
+                                        {...getTrProps(
+                                            track,
+                                            currentlyPlaying,
+                                            clickDisabled,
+                                            updateCurrentlyPlaying
+                                        )}
                                     >
                                         <Td>
                                             <Flex
@@ -473,7 +474,7 @@ const TrackList = () => {
                             </Tbody>
                         </Table>
                         <Table
-                            variant="unstyled"
+                            variant="primary"
                             display={["table", "table", "none"]}
                         >
                             <Thead>
@@ -490,48 +491,12 @@ const TrackList = () => {
                             <Tbody>
                                 {tracks.map((track, index) => (
                                     <Tr
-                                        key={track.id}
-                                        rounded={10}
-                                        outlineOffset={-2}
-                                        outline={
-                                            currentlyPlaying ===
-                                            track.previewUrl
-                                                ? "1px solid"
-                                                : "none"
-                                        }
-                                        outlineColor={
-                                            currentlyPlaying ===
-                                            track.previewUrl
-                                                ? "brand.primary"
-                                                : "transparent"
-                                        }
-                                        color={
-                                            currentlyPlaying ===
-                                            track.previewUrl
-                                                ? "brand.textPrimary"
-                                                : "brand.primary"
-                                        }
-                                        _hover={{
-                                            cursor: "pointer",
-                                            backgroundColor:
-                                                "brand.backgroundTertiaryOpaque",
-                                        }}
-                                        onClick={() => {
-                                            if (!clickDisabled) {
-                                                if (
-                                                    currentlyPlaying ===
-                                                    track.previewUrl
-                                                ) {
-                                                    updateCurrentlyPlaying(
-                                                        undefined
-                                                    );
-                                                } else {
-                                                    updateCurrentlyPlaying(
-                                                        track.previewUrl
-                                                    );
-                                                }
-                                            }
-                                        }}
+                                        {...getTrProps(
+                                            track,
+                                            currentlyPlaying,
+                                            clickDisabled,
+                                            updateCurrentlyPlaying
+                                        )}
                                     >
                                         <Td>
                                             <Flex
