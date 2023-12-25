@@ -5,6 +5,7 @@ import { Track } from "../../types";
 import {
     Badge,
     Box,
+    Button,
     Center,
     Flex,
     Text,
@@ -47,6 +48,7 @@ const TrackReview = ({ reviewStep }: Props) => {
     const id = "review-toast";
     const [loading, setLoading] = useState<boolean>(true);
     const [tracks, setTracks] = useState<Track[]>([]);
+    const [loadMoreTracks, setLoadMoreTracks] = useState<boolean>(false);
 
     useEffect(() => {
         if (currentTrack && audioElementRef.current && userProfile?.autoplay) {
@@ -66,7 +68,7 @@ const TrackReview = ({ reviewStep }: Props) => {
                 endYear: Number(userProfile?.yearTo || getCurrentYear()),
                 userId: user.uid,
                 reviewStep,
-                limit: reviewStep === 1 ? 1 : null,
+                limit: reviewStep === 1 ? 100 : null,
             });
         }
 
@@ -91,6 +93,7 @@ const TrackReview = ({ reviewStep }: Props) => {
             setTracks(tracks);
             setLoading(false);
             setNoTracks(false);
+            setLoadMoreTracks(false);
         } else {
             setCurrentTrack(null);
             setNoTracks(true);
@@ -106,8 +109,13 @@ const TrackReview = ({ reviewStep }: Props) => {
             setCurrentTrack(tracks[0]);
         } else {
             setCurrentTrack(null);
-            setNoTracks(true);
             setLoading(false);
+
+            if (reviewStep === 1) {
+                setLoadMoreTracks(true);
+            } else {
+                setNoTracks(true);
+            }
         }
     }, [tracks]);
 
@@ -148,6 +156,8 @@ const TrackReview = ({ reviewStep }: Props) => {
     const likeOrDislike = async (like: boolean) => {
         try {
             if (currentTrack && user?.uid) {
+                setLoading(true);
+                setLoadingMessage("");
                 const track = { ...currentTrack };
                 setCurrentTrack(null);
                 await updateTrackReviewStep({
@@ -157,14 +167,8 @@ const TrackReview = ({ reviewStep }: Props) => {
                     userId: user.uid,
                 });
 
-                if (reviewStep === 1) {
-                    setLoading(true);
-                    setTriggerGetTracks((prev) => !prev);
-                } else {
-                    setLoading(true);
-                    if (tracks.length > 0) {
-                        setTracks((prev) => prev.slice(1));
-                    }
+                if (tracks.length > 0) {
+                    setTracks((prev) => prev.slice(1));
                 }
             }
         } catch (error) {
@@ -183,6 +187,20 @@ const TrackReview = ({ reviewStep }: Props) => {
 
     return (
         <Box position="relative">
+            {!loading && loadMoreTracks && (
+                <Center
+                    zIndex={150}
+                    top="200px"
+                    right="50%"
+                    transform={`translate(50%, 0)`}
+                    position="absolute"
+                    px={4}
+                >
+                    <Button onClick={onGetTracks} variant="primary">
+                        Load a new track
+                    </Button>
+                </Center>
+            )}
             {loading && loadingMessage.length === 0 && (
                 <Loading
                     showLoadingBar={
