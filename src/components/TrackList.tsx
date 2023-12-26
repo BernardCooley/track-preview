@@ -258,12 +258,13 @@ const TrackList = () => {
         ) {
             updatePreviousTracks(reviewTracks[4]);
             getTracks(reviewTracks[4][index]);
+            setClickDisabled(false);
         }
     };
 
     return (
         <Box position="relative" pb={20}>
-            {loading && <Loading loadingText={`Loading step 4 tracks`} />}
+            {loading && <Loading loadingText={`Loading library`} />}
             {!loading && noTracks && (
                 <Center>
                     <Badge
@@ -418,19 +419,21 @@ const TrackList = () => {
                                     <Th>
                                         <TableHeading title="releaseDate" />
                                     </Th>
-                                    <Th>
-                                        <Box
-                                            as={Button}
-                                            variant="unstyled"
-                                            border="none"
-                                            shadow="none"
-                                            _hover={{
-                                                cursor: "default",
-                                            }}
-                                        >
-                                            <br />
-                                        </Box>
-                                    </Th>
+                                    {!currentAlbumTrack && (
+                                        <Th>
+                                            <Box
+                                                as={Button}
+                                                variant="unstyled"
+                                                border="none"
+                                                shadow="none"
+                                                _hover={{
+                                                    cursor: "default",
+                                                }}
+                                            >
+                                                <br />
+                                            </Box>
+                                        </Th>
+                                    )}
                                 </Tr>
                             </Thead>
                             <Tbody>
@@ -507,24 +510,26 @@ const TrackList = () => {
                                                 track.releaseDate
                                             ) || track.releaseYear}
                                         </Td>
-                                        <Td>
-                                            <TrackMenuOptions
-                                                onMouseEnter={() =>
-                                                    setClickDisabled(true)
-                                                }
-                                                onMouseLeave={() =>
-                                                    setClickDisabled(false)
-                                                }
-                                                onTrackDelete={() =>
-                                                    setTrackToDelete(index)
-                                                }
-                                                onViewAlbum={() =>
-                                                    gotToAlbum(index)
-                                                }
-                                                track={track}
-                                                index={index}
-                                            />
-                                        </Td>
+                                        {!currentAlbumTrack && (
+                                            <Td>
+                                                <TrackMenuOptions
+                                                    onMouseEnter={() =>
+                                                        setClickDisabled(true)
+                                                    }
+                                                    onMouseLeave={() =>
+                                                        setClickDisabled(false)
+                                                    }
+                                                    onTrackDelete={() =>
+                                                        setTrackToDelete(index)
+                                                    }
+                                                    onViewAlbum={() =>
+                                                        gotToAlbum(index)
+                                                    }
+                                                    track={track}
+                                                    index={index}
+                                                />
+                                            </Td>
+                                        )}
                                     </Tr>
                                 ))}
                             </Tbody>
@@ -541,9 +546,11 @@ const TrackList = () => {
                                     <Th>
                                         <TableHeading title="genre" />
                                     </Th>
-                                    <Th>
-                                        <br />
-                                    </Th>
+                                    {!currentAlbumTrack && (
+                                        <Th>
+                                            <br />
+                                        </Th>
+                                    )}
                                 </Tr>
                             </Thead>
                             <Tbody>
@@ -631,24 +638,26 @@ const TrackList = () => {
                                                 {track.genre}
                                             </Text>
                                         </Td>
-                                        <Td>
-                                            <TrackMenuOptions
-                                                onMouseEnter={() =>
-                                                    setClickDisabled(true)
-                                                }
-                                                onMouseLeave={() =>
-                                                    setClickDisabled(false)
-                                                }
-                                                onTrackDelete={() =>
-                                                    setTrackToDelete(index)
-                                                }
-                                                onViewAlbum={() =>
-                                                    gotToAlbum(index)
-                                                }
-                                                track={track}
-                                                index={index}
-                                            />
-                                        </Td>
+                                        {!currentAlbumTrack && (
+                                            <Td>
+                                                <TrackMenuOptions
+                                                    onMouseEnter={() =>
+                                                        setClickDisabled(true)
+                                                    }
+                                                    onMouseLeave={() =>
+                                                        setClickDisabled(false)
+                                                    }
+                                                    onTrackDelete={() =>
+                                                        setTrackToDelete(index)
+                                                    }
+                                                    onViewAlbum={() =>
+                                                        gotToAlbum(index)
+                                                    }
+                                                    track={track}
+                                                    index={index}
+                                                />
+                                            </Td>
+                                        )}
                                     </Tr>
                                 ))}
                             </Tbody>
