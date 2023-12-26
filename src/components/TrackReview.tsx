@@ -169,6 +169,7 @@ const TrackReview = ({ reviewStep }: Props) => {
                 setLoading(true);
                 setLoadingMessage("");
                 const track = { ...currentTrack };
+                setCurrentTrack(null);
 
                 if (reviewStep === 3 && like) {
                     updateAddedToLibrary(true);
@@ -177,6 +178,19 @@ const TrackReview = ({ reviewStep }: Props) => {
                 if (reviewTracks[reviewStep].length > 0) {
                     if (reviewTracks[reviewStep].length === 1) {
                         onGetTracks(true);
+                        await updateTrackReviewStep({
+                            trackId: track.id,
+                            reviewStep,
+                            like,
+                            userId: user.uid,
+                        });
+                    } else {
+                        updateTrackReviewStep({
+                            trackId: track.id,
+                            reviewStep,
+                            like,
+                            userId: user.uid,
+                        });
                     }
 
                     updateReviewTracks(
@@ -184,13 +198,6 @@ const TrackReview = ({ reviewStep }: Props) => {
                         reviewTracks[reviewStep].slice(1)
                     );
                 }
-
-                await updateTrackReviewStep({
-                    trackId: track.id,
-                    reviewStep,
-                    like,
-                    userId: user.uid,
-                });
             }
         } catch (error) {
             showToast({
