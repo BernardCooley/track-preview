@@ -74,7 +74,7 @@ export default function Explore() {
     }, [currentlyPlaying]);
 
     return (
-        <Box h="full" m={0} px={[4, 8]}>
+        <Box h="full" m={0} px={[4, 8]} overflowY="hidden">
             <Header />
             <Center h="full">
                 <Flex direction="column" w="full" h="full">

@@ -333,7 +333,7 @@ const TrackList = () => {
                 }}
             >
                 {!loading && !noTracks && (
-                    <TableContainer>
+                    <TableContainer maxH="70vh" overflowY="scroll">
                         <Table
                             variant="primary"
                             display={["none", "none", "table"]}
