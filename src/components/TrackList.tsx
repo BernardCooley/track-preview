@@ -28,12 +28,13 @@ import {
 } from "@chakra-ui/react";
 import { Track } from "../../types";
 import { useTrackContext } from "../../context/TrackContext";
-import { fetchTracks, updateTrackReviewStep } from "@/bff/bff";
+import { fetchAlbum, fetchTracks, updateTrackReviewStep } from "@/bff/bff";
 import { useAuthContext } from "../../Contexts/AuthContext";
 import Loading from "./Loading";
 import { camelcaseToTitleCase, getFormattedDate } from "../../utils";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import TrackMenuOptions from "./TrackOptionsMenu";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 
 const TrackList = () => {
     const { user } = useAuthContext();
@@ -44,6 +45,10 @@ const TrackList = () => {
         updateReviewTracks,
         addedToLibrary,
         updateAddedToLibrary,
+        currentAlbumTrack,
+        updateCurrentAlbumTrack,
+        previousTracks,
+        updatePreviousTracks,
     } = useTrackContext();
     const [loading, setLoading] = useState<boolean>(false);
     const [noTracks, setNoTracks] = useState<boolean>(false);
@@ -58,7 +63,7 @@ const TrackList = () => {
 
     useEffect(() => {
         if (addedToLibrary || reviewTracks[4].length === 0) {
-            getTracks();
+            getTracks(null);
         }
     }, [user]);
 
@@ -118,29 +123,37 @@ const TrackList = () => {
         [toast]
     );
 
-    const getTracks = useCallback(async () => {
-        updateReviewTracks(4, []);
-        setNoTracks(false);
-        setLoading(true);
-        if (user?.uid) {
-            try {
-                const fetchedTracks = await fetchTracks({
-                    userId: user.uid,
-                    reviewStep: 4,
-                });
+    const getTracks = useCallback(
+        async (track: Track | null) => {
+            updateReviewTracks(4, []);
+            setNoTracks(false);
+            setLoading(true);
+            if (user?.uid) {
+                try {
+                    const fetchedTracks = track
+                        ? await fetchAlbum({
+                              releaseTitle: track.releaseTitle,
+                              releaseDate: track.releaseDate,
+                          })
+                        : await fetchTracks({
+                              userId: user.uid,
+                              reviewStep: 4,
+                          });
 
-                if (fetchedTracks && fetchedTracks.length > 0) {
-                    updateReviewTracks(4, fetchedTracks);
-                    updateAddedToLibrary(false);
-                    setLoading(false);
-                } else {
-                    setNoTracks(true);
+                    if (fetchedTracks && fetchedTracks.length > 0) {
+                        updateReviewTracks(4, fetchedTracks);
+                        updateAddedToLibrary(false);
+                        setLoading(false);
+                    } else {
+                        setNoTracks(true);
+                    }
+                } catch (error) {
+                    showToast({ status: "error" });
                 }
-            } catch (error) {
-                showToast({ status: "error" });
             }
-        }
-    }, [user]);
+        },
+        [user]
+    );
 
     const closeDialog = () => {
         onClose();
@@ -235,6 +248,19 @@ const TrackList = () => {
         };
     };
 
+    const gotToAlbum = (index: number) => {
+        updateCurrentAlbumTrack(reviewTracks[4][index]);
+        if (
+            currentAlbumTrack?.releaseTitle !==
+                reviewTracks[4][index].releaseTitle &&
+            currentAlbumTrack?.releaseDate !==
+                reviewTracks[4][index].releaseDate
+        ) {
+            updatePreviousTracks(reviewTracks[4]);
+            getTracks(reviewTracks[4][index]);
+        }
+    };
+
     return (
         <Box position="relative" pb={20}>
             {loading && <Loading loadingText={`Loading step 4 tracks`} />}
@@ -314,6 +340,7 @@ const TrackList = () => {
                 </AlertDialogOverlay>
             </AlertDialog>
             <Stack
+                position="relative"
                 h="full"
                 divider={
                     <StackDivider borderColor="brand.backgroundTertiaryOpaque" />
@@ -332,8 +359,47 @@ const TrackList = () => {
                     },
                 }}
             >
+                {currentAlbumTrack && (
+                    <Flex
+                        gap={4}
+                        w="full"
+                        alignItems="flex-start"
+                        top={-1}
+                        p={2}
+                    >
+                        <Button
+                            variant="primary"
+                            leftIcon={<ChevronLeftIcon />}
+                            onClick={() => {
+                                updateReviewTracks(4, previousTracks);
+                                updatePreviousTracks([]);
+
+                                updateCurrentAlbumTrack(null);
+                            }}
+                        >
+                            Library
+                        </Button>
+                        <Flex direction="column">
+                            <Flex gap={2}>
+                                <Text
+                                    fontSize="md"
+                                    color="brand.textPrimaryLight"
+                                >
+                                    Album:
+                                </Text>
+                                <Text noOfLines={2}>
+                                    {currentAlbumTrack.artist} -{" "}
+                                    {currentAlbumTrack.releaseTitle}
+                                </Text>
+                            </Flex>
+                        </Flex>
+                    </Flex>
+                )}
                 {!loading && !noTracks && (
-                    <TableContainer maxH="70vh" overflowY="scroll">
+                    <TableContainer
+                        maxH={currentAlbumTrack ? "60vh" : "70vh"}
+                        overflowY="scroll"
+                    >
                         <Table
                             variant="primary"
                             display={["none", "none", "table"]}
@@ -390,7 +456,10 @@ const TrackList = () => {
                                                     src={track.thumbnail}
                                                     alt=""
                                                 ></Image>
-                                                <Flex direction="column">
+                                                <Flex
+                                                    direction="column"
+                                                    gap={2}
+                                                >
                                                     <Text
                                                         fontSize={"md"}
                                                         color={
@@ -449,6 +518,9 @@ const TrackList = () => {
                                                 onTrackDelete={() =>
                                                     setTrackToDelete(index)
                                                 }
+                                                onViewAlbum={() =>
+                                                    gotToAlbum(index)
+                                                }
                                                 track={track}
                                                 index={index}
                                             />
@@ -500,6 +572,7 @@ const TrackList = () => {
                                                 <Flex
                                                     direction="column"
                                                     maxW={[32, 40]}
+                                                    gap={1}
                                                 >
                                                     <Text
                                                         isTruncated={
@@ -568,6 +641,9 @@ const TrackList = () => {
                                                 }
                                                 onTrackDelete={() =>
                                                     setTrackToDelete(index)
+                                                }
+                                                onViewAlbum={() =>
+                                                    gotToAlbum(index)
                                                 }
                                                 track={track}
                                                 index={index}

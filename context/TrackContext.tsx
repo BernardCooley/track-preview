@@ -10,6 +10,10 @@ interface TrackContextProps {
     updateReviewTracks: (reviewStep: number, tracks: Track[]) => void;
     addedToLibrary: boolean;
     updateAddedToLibrary: (addedToLibrary: boolean) => void;
+    currentAlbumTrack: Track | null;
+    updateCurrentAlbumTrack: (track: Track | null) => void;
+    previousTracks: Track[];
+    updatePreviousTracks: (tracks: Track[]) => void;
 }
 
 export const TrackContext = createContext<TrackContextProps | null>(null);
@@ -35,6 +39,10 @@ export const TrackContextProvider = ({ children }: { children: ReactNode }) => {
         4: [],
     });
     const [addedToLibrary, setAddedToLibrary] = useState<boolean>(false);
+    const [currentAlbumTrack, setCurrentAlbumTrack] = useState<Track | null>(
+        null
+    );
+    const [previousTracks, setPreviousTracks] = useState<Track[]>([]);
 
     const updateCurrentlyPlaying = (trackId: string | undefined) => {
         setCurrentlyPlaying(trackId || "");
@@ -51,6 +59,14 @@ export const TrackContextProvider = ({ children }: { children: ReactNode }) => {
         setAddedToLibrary(addedToLibrary);
     };
 
+    const updateCurrentAlbumTrack = (track: Track | null) => {
+        setCurrentAlbumTrack(track);
+    };
+
+    const updatePreviousTracks = (tracks: Track[]) => {
+        setPreviousTracks(tracks);
+    };
+
     return (
         <TrackContext.Provider
             value={{
@@ -60,6 +76,10 @@ export const TrackContextProvider = ({ children }: { children: ReactNode }) => {
                 updateReviewTracks,
                 addedToLibrary,
                 updateAddedToLibrary,
+                currentAlbumTrack,
+                updateCurrentAlbumTrack,
+                previousTracks,
+                updatePreviousTracks,
             }}
         >
             {children}
