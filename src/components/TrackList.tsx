@@ -37,8 +37,14 @@ import TrackMenuOptions from "./TrackOptionsMenu";
 
 const TrackList = () => {
     const { user } = useAuthContext();
-    const { currentlyPlaying, updateCurrentlyPlaying } = useTrackContext();
-    const [tracks, setTracks] = useState<Track[]>([]);
+    const {
+        currentlyPlaying,
+        updateCurrentlyPlaying,
+        reviewTracks,
+        updateReviewTracks,
+        addedToLibrary,
+        updateAddedToLibrary,
+    } = useTrackContext();
     const [loading, setLoading] = useState<boolean>(false);
     const [noTracks, setNoTracks] = useState<boolean>(false);
     const toast = useToast();
@@ -51,7 +57,9 @@ const TrackList = () => {
     const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
 
     useEffect(() => {
-        getTracks();
+        if (addedToLibrary || reviewTracks[4].length === 0) {
+            getTracks();
+        }
     }, [user]);
 
     useEffect(() => {
@@ -70,7 +78,7 @@ const TrackList = () => {
         if (user && (trackToDelete || trackToDelete === 0)) {
             try {
                 await updateTrackReviewStep({
-                    trackId: tracks[trackToDelete].id,
+                    trackId: reviewTracks[4][trackToDelete].id,
                     reviewStep: 4,
                     like: false,
                     userId: user.uid,
@@ -78,15 +86,15 @@ const TrackList = () => {
 
                 updateCurrentlyPlaying(undefined);
 
-                const filteredTracks: Track[] = tracks.filter(
-                    (t) => t.id !== tracks[trackToDelete].id
+                const filteredTracks: Track[] = reviewTracks[4].filter(
+                    (t) => t.id !== reviewTracks[4][trackToDelete].id
                 );
 
                 if (filteredTracks.length > 0) {
-                    setTracks(filteredTracks);
+                    updateReviewTracks(4, filteredTracks);
                 } else {
                     setNoTracks(true);
-                    setTracks([]);
+                    updateReviewTracks(4, []);
                 }
                 onClose();
                 setTrackToDelete(null);
@@ -111,18 +119,19 @@ const TrackList = () => {
     );
 
     const getTracks = useCallback(async () => {
-        setTracks([]);
+        updateReviewTracks(4, []);
         setNoTracks(false);
         setLoading(true);
         if (user?.uid) {
             try {
-                const tracks = await fetchTracks({
+                const fetchedTracks = await fetchTracks({
                     userId: user.uid,
                     reviewStep: 4,
                 });
 
-                if (tracks && tracks.length > 0) {
-                    setTracks(tracks);
+                if (fetchedTracks && fetchedTracks.length > 0) {
+                    updateReviewTracks(4, fetchedTracks);
+                    updateAddedToLibrary(false);
                     setLoading(false);
                 } else {
                     setNoTracks(true);
@@ -143,13 +152,13 @@ const TrackList = () => {
     const sortTracks = (field: TrackKeys) => {
         const order = sortBy === field ? sortDirection : "asc";
 
-        const sortedTracks = [...tracks].sort((a, b) => {
+        const sortedTracks = [...reviewTracks[4]].sort((a, b) => {
             if (a[field] < b[field]) return order === "asc" ? -1 : 1;
             if (a[field] > b[field]) return order === "asc" ? 1 : -1;
             return 0;
         });
 
-        setTracks(sortedTracks);
+        updateReviewTracks(4, sortedTracks);
         setSortBy(field);
         setSortDirection(order === "asc" ? "desc" : "asc");
     };
@@ -274,10 +283,13 @@ const TrackList = () => {
                                     rounded="md"
                                 >
                                     <Text fontSize="xl" fontWeight="bold">
-                                        {tracks[trackToDelete!]?.artist}
+                                        {
+                                            reviewTracks[4][trackToDelete!]
+                                                ?.artist
+                                        }
                                     </Text>
                                     <Text fontSize="md" fontWeight="bold">
-                                        {tracks[trackToDelete!]?.title}
+                                        {reviewTracks[4][trackToDelete!]?.title}
                                     </Text>
                                 </Flex>
                                 <Text>
@@ -356,7 +368,7 @@ const TrackList = () => {
                                 </Tr>
                             </Thead>
                             <Tbody>
-                                {tracks.map((track, index) => (
+                                {reviewTracks[4].map((track, index) => (
                                     <Tr
                                         key={track.id}
                                         {...getTrProps(
@@ -463,7 +475,7 @@ const TrackList = () => {
                                 </Tr>
                             </Thead>
                             <Tbody>
-                                {tracks.map((track, index) => (
+                                {reviewTracks[4].map((track, index) => (
                                     <Tr
                                         key={track.id}
                                         {...getTrProps(

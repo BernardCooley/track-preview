@@ -48,3 +48,7 @@ export interface YearRange {
     from: number;
     to: number;
 }
+
+export interface ReviewTracks {
+    [key: number]: Track[];
+}

@@ -24,12 +24,15 @@ import {
 } from "@/bff/bff";
 import { useLocalStorage } from "usehooks-ts";
 import { genres } from "../../data/genres";
+import { useTrackContext } from "../../context/TrackContext";
 
 interface Props {
     reviewStep: number;
 }
 
 const TrackReview = ({ reviewStep }: Props) => {
+    const { reviewTracks, updateReviewTracks, updateAddedToLibrary } =
+        useTrackContext();
     const [recentGenres, setRecentGenres] = useLocalStorage<string[]>(
         "recentGenres",
         []
@@ -88,27 +91,32 @@ const TrackReview = ({ reviewStep }: Props) => {
         setNoTracks(false);
     }, [reviewStep]);
 
-    const onGetTracks = useCallback(async () => {
-        const tracks = await getTracks();
-        setFetchAttempted(true);
-        if (tracks && tracks.length > 0) {
-            setTracks(tracks);
-            setLoading(false);
-            setNoTracks(false);
-            setLoadMoreTracks(false);
-        } else {
-            setCurrentTrack(null);
-            setNoTracks(true);
-            setLoading(false);
-        }
-    }, [getTracks]);
+    const onGetTracks = useCallback(
+        async (skipCheck: boolean = false) => {
+            if (reviewTracks[reviewStep].length === 0 || skipCheck) {
+                const tracks = await getTracks();
+                setFetchAttempted(true);
+                if (tracks && tracks.length > 0) {
+                    updateReviewTracks(reviewStep, tracks);
+                    setLoading(false);
+                    setNoTracks(false);
+                    setLoadMoreTracks(false);
+                } else {
+                    setCurrentTrack(null);
+                    setNoTracks(true);
+                    setLoading(false);
+                }
+            }
+        },
+        [getTracks]
+    );
 
     useEffect(() => {
         setLoadingMessage("");
-        if (tracks.length > 0) {
+        if (reviewTracks[reviewStep].length > 0) {
             setLoadingMessage("");
             setLoading(false);
-            setCurrentTrack(tracks[0]);
+            setCurrentTrack(reviewTracks[reviewStep][0]);
         } else {
             setCurrentTrack(null);
             setLoading(false);
@@ -119,7 +127,7 @@ const TrackReview = ({ reviewStep }: Props) => {
                 setNoTracks(true);
             }
         }
-    }, [tracks]);
+    }, [reviewTracks[reviewStep]]);
 
     useEffect(() => {
         if (
@@ -169,8 +177,19 @@ const TrackReview = ({ reviewStep }: Props) => {
                     userId: user.uid,
                 });
 
-                if (tracks.length > 0) {
-                    setTracks((prev) => prev.slice(1));
+                if (reviewStep === 3 && like) {
+                    updateAddedToLibrary(true);
+                }
+
+                if (reviewTracks[reviewStep].length > 0) {
+                    if (reviewTracks[reviewStep].length === 1) {
+                        onGetTracks(true);
+                    }
+
+                    updateReviewTracks(
+                        reviewStep,
+                        reviewTracks[reviewStep].slice(1)
+                    );
                 }
             }
         } catch (error) {
@@ -198,7 +217,7 @@ const TrackReview = ({ reviewStep }: Props) => {
                     position="absolute"
                     px={4}
                 >
-                    <Button onClick={onGetTracks} variant="primary">
+                    <Button onClick={() => onGetTracks()} variant="primary">
                         Load a new track
                     </Button>
                 </Center>
