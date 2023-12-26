@@ -169,13 +169,6 @@ const TrackReview = ({ reviewStep }: Props) => {
                 setLoading(true);
                 setLoadingMessage("");
                 const track = { ...currentTrack };
-                setCurrentTrack(null);
-                await updateTrackReviewStep({
-                    trackId: track.id,
-                    reviewStep,
-                    like,
-                    userId: user.uid,
-                });
 
                 if (reviewStep === 3 && like) {
                     updateAddedToLibrary(true);
@@ -191,6 +184,13 @@ const TrackReview = ({ reviewStep }: Props) => {
                         reviewTracks[reviewStep].slice(1)
                     );
                 }
+
+                await updateTrackReviewStep({
+                    trackId: track.id,
+                    reviewStep,
+                    like,
+                    userId: user.uid,
+                });
             }
         } catch (error) {
             showToast({
@@ -198,8 +198,6 @@ const TrackReview = ({ reviewStep }: Props) => {
                 title: "Error saving track",
             });
         }
-        setListened(false);
-        setIsPlaying(false);
     };
 
     const play = () => {
