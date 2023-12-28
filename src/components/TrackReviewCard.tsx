@@ -70,8 +70,9 @@ const TrackReviewCard = ({
                         direction="column"
                         h="full"
                         w="full"
-                        justifyContent="space-between"
+                        justifyContent="center"
                         pt={10}
+                        height="256px"
                     >
                         {isPlaying && (
                             <Flex
