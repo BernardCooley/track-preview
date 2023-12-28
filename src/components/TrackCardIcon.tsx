@@ -29,7 +29,7 @@ const TrackCardIcon = ({
             h="auto"
             colorScheme={colorScheme}
             aria-label={ariaLabel}
-            fontSize={["50px", "100px"]}
+            fontSize={["50px", "60px", "70px"]}
             backgroundColor="brand.backgroundTertiaryOpaque"
             rounded="full"
             icon={<Icon fontSize="inherit" />}

@@ -56,15 +56,12 @@ const TrackReviewCard = ({
                     w="full"
                     minH={["400px", "400px"]}
                     h={["full", "unset"]}
-                    bgImage={currentTrack.thumbnail}
-                    bgSize="cover"
                     borderBottomRadius={20}
                     p={0}
                     as={Flex}
                     direction="column"
                     alignItems="center"
                     justifyContent="space-between"
-                    rounded={20}
                 >
                     <Flex
                         direction="column"
@@ -73,6 +70,9 @@ const TrackReviewCard = ({
                         justifyContent="center"
                         pt={10}
                         height="256px"
+                        bgImage={currentTrack.thumbnail}
+                        bgSize="cover"
+                        roundedTop={20}
                     >
                         {isPlaying && (
                             <Flex
