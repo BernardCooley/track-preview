@@ -12,7 +12,7 @@ import {
 } from "@chakra-ui/react";
 import { usePathname } from "next/navigation";
 import MenuDrawerItem from "./MenuDrawerItem";
-import { auth } from "../../firebase/firebaseInit";
+import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 
 interface Props {
     isOpen: boolean;
@@ -32,11 +32,16 @@ const MenuDrawer = forwardRef<HTMLButtonElement | undefined, Props>(
             >
                 <DrawerOverlay />
                 <DrawerContent bgGradient="linear(to-b, brand.backgroundPrimary, brand.backgroundSecondary)">
-                    <DrawerCloseButton />
+                    <DrawerCloseButton top={4} fontSize="md" />
                     <DrawerHeader>Menu</DrawerHeader>
                     <Divider />
                     <DrawerBody>
-                        <Flex direction="column" gap={4} pt={4}>
+                        <Flex
+                            direction="column"
+                            gap={4}
+                            pt={4}
+                            alignItems="center"
+                        >
                             <MenuDrawerItem
                                 pathname={pathname}
                                 linkText="Home"
@@ -52,14 +57,6 @@ const MenuDrawer = forwardRef<HTMLButtonElement | undefined, Props>(
                                 linkText="Settings"
                                 href="/settings"
                             />
-                            {auth?.currentUser?.uid ===
-                                "JZj7Y57oCpU3QfNaSu6wVJpODAR2" && (
-                                <MenuDrawerItem
-                                    pathname={pathname}
-                                    linkText="Admin"
-                                    href="/admin"
-                                />
-                            )}
                         </Flex>
                     </DrawerBody>
 
@@ -69,7 +66,8 @@ const MenuDrawer = forwardRef<HTMLButtonElement | undefined, Props>(
                         <MenuDrawerItem
                             pathname={pathname}
                             linkText="Contact"
-                            href="/contact"
+                            href="mailto:info@phoniquest.com"
+                            icon={<OpenInNewIcon />}
                         />
                     </DrawerFooter>
                 </DrawerContent>

@@ -1,21 +1,19 @@
 "use client";
 
-import { Button, Text } from "@chakra-ui/react";
-import { useRouter } from "next/navigation";
+import { Flex, IconButton, Link, Text } from "@chakra-ui/react";
 import React from "react";
 
 interface Props {
     pathname: string;
     linkText: string;
     href: string;
+    icon?: React.ReactNode | null;
 }
 
-const MenuDrawerItem = ({ pathname, linkText, href }: Props) => {
-    const router = useRouter();
-
+const MenuDrawerItem = ({ pathname, linkText, href, icon }: Props) => {
     return (
-        <Button
-            textUnderlineOffset={4}
+        <Link
+            transform={pathname === href ? "scale(1.2)" : ""}
             textDecoration={pathname === href ? "underline" : ""}
             _hover={
                 pathname !== href
@@ -24,22 +22,28 @@ const MenuDrawerItem = ({ pathname, linkText, href }: Props) => {
                           color: "brand.primary",
                           transform: "scale(1.2)",
                       }
-                    : {}
+                    : { bg: "transparent" }
             }
-            fontSize="xl"
-            shadow="none"
             color={pathname === href ? "brand.primary" : "white"}
-            variant="unstyled"
-            onClick={() => {
-                if (pathname !== href) {
-                    router.push(href);
-                }
-            }}
+            variant="primary"
+            href={pathname !== href ? href : undefined}
         >
-            <Text textDecoration={pathname === href ? "underline" : ""}>
-                {linkText}
-            </Text>
-        </Button>
+            <Flex alignItems="center">
+                <Text textDecoration={pathname === href ? "underline" : ""}>
+                    {linkText}
+                </Text>
+                {icon && (
+                    <IconButton
+                        color="inherit"
+                        height="30px"
+                        variant="ghost"
+                        aria-label={linkText}
+                        fontSize="2xl"
+                        icon={<>{icon}</>}
+                    />
+                )}
+            </Flex>
+        </Link>
     );
 };
 

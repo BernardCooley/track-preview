@@ -115,6 +115,20 @@ export const theme = extendTheme({
                 },
             },
         },
+        Link: {
+            variants: {
+                primary: {
+                    color: "brand.primary",
+                    fontWeight: "bold",
+                    _hover: {
+                        color: "brand.primaryLight",
+                    },
+                    fontSize: "xl",
+                    textUnderlineOffset: 6,
+                    textAlign: "center",
+                },
+            },
+        },
         Input: {
             variants: {
                 primary: {
