@@ -1,20 +1,12 @@
-import React, { LegacyRef, forwardRef } from "react";
-import {
-    Box,
-    Card,
-    CardBody,
-    CardHeader,
-    Flex,
-    Heading,
-    Tag,
-    Text,
-} from "@chakra-ui/react";
+import React from "react";
+import { Box, Card, CardBody, Flex, Tag, Text } from "@chakra-ui/react";
 import { Track } from "../../types";
 import BouncingDotsLoader from "./BouncingLoaderDots";
-import PlayArrowTwoToneIcon from "@mui/icons-material/PlayArrowTwoTone";
 import ThumbDownAltTwoToneIcon from "@mui/icons-material/ThumbDownAltTwoTone";
 import ThumbUpAltTwoToneIcon from "@mui/icons-material/ThumbUpAltTwoTone";
 import TrackCardIcon from "./TrackCardIcon";
+import AudioPlayer from "react-h5-audio-player";
+import "react-h5-audio-player/lib/styles.css";
 
 interface Props {
     loadingMessage?: string;
@@ -22,172 +14,131 @@ interface Props {
     isPlaying: boolean;
     listened: boolean;
     onLikeOrDislike: (liked: boolean) => Promise<void>;
-    onPlayButtonClicked: () => void;
     onAudioPlay: () => void;
     onListenedToggle: (listened: boolean) => void;
+    autoplay?: boolean;
 }
 
-const TrackReviewCard = forwardRef(
-    (
-        {
-            loadingMessage,
-            currentTrack,
-            isPlaying,
-            listened,
-            onLikeOrDislike,
-            onPlayButtonClicked,
-            onAudioPlay,
-            onListenedToggle,
-        }: Props,
-        ref: LegacyRef<HTMLAudioElement> | undefined
-    ) => {
-        return (
-            <Box h="auto" mt={2}>
-                {loadingMessage && loadingMessage.length > 0 && (
-                    <Box
-                        position="absolute"
-                        top="50%"
-                        transform="translate(50%, 0)"
-                        right="50%"
-                        zIndex={300}
-                    >
-                        <Tag size="lg" variant="loading" colorScheme="white">
-                            <Flex alignItems="center" gap={4}>
-                                <Text fontSize="xl">{loadingMessage}</Text>
-                                <BouncingDotsLoader />
-                            </Flex>
-                        </Tag>
-                    </Box>
-                )}
-                <Card
-                    size="md"
-                    backgroundColor="transparent"
-                    opacity={
-                        loadingMessage && loadingMessage.length > 0 ? 0.2 : 1
-                    }
+const TrackReviewCard = ({
+    loadingMessage,
+    currentTrack,
+    isPlaying,
+    listened,
+    onLikeOrDislike,
+    onAudioPlay,
+    onListenedToggle,
+    autoplay,
+}: Props) => {
+    return (
+        <Box h="auto" mt={2}>
+            {loadingMessage && loadingMessage.length > 0 && (
+                <Box
+                    position="absolute"
+                    top="50%"
+                    transform="translate(50%, 0)"
+                    right="50%"
+                    zIndex={300}
                 >
-                    <CardHeader
-                        color="brand.textPrimary"
-                        backgroundColor="brand.primaryOpaque"
-                        borderTopRadius={20}
-                        p={[2, 4]}
-                    >
-                        <Heading size="md">
-                            <Flex
-                                alignItems="center"
-                                direction="column"
-                                position="relative"
-                                gap={[1, 2]}
-                            >
-                                <Text fontSize={["2xl", "3xl"]}>
-                                    {currentTrack.artist}
-                                </Text>
-                                <Flex gap={1}>
-                                    <Text fontSize={["lg", "xl"]}>
-                                        {currentTrack.title}
-                                        {" ("}
-                                        {currentTrack.releaseYear}
-                                        {")"}
-                                    </Text>
-                                </Flex>
-                            </Flex>
-                        </Heading>
-                    </CardHeader>
-                    <CardBody
-                        w="full"
-                        minH={[64, 80]}
-                        h={["full", "unset"]}
-                        bgImage={currentTrack.thumbnail}
-                        bgSize="cover"
-                        borderBottomRadius={20}
-                        p={0}
-                        as={Flex}
+                    <Tag size="lg" variant="loading" colorScheme="white">
+                        <Flex alignItems="center" gap={4}>
+                            <Text fontSize="xl">{loadingMessage}</Text>
+                            <BouncingDotsLoader />
+                        </Flex>
+                    </Tag>
+                </Box>
+            )}
+            <Card
+                size="md"
+                backgroundColor="transparent"
+                opacity={loadingMessage && loadingMessage.length > 0 ? 0.2 : 1}
+            >
+                <CardBody
+                    w="full"
+                    minH={["400px", "400px"]}
+                    h={["full", "unset"]}
+                    bgImage={currentTrack.thumbnail}
+                    bgSize="cover"
+                    borderBottomRadius={20}
+                    p={0}
+                    as={Flex}
+                    direction="column"
+                    alignItems="center"
+                    justifyContent="space-between"
+                    rounded={20}
+                >
+                    <Flex
                         direction="column"
-                        alignItems="center"
+                        h="full"
+                        w="full"
                         justifyContent="space-between"
+                        pt={10}
                     >
-                        <Flex
-                            direction="column"
-                            h="full"
-                            w="full"
-                            justifyContent="space-between"
-                            p={10}
-                        >
+                        {isPlaying && (
                             <Flex
                                 w="full"
                                 pb={isPlaying ? 8 : 0}
-                                h="full"
-                                justifyContent="center"
+                                justifyContent="space-around"
                             >
-                                {isPlaying ? (
-                                    <Flex
-                                        w="full"
-                                        justifyContent="space-around"
-                                    >
-                                        <TrackCardIcon
-                                            canHover={listened}
-                                            isDisabled={!listened}
-                                            ariaLabel="dislike button"
-                                            onClick={async () =>
-                                                onLikeOrDislike(false)
-                                            }
-                                            colorScheme="red"
-                                            Icon={ThumbDownAltTwoToneIcon}
-                                        />
-                                        <TrackCardIcon
-                                            canHover={listened}
-                                            isDisabled={!listened}
-                                            ariaLabel="like button"
-                                            onClick={async () =>
-                                                onLikeOrDislike(true)
-                                            }
-                                            colorScheme="green"
-                                            Icon={ThumbUpAltTwoToneIcon}
-                                        />
+                                <TrackCardIcon
+                                    canHover={listened}
+                                    isDisabled={!listened}
+                                    ariaLabel="dislike button"
+                                    onClick={async () => onLikeOrDislike(false)}
+                                    colorScheme="red"
+                                    Icon={ThumbDownAltTwoToneIcon}
+                                />
+                                <TrackCardIcon
+                                    canHover={listened}
+                                    isDisabled={!listened}
+                                    ariaLabel="like button"
+                                    onClick={async () => onLikeOrDislike(true)}
+                                    colorScheme="green"
+                                    Icon={ThumbUpAltTwoToneIcon}
+                                />
+                            </Flex>
+                        )}
+                    </Flex>
+                    <Flex
+                        w="full"
+                        bg="brand.backgroundLightPrimary"
+                        color="brand.primary"
+                        roundedBottom={20}
+                    >
+                        <AudioPlayer
+                            autoPlayAfterSrcChange={false}
+                            header={
+                                <Flex
+                                    alignItems="center"
+                                    direction="column"
+                                    position="relative"
+                                    gap={[1, 2]}
+                                >
+                                    <Text fontSize={["2xl", "3xl"]}>
+                                        {currentTrack.artist}
+                                    </Text>
+                                    <Flex gap={1}>
+                                        <Text fontSize={["lg", "xl"]}>
+                                            {currentTrack.title}
+                                            {" ("}
+                                            {currentTrack.releaseYear}
+                                            {")"}
+                                        </Text>
                                     </Flex>
-                                ) : (
-                                    <TrackCardIcon
-                                        ariaLabel="play button"
-                                        onClick={onPlayButtonClicked}
-                                        colorScheme="black"
-                                        Icon={PlayArrowTwoToneIcon}
-                                    />
-                                )}
-                            </Flex>
-
-                            <Flex
-                                direction="column"
-                                h="54px"
-                                opacity={isPlaying ? 1 : 0}
-                                position={isPlaying ? "relative" : "absolute"}
-                                pointerEvents={isPlaying ? "auto" : "none"}
-                            >
-                                <Flex w="full">
-                                    <audio
-                                        onPlay={onAudioPlay}
-                                        onTimeUpdate={(e) => {
-                                            onListenedToggle(
-                                                (e.currentTarget.currentTime >
-                                                    1) as boolean
-                                            );
-                                        }}
-                                        ref={ref}
-                                        style={{
-                                            width: "100%",
-                                        }}
-                                        src={currentTrack.previewUrl}
-                                        controls
-                                    />
                                 </Flex>
-                            </Flex>
-                        </Flex>
-                    </CardBody>
-                </Card>
-            </Box>
-        );
-    }
-);
-
-TrackReviewCard.displayName = "TrackReviewCard";
+                            }
+                            autoPlay={autoplay}
+                            src={currentTrack.previewUrl}
+                            showJumpControls={false}
+                            onListen={() => {
+                                onListenedToggle(true);
+                            }}
+                            onPlay={onAudioPlay}
+                        />
+                    </Flex>
+                </CardBody>
+            </Card>
+        </Box>
+    );
+};
 
 export default TrackReviewCard;

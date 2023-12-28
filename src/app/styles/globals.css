@@ -56,3 +56,8 @@ a {
   z-index: -1;
   padding: 0 50px;
 }
+
+.rhap_container {
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+}

@@ -55,10 +55,6 @@ export const TrackContextProvider = ({ children }: { children: ReactNode }) => {
         3: true,
         4: true,
     });
-    console.log(
-        "🚀 ~ file: TrackContext.tsx:50 ~ TrackContextProvider ~ changesMade:",
-        changesMade
-    );
 
     const updateCurrentlyPlaying = (trackId: string | undefined) => {
         setCurrentlyPlaying(trackId || "");

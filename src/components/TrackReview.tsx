@@ -45,7 +45,6 @@ const TrackReview = ({ reviewStep }: Props) => {
     const [listened, setListened] = useState<boolean>(false);
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
     const [loadingMessage, setLoadingMessage] = useState<string>("");
-    const audioElementRef = useRef<HTMLAudioElement>(null);
     const toast = useToast();
     const id = "review-toast";
     const [loading, setLoading] = useState<boolean>(true);
@@ -56,10 +55,6 @@ const TrackReview = ({ reviewStep }: Props) => {
         if (currentTrack) {
             setListened(false);
             setIsPlaying(false);
-        }
-
-        if (currentTrack && audioElementRef.current && userProfile?.autoplay) {
-            play();
         }
     }, [currentTrack]);
 
@@ -140,16 +135,17 @@ const TrackReview = ({ reviewStep }: Props) => {
             userProfile?.yearFrom &&
             userProfile?.yearTo
         ) {
-            onGetTracks(changesMade[reviewStep as keyof typeof changesMade]);
+            onGetTracks(
+                reviewStep === 1
+                    ? true
+                    : changesMade[reviewStep as keyof typeof changesMade]
+            );
         }
-    }, [
-        userProfile?.genre,
-        user,
-        userProfile?.yearFrom,
-        userProfile?.yearTo,
-        reviewStep,
-        onGetTracks,
-    ]);
+    }, [userProfile?.genre, user, userProfile?.yearFrom, userProfile?.yearTo]);
+
+    useEffect(() => {
+        onGetTracks(changesMade[reviewStep as keyof typeof changesMade]);
+    }, [reviewStep]);
 
     const showToast = useCallback(
         ({ status, title, description }: ToastProps) => {
@@ -208,10 +204,6 @@ const TrackReview = ({ reviewStep }: Props) => {
                 title: "Error saving track",
             });
         }
-    };
-
-    const play = () => {
-        audioElementRef.current?.play();
     };
 
     return (
@@ -370,6 +362,7 @@ const TrackReview = ({ reviewStep }: Props) => {
             <Flex direction="column" position="relative">
                 {currentTrack && (
                     <TrackReviewCard
+                        autoplay={userProfile?.autoplay || false}
                         loadingMessage={loadingMessage}
                         currentTrack={currentTrack}
                         isPlaying={isPlaying}
@@ -377,12 +370,10 @@ const TrackReview = ({ reviewStep }: Props) => {
                         onLikeOrDislike={async (val) =>
                             await likeOrDislike(val)
                         }
-                        onPlayButtonClicked={() => play()}
                         onAudioPlay={() => {
                             setIsPlaying(true);
                         }}
                         onListenedToggle={(val) => setListened(val)}
-                        ref={audioElementRef}
                     />
                 )}
             </Flex>
