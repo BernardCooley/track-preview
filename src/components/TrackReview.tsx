@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useAuthContext } from "../../Contexts/AuthContext";
 import { getCurrentYear } from "../../utils";
 import { Track } from "../../types";
@@ -138,18 +138,18 @@ const TrackReview = ({ reviewStep }: Props) => {
         ) {
             onGetTracks(
                 reviewStep === 1
-                    ? true
-                    : changesMade[reviewStep as keyof typeof changesMade]
+                    ? changesMade[reviewStep as keyof typeof changesMade]
+                    : reviewTracks[reviewStep].length === 0 &&
+                          changesMade[reviewStep as keyof typeof changesMade]
             );
         }
-    }, [userProfile?.genre, user, userProfile?.yearFrom, userProfile?.yearTo]);
-
-    useEffect(() => {
-        onGetTracks(
-            reviewTracks[reviewStep].length === 0 &&
-                changesMade[reviewStep as keyof typeof changesMade]
-        );
-    }, [reviewStep]);
+    }, [
+        userProfile?.genre,
+        user,
+        userProfile?.yearFrom,
+        userProfile?.yearTo,
+        reviewStep,
+    ]);
 
     const showToast = useCallback(
         ({ status, title, description }: ToastProps) => {
@@ -294,6 +294,7 @@ const TrackReview = ({ reviewStep }: Props) => {
                         setIsPlaying(false);
                     }
                     setShowGenreSelector(false);
+                    onGetTracks(true);
                 }}
                 availableGenres={genres}
                 onFavouriteClearClick={() => {
@@ -321,6 +322,7 @@ const TrackReview = ({ reviewStep }: Props) => {
                     setListened(false);
                     setIsPlaying(false);
                     setShowYearSelector(false);
+                    onGetTracks(true);
                 }}
                 onCancel={() => setShowYearSelector(false)}
             />
