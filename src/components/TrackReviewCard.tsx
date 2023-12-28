@@ -125,7 +125,7 @@ const TrackReviewCard = ({
                                         <Text noOfLines={1}>
                                             {currentTrack.title}
                                         </Text>
-                                        <Text>{currentTrack.releaseYear}</Text>
+                                        <Text>{`(${currentTrack.releaseYear})`}</Text>
                                     </Flex>
                                 </Flex>
                             }
