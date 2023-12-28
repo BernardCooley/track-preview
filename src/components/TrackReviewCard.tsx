@@ -121,31 +121,29 @@ const TrackReviewCard = ({
                                         {currentTrack.artist}
                                     </Text>
 
-                                    <Flex
+                                    <Text
+                                        textAlign="center"
                                         fontSize={["lg", "xl"]}
-                                        gap={2}
-                                        direction="column"
-                                        alignItems="center"
+                                        w="full"
+                                        noOfLines={1}
+                                        py={1}
+                                    >
+                                        {currentTrack.title}
+                                    </Text>
+                                    <Flex
+                                        py={1}
+                                        fontSize={["md", "lg"]}
+                                        justifyContent="space-between"
                                         w="full"
                                     >
-                                        <Text noOfLines={1} py={1}>
-                                            {currentTrack.title}
-                                        </Text>
-                                        <Flex
-                                            py={1}
-                                            fontSize={["md", "lg"]}
-                                            justifyContent="space-between"
-                                            w="full"
-                                        >
-                                            <Text
-                                                noOfLines={1}
-                                            >{`Genre: ${currentTrack.genre}`}</Text>
-                                            <Text
-                                                sx={{
-                                                    textWrap: "nowrap",
-                                                }}
-                                            >{`Year: ${currentTrack.releaseYear}`}</Text>
-                                        </Flex>
+                                        <Text
+                                            noOfLines={1}
+                                        >{`Genre: ${currentTrack.genre}`}</Text>
+                                        <Text
+                                            sx={{
+                                                textWrap: "nowrap",
+                                            }}
+                                        >{`Year: ${currentTrack.releaseYear}`}</Text>
                                     </Flex>
                                 </Flex>
                             }
