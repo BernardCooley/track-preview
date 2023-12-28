@@ -102,7 +102,7 @@ const TrackReviewCard = ({
                     <Flex
                         w="full"
                         bg="brand.backgroundLightPrimary"
-                        color="brand.primary"
+                        color="brand.textSecondary"
                         roundedBottom={20}
                     >
                         <AudioPlayer
@@ -114,16 +114,18 @@ const TrackReviewCard = ({
                                     position="relative"
                                     gap={[1, 2]}
                                 >
-                                    <Text fontSize={["2xl", "3xl"]}>
+                                    <Text
+                                        noOfLines={1}
+                                        fontSize={["2xl", "3xl"]}
+                                    >
                                         {currentTrack.artist}
                                     </Text>
-                                    <Flex gap={1}>
-                                        <Text fontSize={["lg", "xl"]}>
+
+                                    <Flex fontSize={["lg", "xl"]} gap={2}>
+                                        <Text noOfLines={1}>
                                             {currentTrack.title}
-                                            {" ("}
-                                            {currentTrack.releaseYear}
-                                            {")"}
                                         </Text>
+                                        <Text>{currentTrack.releaseYear}</Text>
                                     </Flex>
                                 </Flex>
                             }
