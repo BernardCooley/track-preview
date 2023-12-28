@@ -91,8 +91,8 @@ const TrackReview = ({ reviewStep }: Props) => {
     }, [reviewStep]);
 
     const onGetTracks = useCallback(
-        async (skipCheck: boolean = false) => {
-            if (reviewTracks[reviewStep].length === 0 || skipCheck) {
+        async (forceFetch: boolean = false) => {
+            if (forceFetch) {
                 const tracks = await getTracks();
                 setFetchAttempted(true);
                 if (tracks && tracks.length > 0) {
@@ -144,7 +144,10 @@ const TrackReview = ({ reviewStep }: Props) => {
     }, [userProfile?.genre, user, userProfile?.yearFrom, userProfile?.yearTo]);
 
     useEffect(() => {
-        onGetTracks(changesMade[reviewStep as keyof typeof changesMade]);
+        onGetTracks(
+            reviewTracks[reviewStep].length === 0 &&
+                changesMade[reviewStep as keyof typeof changesMade]
+        );
     }, [reviewStep]);
 
     const showToast = useCallback(
