@@ -1,4 +1,4 @@
-import { Flex, Spinner, Tag, Text } from "@chakra-ui/react";
+import { Box, Flex, Spinner, Tag, Text } from "@chakra-ui/react";
 import React from "react";
 import { isMobile } from "react-device-detect";
 import { getCurrentYear } from "../../utils";
@@ -14,6 +14,7 @@ interface Props {
     onAutoPlayToggle: () => void;
     onGenreClick?: () => void;
     onYearClick?: () => void;
+    autoplayLoading?: boolean;
 }
 
 const FilterTags = ({
@@ -26,6 +27,7 @@ const FilterTags = ({
     onAutoPlayToggle,
     onGenreClick,
     onYearClick,
+    autoplayLoading = false,
 }: Props) => {
     return (
         <Flex transition="opacity 200ms">
@@ -97,10 +99,12 @@ const FilterTags = ({
                     }
                     variant="filter"
                 >
-                    {profileLoaded ? (
+                    {profileLoaded && !autoplayLoading ? (
                         <Text userSelect="none">AutoPlay</Text>
                     ) : (
-                        <Spinner color="brand.primary" size="xs" />
+                        <Box w="102px">
+                            <Spinner color="brand.primary" size="xs" />
+                        </Box>
                     )}
                 </Tag>
             </Flex>

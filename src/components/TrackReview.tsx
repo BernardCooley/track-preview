@@ -50,6 +50,7 @@ const TrackReview = ({ reviewStep }: Props) => {
     const [loading, setLoading] = useState<boolean>(true);
     const [loadMoreTracks, setLoadMoreTracks] = useState<boolean>(false);
     const [fetchAttempted, setFetchAttempted] = useState<boolean>(false);
+    const [autoplayLoading, setAutoplayLoading] = useState<boolean>(false);
 
     useEffect(() => {
         if (currentTrack) {
@@ -336,17 +337,20 @@ const TrackReview = ({ reviewStep }: Props) => {
             >
                 {user?.uid && (
                     <FilterTags
+                        autoplayLoading={autoplayLoading}
                         onYearClick={() => setShowYearSelector((prev) => !prev)}
                         onGenreClick={() =>
                             setShowGenreSelector((prev) => !prev)
                         }
                         onAutoPlayToggle={async () => {
+                            setAutoplayLoading(true);
                             const newProfile = await mutateUserProfile({
                                 userId: user.uid,
                                 autoplay: !userProfile?.autoplay,
                             });
 
                             updateUserProfile(newProfile);
+                            setAutoplayLoading(false);
                         }}
                         showDates={reviewStep === 1 ? true : false}
                         showGenre={reviewStep === 1 ? true : false}
