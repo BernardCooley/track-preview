@@ -55,6 +55,7 @@ const TrackReview = ({ reviewStep }: Props) => {
     useEffect(() => {
         if (currentTrack) {
             setListened(false);
+            setIsPlaying(false);
         }
 
         if (currentTrack && audioElementRef.current && userProfile?.autoplay) {
@@ -63,6 +64,7 @@ const TrackReview = ({ reviewStep }: Props) => {
     }, [currentTrack]);
 
     const getTracks = useCallback(async () => {
+        setCurrentTrack(null);
         if (userProfile?.genre && user?.uid) {
             setLoading(true);
             return await fetchTracks({
