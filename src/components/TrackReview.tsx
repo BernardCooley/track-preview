@@ -55,6 +55,10 @@ const TrackReview = ({ reviewStep }: Props) => {
     const [fetchAttempted, setFetchAttempted] = useState<boolean>(false);
 
     useEffect(() => {
+        if (currentTrack) {
+            setListened(false);
+        }
+
         if (currentTrack && audioElementRef.current && userProfile?.autoplay) {
             play();
         }
