@@ -8,12 +8,16 @@ interface TrackContextProps {
     updateCurrentlyPlaying: (trackId: string | undefined) => void;
     reviewTracks: ReviewTracks;
     updateReviewTracks: (reviewStep: number, tracks: Track[]) => void;
-    addedToLibrary: boolean;
-    updateAddedToLibrary: (addedToLibrary: boolean) => void;
     currentAlbumTrack: Track | null;
     updateCurrentAlbumTrack: (track: Track | null) => void;
     previousTracks: Track[];
     updatePreviousTracks: (tracks: Track[]) => void;
+    changesMade: {
+        2: boolean;
+        3: boolean;
+        4: boolean;
+    };
+    updateChangesMade: (reviewStep: number, changesMade: boolean) => void;
 }
 
 export const TrackContext = createContext<TrackContextProps | null>(null);
@@ -38,11 +42,23 @@ export const TrackContextProvider = ({ children }: { children: ReactNode }) => {
         3: [],
         4: [],
     });
-    const [addedToLibrary, setAddedToLibrary] = useState<boolean>(false);
     const [currentAlbumTrack, setCurrentAlbumTrack] = useState<Track | null>(
         null
     );
     const [previousTracks, setPreviousTracks] = useState<Track[]>([]);
+    const [changesMade, setChangesMade] = useState<{
+        2: boolean;
+        3: boolean;
+        4: boolean;
+    }>({
+        2: true,
+        3: true,
+        4: true,
+    });
+    console.log(
+        "🚀 ~ file: TrackContext.tsx:50 ~ TrackContextProvider ~ changesMade:",
+        changesMade
+    );
 
     const updateCurrentlyPlaying = (trackId: string | undefined) => {
         setCurrentlyPlaying(trackId || "");
@@ -55,16 +71,19 @@ export const TrackContextProvider = ({ children }: { children: ReactNode }) => {
         }));
     };
 
-    const updateAddedToLibrary = (addedToLibrary: boolean) => {
-        setAddedToLibrary(addedToLibrary);
-    };
-
     const updateCurrentAlbumTrack = (track: Track | null) => {
         setCurrentAlbumTrack(track);
     };
 
     const updatePreviousTracks = (tracks: Track[]) => {
         setPreviousTracks(tracks);
+    };
+
+    const updateChangesMade = (reviewStep: number, changesMade: boolean) => {
+        setChangesMade((prevChangesMade) => ({
+            ...prevChangesMade,
+            [reviewStep]: changesMade,
+        }));
     };
 
     return (
@@ -74,12 +93,12 @@ export const TrackContextProvider = ({ children }: { children: ReactNode }) => {
                 updateCurrentlyPlaying,
                 reviewTracks,
                 updateReviewTracks,
-                addedToLibrary,
-                updateAddedToLibrary,
                 currentAlbumTrack,
                 updateCurrentAlbumTrack,
                 previousTracks,
                 updatePreviousTracks,
+                changesMade,
+                updateChangesMade,
             }}
         >
             {children}

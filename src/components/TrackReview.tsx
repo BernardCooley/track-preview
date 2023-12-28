@@ -31,7 +31,7 @@ interface Props {
 }
 
 const TrackReview = ({ reviewStep }: Props) => {
-    const { reviewTracks, updateReviewTracks, updateAddedToLibrary } =
+    const { reviewTracks, updateReviewTracks, changesMade, updateChangesMade } =
         useTrackContext();
     const [recentGenres, setRecentGenres] = useLocalStorage<string[]>(
         "recentGenres",
@@ -46,11 +46,9 @@ const TrackReview = ({ reviewStep }: Props) => {
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
     const [loadingMessage, setLoadingMessage] = useState<string>("");
     const audioElementRef = useRef<HTMLAudioElement>(null);
-    const [triggerGetTracks, setTriggerGetTracks] = useState<boolean>(false);
     const toast = useToast();
     const id = "review-toast";
     const [loading, setLoading] = useState<boolean>(true);
-    const [tracks, setTracks] = useState<Track[]>([]);
     const [loadMoreTracks, setLoadMoreTracks] = useState<boolean>(false);
     const [fetchAttempted, setFetchAttempted] = useState<boolean>(false);
 
@@ -110,6 +108,7 @@ const TrackReview = ({ reviewStep }: Props) => {
                     setNoTracks(true);
                     setLoading(false);
                 }
+                updateChangesMade(reviewStep, false);
             }
         },
         [getTracks]
@@ -139,7 +138,7 @@ const TrackReview = ({ reviewStep }: Props) => {
             userProfile?.yearFrom &&
             userProfile?.yearTo
         ) {
-            onGetTracks();
+            onGetTracks(changesMade[reviewStep as keyof typeof changesMade]);
         }
     }, [
         userProfile?.genre,
@@ -147,7 +146,6 @@ const TrackReview = ({ reviewStep }: Props) => {
         userProfile?.yearFrom,
         userProfile?.yearTo,
         reviewStep,
-        triggerGetTracks,
         onGetTracks,
     ]);
 
@@ -175,13 +173,11 @@ const TrackReview = ({ reviewStep }: Props) => {
                 const track = { ...currentTrack };
                 setCurrentTrack(null);
 
-                if (reviewStep === 3 && like) {
-                    updateAddedToLibrary(true);
-                }
-
                 if (reviewTracks[reviewStep].length > 0) {
                     if (reviewTracks[reviewStep].length === 1) {
-                        onGetTracks(true);
+                        onGetTracks(
+                            changesMade[reviewStep as keyof typeof changesMade]
+                        );
                         await updateTrackReviewStep({
                             trackId: track.id,
                             reviewStep,
@@ -202,6 +198,7 @@ const TrackReview = ({ reviewStep }: Props) => {
                         reviewTracks[reviewStep].slice(1)
                     );
                 }
+                updateChangesMade(reviewStep + 1, true);
             }
         } catch (error) {
             showToast({
@@ -226,7 +223,7 @@ const TrackReview = ({ reviewStep }: Props) => {
                     position="absolute"
                     px={4}
                 >
-                    <Button onClick={() => onGetTracks()} variant="primary">
+                    <Button onClick={() => onGetTracks(true)} variant="primary">
                         Load a new track
                     </Button>
                 </Center>

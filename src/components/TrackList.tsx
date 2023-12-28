@@ -43,12 +43,12 @@ const TrackList = () => {
         updateCurrentlyPlaying,
         reviewTracks,
         updateReviewTracks,
-        addedToLibrary,
-        updateAddedToLibrary,
         currentAlbumTrack,
         updateCurrentAlbumTrack,
         previousTracks,
         updatePreviousTracks,
+        changesMade,
+        updateChangesMade,
     } = useTrackContext();
     const [loading, setLoading] = useState<boolean>(false);
     const [noTracks, setNoTracks] = useState<boolean>(false);
@@ -62,7 +62,7 @@ const TrackList = () => {
     const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
 
     useEffect(() => {
-        if (addedToLibrary || reviewTracks[4].length === 0) {
+        if (changesMade[4] || reviewTracks[4].length === 0) {
             getTracks(null);
         }
     }, [user]);
@@ -142,7 +142,7 @@ const TrackList = () => {
 
                     if (fetchedTracks && fetchedTracks.length > 0) {
                         updateReviewTracks(4, fetchedTracks);
-                        updateAddedToLibrary(false);
+                        updateChangesMade(4, false);
                         setLoading(false);
                     } else {
                         setNoTracks(true);
