@@ -121,11 +121,31 @@ const TrackReviewCard = ({
                                         {currentTrack.artist}
                                     </Text>
 
-                                    <Flex fontSize={["lg", "xl"]} gap={2}>
-                                        <Text noOfLines={1}>
+                                    <Flex
+                                        fontSize={["lg", "xl"]}
+                                        gap={2}
+                                        direction="column"
+                                        alignItems="center"
+                                        w="full"
+                                    >
+                                        <Text noOfLines={1} py={1}>
                                             {currentTrack.title}
                                         </Text>
-                                        <Text>{`(${currentTrack.releaseYear})`}</Text>
+                                        <Flex
+                                            py={1}
+                                            fontSize={["md", "lg"]}
+                                            justifyContent="space-between"
+                                            w="full"
+                                        >
+                                            <Text
+                                                noOfLines={1}
+                                            >{`Genre: ${currentTrack.genre}`}</Text>
+                                            <Text
+                                                sx={{
+                                                    textWrap: "nowrap",
+                                                }}
+                                            >{`Year: ${currentTrack.releaseYear}`}</Text>
+                                        </Flex>
                                     </Flex>
                                 </Flex>
                             }
