@@ -138,7 +138,8 @@ const TrackReview = ({ reviewStep }: Props) => {
         ) {
             onGetTracks(
                 reviewStep === 1
-                    ? changesMade[reviewStep as keyof typeof changesMade]
+                    ? changesMade[reviewStep as keyof typeof changesMade] ||
+                          reviewTracks[reviewStep].length === 0
                     : reviewTracks[reviewStep].length === 0 &&
                           changesMade[reviewStep as keyof typeof changesMade]
             );
