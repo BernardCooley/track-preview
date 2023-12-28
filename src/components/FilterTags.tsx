@@ -34,7 +34,7 @@ const FilterTags = ({
             <Flex gap={2} w="full" flexWrap="wrap">
                 {showGenre && (
                     <Tag
-                        w="110px"
+                        w={genre ? "auto" : "102px"}
                         key={`${genre}`}
                         variant="filter"
                         pointerEvents={profileLoaded ? "auto" : "none"}
@@ -56,7 +56,7 @@ const FilterTags = ({
 
                 {showDates ? (
                     <Tag
-                        w="100px"
+                        w={yearRange?.to ? "auto" : "102px"}
                         variant="filter"
                         onClick={onYearClick}
                         pointerEvents={profileLoaded ? "auto" : "none"}
