@@ -72,6 +72,7 @@ const FilterTags = ({
                 ) : null}
 
                 <Tag
+                    w="102px"
                     onClick={onAutoPlayToggle}
                     pointerEvents={profileLoaded ? "auto" : "none"}
                     bg={
@@ -102,7 +103,7 @@ const FilterTags = ({
                     {profileLoaded && !autoplayLoading ? (
                         <Text userSelect="none">AutoPlay</Text>
                     ) : (
-                        <Box w="102px">
+                        <Box w="full">
                             <Spinner color="brand.primary" size="xs" />
                         </Box>
                     )}
