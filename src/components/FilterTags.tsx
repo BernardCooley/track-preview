@@ -56,7 +56,7 @@ const FilterTags = ({
 
                 {showDates ? (
                     <Tag
-                        w={yearRange?.to ? "auto" : "102px"}
+                        w={yearRange && profileLoaded ? "auto" : "102px"}
                         variant="filter"
                         onClick={onYearClick}
                         pointerEvents={profileLoaded ? "auto" : "none"}
