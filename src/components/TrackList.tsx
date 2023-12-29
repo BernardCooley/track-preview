@@ -640,8 +640,7 @@ const TrackList = () => {
                                                         bg="transparent"
                                                         shadow="none"
                                                         onClick={(e) => {
-                                                            (e) =>
-                                                                e.stopPropagation();
+                                                            e.stopPropagation();
                                                             setTrackToBuy(
                                                                 index
                                                             );
@@ -812,8 +811,7 @@ const TrackList = () => {
                                                         bg="transparent"
                                                         shadow="none"
                                                         onClick={(e) => {
-                                                            (e) =>
-                                                                e.stopPropagation();
+                                                            e.stopPropagation();
                                                             setTrackToBuy(
                                                                 index
                                                             );
