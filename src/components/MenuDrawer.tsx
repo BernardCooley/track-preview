@@ -38,7 +38,7 @@ const MenuDrawer = forwardRef<HTMLButtonElement | undefined, Props>(
                     <DrawerBody>
                         <Flex
                             direction="column"
-                            gap={4}
+                            gap={6}
                             pt={4}
                             alignItems="center"
                         >
