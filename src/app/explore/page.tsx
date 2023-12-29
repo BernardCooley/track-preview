@@ -1,10 +1,17 @@
 "use client";
 
-import { Box, Center, Flex, Slide, Stack } from "@chakra-ui/react";
+import {
+    Box,
+    Button,
+    Center,
+    Flex,
+    Grid,
+    Slide,
+    Stack,
+} from "@chakra-ui/react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import ProgressStepper from "@/components/ProgressStepper";
 import AudioPlayer from "@/components/AudioPlayer";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { onAuthStateChanged } from "firebase/auth";
 import TrackList from "@/components/TrackList";
 import Header from "@/components/Header";
@@ -14,11 +21,14 @@ import { useAuthContext } from "../../../Contexts/AuthContext";
 import { GetCurrentUser } from "../../../firebase/utils";
 import { auth } from "../../../firebase/firebaseInit";
 import TrackReview from "@/components/TrackReview";
+import LooksOneIcon from "@mui/icons-material/LooksOne";
+import LooksTwoIcon from "@mui/icons-material/LooksTwo";
+import Looks3Icon from "@mui/icons-material/Looks3";
+import LibraryMusicIcon from "@mui/icons-material/LibraryMusic";
 
 export default function Explore() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const pathname = usePathname();
     const { currentlyPlaying, updateCurrentlyPlaying } = useTrackContext();
     const audioElement = useRef<HTMLAudioElement>(null);
     const [currentStep, setCurrentStep] = useState<number>(0);
@@ -73,6 +83,29 @@ export default function Explore() {
         }
     }, [currentlyPlaying]);
 
+    const tabButtons = [
+        {
+            name: "Step 1",
+            icon: <LooksOneIcon />,
+            onClick: () => router.push("/explore?reviewStep=1"),
+        },
+        {
+            name: "Step 2",
+            icon: <LooksTwoIcon />,
+            onClick: () => router.push("/explore?reviewStep=2"),
+        },
+        {
+            name: "Step 3",
+            icon: <Looks3Icon />,
+            onClick: () => router.push("/explore?reviewStep=3"),
+        },
+        {
+            name: "Step 4",
+            icon: <LibraryMusicIcon />,
+            onClick: () => router.push("/explore?reviewStep=4"),
+        },
+    ];
+
     return (
         <Box h="full" m={0} px={[4, 8]} overflowY="hidden">
             <Header />
@@ -85,12 +118,26 @@ export default function Explore() {
                         transition="ease-in-out"
                         transitionDuration="200"
                     >
-                        <ProgressStepper
-                            currentStep={currentStep}
-                            onStepChange={(step) => {
-                                router.push(`${pathname}?reviewStep=${step}`);
-                            }}
-                        />
+                        <Grid templateColumns="repeat(4, 1fr)" w="full">
+                            {tabButtons.map((button, index) => (
+                                <Button
+                                    rightIcon={<>{button.icon}</>}
+                                    key={button.name}
+                                    variant={
+                                        currentStep === index + 1
+                                            ? "tab selected"
+                                            : "tab deselected"
+                                    }
+                                    rounded="none"
+                                    onClick={() =>
+                                        router.push(
+                                            `/explore?reviewStep=${index + 1}`
+                                        )
+                                    }
+                                ></Button>
+                            ))}
+                        </Grid>
+
                         {reviewStep &&
                             Number(reviewStep) >= 1 &&
                             reviewStep &&

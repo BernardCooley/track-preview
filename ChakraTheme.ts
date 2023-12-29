@@ -13,6 +13,7 @@ export const theme = extendTheme({
             primaryLight: "#16c6cc",
             textPrimary: "#FFFFFF",
             textPrimaryLight: "#b7c0c2",
+            textPrimaryLighter: "#809093",
             textSecondary: "#383838",
             backgroundPrimary: "#293533",
             backgroundSecondary: "#40514e",
@@ -60,16 +61,25 @@ export const theme = extendTheme({
                     },
                     color: "white",
                 },
-                secondary: {
-                    border: "1px solid",
-                    borderColor: "brand.backgroundTertiary",
+                "tab selected": {
+                    borderBottom: "3px solid",
+                    borderBottomColor: "brand.primary",
                     backgroundColor: "brand.backgroundTertiary",
                     _hover: {
                         shadow: "xl",
-                        border: "1px solid",
-                        borderColor: "brand.primary",
                     },
                     color: "white",
+                },
+                "tab deselected": {
+                    borderBottom: "3px solid",
+                    borderBottomColor: "transparent",
+                    _hover: {
+                        shadow: "xl",
+                        borderBottomColor: "brand.primary",
+                    },
+                    color: "brand.textPrimaryLighter",
+                    shadow: "none",
+                    rounded: "none",
                 },
                 tertiary: {
                     shadow: "none",
