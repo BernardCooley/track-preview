@@ -74,7 +74,7 @@ const TrackList = () => {
     const [trackToDelete, setTrackToDelete] = useState<number | null>(null);
     const [trackToBuy, setTrackToBuy] = useState<number | null>(null);
     const [clickDisabled, setClickDisabled] = useState<boolean>(false);
-    const [sortBy, setSortBy] = useState<keyof Track | "">("");
+    const [sortBy, setSortBy] = useState<keyof Track | "">("title");
     const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
 
     useEffect(() => {
