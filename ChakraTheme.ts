@@ -62,24 +62,22 @@ export const theme = extendTheme({
                     color: "white",
                 },
                 "tab selected": {
-                    borderBottom: "3px solid",
-                    borderBottomColor: "brand.primary",
-                    backgroundColor: "brand.backgroundTertiary",
                     _hover: {
                         shadow: "xl",
                     },
-                    color: "white",
-                },
-                "tab deselected": {
-                    borderBottom: "3px solid",
-                    borderBottomColor: "transparent",
-                    _hover: {
-                        shadow: "xl",
-                        borderBottomColor: "brand.primary",
-                    },
-                    color: "brand.textPrimaryLighter",
+                    color: "brand.textPrimary",
                     shadow: "none",
                     rounded: "none",
+                },
+                "tab deselected": {
+                    color: "brand.textPrimaryLighter",
+                    borderBottom: "3px solid",
+                    borderBottomColor: "transparent",
+                    backgroundColor: "brand.backgroundTertiaryOpaque",
+                    _hover: {
+                        shadow: "xl",
+                        borderBottomColor: "brand.textPrimaryLight",
+                    },
                 },
                 tertiary: {
                     shadow: "none",
