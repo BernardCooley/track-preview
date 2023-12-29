@@ -93,11 +93,18 @@ const GenreModal = ({
             }}
         >
             <ModalOverlay />
-            <ModalContent rounded={20} mx={4}>
+            <ModalContent
+                rounded={20}
+                m={6}
+                bg="brand.backgroundPrimary"
+                shadow="2xl"
+                border="1px solid"
+                borderColor="brand.primary"
+            >
                 <Flex
                     h="full"
                     w="full"
-                    bg="brand.backgroundSecondary"
+                    bg="brand.backgroundPrimary"
                     rounded={20}
                     p={showGenreSelector ? 4 : 0}
                     direction="column"
