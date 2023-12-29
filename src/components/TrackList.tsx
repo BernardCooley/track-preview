@@ -182,6 +182,11 @@ const TrackList = () => {
         setTrackToDelete(null);
     };
 
+    const closeBuyModal = () => {
+        onBuyModalClose();
+        setTrackToBuy(null);
+    };
+
     type TrackKeys = keyof Track;
 
     const sortTracks = (field: TrackKeys) => {
@@ -333,7 +338,7 @@ const TrackList = () => {
                 isCentered
                 blockScrollOnMount={false}
                 isOpen={buyModalIsOpen}
-                onClose={onBuyModalClose}
+                onClose={closeBuyModal}
                 closeOnEsc={true}
             >
                 <ModalOverlay />
@@ -373,7 +378,7 @@ const TrackList = () => {
                         <Button
                             variant="primary"
                             mr={3}
-                            onClick={onBuyModalClose}
+                            onClick={closeBuyModal}
                         >
                             Close
                         </Button>
