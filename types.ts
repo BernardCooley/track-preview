@@ -52,3 +52,11 @@ export interface YearRange {
 export interface ReviewTracks {
     [key: number]: Track[];
 }
+
+export type BuyPlatforms =
+    | "juno"
+    | "beatport"
+    | "juno download"
+    | "discogs"
+    | "bandcamp"
+    | "apple music";

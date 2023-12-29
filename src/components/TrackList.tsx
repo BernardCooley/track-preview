@@ -11,7 +11,16 @@ import {
     Button,
     Center,
     Flex,
+    Grid,
+    GridItem,
     Image,
+    Modal,
+    ModalBody,
+    ModalCloseButton,
+    ModalContent,
+    ModalFooter,
+    ModalHeader,
+    ModalOverlay,
     Stack,
     StackDivider,
     Table,
@@ -26,7 +35,7 @@ import {
     useDisclosure,
     useToast,
 } from "@chakra-ui/react";
-import { Track } from "../../types";
+import { BuyPlatforms, Track } from "../../types";
 import { useTrackContext } from "../../context/TrackContext";
 import { fetchAlbum, fetchTracks, updateTrackReviewStep } from "@/bff/bff";
 import { useAuthContext } from "../../Contexts/AuthContext";
@@ -35,6 +44,7 @@ import { camelcaseToTitleCase, getFormattedDate } from "../../utils";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import TrackMenuOptions from "./TrackOptionsMenu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import BuyLink from "./BuyLink";
 
 const TrackList = () => {
     const { user } = useAuthContext();
@@ -55,8 +65,14 @@ const TrackList = () => {
     const toast = useToast();
     const id = "step4-toast";
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const {
+        isOpen: buyModalIsOpen,
+        onOpen: onBuyModalOpen,
+        onClose: onBuyModalClose,
+    } = useDisclosure();
     const cancelRef = useRef<HTMLButtonElement>(null);
     const [trackToDelete, setTrackToDelete] = useState<number | null>(null);
+    const [trackToBuy, setTrackToBuy] = useState<number | null>(null);
     const [clickDisabled, setClickDisabled] = useState<boolean>(false);
     const [sortBy, setSortBy] = useState<keyof Track | "">("");
     const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
@@ -72,6 +88,12 @@ const TrackList = () => {
             onOpen();
         }
     }, [trackToDelete]);
+
+    useEffect(() => {
+        if (trackToBuy || trackToBuy === 0) {
+            onBuyModalOpen();
+        }
+    }, [trackToBuy]);
 
     useEffect(() => {
         if (noTracks) {
@@ -262,6 +284,33 @@ const TrackList = () => {
         }
     };
 
+    const buyLinks = [
+        {
+            platform: "beatport",
+            logo: "/logos/beatport.png",
+        },
+        {
+            platform: "juno download",
+            logo: "/logos/juno_download.jpeg",
+        },
+        {
+            platform: "juno",
+            logo: "/logos/juno.jpeg",
+        },
+        {
+            platform: "discogs",
+            logo: "/logos/discogs.jpeg",
+        },
+        {
+            platform: "bandcamp",
+            logo: "/logos/bandcamp.png",
+        },
+        {
+            platform: "apple music",
+            logo: "/logos/apple_music.jpeg",
+        },
+    ];
+
     return (
         <Box position="relative" pb={20}>
             {loading && <Loading loadingText={`Loading library`} />}
@@ -280,6 +329,57 @@ const TrackList = () => {
                     </Badge>
                 </Center>
             )}
+            <Modal
+                isCentered
+                blockScrollOnMount={false}
+                isOpen={buyModalIsOpen}
+                onClose={onBuyModalClose}
+                closeOnEsc={true}
+            >
+                <ModalOverlay />
+                <ModalContent
+                    m={6}
+                    bg="brand.backgroundPrimary"
+                    shadow="2xl"
+                    border="1px solid"
+                    borderColor="brand.primary"
+                >
+                    <ModalHeader>Buy</ModalHeader>
+                    <ModalCloseButton />
+                    <ModalBody>
+                        <Grid templateColumns="repeat(3, 1fr)" gap={6}>
+                            {buyLinks.map((buyLink) => (
+                                <GridItem
+                                    transition={"all .1s ease-in-out"}
+                                    _hover={{
+                                        transform: "scale(1.2)",
+                                    }}
+                                    key={buyLink.platform}
+                                    w="100%"
+                                >
+                                    <BuyLink
+                                        track={reviewTracks[4][trackToBuy!]}
+                                        platform={
+                                            buyLink.platform as BuyPlatforms
+                                        }
+                                        logo={buyLink.logo}
+                                    />
+                                </GridItem>
+                            ))}
+                        </Grid>
+                    </ModalBody>
+
+                    <ModalFooter>
+                        <Button
+                            variant="primary"
+                            mr={3}
+                            onClick={onBuyModalClose}
+                        >
+                            Close
+                        </Button>
+                    </ModalFooter>
+                </ModalContent>
+            </Modal>
             <AlertDialog
                 isOpen={isOpen}
                 leastDestructiveRef={cancelRef}
@@ -326,7 +426,11 @@ const TrackList = () => {
                         </AlertDialogBody>
 
                         <AlertDialogFooter>
-                            <Button ref={cancelRef} onClick={closeDialog}>
+                            <Button
+                                variant="primary"
+                                ref={cancelRef}
+                                onClick={closeDialog}
+                            >
                                 Cancel
                             </Button>
                             <Button
@@ -525,7 +629,9 @@ const TrackList = () => {
                                                     onViewAlbum={() =>
                                                         gotToAlbum(index)
                                                     }
-                                                    track={track}
+                                                    onBuyClick={() => {
+                                                        setTrackToBuy(index);
+                                                    }}
                                                     index={index}
                                                 />
                                             </Td>
@@ -653,7 +759,9 @@ const TrackList = () => {
                                                     onViewAlbum={() =>
                                                         gotToAlbum(index)
                                                     }
-                                                    track={track}
+                                                    onBuyClick={() => {
+                                                        setTrackToBuy(index);
+                                                    }}
                                                     index={index}
                                                 />
                                             </Td>

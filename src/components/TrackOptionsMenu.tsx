@@ -1,26 +1,24 @@
 import { Menu, MenuButton, MenuItem, MenuList } from "@chakra-ui/menu";
 import React from "react";
-import { Track } from "../../types";
 import { Button } from "@chakra-ui/button";
-import { Link } from "@chakra-ui/layout";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 
 interface TrackOptionsProps {
-    track: Track;
     index: number;
     onMouseEnter: () => void;
     onMouseLeave: () => void;
     onTrackDelete: (index: number) => void;
     onViewAlbum: (index: number) => void;
+    onBuyClick: (index: number) => void;
 }
 
 const TrackMenuOptions = ({
-    track,
     index,
     onMouseEnter,
     onMouseLeave,
     onTrackDelete,
     onViewAlbum,
+    onBuyClick,
 }: TrackOptionsProps) => {
     return (
         <Menu variant="primary">
@@ -48,12 +46,9 @@ const TrackMenuOptions = ({
                     View album
                 </MenuItem>
                 <MenuItem
-                    as={Link}
                     onMouseEnter={onMouseEnter}
                     onMouseLeave={onMouseLeave}
-                    variant="primary"
-                    href={track.purchaseUrl}
-                    isExternal
+                    onClick={() => onBuyClick(index)}
                 >
                     Buy
                 </MenuItem>
