@@ -13,6 +13,7 @@ import {
     Flex,
     Grid,
     GridItem,
+    IconButton,
     Image,
     Modal,
     ModalBody,
@@ -45,6 +46,7 @@ import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import TrackMenuOptions from "./TrackOptionsMenu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import BuyLink from "./BuyLink";
+import ShopIcon from "@mui/icons-material/Shop";
 
 const TrackList = () => {
     const { user } = useAuthContext();
@@ -621,24 +623,63 @@ const TrackList = () => {
                                         </Td>
                                         {!currentAlbumTrack && (
                                             <Td>
-                                                <TrackMenuOptions
-                                                    onMouseEnter={() =>
-                                                        setClickDisabled(true)
-                                                    }
-                                                    onMouseLeave={() =>
-                                                        setClickDisabled(false)
-                                                    }
-                                                    onTrackDelete={() =>
-                                                        setTrackToDelete(index)
-                                                    }
-                                                    onViewAlbum={() =>
-                                                        gotToAlbum(index)
-                                                    }
-                                                    onBuyClick={() => {
-                                                        setTrackToBuy(index);
-                                                    }}
-                                                    index={index}
-                                                />
+                                                <Flex alignItems="center">
+                                                    <IconButton
+                                                        onMouseEnter={() =>
+                                                            setClickDisabled(
+                                                                true
+                                                            )
+                                                        }
+                                                        onMouseLeave={() =>
+                                                            setClickDisabled(
+                                                                false
+                                                            )
+                                                        }
+                                                        color="brand.primary"
+                                                        fontSize="2xl"
+                                                        bg="transparent"
+                                                        shadow="none"
+                                                        onClick={() => {
+                                                            setTrackToBuy(
+                                                                index
+                                                            );
+                                                        }}
+                                                        position="relative"
+                                                        rounded="full"
+                                                        variant="ghost"
+                                                        aria-label="buy track"
+                                                        icon={
+                                                            <ShopIcon fontSize="inherit" />
+                                                        }
+                                                        _hover={{
+                                                            bg: "transparent",
+                                                        }}
+                                                        _focusVisible={{
+                                                            outline: "none",
+                                                        }}
+                                                    />
+                                                    <TrackMenuOptions
+                                                        onMouseEnter={() =>
+                                                            setClickDisabled(
+                                                                true
+                                                            )
+                                                        }
+                                                        onMouseLeave={() =>
+                                                            setClickDisabled(
+                                                                false
+                                                            )
+                                                        }
+                                                        onTrackDelete={() =>
+                                                            setTrackToDelete(
+                                                                index
+                                                            )
+                                                        }
+                                                        onViewAlbum={() =>
+                                                            gotToAlbum(index)
+                                                        }
+                                                        index={index}
+                                                    />
+                                                </Flex>
                                             </Td>
                                         )}
                                     </Tr>
@@ -751,24 +792,64 @@ const TrackList = () => {
                                         </Td>
                                         {!currentAlbumTrack && (
                                             <Td>
-                                                <TrackMenuOptions
-                                                    onMouseEnter={() =>
-                                                        setClickDisabled(true)
-                                                    }
-                                                    onMouseLeave={() =>
-                                                        setClickDisabled(false)
-                                                    }
-                                                    onTrackDelete={() =>
-                                                        setTrackToDelete(index)
-                                                    }
-                                                    onViewAlbum={() =>
-                                                        gotToAlbum(index)
-                                                    }
-                                                    onBuyClick={() => {
-                                                        setTrackToBuy(index);
-                                                    }}
-                                                    index={index}
-                                                />
+                                                <Flex alignItems="center">
+                                                    <IconButton
+                                                        left={2}
+                                                        onMouseEnter={() =>
+                                                            setClickDisabled(
+                                                                true
+                                                            )
+                                                        }
+                                                        onMouseLeave={() =>
+                                                            setClickDisabled(
+                                                                false
+                                                            )
+                                                        }
+                                                        color="brand.primary"
+                                                        fontSize="2xl"
+                                                        bg="transparent"
+                                                        shadow="none"
+                                                        onClick={() => {
+                                                            setTrackToBuy(
+                                                                index
+                                                            );
+                                                        }}
+                                                        position="relative"
+                                                        rounded="full"
+                                                        variant="ghost"
+                                                        aria-label="buy track"
+                                                        icon={
+                                                            <ShopIcon fontSize="inherit" />
+                                                        }
+                                                        _hover={{
+                                                            bg: "transparent",
+                                                        }}
+                                                        _focusVisible={{
+                                                            outline: "none",
+                                                        }}
+                                                    />
+                                                    <TrackMenuOptions
+                                                        onMouseEnter={() =>
+                                                            setClickDisabled(
+                                                                true
+                                                            )
+                                                        }
+                                                        onMouseLeave={() =>
+                                                            setClickDisabled(
+                                                                false
+                                                            )
+                                                        }
+                                                        onTrackDelete={() =>
+                                                            setTrackToDelete(
+                                                                index
+                                                            )
+                                                        }
+                                                        onViewAlbum={() =>
+                                                            gotToAlbum(index)
+                                                        }
+                                                        index={index}
+                                                    />
+                                                </Flex>
                                             </Td>
                                         )}
                                     </Tr>
