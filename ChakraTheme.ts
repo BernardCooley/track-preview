@@ -107,9 +107,6 @@ export const theme = extendTheme({
                 menuButton: {
                     shadow: "none",
                     backgroundColor: "transparent",
-                    _hover: {
-                        transform: "scale(1.3)",
-                    },
                     color: "brand.primary",
                     padding: "0",
                 },
@@ -283,7 +280,7 @@ export const theme = extendTheme({
                         shadow: "md",
                     },
                     item: {
-                        px: 2,
+                        p: 3,
                         fontSize: "lg",
                         rounded: "md",
                         bg: "transparent",
