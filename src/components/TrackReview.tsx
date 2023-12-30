@@ -38,6 +38,9 @@ const TrackReview = ({ reviewStep }: Props) => {
         []
     );
     const { user, userProfile, updateUserProfile } = useAuthContext();
+    const [prevUserProfile, setPrevUserProfile] = useState(userProfile);
+    const hasUserProfileChanged =
+        JSON.stringify(prevUserProfile) !== JSON.stringify(userProfile);
     const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
     const [noTracks, setNoTracks] = useState<boolean>(false);
     const [showYearSelector, setShowYearSelector] = useState<boolean>(false);
@@ -51,6 +54,10 @@ const TrackReview = ({ reviewStep }: Props) => {
     const [loadMoreTracks, setLoadMoreTracks] = useState<boolean>(false);
     const [fetchAttempted, setFetchAttempted] = useState<boolean>(false);
     const [autoplayLoading, setAutoplayLoading] = useState<boolean>(false);
+
+    useEffect(() => {
+        setPrevUserProfile(userProfile);
+    }, [userProfile]);
 
     useEffect(() => {
         if (currentTrack) {
@@ -147,14 +154,10 @@ const TrackReview = ({ reviewStep }: Props) => {
     }, [reviewStep]);
 
     useEffect(() => {
-        if (
-            userProfile?.genre &&
-            userProfile?.yearFrom &&
-            userProfile?.yearTo
-        ) {
+        if (hasUserProfileChanged) {
             onGetTracks(true);
         }
-    }, [userProfile?.genre, user, userProfile?.yearFrom, userProfile?.yearTo]);
+    }, [hasUserProfileChanged]);
 
     const showToast = useCallback(
         ({ status, title, description }: ToastProps) => {
@@ -326,7 +329,6 @@ const TrackReview = ({ reviewStep }: Props) => {
                     setListened(false);
                     setIsPlaying(false);
                     setShowYearSelector(false);
-                    onGetTracks(true);
                 }}
                 onCancel={() => setShowYearSelector(false)}
             />
@@ -354,7 +356,6 @@ const TrackReview = ({ reviewStep }: Props) => {
                                 userId: user.uid,
                                 autoplay: !userProfile?.autoplay,
                             });
-
                             updateUserProfile(newProfile);
                             setAutoplayLoading(false);
                         }}
