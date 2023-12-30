@@ -4,7 +4,7 @@ const fs = require("fs");
 const path = require("path");
 
 async function main() {
-    const dir = "./scraping_tracks/seedCleaned/found";
+    const dir = "./scraping_tracks/searchedTracks/deezer/found";
 
     fs.readdir(dir, (err, files) => {
         files.map(async (file, fileIndex) => {

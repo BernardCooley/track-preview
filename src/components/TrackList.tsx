@@ -345,6 +345,7 @@ const TrackList = () => {
             >
                 <ModalOverlay />
                 <ModalContent
+                    minH="352px"
                     m={6}
                     bg="brand.backgroundPrimary"
                     shadow="2xl"

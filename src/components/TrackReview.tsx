@@ -144,13 +144,17 @@ const TrackReview = ({ reviewStep }: Props) => {
                           changesMade[reviewStep as keyof typeof changesMade]
             );
         }
-    }, [
-        userProfile?.genre,
-        user,
-        userProfile?.yearFrom,
-        userProfile?.yearTo,
-        reviewStep,
-    ]);
+    }, [reviewStep]);
+
+    useEffect(() => {
+        if (
+            userProfile?.genre &&
+            userProfile?.yearFrom &&
+            userProfile?.yearTo
+        ) {
+            onGetTracks(true);
+        }
+    }, [userProfile?.genre, user, userProfile?.yearFrom, userProfile?.yearTo]);
 
     const showToast = useCallback(
         ({ status, title, description }: ToastProps) => {
@@ -295,7 +299,6 @@ const TrackReview = ({ reviewStep }: Props) => {
                         setIsPlaying(false);
                     }
                     setShowGenreSelector(false);
-                    onGetTracks(true);
                 }}
                 availableGenres={genres}
                 onFavouriteClearClick={() => {
