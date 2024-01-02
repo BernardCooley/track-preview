@@ -38,15 +38,7 @@ const TrackReview = ({ reviewStep }: Props) => {
         []
     );
     const { user, userProfile, updateUserProfile } = useAuthContext();
-    const profileWithoutAutoplay = () => {
-        const { autoplay, ...rest } = userProfile || {};
-        return rest;
-    };
-
-    const [prevUserProfile, setPrevUserProfile] = useState(
-        profileWithoutAutoplay()
-    );
-
+    const [prevUserProfile, setPrevUserProfile] = useState(userProfile);
     const hasUserProfileChanged =
         JSON.stringify(prevUserProfile) !== JSON.stringify(userProfile);
     const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
@@ -64,7 +56,7 @@ const TrackReview = ({ reviewStep }: Props) => {
     const [autoplayLoading, setAutoplayLoading] = useState<boolean>(false);
 
     useEffect(() => {
-        setPrevUserProfile(profileWithoutAutoplay());
+        setPrevUserProfile(userProfile);
     }, [userProfile]);
 
     useEffect(() => {
