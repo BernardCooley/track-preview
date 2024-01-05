@@ -74,6 +74,7 @@ export const theme = extendTheme({
                     borderBottom: "3px solid",
                     borderBottomColor: "transparent",
                     backgroundColor: "brand.backgroundTertiaryOpaque",
+                    transition: "all 0s",
                     _hover: {
                         shadow: "xl",
                         borderBottomColor: "brand.textPrimaryLight",
