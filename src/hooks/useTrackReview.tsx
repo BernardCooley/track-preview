@@ -10,6 +10,7 @@ import {
 import { useLocalStorage } from "usehooks-ts";
 import { useToast, ToastProps } from "@chakra-ui/react";
 import { Track, YearRange } from "../../types";
+import { User as UserProfile } from "@prisma/client";
 
 export const useTrackReview = (reviewStep: number) => {
     const { reviewTracks, updateReviewTracks, changesMade, updateChangesMade } =
@@ -19,9 +20,9 @@ export const useTrackReview = (reviewStep: number) => {
         []
     );
     const { user, userProfile, updateUserProfile } = useAuthContext();
-    const [prevUserProfile, setPrevUserProfile] = useState(userProfile);
-    const hasUserProfileChanged =
-        JSON.stringify(prevUserProfile) !== JSON.stringify(userProfile);
+    const [prevUserProfile, setPrevUserProfile] = useState<UserProfile | null>(
+        userProfile
+    );
     const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
     const [noTracks, setNoTracks] = useState<boolean>(false);
     const [showYearSelector, setShowYearSelector] = useState<boolean>(false);
@@ -35,6 +36,17 @@ export const useTrackReview = (reviewStep: number) => {
     const [loadMoreTracks, setLoadMoreTracks] = useState<boolean>(false);
     const [fetchAttempted, setFetchAttempted] = useState<boolean>(false);
     const [autoplayLoading, setAutoplayLoading] = useState<boolean>(false);
+
+    const comparisonUserProfile = (profile: UserProfile | null) => {
+        if (profile === null) return;
+
+        const { autoplay, ...rest } = profile;
+        return JSON.stringify(rest);
+    };
+
+    const hasUserProfileChanged =
+        comparisonUserProfile(prevUserProfile) !==
+        comparisonUserProfile(userProfile);
 
     useEffect(() => {
         setPrevUserProfile(userProfile);
@@ -51,7 +63,6 @@ export const useTrackReview = (reviewStep: number) => {
         setCurrentTrack(null);
         if (userProfile?.genre && user?.uid) {
             setLoading(true);
-            console.log("================");
             return await fetchTracks({
                 genre:
                     userProfile?.genre && reviewStep === 1
