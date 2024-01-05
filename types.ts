@@ -60,3 +60,16 @@ export type BuyPlatforms =
     | "discogs"
     | "bandcamp"
     | "apple music";
+
+export interface IBuyLink {
+    platform: BuyPlatforms;
+    logo: string;
+}
+
+export type SortDirection = "asc" | "desc";
+
+export interface Decades {
+    title: string;
+    from: number;
+    to: number;
+}

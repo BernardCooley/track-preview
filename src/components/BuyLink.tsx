@@ -1,32 +1,33 @@
 import { Flex, Image, Link, Text } from "@chakra-ui/react";
 import React from "react";
-import { BuyPlatforms, Track } from "../../types";
+import { IBuyLink, Track } from "../../types";
 import { capitaliseWords, formatBuyUrl } from "../../utils";
 
 interface Props {
     track: Track;
-    platform: BuyPlatforms;
-    logo: string;
+    buyLink: IBuyLink;
 }
 
-const BuyLink = ({ track, platform, logo }: Props) => {
+const BuyLink = ({ track, buyLink }: Props) => {
     return (
         <Link
             isExternal
-            href={formatBuyUrl(track, platform)}
+            href={formatBuyUrl(track, buyLink.platform)}
             _hover={{
                 transform: "scale(1.2)",
             }}
         >
             <Flex direction="column" alignItems="center">
                 <Image
-                    alt={platform}
+                    alt={buyLink.platform}
                     rounded="full"
                     maxW={16}
                     maxH={16}
-                    src={logo}
+                    src={buyLink.logo}
                 ></Image>
-                <Text textAlign="center">{capitaliseWords(platform)}</Text>
+                <Text textAlign="center">
+                    {capitaliseWords(buyLink.platform)}
+                </Text>
             </Flex>
         </Link>
     );
