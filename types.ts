@@ -45,8 +45,8 @@ export interface AccessToken {
 }
 
 export interface YearRange {
-    from: number;
-    to: number;
+    from: number | undefined;
+    to: number | undefined;
 }
 
 export interface ReviewTracks {
