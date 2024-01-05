@@ -212,6 +212,7 @@ const TrackList = () => {
     const TableHeading = ({ title }: TableHeadingProps) => {
         return (
             <Flex
+                position="relative"
                 as={Button}
                 variant="unstyled"
                 border="none"
@@ -224,6 +225,9 @@ const TrackList = () => {
                 <Text>{camelcaseToTitleCase(title)}</Text>
                 {sortBy === title && (
                     <Box
+                        top={2}
+                        right={-6}
+                        position="absolute"
                         transform={
                             sortBy === title && sortDirection === "asc"
                                 ? ""
