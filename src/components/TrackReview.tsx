@@ -137,6 +137,7 @@ const TrackReview = ({ reviewStep }: Props) => {
                 justifyContent="space-between"
                 direction="column"
                 p={4}
+                px={0}
                 pt={2}
                 gap={2}
                 zIndex={200}
