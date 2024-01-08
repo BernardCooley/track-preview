@@ -6,20 +6,20 @@ import { Track } from "../../types";
 interface Props {
     updateReviewTracks: (step: number, tracks: any) => void;
     updatePreviousTracks: (tracks: Track[]) => void;
-    updateCurrentAlbumTrack: (track: Track | null) => void;
+    updateCurrentReleaseTrack: (track: Track | null) => void;
     previousTracks: Track[];
-    currentAlbumTrack: Track;
+    currentReleaseTrack: Track;
 }
 
-const AlbumHeader = ({
+const ReleaseHeader = ({
     updateReviewTracks,
     updatePreviousTracks,
-    updateCurrentAlbumTrack,
+    updateCurrentReleaseTrack,
     previousTracks,
-    currentAlbumTrack,
+    currentReleaseTrack,
 }: Props) => {
     return (
-        <Flex gap={4} w="full" alignItems="flex-start" top={-1} p={2}>
+        <Flex gap={4} w="full" alignItems="center" top={-1} p={2} wrap="wrap">
             <Button
                 variant="primary"
                 leftIcon={<ChevronLeftIcon />}
@@ -27,19 +27,32 @@ const AlbumHeader = ({
                     updateReviewTracks(4, previousTracks);
                     updatePreviousTracks([]);
 
-                    updateCurrentAlbumTrack(null);
+                    updateCurrentReleaseTrack(null);
                 }}
             >
                 Library
             </Button>
             <Flex direction="column">
                 <Flex gap={2}>
-                    <Text fontSize="md" color="brand.textPrimaryLight">
-                        Album:
+                    <Text
+                        noOfLines={1}
+                        fontSize="md"
+                        color="brand.textPrimaryLight"
+                    >
+                        Artist:
+                    </Text>
+                    <Text noOfLines={2}>{currentReleaseTrack.artist}</Text>
+                </Flex>
+                <Flex gap={2}>
+                    <Text
+                        noOfLines={1}
+                        fontSize="md"
+                        color="brand.textPrimaryLight"
+                    >
+                        Release title:
                     </Text>
                     <Text noOfLines={2}>
-                        {currentAlbumTrack.artist} -{" "}
-                        {currentAlbumTrack.releaseTitle}
+                        {currentReleaseTrack.releaseTitle}
                     </Text>
                 </Flex>
             </Flex>
@@ -47,4 +60,4 @@ const AlbumHeader = ({
     );
 };
 
-export default AlbumHeader;
+export default ReleaseHeader;

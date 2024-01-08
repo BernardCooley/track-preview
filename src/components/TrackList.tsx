@@ -1,11 +1,11 @@
 import React, { useEffect } from "react";
-import { Badge, Box, Center, Stack, StackDivider } from "@chakra-ui/react";
+import { Badge, Box, Center } from "@chakra-ui/react";
 import Loading from "./Loading";
 import { buyLinks } from "../../consts";
 import BuyModal from "./BuyModal";
 import DeleteTrackDialog from "./DeleteTrackDialog";
 import LibraryTable from "./LibraryTable";
-import AlbumHeader from "./AlbumHeader";
+import ReleaseHeader from "./ReleaseHeader";
 import { useTrackList } from "@/hooks/useTrackList";
 
 const TrackList = () => {
@@ -15,8 +15,8 @@ const TrackList = () => {
         updateCurrentlyPlaying,
         reviewTracks,
         updateReviewTracks,
-        currentAlbumTrack,
-        updateCurrentAlbumTrack,
+        currentReleaseTrack,
+        updateCurrentReleaseTrack,
         previousTracks,
         updatePreviousTracks,
         changesMade,
@@ -103,56 +103,36 @@ const TrackList = () => {
                 deleteTrack={deleteTrack}
                 ref={cancelRef}
             />
-            <Stack
-                position="relative"
-                h="full"
-                divider={
-                    <StackDivider borderColor="brand.backgroundTertiaryOpaque" />
-                }
-                spacing="4"
-                css={{
-                    "&::-webkit-scrollbar": {
-                        width: "4px",
-                    },
-                    "&::-webkit-scrollbar-track": {
-                        width: "6px",
-                    },
-                    "&::-webkit-scrollbar-thumb": {
-                        background: "lightgray",
-                        borderRadius: "24px",
-                    },
-                }}
-            >
-                {currentAlbumTrack && (
-                    <AlbumHeader
-                        updateReviewTracks={updateReviewTracks}
-                        updatePreviousTracks={updatePreviousTracks}
-                        updateCurrentAlbumTrack={updateCurrentAlbumTrack}
-                        previousTracks={previousTracks}
-                        currentAlbumTrack={currentAlbumTrack}
-                    />
-                )}
-                {!loading && !noTracks && (
-                    <LibraryTable
-                        sortBy={sortBy}
-                        sortDirection={sortDirection}
-                        currentAlbumTrack={currentAlbumTrack}
-                        reviewTracks={reviewTracks}
-                        currentlyPlaying={currentlyPlaying}
-                        clickDisabled={clickDisabled}
-                        updateCurrentlyPlaying={updateCurrentlyPlaying}
-                        setClickDisabled={setClickDisabled}
-                        setTrackToBuy={setTrackToBuy}
-                        setTrackToDelete={setTrackToDelete}
-                        updateCurrentAlbumTrack={updateCurrentAlbumTrack}
-                        updatePreviousTracks={updatePreviousTracks}
-                        getTracks={getTracks}
-                        updateReviewTracks={updateReviewTracks}
-                        setSortBy={setSortBy}
-                        setSortDirection={setSortDirection}
-                    />
-                )}
-            </Stack>
+
+            {currentReleaseTrack && (
+                <ReleaseHeader
+                    updateReviewTracks={updateReviewTracks}
+                    updatePreviousTracks={updatePreviousTracks}
+                    updateCurrentReleaseTrack={updateCurrentReleaseTrack}
+                    previousTracks={previousTracks}
+                    currentReleaseTrack={currentReleaseTrack}
+                />
+            )}
+            {!loading && !noTracks && (
+                <LibraryTable
+                    sortBy={sortBy}
+                    sortDirection={sortDirection}
+                    currentReleaseTrack={currentReleaseTrack}
+                    reviewTracks={reviewTracks}
+                    currentlyPlaying={currentlyPlaying}
+                    clickDisabled={clickDisabled}
+                    updateCurrentlyPlaying={updateCurrentlyPlaying}
+                    setClickDisabled={setClickDisabled}
+                    setTrackToBuy={setTrackToBuy}
+                    setTrackToDelete={setTrackToDelete}
+                    updateCurrentReleaseTrack={updateCurrentReleaseTrack}
+                    updatePreviousTracks={updatePreviousTracks}
+                    getTracks={getTracks}
+                    updateReviewTracks={updateReviewTracks}
+                    setSortBy={setSortBy}
+                    setSortDirection={setSortDirection}
+                />
+            )}
         </Box>
     );
 };

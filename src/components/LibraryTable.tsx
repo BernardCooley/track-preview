@@ -31,7 +31,7 @@ interface TableHeadingProps {
 interface Props {
     sortBy: keyof Track | "";
     sortDirection: SortDirection;
-    currentAlbumTrack: Track | null;
+    currentReleaseTrack: Track | null;
     reviewTracks: ReviewTracks;
     currentlyPlaying: string | undefined;
     clickDisabled: boolean;
@@ -39,7 +39,7 @@ interface Props {
     setClickDisabled: React.Dispatch<React.SetStateAction<boolean>>;
     setTrackToBuy: React.Dispatch<React.SetStateAction<number | null>>;
     setTrackToDelete: React.Dispatch<React.SetStateAction<number | null>>;
-    updateCurrentAlbumTrack: (track: Track) => void;
+    updateCurrentReleaseTrack: (track: Track) => void;
     updatePreviousTracks: (tracks: Track[]) => void;
     getTracks: (track: Track) => void;
     updateReviewTracks: (reviewStep: number, tracks: Track[]) => void;
@@ -50,7 +50,7 @@ interface Props {
 const LibraryTable = ({
     sortBy,
     sortDirection,
-    currentAlbumTrack,
+    currentReleaseTrack,
     reviewTracks,
     currentlyPlaying,
     clickDisabled,
@@ -58,7 +58,7 @@ const LibraryTable = ({
     setClickDisabled,
     setTrackToBuy,
     setTrackToDelete,
-    updateCurrentAlbumTrack,
+    updateCurrentReleaseTrack,
     updatePreviousTracks,
     getTracks,
     updateReviewTracks,
@@ -79,12 +79,12 @@ const LibraryTable = ({
         setSortDirection(order === "asc" ? "desc" : "asc");
     };
 
-    const gotToAlbum = (index: number) => {
-        updateCurrentAlbumTrack(reviewTracks[4][index]);
+    const gotToRelease = (index: number) => {
+        updateCurrentReleaseTrack(reviewTracks[4][index]);
         if (
-            currentAlbumTrack?.releaseTitle !==
+            currentReleaseTrack?.releaseTitle !==
                 reviewTracks[4][index].releaseTitle &&
-            currentAlbumTrack?.releaseDate !==
+            currentReleaseTrack?.releaseDate !==
                 reviewTracks[4][index].releaseDate
         ) {
             updatePreviousTracks(reviewTracks[4]);
@@ -165,8 +165,13 @@ const LibraryTable = ({
 
     return (
         <TableContainer
-            maxH={currentAlbumTrack ? "60vh" : "70vh"}
+            maxH={currentReleaseTrack ? "60vh" : "70vh"}
             overflowY="scroll"
+            sx={{
+                "::-webkit-scrollbar": {
+                    display: "none",
+                },
+            }}
         >
             <Table variant="primary" display={["none", "none", "table"]}>
                 <Thead>
@@ -183,7 +188,7 @@ const LibraryTable = ({
                         <Th>
                             <TableHeading title="releaseDate" />
                         </Th>
-                        {!currentAlbumTrack && (
+                        {!currentReleaseTrack && (
                             <Th>
                                 <Box
                                     as={Button}
@@ -216,6 +221,7 @@ const LibraryTable = ({
                                     alignItems="center"
                                     gap={6}
                                     justifyContent="flex-start"
+                                    pl={2}
                                 >
                                     <Image
                                         maxW={16}
@@ -225,6 +231,7 @@ const LibraryTable = ({
                                     ></Image>
                                     <Flex direction="column" gap={2}>
                                         <Text
+                                            // noOfLines={3}
                                             fontSize={"md"}
                                             color={"brand.textPrimary"}
                                             maxW={32}
@@ -262,7 +269,7 @@ const LibraryTable = ({
                                 {getFormattedDate(track.releaseDate) ||
                                     track.releaseYear}
                             </Td>
-                            {!currentAlbumTrack && (
+                            {!currentReleaseTrack && (
                                 <Td>
                                     <Flex alignItems="center">
                                         <IconButton
@@ -304,8 +311,8 @@ const LibraryTable = ({
                                             onTrackDelete={() =>
                                                 setTrackToDelete(index)
                                             }
-                                            onViewAlbum={() =>
-                                                gotToAlbum(index)
+                                            onViewRelease={() =>
+                                                gotToRelease(index)
                                             }
                                             index={index}
                                         />
@@ -325,7 +332,7 @@ const LibraryTable = ({
                         <Th>
                             <TableHeading title="genre" />
                         </Th>
-                        {!currentAlbumTrack && (
+                        {!currentReleaseTrack && (
                             <Th>
                                 <br />
                             </Th>
@@ -342,12 +349,14 @@ const LibraryTable = ({
                                 clickDisabled,
                                 updateCurrentlyPlaying
                             )}
+                            fontSize="sm"
                         >
                             <Td>
                                 <Flex
                                     alignItems="center"
                                     gap={3}
                                     justifyContent="flex-start"
+                                    pl={2}
                                 >
                                     <Image
                                         maxW={14}
@@ -365,7 +374,6 @@ const LibraryTable = ({
                                                 currentlyPlaying !==
                                                 track.previewUrl
                                             }
-                                            fontSize="sm"
                                             color={"brand.textPrimary"}
                                             sx={{
                                                 textWrap:
@@ -402,7 +410,6 @@ const LibraryTable = ({
                                     isTruncated={
                                         currentlyPlaying !== track.previewUrl
                                     }
-                                    maxW={28}
                                     sx={{
                                         textWrap:
                                             currentlyPlaying !==
@@ -414,7 +421,7 @@ const LibraryTable = ({
                                     {track.genre}
                                 </Text>
                             </Td>
-                            {!currentAlbumTrack && (
+                            {!currentReleaseTrack && (
                                 <Td>
                                     <Flex alignItems="center">
                                         <IconButton
@@ -457,8 +464,8 @@ const LibraryTable = ({
                                             onTrackDelete={() =>
                                                 setTrackToDelete(index)
                                             }
-                                            onViewAlbum={() =>
-                                                gotToAlbum(index)
+                                            onViewRelease={() =>
+                                                gotToRelease(index)
                                             }
                                             index={index}
                                         />

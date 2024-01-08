@@ -8,8 +8,8 @@ interface TrackContextProps {
     updateCurrentlyPlaying: (trackId: string | undefined) => void;
     reviewTracks: ReviewTracks;
     updateReviewTracks: (reviewStep: number, tracks: Track[]) => void;
-    currentAlbumTrack: Track | null;
-    updateCurrentAlbumTrack: (track: Track | null) => void;
+    currentReleaseTrack: Track | null;
+    updateCurrentReleaseTrack: (track: Track | null) => void;
     previousTracks: Track[];
     updatePreviousTracks: (tracks: Track[]) => void;
     changesMade: {
@@ -42,9 +42,8 @@ export const TrackContextProvider = ({ children }: { children: ReactNode }) => {
         3: [],
         4: [],
     });
-    const [currentAlbumTrack, setCurrentAlbumTrack] = useState<Track | null>(
-        null
-    );
+    const [currentReleaseTrack, setCurrentReleaseTrack] =
+        useState<Track | null>(null);
     const [previousTracks, setPreviousTracks] = useState<Track[]>([]);
     const [changesMade, setChangesMade] = useState<{
         2: boolean;
@@ -67,8 +66,8 @@ export const TrackContextProvider = ({ children }: { children: ReactNode }) => {
         }));
     };
 
-    const updateCurrentAlbumTrack = (track: Track | null) => {
-        setCurrentAlbumTrack(track);
+    const updateCurrentReleaseTrack = (track: Track | null) => {
+        setCurrentReleaseTrack(track);
     };
 
     const updatePreviousTracks = (tracks: Track[]) => {
@@ -89,8 +88,8 @@ export const TrackContextProvider = ({ children }: { children: ReactNode }) => {
                 updateCurrentlyPlaying,
                 reviewTracks,
                 updateReviewTracks,
-                currentAlbumTrack,
-                updateCurrentAlbumTrack,
+                currentReleaseTrack,
+                updateCurrentReleaseTrack,
                 previousTracks,
                 updatePreviousTracks,
                 changesMade,

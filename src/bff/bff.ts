@@ -376,17 +376,17 @@ export const fetchTracks = async ({
     }
 };
 
-interface GetAlbumProps {
+interface GetReleaseProps {
     releaseTitle: string;
     releaseDate: string;
 }
 
-export const fetchAlbum = async ({
+export const fetchRelease = async ({
     releaseTitle,
     releaseDate,
-}: GetAlbumProps): Promise<Track[] | null> => {
+}: GetReleaseProps): Promise<Track[] | null> => {
     try {
-        const tracks = await fetchWithErrorHandling("/api/getAlbum", "POST", {
+        const tracks = await fetchWithErrorHandling("/api/getRelease", "POST", {
             releaseTitle,
             releaseDate,
         });

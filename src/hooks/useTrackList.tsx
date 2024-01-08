@@ -2,7 +2,7 @@ import { useCallback, useRef, useState } from "react";
 import { ToastProps, useDisclosure, useToast } from "@chakra-ui/react";
 import { Track } from "../../types";
 import { useTrackContext } from "../../context/TrackContext";
-import { fetchAlbum, fetchTracks, updateTrackReviewStep } from "@/bff/bff";
+import { fetchRelease, fetchTracks, updateTrackReviewStep } from "@/bff/bff";
 import { useAuthContext } from "../../Contexts/AuthContext";
 
 export const useTrackList = () => {
@@ -12,8 +12,8 @@ export const useTrackList = () => {
         updateCurrentlyPlaying,
         reviewTracks,
         updateReviewTracks,
-        currentAlbumTrack,
-        updateCurrentAlbumTrack,
+        currentReleaseTrack,
+        updateCurrentReleaseTrack,
         previousTracks,
         updatePreviousTracks,
         changesMade,
@@ -88,7 +88,7 @@ export const useTrackList = () => {
             if (user?.uid) {
                 try {
                     const fetchedTracks = track
-                        ? await fetchAlbum({
+                        ? await fetchRelease({
                               releaseTitle: track.releaseTitle,
                               releaseDate: track.releaseDate,
                           })
@@ -133,8 +133,8 @@ export const useTrackList = () => {
         updateCurrentlyPlaying,
         reviewTracks,
         updateReviewTracks,
-        currentAlbumTrack,
-        updateCurrentAlbumTrack,
+        currentReleaseTrack,
+        updateCurrentReleaseTrack,
         previousTracks,
         updatePreviousTracks,
         changesMade,

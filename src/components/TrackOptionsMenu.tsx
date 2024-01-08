@@ -8,7 +8,7 @@ interface TrackOptionsProps {
     onMouseEnter: () => void;
     onMouseLeave: () => void;
     onTrackDelete: (index: number) => void;
-    onViewAlbum: (index: number) => void;
+    onViewRelease: (index: number) => void;
 }
 
 const TrackMenuOptions = ({
@@ -16,7 +16,7 @@ const TrackMenuOptions = ({
     onMouseEnter,
     onMouseLeave,
     onTrackDelete,
-    onViewAlbum,
+    onViewRelease,
 }: TrackOptionsProps) => {
     return (
         <Menu variant="primary">
@@ -39,9 +39,9 @@ const TrackMenuOptions = ({
                 <MenuItem
                     onMouseEnter={onMouseEnter}
                     onMouseLeave={onMouseLeave}
-                    onClick={() => onViewAlbum(index)}
+                    onClick={() => onViewRelease(index)}
                 >
-                    View album
+                    View release
                 </MenuItem>
             </MenuList>
         </Menu>
