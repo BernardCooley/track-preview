@@ -174,8 +174,6 @@ const LibraryTable = ({
             }}
             shadow="2xl"
             rounded="2xl"
-            border="1px solid"
-            borderColor="brand.backgroundTertiaryOpaque"
         >
             <Table variant="primary" display={["none", "none", "table"]}>
                 <Thead>
