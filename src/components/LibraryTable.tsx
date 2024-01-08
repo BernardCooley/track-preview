@@ -165,7 +165,7 @@ const LibraryTable = ({
 
     return (
         <TableContainer
-            maxH={currentReleaseTrack || currentlyPlaying ? "75vh" : "80vh"}
+            maxH={currentReleaseTrack || currentlyPlaying ? "70vh" : "75vh"}
             overflowY="scroll"
             sx={{
                 "::-webkit-scrollbar": {
