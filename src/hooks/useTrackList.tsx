@@ -19,7 +19,7 @@ export const useTrackList = () => {
         changesMade,
         updateChangesMade,
     } = useTrackContext();
-    const [loading, setLoading] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(true);
     const [noTracks, setNoTracks] = useState<boolean>(false);
     const toast = useToast();
     const id = "step4-toast";

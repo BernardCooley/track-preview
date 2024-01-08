@@ -34,7 +34,7 @@ const TrackMenuOptions = ({
                     onMouseLeave={onMouseLeave}
                     onClick={() => onTrackDelete(index)}
                 >
-                    Delete
+                    Delete track
                 </MenuItem>
                 <MenuItem
                     onMouseEnter={onMouseEnter}

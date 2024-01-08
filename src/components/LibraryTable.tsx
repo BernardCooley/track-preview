@@ -165,18 +165,22 @@ const LibraryTable = ({
 
     return (
         <TableContainer
-            maxH={currentReleaseTrack ? "60vh" : "70vh"}
+            maxH={currentReleaseTrack ? "70vh" : "80vh"}
             overflowY="scroll"
             sx={{
                 "::-webkit-scrollbar": {
                     display: "none",
                 },
             }}
+            shadow="2xl"
+            rounded="2xl"
+            border="1px solid"
+            borderColor="brand.backgroundTertiaryOpaque"
         >
             <Table variant="primary" display={["none", "none", "table"]}>
                 <Thead>
                     <Tr>
-                        <Th>
+                        <Th pl={1}>
                             <TableHeading title="title" />
                         </Th>
                         <Th>
@@ -231,7 +235,7 @@ const LibraryTable = ({
                                     ></Image>
                                     <Flex direction="column" gap={2}>
                                         <Text
-                                            // noOfLines={3}
+                                            noOfLines={3}
                                             fontSize={"md"}
                                             color={"brand.textPrimary"}
                                             maxW={32}
