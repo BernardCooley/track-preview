@@ -178,7 +178,7 @@ const LibraryTable = ({
             <Table variant="primary" display={["none", "none", "table"]}>
                 <Thead>
                     <Tr>
-                        <Th pl={1}>
+                        <Th pl={4}>
                             <TableHeading title="title" />
                         </Th>
                         <Th>
@@ -223,11 +223,12 @@ const LibraryTable = ({
                                     alignItems="center"
                                     gap={6}
                                     justifyContent="flex-start"
-                                    pl={2}
+                                    pl={4}
                                 >
                                     <Image
-                                        maxW={16}
-                                        maxH={16}
+                                        rounded="full"
+                                        w={16}
+                                        h={16}
                                         src={track.thumbnail}
                                         alt=""
                                     ></Image>
@@ -328,7 +329,7 @@ const LibraryTable = ({
             <Table variant="primary" display={["table", "table", "none"]}>
                 <Thead>
                     <Tr>
-                        <Th>
+                        <Th pl={4}>
                             <TableHeading title="title" />
                         </Th>
                         <Th>
@@ -358,11 +359,12 @@ const LibraryTable = ({
                                     alignItems="center"
                                     gap={3}
                                     justifyContent="flex-start"
-                                    pl={2}
+                                    pl={4}
                                 >
                                     <Image
-                                        maxW={14}
-                                        maxH={14}
+                                        rounded="full"
+                                        w={14}
+                                        h={14}
                                         src={track.thumbnail}
                                         alt=""
                                     ></Image>

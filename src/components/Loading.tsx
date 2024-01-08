@@ -19,7 +19,6 @@ const Loading = ({
             gap={2}
             direction="column"
             alignItems="center"
-            w={["full", "70%", "50%", "400px"]}
             position="absolute"
             top="100%"
             transform="translate(50%, 0)"
@@ -33,7 +32,7 @@ const Loading = ({
             borderColor="brand.primary"
         >
             <Flex alignItems="center" gap={2} direction="column">
-                <Text color="brand.primary" fontSize="xl">
+                <Text textAlign="center" color="brand.primary" fontSize="xl">
                     {loadingText}
                 </Text>
                 <BouncingDotsLoader />

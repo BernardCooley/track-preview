@@ -70,8 +70,8 @@ const TrackList = () => {
     }, [noTracks]);
 
     return (
-        <Box position="relative" pb={20}>
-            {loading && <Loading loadingText={`Loading library`} />}
+        <Box px={0} position="relative" pb={20}>
+            {loading && <Loading loadingText="Loading library" />}
             {!loading && noTracks && (
                 <Center>
                     <Badge

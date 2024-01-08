@@ -107,7 +107,7 @@ export default function Explore() {
     ];
 
     return (
-        <Box h="full" m={0} px={[4, 8]} overflowY="hidden">
+        <Box h="full" m={0} overflowY="hidden">
             <Header />
             <Center h="full">
                 <Flex direction="column" w="full" h="full">

@@ -44,7 +44,7 @@ const TrackReview = ({ reviewStep }: Props) => {
     } = useTrackReview(reviewStep);
 
     return (
-        <Box position="relative">
+        <Box px={[4, 8]} position="relative">
             {fetchAttempted && !noTracks && !loading && loadMoreTracks && (
                 <Center
                     zIndex={150}
