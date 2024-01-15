@@ -61,3 +61,15 @@ a {
   border-bottom-left-radius: 20px;
   border-bottom-right-radius: 20px;
 }
+
+.rhap_time, .rhap_container svg {
+  color: white !important;
+}
+
+.rhap_progress-indicator, .rhap_volume-indicator, .rhap_progress-filled {
+  background-color: white !important;
+}
+
+.rhap_download-progress {
+  background-color: #dddddd00 !important;
+}

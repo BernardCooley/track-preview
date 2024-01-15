@@ -20,6 +20,7 @@ export const theme = extendTheme({
             backgroundTertiary: "#576d69",
             backgroundTertiaryOpaque: "rgba(86, 108, 104, 0.46)",
             backgroundTertiaryOpaque2: "rgba(86, 108, 104, 0.15)",
+            backgroundTertiaryOpaque3: "rgba(86, 108, 104, 0.80)",
             backgroundLightPrimary: "#d6dbdc",
             backgroundLightSecondary: "brand.textPrimary",
             error: "#ff0000",

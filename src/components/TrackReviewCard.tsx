@@ -62,6 +62,9 @@ const TrackReviewCard = ({
                     direction="column"
                     alignItems="center"
                     justifyContent="space-between"
+                    bgImage={currentTrack.thumbnail}
+                    bgSize="cover"
+                    rounded={20}
                 >
                     <Flex
                         direction="column"
@@ -70,8 +73,6 @@ const TrackReviewCard = ({
                         justifyContent="center"
                         pt={10}
                         height="256px"
-                        bgImage={currentTrack.thumbnail}
-                        bgSize="cover"
                         roundedTop={20}
                     >
                         {isPlaying && (
@@ -101,11 +102,12 @@ const TrackReviewCard = ({
                     </Flex>
                     <Flex
                         w="full"
-                        bg="brand.backgroundLightPrimary"
-                        color="brand.textSecondary"
+                        bg="brand.backgroundTertiaryOpaque3"
+                        color="brand.textPrimary"
                         roundedBottom={20}
                     >
                         <AudioPlayer
+                            style={{ backgroundColor: "transparent" }}
                             autoPlayAfterSrcChange={false}
                             header={
                                 <Flex
@@ -116,21 +118,20 @@ const TrackReviewCard = ({
                                 >
                                     <Text
                                         textAlign="center"
-                                        noOfLines={2}
-                                        fontSize={["2xl", "3xl"]}
-                                        pb="2px"
-                                    >
-                                        {currentTrack.artist}
-                                    </Text>
-
-                                    <Text
-                                        textAlign="center"
-                                        fontSize={["lg", "xl"]}
                                         w="full"
+                                        fontSize={["2xl", "3xl"]}
                                         noOfLines={2}
                                         pb="2px"
                                     >
                                         {currentTrack.title}
+                                    </Text>
+                                    <Text
+                                        textAlign="center"
+                                        noOfLines={2}
+                                        fontSize={["lg", "xl"]}
+                                        pb="2px"
+                                    >
+                                        {currentTrack.artist}
                                     </Text>
                                     <Flex
                                         py={1}
