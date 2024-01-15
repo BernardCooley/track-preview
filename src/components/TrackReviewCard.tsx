@@ -115,8 +115,10 @@ const TrackReviewCard = ({
                                     gap={[1, 2]}
                                 >
                                     <Text
-                                        noOfLines={1}
+                                        textAlign="center"
+                                        noOfLines={2}
                                         fontSize={["2xl", "3xl"]}
+                                        pb="2px"
                                     >
                                         {currentTrack.artist}
                                     </Text>
@@ -125,8 +127,8 @@ const TrackReviewCard = ({
                                         textAlign="center"
                                         fontSize={["lg", "xl"]}
                                         w="full"
-                                        noOfLines={1}
-                                        py={1}
+                                        noOfLines={2}
+                                        pb="2px"
                                     >
                                         {currentTrack.title}
                                     </Text>
@@ -136,14 +138,16 @@ const TrackReviewCard = ({
                                         justifyContent="space-between"
                                         w="full"
                                     >
-                                        <Text
-                                            noOfLines={1}
-                                        >{`Genre: ${currentTrack.genre}`}</Text>
+                                        <Text noOfLines={1}>
+                                            {currentTrack.genre}
+                                        </Text>
                                         <Text
                                             sx={{
                                                 textWrap: "nowrap",
                                             }}
-                                        >{`Year: ${currentTrack.releaseYear}`}</Text>
+                                        >
+                                            {currentTrack.releaseYear}
+                                        </Text>
                                     </Flex>
                                 </Flex>
                             }
