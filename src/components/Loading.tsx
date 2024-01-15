@@ -9,11 +9,7 @@ interface Props {
     showLoadingBar?: boolean;
 }
 
-const Loading = ({
-    progress,
-    loadingText = "Loading",
-    showLoadingBar = false,
-}: Props) => {
+const Loading = ({ progress, loadingText, showLoadingBar = false }: Props) => {
     return (
         <Flex
             gap={2}
@@ -23,18 +19,17 @@ const Loading = ({
             top="100%"
             transform="translate(50%, 0)"
             right="50%"
-            bg="brand.backgroundTertiaryOpaque2"
-            p={10}
-            pt={6}
-            rounded={20}
-            shadow="2xl"
-            border="1px solid"
-            borderColor="brand.primary"
         >
             <Flex alignItems="center" gap={2} direction="column">
-                <Text textAlign="center" color="brand.primary" fontSize="xl">
-                    {loadingText}
-                </Text>
+                {loadingText && (
+                    <Text
+                        textAlign="center"
+                        color="brand.primary"
+                        fontSize="xl"
+                    >
+                        {loadingText}
+                    </Text>
+                )}
                 <BouncingDotsLoader />
             </Flex>
             {progress !== undefined && showLoadingBar && (

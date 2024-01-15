@@ -241,6 +241,12 @@ const LibraryTable = ({
                                             sx={{
                                                 textWrap: "wrap",
                                             }}
+                                            fontWeight={
+                                                currentlyPlaying !==
+                                                track.previewUrl
+                                                    ? "normal"
+                                                    : "bold"
+                                            }
                                         >
                                             {track.title}
                                         </Text>
@@ -250,6 +256,12 @@ const LibraryTable = ({
                                             sx={{
                                                 textWrap: "wrap",
                                             }}
+                                            fontWeight={
+                                                currentlyPlaying !==
+                                                track.previewUrl
+                                                    ? "normal"
+                                                    : "bold"
+                                            }
                                         >
                                             {track.artist}
                                         </Text>
@@ -386,6 +398,12 @@ const LibraryTable = ({
                                                         ? "nowrap"
                                                         : "wrap",
                                             }}
+                                            fontWeight={
+                                                currentlyPlaying !==
+                                                track.previewUrl
+                                                    ? "normal"
+                                                    : "bold"
+                                            }
                                         >
                                             {track.title}
                                         </Text>
@@ -403,6 +421,12 @@ const LibraryTable = ({
                                                         ? "nowrap"
                                                         : "wrap",
                                             }}
+                                            fontWeight={
+                                                currentlyPlaying !==
+                                                track.previewUrl
+                                                    ? "normal"
+                                                    : "bold"
+                                            }
                                         >
                                             {track.artist}
                                         </Text>

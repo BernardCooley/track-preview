@@ -68,13 +68,6 @@ const TrackReview = ({ reviewStep }: Props) => {
                             ? true
                             : false
                     }
-                    loadingText={
-                        userProfile?.genre &&
-                        userProfile?.yearFrom &&
-                        userProfile?.yearTo
-                            ? "Loading new track"
-                            : "Loading user profile"
-                    }
                 />
             )}
             {noTracks && !loading && reviewStep > 1 && (
