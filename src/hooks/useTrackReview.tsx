@@ -29,7 +29,6 @@ export const useTrackReview = (reviewStep: number) => {
     const [showGenreSelector, setShowGenreSelector] = useState<boolean>(false);
     const [listened, setListened] = useState<boolean>(false);
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
-    const [loadingMessage, setLoadingMessage] = useState<string>("");
     const toast = useToast();
     const id = "review-toast";
     const [loading, setLoading] = useState<boolean>(true);
@@ -113,9 +112,7 @@ export const useTrackReview = (reviewStep: number) => {
     );
 
     useEffect(() => {
-        setLoadingMessage("");
         if (reviewTracks[reviewStep].length > 0) {
-            setLoadingMessage("");
             setLoading(false);
             setCurrentTrack(reviewTracks[reviewStep][0] as Track);
         } else {
@@ -140,8 +137,7 @@ export const useTrackReview = (reviewStep: number) => {
                 reviewStep === 1
                     ? changesMade[reviewStep as keyof typeof changesMade] ||
                           reviewTracks[reviewStep].length === 0
-                    : reviewTracks[reviewStep].length === 0 &&
-                          changesMade[reviewStep as keyof typeof changesMade]
+                    : changesMade[reviewStep as keyof typeof changesMade]
             );
         }
     }, [reviewStep]);
@@ -172,7 +168,6 @@ export const useTrackReview = (reviewStep: number) => {
         try {
             if (currentTrack && user?.uid) {
                 setLoading(true);
-                setLoadingMessage("");
                 const track = { ...currentTrack };
                 setCurrentTrack(null);
 
@@ -264,8 +259,6 @@ export const useTrackReview = (reviewStep: number) => {
         setListened,
         isPlaying,
         setIsPlaying,
-        loadingMessage,
-        setLoadingMessage,
         toast,
         id,
         loading,
@@ -276,6 +269,5 @@ export const useTrackReview = (reviewStep: number) => {
         setFetchAttempted,
         autoplayLoading,
         setAutoplayLoading,
-        // ... rest of the returned values
     };
 };

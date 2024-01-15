@@ -31,7 +31,6 @@ const TrackReview = ({ reviewStep }: Props) => {
         setListened,
         isPlaying,
         setIsPlaying,
-        loadingMessage,
         loading,
         loadMoreTracks,
         fetchAttempted,
@@ -58,17 +57,6 @@ const TrackReview = ({ reviewStep }: Props) => {
                         Load a new track
                     </Button>
                 </Center>
-            )}
-            {loading && loadingMessage.length === 0 && (
-                <Loading
-                    showLoadingBar={
-                        userProfile?.genre &&
-                        userProfile?.yearFrom &&
-                        userProfile?.yearTo
-                            ? true
-                            : false
-                    }
-                />
             )}
             {noTracks && !loading && reviewStep > 1 && (
                 <Center>
@@ -170,7 +158,6 @@ const TrackReview = ({ reviewStep }: Props) => {
                 {currentTrack && (
                     <TrackReviewCard
                         autoplay={userProfile?.autoplay || false}
-                        loadingMessage={loadingMessage}
                         currentTrack={currentTrack}
                         isPlaying={isPlaying}
                         listened={listened}
