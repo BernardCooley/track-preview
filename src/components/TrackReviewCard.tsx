@@ -30,7 +30,7 @@ const TrackReviewCard = ({
     autoplay,
 }: Props) => {
     return (
-        <Box h="auto" mt={2}>
+        <Flex h="auto" mt={2} justify="center">
             {loadingMessage && loadingMessage.length > 0 && (
                 <Box
                     position="absolute"
@@ -48,6 +48,8 @@ const TrackReviewCard = ({
                 </Box>
             )}
             <Card
+                w="full"
+                maxW="600px"
                 size="md"
                 backgroundColor="transparent"
                 opacity={loadingMessage && loadingMessage.length > 0 ? 0.2 : 1}
@@ -163,7 +165,7 @@ const TrackReviewCard = ({
                     </Flex>
                 </CardBody>
             </Card>
-        </Box>
+        </Flex>
     );
 };
 
