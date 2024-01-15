@@ -29,7 +29,7 @@ export async function POST(req: Request) {
         WHERE id IN (
             SELECT "trackId" FROM "Review" WHERE "userId" = '${userId}' AND "currentReviewStep" = ${reviewStep}
         )
-        ORDER BY RANDOM() ASC
+        ORDER BY title ASC
         ${limitCondition}
     `;
 
