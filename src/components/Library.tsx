@@ -82,7 +82,18 @@ const Library = () => {
 
     return (
         <Flex px={0} position="relative" pb={20} direction="column">
-            {loading && <Loading />}
+            {loading && (
+                <Center
+                    zIndex={150}
+                    top="200px"
+                    right="50%"
+                    transform={`translate(50%, 0)`}
+                    position="absolute"
+                    px={4}
+                >
+                    <Loading />
+                </Center>
+            )}
             {!loading && noTracks && (
                 <Center>
                     <Badge
