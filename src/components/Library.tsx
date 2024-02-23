@@ -52,8 +52,6 @@ const Library = () => {
         closeBuyModal,
         closeDialog,
         deleteTrack,
-        showAlreadyOwned,
-        setShowAlreadyOwned,
     } = useTrackList();
 
     useEffect(() => {
@@ -147,14 +145,6 @@ const Library = () => {
                         <FormLabel m={0} htmlFor="showAlreadyOwned">
                             Show already owned
                         </FormLabel>
-                        <Switch
-                            colorScheme="teal"
-                            id="showAlreadyOwned"
-                            isChecked={showAlreadyOwned}
-                            onChange={() =>
-                                setShowAlreadyOwned(!showAlreadyOwned)
-                            }
-                        />
                     </Flex>
                     <LibraryTable
                         sortBy={sortBy}
