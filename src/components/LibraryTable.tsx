@@ -165,6 +165,8 @@ const LibraryTable = ({
 
     return (
         <TableContainer
+            transition="padding 0.2s ease-in-out"
+            pb={currentlyPlaying ? 14 : 0}
             maxH={currentReleaseTrack || currentlyPlaying ? "70vh" : "75vh"}
             overflowY="scroll"
             sx={{
