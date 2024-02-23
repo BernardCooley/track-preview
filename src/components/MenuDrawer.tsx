@@ -52,11 +52,6 @@ const MenuDrawer = forwardRef<HTMLButtonElement | undefined, Props>(
                                 linkText="Account"
                                 href="/account"
                             />
-                            <MenuDrawerItem
-                                pathname={pathname}
-                                linkText="Settings"
-                                href="/settings"
-                            />
                         </Flex>
                     </DrawerBody>
 

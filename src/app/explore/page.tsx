@@ -13,7 +13,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import AudioPlayer from "@/components/AudioPlayer";
 import { useRouter, useSearchParams } from "next/navigation";
 import { onAuthStateChanged } from "firebase/auth";
-import TrackList from "@/components/TrackList";
+import Library from "@/components/Library";
 import Header from "@/components/Header";
 import { getUserProfile } from "@/bff/bff";
 import { useTrackContext } from "../../../context/TrackContext";
@@ -144,9 +144,7 @@ export default function Explore() {
                             Number(reviewStep) <= 3 && (
                                 <TrackReview reviewStep={Number(reviewStep)} />
                             )}
-                        {reviewStep && Number(reviewStep) === 4 && (
-                            <TrackList />
-                        )}
+                        {reviewStep && Number(reviewStep) === 4 && <Library />}
                     </Stack>
                     <Slide
                         direction="bottom"

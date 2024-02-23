@@ -1,5 +1,14 @@
 import React, { useEffect } from "react";
-import { Badge, Box, Center } from "@chakra-ui/react";
+import {
+    Badge,
+    Box,
+    Center,
+    Flex,
+    FormControl,
+    FormLabel,
+    SimpleGrid,
+    Switch,
+} from "@chakra-ui/react";
 import Loading from "./Loading";
 import { buyLinks } from "../../consts";
 import BuyModal from "./BuyModal";
@@ -8,7 +17,7 @@ import LibraryTable from "./LibraryTable";
 import ReleaseHeader from "./ReleaseHeader";
 import { useTrackList } from "@/hooks/useTrackList";
 
-const TrackList = () => {
+const Library = () => {
     const {
         user,
         currentlyPlaying,
@@ -43,6 +52,8 @@ const TrackList = () => {
         closeBuyModal,
         closeDialog,
         deleteTrack,
+        showAlreadyOwned,
+        setShowAlreadyOwned,
     } = useTrackList();
 
     useEffect(() => {
@@ -70,7 +81,7 @@ const TrackList = () => {
     }, [noTracks]);
 
     return (
-        <Box px={0} position="relative" pb={20}>
+        <Flex px={0} position="relative" pb={20} direction="column">
             {loading && <Loading />}
             {!loading && noTracks && (
                 <Center>
@@ -114,27 +125,48 @@ const TrackList = () => {
                 />
             )}
             {!loading && !noTracks && (
-                <LibraryTable
-                    sortBy={sortBy}
-                    sortDirection={sortDirection}
-                    currentReleaseTrack={currentReleaseTrack}
-                    reviewTracks={reviewTracks}
-                    currentlyPlaying={currentlyPlaying}
-                    clickDisabled={clickDisabled}
-                    updateCurrentlyPlaying={updateCurrentlyPlaying}
-                    setClickDisabled={setClickDisabled}
-                    setTrackToBuy={setTrackToBuy}
-                    setTrackToDelete={setTrackToDelete}
-                    updateCurrentReleaseTrack={updateCurrentReleaseTrack}
-                    updatePreviousTracks={updatePreviousTracks}
-                    getTracks={getTracks}
-                    updateReviewTracks={updateReviewTracks}
-                    setSortBy={setSortBy}
-                    setSortDirection={setSortDirection}
-                />
+                <Flex direction="column">
+                    <Flex
+                        px={2}
+                        gap={2}
+                        alignItems="center"
+                        w="full"
+                        justify="flex-end"
+                    >
+                        <FormLabel m={0} htmlFor="showAlreadyOwned">
+                            Show already owned
+                        </FormLabel>
+                        <Switch
+                            colorScheme="teal"
+                            id="showAlreadyOwned"
+                            isChecked={showAlreadyOwned}
+                            onChange={() =>
+                                setShowAlreadyOwned(!showAlreadyOwned)
+                            }
+                        />
+                    </Flex>
+                    <LibraryTable
+                        sortBy={sortBy}
+                        sortDirection={sortDirection}
+                        currentReleaseTrack={currentReleaseTrack}
+                        reviewTracks={reviewTracks}
+                        currentlyPlaying={currentlyPlaying}
+                        clickDisabled={clickDisabled}
+                        updateCurrentlyPlaying={updateCurrentlyPlaying}
+                        setClickDisabled={setClickDisabled}
+                        setTrackToBuy={setTrackToBuy}
+                        setTrackToDelete={setTrackToDelete}
+                        updateCurrentReleaseTrack={updateCurrentReleaseTrack}
+                        updatePreviousTracks={updatePreviousTracks}
+                        getTracks={getTracks}
+                        updateReviewTracks={updateReviewTracks}
+                        setSortBy={setSortBy}
+                        setSortDirection={setSortDirection}
+                    />
+                </Flex>
             )}
-        </Box>
+        </Flex>
     );
 };
 
-export default TrackList;
+export default Library;
