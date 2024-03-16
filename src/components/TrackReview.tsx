@@ -215,7 +215,7 @@ const TrackReview = memo(
                 {animate === "dislike" && (
                     <Flex
                         position="absolute"
-                        bottom={[364, 36]}
+                        top={300}
                         width="full"
                         justifyContent="center"
                     >
