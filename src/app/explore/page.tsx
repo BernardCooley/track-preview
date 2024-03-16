@@ -34,6 +34,7 @@ export default function Explore() {
     const [currentStep, setCurrentStep] = useState<number>(0);
     const { updateUser, user, updateUserProfile } = useAuthContext();
     const reviewStep = searchParams?.get("reviewStep");
+    const pageRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         if (user?.uid) {
@@ -107,7 +108,7 @@ export default function Explore() {
     ];
 
     return (
-        <Box h="full" m={0} overflowY="hidden">
+        <Box h="full" m={0} overflowY="hidden" ref={pageRef}>
             <Header />
             <Center h="full">
                 <Flex direction="column" w="full" h="full">
@@ -117,6 +118,7 @@ export default function Explore() {
                         position="relative"
                         transition="ease-in-out"
                         transitionDuration="200"
+                        h="full"
                     >
                         <Grid templateColumns="repeat(4, 1fr)" w="full">
                             {tabButtons.map((button, index) => (

@@ -1,14 +1,5 @@
 import React, { useEffect } from "react";
-import {
-    Badge,
-    Box,
-    Center,
-    Flex,
-    FormControl,
-    FormLabel,
-    SimpleGrid,
-    Switch,
-} from "@chakra-ui/react";
+import { Badge, Center, Flex } from "@chakra-ui/react";
 import Loading from "./Loading";
 import { buyLinks } from "../../consts";
 import BuyModal from "./BuyModal";
@@ -135,17 +126,6 @@ const Library = () => {
             )}
             {!loading && !noTracks && (
                 <Flex direction="column">
-                    <Flex
-                        px={2}
-                        gap={2}
-                        alignItems="center"
-                        w="full"
-                        justify="flex-end"
-                    >
-                        <FormLabel m={0} htmlFor="showAlreadyOwned">
-                            Show already owned
-                        </FormLabel>
-                    </Flex>
                     <LibraryTable
                         sortBy={sortBy}
                         sortDirection={sortDirection}
