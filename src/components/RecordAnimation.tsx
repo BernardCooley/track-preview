@@ -23,7 +23,7 @@ const RecordAnimation = ({
     const getAnimation = () => {
         if (animate) {
             return animate === "like"
-                ? { top: isMobile ? -50 : -100, left: leftPosition, opacity: 1 }
+                ? { top: isMobile ? -65 : -100, left: leftPosition, opacity: 1 }
                 : { top: 300, opacity: 1 };
         }
         return initial;
@@ -40,8 +40,8 @@ const RecordAnimation = ({
             px={4}
             justify="center"
             alignItems="center"
-            w={animate ? ["50px", "100px"] : "300px"}
-            h={animate ? ["50px", "100px"] : "300px"}
+            w={animate ? ["65px", "100px"] : "300px"}
+            h={animate ? ["65px", "100px"] : "300px"}
             rounded="full"
             bgImage="./vinyl.png"
             bgSize="cover"
