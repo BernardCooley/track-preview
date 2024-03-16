@@ -212,7 +212,7 @@ const TrackReview = memo(
                     image={currentTrack?.thumbnail || ""}
                 />
 
-                {animate && (
+                {animate === "dislike" && (
                     <Flex
                         position="absolute"
                         bottom={[364, 36]}
