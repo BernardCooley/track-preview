@@ -209,7 +209,7 @@ const TrackReviewCard = ({
                                     previous:
                                         indexOfCurrentTrack > 0 ? (
                                             <Icon
-                                                fontSize="32"
+                                                fontSize="34"
                                                 as={SkipPreviousIcon}
                                             />
                                         ) : (
@@ -219,7 +219,7 @@ const TrackReviewCard = ({
                                         indexOfCurrentTrack <
                                         trackList.length - 1 ? (
                                             <Icon
-                                                fontSize="32"
+                                                fontSize="34"
                                                 as={SkipNextIcon}
                                             />
                                         ) : (
@@ -234,6 +234,7 @@ const TrackReviewCard = ({
                                           )
                                         : undefined;
                                 }}
+                                customVolumeControls={[]}
                             />
                         </Flex>
                     </CardBody>
