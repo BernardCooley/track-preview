@@ -91,10 +91,10 @@ const TracklistTable = ({
                                     updateCurrentlyPlaying
                                 )}
                             >
-                                <Td px={2}>
+                                <Td pr={2}>
                                     <Flex
                                         alignItems="center"
-                                        gap={6}
+                                        gap={3}
                                         justifyContent="flex-start"
                                         pl={2}
                                     >
