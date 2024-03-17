@@ -207,8 +207,7 @@ const TrackReviewCard = ({
                                 onPlay={onAudioPlay}
                                 customIcons={{
                                     previous:
-                                        indexOfCurrentTrack > 0 &&
-                                        reviewStep > 1 ? (
+                                        indexOfCurrentTrack > 0 ? (
                                             <Icon
                                                 fontSize="32"
                                                 as={SkipPreviousIcon}
@@ -218,8 +217,7 @@ const TrackReviewCard = ({
                                         ),
                                     next:
                                         indexOfCurrentTrack <
-                                            trackList.length - 1 &&
-                                        reviewStep > 1 ? (
+                                        trackList.length - 1 ? (
                                             <Icon
                                                 fontSize="32"
                                                 as={SkipNextIcon}
@@ -230,9 +228,7 @@ const TrackReviewCard = ({
                                 }}
                                 onEnded={() => {
                                     indexOfCurrentTrack <
-                                        trackList.length - 1 &&
-                                    reviewStep > 1 &&
-                                    autoplay
+                                        trackList.length - 1 && autoplay
                                         ? setCurrentTrack(
                                               trackList[indexOfCurrentTrack + 1]
                                           )
