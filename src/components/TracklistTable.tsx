@@ -40,7 +40,6 @@ const TracklistTable = ({
     ) => {
         return {
             fontSize: "md",
-            rounded: 10,
             outlineOffset: -2,
             outline:
                 currentlyPlaying?.previewUrl === track.previewUrl
