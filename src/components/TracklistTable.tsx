@@ -2,9 +2,11 @@
 
 import React from "react";
 import {
+    Box,
     Collapse,
     Flex,
     Image,
+    Progress,
     Table,
     TableContainer,
     Tbody,
@@ -20,6 +22,7 @@ interface Props {
     updateCurrentlyPlaying: (track: Track | null) => void;
     reviewStep: number;
     isOpen: boolean;
+    currentTrackProgress: number;
 }
 
 const TracklistTable = ({
@@ -28,6 +31,7 @@ const TracklistTable = ({
     updateCurrentlyPlaying,
     reviewStep,
     isOpen,
+    currentTrackProgress,
 }: Props) => {
     const getTrProps = (
         track: Track,
@@ -97,6 +101,7 @@ const TracklistTable = ({
                                         gap={3}
                                         justifyContent="flex-start"
                                         pl={2}
+                                        mb={2}
                                     >
                                         <Image
                                             rounded="full"
@@ -143,14 +148,26 @@ const TracklistTable = ({
                                             </Text>
                                         </Flex>
                                     </Flex>
+                                    <Flex justifyContent="space-between">
+                                        <Text
+                                            px={2}
+                                            noOfLines={2}
+                                            sx={{ textWrap: "wrap" }}
+                                        >
+                                            {track.genre}
+                                        </Text>
+                                        <Text>{track.releaseYear}</Text>
+                                    </Flex>
+                                    {currentlyPlaying?.id === track.id && (
+                                        <Box mt={2}>
+                                            <Progress
+                                                value={currentTrackProgress}
+                                                size="xs"
+                                                colorScheme="teal"
+                                            />
+                                        </Box>
+                                    )}
                                 </Td>
-                                <Td>
-                                    <Text px={2} sx={{ textWrap: "wrap" }}>
-                                        {track.genre}
-                                    </Text>
-                                </Td>
-
-                                <Td px={2}>{track.releaseYear}</Td>
                             </Tr>
                         ))}
                     </Tbody>

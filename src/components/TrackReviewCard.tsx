@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
     Box,
     Card,
@@ -31,7 +31,7 @@ interface Props {
     isOpen: boolean;
     trackList: Track[];
     setCurrentTrack: (track: Track) => void;
-    reviewStep: number;
+    onProgressUpdate: (progress: number) => void;
 }
 
 const TrackReviewCard = ({
@@ -46,11 +46,25 @@ const TrackReviewCard = ({
     isOpen,
     trackList,
     setCurrentTrack,
-    reviewStep,
+    onProgressUpdate,
 }: Props) => {
     const indexOfCurrentTrack = trackList.findIndex(
         (t) => t.id === currentTrack.id
     );
+
+    const [duration, setDuration] = useState<number>(0);
+
+    const handleOnListen = (e: Event) => {
+        onListenedToggle(true);
+        const audio = e.target as HTMLAudioElement;
+        const prog = Math.floor((audio.currentTime / duration) * 100);
+        onProgressUpdate(prog);
+    };
+
+    const handleOnLoadedMetadata = (e: Event) => {
+        const audio = e.target as HTMLAudioElement;
+        setDuration(audio.duration);
+    };
 
     return (
         <Collapse in={isOpen} animateOpacity>
@@ -201,9 +215,8 @@ const TrackReviewCard = ({
                                           )
                                         : undefined;
                                 }}
-                                onListen={() => {
-                                    onListenedToggle(true);
-                                }}
+                                onLoadedMetaData={handleOnLoadedMetadata}
+                                onListen={handleOnListen}
                                 onPlay={onAudioPlay}
                                 customIcons={{
                                     previous:
