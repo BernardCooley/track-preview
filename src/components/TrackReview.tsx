@@ -93,7 +93,7 @@ const TrackReview = memo(
         }, [animate]);
 
         return (
-            <Box px={[4, 8]} position="relative" height="full">
+            <Box px={[0, 8]} position="relative" height="full">
                 {loading && !animate && (
                     <Center
                         zIndex={150}
@@ -179,12 +179,12 @@ const TrackReview = memo(
                     onCancel={() => setShowYearSelector(false)}
                 />
                 <Flex
+                    px={[4, 0]}
                     w="full"
                     alignItems="baseline"
                     justifyContent="space-between"
                     direction="column"
                     p={4}
-                    px={0}
                     pt={2}
                     gap={2}
                     zIndex={200}
@@ -242,12 +242,14 @@ const TrackReview = memo(
                     </Button>
                 )}
 
-                <RecordAnimation
-                    animate={animate}
-                    leftPosition={(windowWidth / 4) * reviewStep}
-                    animationDuration={animationDuration}
-                    image={currentTrack?.thumbnail || ""}
-                />
+                {animate && (
+                    <RecordAnimation
+                        animate={animate}
+                        leftPosition={(windowWidth / 4) * reviewStep}
+                        animationDuration={animationDuration}
+                        image={currentTrack?.thumbnail || ""}
+                    />
+                )}
 
                 {animate === "dislike" && (
                     <Flex

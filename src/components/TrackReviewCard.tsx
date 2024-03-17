@@ -97,7 +97,6 @@ const TrackReviewCard = ({
                         w="full"
                         minH="456px"
                         h={["full", "unset"]}
-                        borderBottomRadius={20}
                         p={0}
                         as={Flex}
                         direction="column"
@@ -105,7 +104,6 @@ const TrackReviewCard = ({
                         justifyContent="space-between"
                         bgImage={currentTrack.thumbnail}
                         bgSize="cover"
-                        rounded={20}
                     >
                         <Flex
                             direction="column"
@@ -114,7 +112,6 @@ const TrackReviewCard = ({
                             justifyContent="center"
                             pt={10}
                             height="256px"
-                            roundedTop={20}
                         >
                             {isPlaying && (
                                 <Flex
@@ -149,7 +146,6 @@ const TrackReviewCard = ({
                             w="full"
                             bg="brand.backgroundTertiaryOpaque3"
                             color="brand.textPrimary"
-                            roundedBottom={20}
                         >
                             <AudioPlayer
                                 style={{ backgroundColor: "transparent" }}

@@ -159,7 +159,7 @@ const TracklistTable = ({
                                         <Text>{track.releaseYear}</Text>
                                     </Flex>
                                     {currentlyPlaying?.id === track.id && (
-                                        <Box mt={2}>
+                                        <Box mt={2} ml={1} w="full" px={2}>
                                             <Progress
                                                 value={currentTrackProgress}
                                                 size="xs"
