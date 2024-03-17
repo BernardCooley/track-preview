@@ -222,7 +222,7 @@ const TrackReview = memo(
                     )}
                 </Flex>
 
-                {reviewStep > 1 && reviewStep < 4 && (
+                {!noTracks && !loading && reviewStep > 1 && reviewStep < 4 && (
                     <Button
                         onClick={toggleTracklist}
                         variant="ghost"
