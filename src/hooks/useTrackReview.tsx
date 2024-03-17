@@ -167,9 +167,11 @@ export const useTrackReview = (reviewStep: number) => {
     const likeOrDislike = async (like: boolean) => {
         try {
             if (currentTrack && user?.uid) {
+                const indexOfTrack = reviewTracks[reviewStep].findIndex(
+                    (t) => t.id === currentTrack.id
+                );
                 setLoading(true);
                 const track = { ...currentTrack };
-                setCurrentTrack(null);
 
                 if (reviewTracks[reviewStep].length > 0) {
                     if (reviewTracks[reviewStep].length === 1) {
@@ -193,7 +195,9 @@ export const useTrackReview = (reviewStep: number) => {
 
                     updateReviewTracks(
                         reviewStep,
-                        reviewTracks[reviewStep].slice(1)
+                        reviewTracks[reviewStep].filter(
+                            (_, index) => index !== indexOfTrack
+                        )
                     );
                 }
                 updateChangesMade(reviewStep + 1, true);
@@ -269,5 +273,6 @@ export const useTrackReview = (reviewStep: number) => {
         setFetchAttempted,
         autoplayLoading,
         setAutoplayLoading,
+        reviewTracks,
     };
 };

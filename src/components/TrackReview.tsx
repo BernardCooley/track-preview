@@ -1,6 +1,15 @@
 import React, { memo, useEffect, useState } from "react";
 import { getCurrentYear } from "../../utils";
-import { Badge, Box, Button, Center, Flex, Icon, Text } from "@chakra-ui/react";
+import {
+    Badge,
+    Box,
+    Button,
+    Center,
+    Flex,
+    Icon,
+    Text,
+    useDisclosure,
+} from "@chakra-ui/react";
 import Loading from "./Loading";
 import YearModal from "./YearModal";
 import GenreModal from "./GenreModal";
@@ -11,6 +20,7 @@ import { genres } from "../../data/genres";
 import { useTrackReview } from "@/hooks/useTrackReview";
 import RecordAnimation from "./RecordAnimation";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import TracklistTable from "./TracklistTable";
 
 interface Props {
     reviewStep: number;
@@ -19,12 +29,14 @@ interface Props {
 const TrackReview = memo(
     ({ reviewStep }: Props) => {
         const {
+            reviewTracks,
             recentGenres,
             setRecentGenres,
             user,
             userProfile,
             updateUserProfile,
             currentTrack,
+            setCurrentTrack,
             noTracks,
             showYearSelector,
             setShowYearSelector,
@@ -45,6 +57,8 @@ const TrackReview = memo(
             onYearConfirm,
         } = useTrackReview(reviewStep);
 
+        const { isOpen: isShowingTracklist, onToggle: toggleTracklist } =
+            useDisclosure();
         const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
         useEffect(() => {
@@ -64,6 +78,9 @@ const TrackReview = memo(
 
         useEffect(() => {
             setAnimate(null);
+            if (isShowingTracklist) {
+                toggleTracklist();
+            }
         }, [reviewStep]);
 
         useEffect(() => {
@@ -205,6 +222,25 @@ const TrackReview = memo(
                     )}
                 </Flex>
 
+                {reviewStep > 1 && reviewStep < 4 && (
+                    <Button
+                        onClick={toggleTracklist}
+                        variant="ghost"
+                        position="absolute"
+                        right={[1, 4]}
+                        top={2}
+                        fontSize="md"
+                        colorScheme="teal"
+                        _hover={{
+                            bg: "transparent",
+                            color: "brand.primary",
+                        }}
+                        shadow="none"
+                    >
+                        {isShowingTracklist ? "Hide" : "Show"} tracklist
+                    </Button>
+                )}
+
                 <RecordAnimation
                     animate={animate}
                     leftPosition={(windowWidth / 4) * reviewStep}
@@ -229,11 +265,13 @@ const TrackReview = memo(
                 <Flex
                     transition={"all 0.5s ease"}
                     opacity={animate ? 0 : 1}
-                    direction="column"
                     position="relative"
+                    gap={4}
+                    direction="column"
                 >
                     {currentTrack && !animate && (
                         <TrackReviewCard
+                            isOpen={reviewStep === 1 || !isShowingTracklist}
                             autoplay={userProfile?.autoplay || false}
                             currentTrack={currentTrack}
                             isPlaying={isPlaying}
@@ -246,6 +284,18 @@ const TrackReview = memo(
                                 setIsPlaying(true);
                             }}
                             onListenedToggle={(val) => setListened(val)}
+                        />
+                    )}
+                    {!animate && reviewStep > 1 && reviewStep < 4 && (
+                        <TracklistTable
+                            isOpen={isShowingTracklist}
+                            reviewStep={reviewStep}
+                            tracklist={reviewTracks}
+                            currentlyPlaying={currentTrack}
+                            updateCurrentlyPlaying={(track) => {
+                                setCurrentTrack(track);
+                                toggleTracklist();
+                            }}
                         />
                     )}
                 </Flex>
