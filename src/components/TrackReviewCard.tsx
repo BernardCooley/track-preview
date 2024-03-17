@@ -31,6 +31,7 @@ interface Props {
     isOpen: boolean;
     trackList: Track[];
     setCurrentTrack: (track: Track) => void;
+    reviewStep: number;
 }
 
 const TrackReviewCard = ({
@@ -45,6 +46,7 @@ const TrackReviewCard = ({
     isOpen,
     trackList,
     setCurrentTrack,
+    reviewStep,
 }: Props) => {
     const indexOfCurrentTrack = trackList.findIndex(
         (t) => t.id === currentTrack.id
@@ -203,10 +205,10 @@ const TrackReviewCard = ({
                                     onListenedToggle(true);
                                 }}
                                 onPlay={onAudioPlay}
-                                customAdditionalControls={[]}
                                 customIcons={{
                                     previous:
-                                        indexOfCurrentTrack > 0 ? (
+                                        indexOfCurrentTrack > 0 &&
+                                        reviewStep > 1 ? (
                                             <Icon
                                                 fontSize="32"
                                                 as={SkipPreviousIcon}
@@ -216,7 +218,8 @@ const TrackReviewCard = ({
                                         ),
                                     next:
                                         indexOfCurrentTrack <
-                                        trackList.length - 1 ? (
+                                            trackList.length - 1 &&
+                                        reviewStep > 1 ? (
                                             <Icon
                                                 fontSize="32"
                                                 as={SkipNextIcon}
@@ -224,6 +227,16 @@ const TrackReviewCard = ({
                                         ) : (
                                             <Box></Box>
                                         ),
+                                }}
+                                onEnded={() => {
+                                    indexOfCurrentTrack <
+                                        trackList.length - 1 &&
+                                    reviewStep > 1 &&
+                                    autoplay
+                                        ? setCurrentTrack(
+                                              trackList[indexOfCurrentTrack + 1]
+                                          )
+                                        : undefined;
                                 }}
                             />
                         </Flex>

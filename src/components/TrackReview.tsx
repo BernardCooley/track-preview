@@ -271,6 +271,7 @@ const TrackReview = memo(
                 >
                     {currentTrack && !animate && (
                         <TrackReviewCard
+                            reviewStep={reviewStep}
                             trackList={reviewTracks[reviewStep]}
                             setCurrentTrack={setCurrentTrack}
                             isOpen={reviewStep === 1 || !isShowingTracklist}
