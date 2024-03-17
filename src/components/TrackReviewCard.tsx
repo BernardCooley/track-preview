@@ -5,6 +5,7 @@ import {
     CardBody,
     Collapse,
     Flex,
+    Icon,
     Tag,
     Text,
 } from "@chakra-ui/react";
@@ -15,6 +16,8 @@ import ThumbUpAltTwoToneIcon from "@mui/icons-material/ThumbUpAltTwoTone";
 import TrackCardIcon from "./TrackCardIcon";
 import AudioPlayer from "react-h5-audio-player";
 import "react-h5-audio-player/lib/styles.css";
+import SkipNextIcon from "@mui/icons-material/SkipNext";
+import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
 
 interface Props {
     loadingMessage?: string;
@@ -26,6 +29,8 @@ interface Props {
     onListenedToggle: (listened: boolean) => void;
     autoplay?: boolean;
     isOpen: boolean;
+    trackList: Track[];
+    setCurrentTrack: (track: Track) => void;
 }
 
 const TrackReviewCard = ({
@@ -38,7 +43,13 @@ const TrackReviewCard = ({
     onListenedToggle,
     autoplay,
     isOpen,
+    trackList,
+    setCurrentTrack,
 }: Props) => {
+    const indexOfCurrentTrack = trackList.findIndex(
+        (t) => t.id === currentTrack.id
+    );
+
     return (
         <Collapse in={isOpen} animateOpacity>
             <Flex h="auto" justify="center" w="full">
@@ -68,7 +79,7 @@ const TrackReviewCard = ({
                 >
                     <CardBody
                         w="full"
-                        minH={["400px", "400px"]}
+                        minH="456px"
                         h={["full", "unset"]}
                         borderBottomRadius={20}
                         p={0}
@@ -173,10 +184,47 @@ const TrackReviewCard = ({
                                 autoPlay={autoplay}
                                 src={currentTrack.previewUrl}
                                 showJumpControls={false}
+                                showSkipControls={true}
+                                onClickNext={() => {
+                                    indexOfCurrentTrack < trackList.length - 1
+                                        ? setCurrentTrack(
+                                              trackList[indexOfCurrentTrack + 1]
+                                          )
+                                        : undefined;
+                                }}
+                                onClickPrevious={() => {
+                                    indexOfCurrentTrack > 0
+                                        ? setCurrentTrack(
+                                              trackList[indexOfCurrentTrack - 1]
+                                          )
+                                        : undefined;
+                                }}
                                 onListen={() => {
                                     onListenedToggle(true);
                                 }}
                                 onPlay={onAudioPlay}
+                                customAdditionalControls={[]}
+                                customIcons={{
+                                    previous:
+                                        indexOfCurrentTrack > 0 ? (
+                                            <Icon
+                                                fontSize="32"
+                                                as={SkipPreviousIcon}
+                                            />
+                                        ) : (
+                                            <Box></Box>
+                                        ),
+                                    next:
+                                        indexOfCurrentTrack <
+                                        trackList.length - 1 ? (
+                                            <Icon
+                                                fontSize="32"
+                                                as={SkipNextIcon}
+                                            />
+                                        ) : (
+                                            <Box></Box>
+                                        ),
+                                }}
                             />
                         </Flex>
                     </CardBody>

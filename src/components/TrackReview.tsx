@@ -271,6 +271,8 @@ const TrackReview = memo(
                 >
                     {currentTrack && !animate && (
                         <TrackReviewCard
+                            trackList={reviewTracks[reviewStep]}
+                            setCurrentTrack={setCurrentTrack}
                             isOpen={reviewStep === 1 || !isShowingTracklist}
                             autoplay={userProfile?.autoplay || false}
                             currentTrack={currentTrack}
