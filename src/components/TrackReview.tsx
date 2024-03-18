@@ -186,6 +186,7 @@ const TrackReview = memo(
                     pb={4}
                     gap={2}
                     zIndex={200}
+                    minH="46px"
                 >
                     {user?.uid && (
                         <FilterTags
@@ -215,7 +216,7 @@ const TrackReview = memo(
                         variant="ghost"
                         position="absolute"
                         right={[1, 4]}
-                        top={2}
+                        top={0}
                         fontSize="md"
                         colorScheme="teal"
                         _hover={{
