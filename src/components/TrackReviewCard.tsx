@@ -14,7 +14,7 @@ import BouncingDotsLoader from "./BouncingLoaderDots";
 import ThumbDownAltTwoToneIcon from "@mui/icons-material/ThumbDownAltTwoTone";
 import ThumbUpAltTwoToneIcon from "@mui/icons-material/ThumbUpAltTwoTone";
 import TrackCardIcon from "./TrackCardIcon";
-import AudioPlayer from "react-h5-audio-player";
+import AudioPlayer, { RHAP_UI } from "react-h5-audio-player";
 import "react-h5-audio-player/lib/styles.css";
 import SkipNextIcon from "@mui/icons-material/SkipNext";
 import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
@@ -31,6 +31,8 @@ interface Props {
     isOpen: boolean;
     trackList: Track[];
     setCurrentTrack: (track: Track) => void;
+    onAutoPlayToggle: () => void;
+    preferredAutoPlay: boolean;
 }
 
 const TrackReviewCard = ({
@@ -45,6 +47,8 @@ const TrackReviewCard = ({
     isOpen,
     trackList,
     setCurrentTrack,
+    onAutoPlayToggle,
+    preferredAutoPlay,
 }: Props) => {
     const indexOfCurrentTrack = trackList.findIndex(
         (t) => t.id === currentTrack.id
@@ -232,6 +236,18 @@ const TrackReviewCard = ({
                                     handleOnListen();
                                 }}
                                 customVolumeControls={[]}
+                                customControlsSection={[
+                                    RHAP_UI.ADDITIONAL_CONTROLS,
+                                    RHAP_UI.MAIN_CONTROLS,
+                                    <Box
+                                        key="AutoplayButton"
+                                        w="66px"
+                                        onClick={onAutoPlayToggle}
+                                        opacity={preferredAutoPlay ? 1 : 0.3}
+                                    >
+                                        <Text userSelect="none">AutoPlay</Text>
+                                    </Box>,
+                                ]}
                             />
                         </Flex>
                     </CardBody>

@@ -73,3 +73,8 @@ a {
 .rhap_download-progress {
   background-color: #dddddd00 !important;
 }
+
+.rhap_additional-controls {
+  flex: unset !important;
+  width: 66px;
+}

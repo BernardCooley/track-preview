@@ -189,22 +189,12 @@ const TrackReview = memo(
                 >
                     {user?.uid && (
                         <FilterTags
-                            autoplayLoading={autoplayLoading}
                             onYearClick={() =>
                                 setShowYearSelector((prev) => !prev)
                             }
                             onGenreClick={() =>
                                 setShowGenreSelector((prev) => !prev)
                             }
-                            onAutoPlayToggle={async () => {
-                                setAutoplayLoading(true);
-                                const newProfile = await mutateUserProfile({
-                                    userId: user.uid,
-                                    autoplay: !userProfile?.autoplay,
-                                });
-                                updateUserProfile(newProfile);
-                                setAutoplayLoading(false);
-                            }}
                             showDates={reviewStep === 1 ? true : false}
                             showGenre={reviewStep === 1 ? true : false}
                             profileLoaded={userProfile ? true : false}
@@ -215,7 +205,6 @@ const TrackReview = memo(
                                     to: userProfile?.yearTo || getCurrentYear(),
                                 } || { from: 1960, to: getCurrentYear() }
                             }
-                            preferredAutoPlay={userProfile?.autoplay || false}
                         />
                     )}
                 </Flex>
@@ -271,6 +260,16 @@ const TrackReview = memo(
                 >
                     {currentTrack && !animate && (
                         <TrackReviewCard
+                            onAutoPlayToggle={async () => {
+                                setAutoplayLoading(true);
+                                const newProfile = await mutateUserProfile({
+                                    userId: user?.uid || "",
+                                    autoplay: !userProfile?.autoplay,
+                                });
+                                updateUserProfile(newProfile);
+                                setAutoplayLoading(false);
+                            }}
+                            preferredAutoPlay={userProfile?.autoplay || false}
                             trackList={reviewTracks[reviewStep]}
                             setCurrentTrack={setCurrentTrack}
                             isOpen={reviewStep === 1 || !isShowingTracklist}

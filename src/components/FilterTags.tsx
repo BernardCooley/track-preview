@@ -1,33 +1,26 @@
 import { Box, Flex, Spinner, Tag, Text } from "@chakra-ui/react";
 import React from "react";
-import { isMobile } from "react-device-detect";
 import { getCurrentYear } from "../../utils";
 import { YearRange } from "../../types";
 
 interface Props {
     genre?: string | null;
     yearRange?: YearRange | null;
-    preferredAutoPlay: boolean;
     showDates: boolean;
     showGenre: boolean;
     profileLoaded: boolean;
-    onAutoPlayToggle: () => void;
     onGenreClick?: () => void;
     onYearClick?: () => void;
-    autoplayLoading?: boolean;
 }
 
 const FilterTags = ({
     genre,
     yearRange,
-    preferredAutoPlay,
     showDates,
     showGenre,
     profileLoaded,
-    onAutoPlayToggle,
     onGenreClick,
     onYearClick,
-    autoplayLoading = false,
 }: Props) => {
     return (
         <Flex transition="opacity 200ms">
@@ -76,44 +69,6 @@ const FilterTags = ({
                         )}
                     </Tag>
                 ) : null}
-
-                <Tag
-                    width="78px"
-                    onClick={onAutoPlayToggle}
-                    pointerEvents={profileLoaded ? "auto" : "none"}
-                    bg={
-                        preferredAutoPlay
-                            ? "brand.primaryOpaque"
-                            : "transparent"
-                    }
-                    borderColor={
-                        preferredAutoPlay
-                            ? "brand.primaryLight"
-                            : "brand.primaryOpaque"
-                    }
-                    _hover={
-                        isMobile
-                            ? {}
-                            : {
-                                  cursor: "pointer",
-                                  bg: preferredAutoPlay
-                                      ? "transparent"
-                                      : "brand.primaryOpaque",
-                                  borderColor: preferredAutoPlay
-                                      ? "brand.primaryOpaque"
-                                      : "brand.primaryLight",
-                              }
-                    }
-                    variant="filter"
-                >
-                    {profileLoaded && !autoplayLoading ? (
-                        <Text userSelect="none">AutoPlay</Text>
-                    ) : (
-                        <Box w="full">
-                            <Spinner color="brand.primary" size="xs" />
-                        </Box>
-                    )}
-                </Tag>
             </Flex>
         </Flex>
     );
