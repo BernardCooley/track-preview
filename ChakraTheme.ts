@@ -228,6 +228,25 @@ export const theme = extendTheme({
                 },
             },
         },
+        Tabs: {
+            variants: {
+                "solid-rounded": {
+                    tablist: {
+                        borderBottom: "1px solid",
+                        borderColor: "brand.primary",
+                    },
+                    tab: {
+                        color: "brand.textPrimaryLighter",
+                        borderBottomRadius: "0px",
+                        borderTopRadius: "14px",
+                        _selected: {
+                            bg: "brand.primary",
+                            color: "brand.textPrimary",
+                        },
+                    },
+                },
+            },
+        },
         Tag: {
             variants: {
                 filter: {
