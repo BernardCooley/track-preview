@@ -57,7 +57,6 @@ const TrackReview = memo(
             onYearConfirm,
         } = useTrackReview(reviewStep);
 
-        const [trackProgress, setTrackProgress] = useState(0);
         const { isOpen: isShowingTracklist, onToggle: toggleTracklist } =
             useDisclosure();
         const [windowWidth, setWindowWidth] = useState(window.innerWidth);
@@ -274,9 +273,6 @@ const TrackReview = memo(
                 >
                     {currentTrack && !animate && (
                         <TrackReviewCard
-                            onProgressUpdate={(progress: number) => {
-                                setTrackProgress(progress);
-                            }}
                             trackList={reviewTracks[reviewStep]}
                             setCurrentTrack={setCurrentTrack}
                             isOpen={reviewStep === 1 || !isShowingTracklist}
@@ -296,7 +292,6 @@ const TrackReview = memo(
                     )}
                     {!animate && reviewStep > 1 && reviewStep < 4 && (
                         <TracklistTable
-                            currentTrackProgress={trackProgress}
                             isOpen={isShowingTracklist}
                             reviewStep={reviewStep}
                             tracklist={reviewTracks}

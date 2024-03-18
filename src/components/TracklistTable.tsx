@@ -6,7 +6,6 @@ import {
     Collapse,
     Flex,
     Image,
-    Progress,
     Table,
     TableContainer,
     Tbody,
@@ -22,7 +21,6 @@ interface Props {
     updateCurrentlyPlaying: (track: Track | null) => void;
     reviewStep: number;
     isOpen: boolean;
-    currentTrackProgress: number;
 }
 
 const TracklistTable = ({
@@ -31,7 +29,6 @@ const TracklistTable = ({
     updateCurrentlyPlaying,
     reviewStep,
     isOpen,
-    currentTrackProgress,
 }: Props) => {
     const getTrProps = (
         track: Track,
@@ -160,15 +157,6 @@ const TracklistTable = ({
                                             </Text>
                                             <Text>{releaseYear}</Text>
                                         </Flex>
-                                        {isCurrentTrack && (
-                                            <Box mt={2} ml={1} w="full" px={2}>
-                                                <Progress
-                                                    value={currentTrackProgress}
-                                                    size="xs"
-                                                    colorScheme="teal"
-                                                />
-                                            </Box>
-                                        )}
                                     </Td>
                                 </Tr>
                             );

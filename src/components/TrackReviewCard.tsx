@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
     Box,
     Card,
@@ -31,7 +31,6 @@ interface Props {
     isOpen: boolean;
     trackList: Track[];
     setCurrentTrack: (track: Track) => void;
-    onProgressUpdate: (progress: number) => void;
 }
 
 const TrackReviewCard = ({
@@ -46,24 +45,13 @@ const TrackReviewCard = ({
     isOpen,
     trackList,
     setCurrentTrack,
-    onProgressUpdate,
 }: Props) => {
     const indexOfCurrentTrack = trackList.findIndex(
         (t) => t.id === currentTrack.id
     );
 
-    const [duration, setDuration] = useState<number>(0);
-
-    const handleOnListen = (e: Event) => {
+    const handleOnListen = () => {
         onListenedToggle(true);
-        const audio = e.target as HTMLAudioElement;
-        const prog = Math.floor((audio.currentTime / duration) * 100);
-        onProgressUpdate(prog);
-    };
-
-    const handleOnLoadedMetadata = (e: Event) => {
-        const audio = e.target as HTMLAudioElement;
-        setDuration(audio.duration);
     };
 
     return (
@@ -211,7 +199,6 @@ const TrackReviewCard = ({
                                           )
                                         : undefined;
                                 }}
-                                onLoadedMetaData={handleOnLoadedMetadata}
                                 onListen={handleOnListen}
                                 onPlay={onAudioPlay}
                                 customIcons={{
@@ -242,6 +229,7 @@ const TrackReviewCard = ({
                                               trackList[indexOfCurrentTrack + 1]
                                           )
                                         : undefined;
+                                    handleOnListen();
                                 }}
                                 customVolumeControls={[]}
                             />
