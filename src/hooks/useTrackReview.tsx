@@ -35,6 +35,7 @@ export const useTrackReview = (reviewStep: number) => {
     const [loadMoreTracks, setLoadMoreTracks] = useState<boolean>(false);
     const [fetchAttempted, setFetchAttempted] = useState<boolean>(false);
     const [autoplayLoading, setAutoplayLoading] = useState<boolean>(false);
+    const [indexOfTrack, setIndexOfTrack] = useState(0);
 
     const comparisonUserProfile = (profile: UserProfile | null) => {
         if (profile === null) return;
@@ -114,7 +115,7 @@ export const useTrackReview = (reviewStep: number) => {
     useEffect(() => {
         if (reviewTracks[reviewStep].length > 0) {
             setLoading(false);
-            setCurrentTrack(reviewTracks[reviewStep][0] as Track);
+            setCurrentTrack(reviewTracks[reviewStep][indexOfTrack] as Track);
         } else {
             setCurrentTrack(null);
             setLoading(false);
@@ -167,9 +168,12 @@ export const useTrackReview = (reviewStep: number) => {
     const likeOrDislike = async (like: boolean) => {
         try {
             if (currentTrack && user?.uid) {
-                const indexOfTrack = reviewTracks[reviewStep].findIndex(
-                    (t) => t.id === currentTrack.id
+                setIndexOfTrack(
+                    reviewTracks[reviewStep].findIndex(
+                        (t) => t.id === currentTrack.id
+                    )
                 );
+
                 setLoading(true);
                 const track = { ...currentTrack };
 
