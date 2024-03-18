@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import {
     Box,
     Collapse,
@@ -30,6 +30,23 @@ const TracklistTable = ({
     reviewStep,
     isOpen,
 }: Props) => {
+    const itemRef = useRef<HTMLTableRowElement | null>(null);
+
+    useEffect(() => {
+        if (isOpen) {
+            executeScroll();
+        }
+    }, [isOpen]);
+
+    const executeScroll = () => {
+        if (itemRef.current) {
+            itemRef.current.scrollIntoView({
+                block: "nearest",
+                inline: "start",
+            });
+        }
+    };
+
     const getTrProps = (
         track: Track,
         updateCurrentlyPlaying: (track: Track | null) => void,
@@ -85,10 +102,10 @@ const TracklistTable = ({
                                 artist,
                                 genre,
                                 releaseYear,
-                                previewUrl,
                             } = track;
                             return (
                                 <Tr
+                                    ref={isCurrentTrack ? itemRef : null}
                                     key={id}
                                     {...getTrProps(
                                         track,
