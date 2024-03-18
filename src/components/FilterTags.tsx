@@ -78,7 +78,7 @@ const FilterTags = ({
                 ) : null}
 
                 <Tag
-                    w="102px"
+                    width="78px"
                     onClick={onAutoPlayToggle}
                     pointerEvents={profileLoaded ? "auto" : "none"}
                     bg={

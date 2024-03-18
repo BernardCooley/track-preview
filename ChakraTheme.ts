@@ -232,8 +232,9 @@ export const theme = extendTheme({
             variants: {
                 filter: {
                     container: {
-                        padding: "18px",
-                        height: "32px",
+                        width: "full",
+                        paddingY: "6px",
+                        paddingX: "10px",
                         border: "1px solid",
                         borderColor: "brand.primary",
                         backgroundColor: "brand.backgroundTertiary",
@@ -251,13 +252,16 @@ export const theme = extendTheme({
                             bg: "brand.primaryOpaque",
                         },
                         color: "white",
-                        fontSize: "16px",
+                        fontSize: "14px",
                         fontWeight: "normal",
                         rounded: "full",
                         userSelect: "none",
                         textAlign: "center",
                         whiteSpace: "nowrap",
                         bg: "brand.backgroundTertiaryOpaque",
+                    },
+                    label: {
+                        width: "full",
                     },
                 },
                 loading: {

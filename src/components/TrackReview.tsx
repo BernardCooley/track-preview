@@ -183,11 +183,9 @@ const TrackReview = memo(
                     alignItems="baseline"
                     justifyContent="space-between"
                     direction="column"
-                    p={4}
-                    pt={2}
+                    pb={4}
                     gap={2}
                     zIndex={200}
-                    minH="66px"
                 >
                     {user?.uid && (
                         <FilterTags
