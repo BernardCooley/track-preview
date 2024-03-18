@@ -23,11 +23,8 @@ import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
 interface Props {
     loadingMessage?: string;
     currentTrack: Track;
-    isPlaying: boolean;
-    listened: boolean;
     onLikeOrDislike: (liked: boolean) => Promise<void>;
     onAudioPlay: () => void;
-    onListenedToggle: (listened: boolean) => void;
     autoplay?: boolean;
     isOpen: boolean;
     trackList: Track[];
@@ -41,11 +38,8 @@ interface Props {
 const TrackReviewCard = ({
     loadingMessage,
     currentTrack,
-    isPlaying,
-    listened,
     onLikeOrDislike,
     onAudioPlay,
-    onListenedToggle,
     autoplay,
     isOpen,
     trackList,
@@ -58,10 +52,6 @@ const TrackReviewCard = ({
     const indexOfCurrentTrack = trackList.findIndex(
         (t) => t.id === currentTrack.id
     );
-
-    const handleOnListen = () => {
-        onListenedToggle(true);
-    };
 
     return (
         <Collapse in={isOpen} animateOpacity>
@@ -110,34 +100,20 @@ const TrackReviewCard = ({
                             pt={10}
                             height="256px"
                         >
-                            {isPlaying && (
-                                <Flex
-                                    w="full"
-                                    pb={isPlaying ? 8 : 0}
-                                    justifyContent="space-around"
-                                >
-                                    <TrackCardIcon
-                                        canHover={listened}
-                                        isDisabled={!listened}
-                                        ariaLabel="dislike button"
-                                        onClick={async () =>
-                                            onLikeOrDislike(false)
-                                        }
-                                        colorScheme="red"
-                                        Icon={ThumbDownAltTwoToneIcon}
-                                    />
-                                    <TrackCardIcon
-                                        canHover={listened}
-                                        isDisabled={!listened}
-                                        ariaLabel="like button"
-                                        onClick={async () =>
-                                            onLikeOrDislike(true)
-                                        }
-                                        colorScheme="green"
-                                        Icon={ThumbUpAltTwoToneIcon}
-                                    />
-                                </Flex>
-                            )}
+                            <Flex w="full" justifyContent="space-around">
+                                <TrackCardIcon
+                                    ariaLabel="dislike button"
+                                    onClick={async () => onLikeOrDislike(false)}
+                                    colorScheme="red"
+                                    Icon={ThumbDownAltTwoToneIcon}
+                                />
+                                <TrackCardIcon
+                                    ariaLabel="like button"
+                                    onClick={async () => onLikeOrDislike(true)}
+                                    colorScheme="green"
+                                    Icon={ThumbUpAltTwoToneIcon}
+                                />
+                            </Flex>
                         </Flex>
                         <Flex
                             w="full"
@@ -208,7 +184,6 @@ const TrackReviewCard = ({
                                           )
                                         : undefined;
                                 }}
-                                onListen={handleOnListen}
                                 onPlay={onAudioPlay}
                                 customIcons={{
                                     previous:
@@ -238,7 +213,6 @@ const TrackReviewCard = ({
                                               trackList[indexOfCurrentTrack + 1]
                                           )
                                         : undefined;
-                                    handleOnListen();
                                 }}
                                 customVolumeControls={[]}
                                 customControlsSection={[

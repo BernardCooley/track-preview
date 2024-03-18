@@ -42,9 +42,6 @@ const TrackReview = memo(
             setShowYearSelector,
             showGenreSelector,
             setShowGenreSelector,
-            listened,
-            setListened,
-            isPlaying,
             setIsPlaying,
             loading,
             loadMoreTracks,
@@ -278,8 +275,6 @@ const TrackReview = memo(
                             isOpen={reviewStep === 1 || !isShowingTracklist}
                             autoplay={userProfile?.autoplay || false}
                             currentTrack={currentTrack}
-                            isPlaying={isPlaying}
-                            listened={listened}
                             onLikeOrDislike={async (val) => {
                                 await likeOrDislike(val);
                                 setAnimate(val ? "like" : "dislike");
@@ -287,7 +282,6 @@ const TrackReview = memo(
                             onAudioPlay={() => {
                                 setIsPlaying(true);
                             }}
-                            onListenedToggle={(val) => setListened(val)}
                         />
                     )}
                     {!animate && reviewStep > 1 && reviewStep < 4 && (
