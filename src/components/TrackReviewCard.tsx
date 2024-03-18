@@ -255,12 +255,15 @@ const TrackReviewCard = ({
                                                 AutoPlay
                                             </Text>
                                         ) : (
-                                            <Box w="full">
+                                            <Flex
+                                                w="full"
+                                                justifyContent="center"
+                                            >
                                                 <Spinner
                                                     color="brand.primary"
                                                     size="xs"
                                                 />
-                                            </Box>
+                                            </Flex>
                                         )}
                                     </Box>,
                                 ]}
