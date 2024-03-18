@@ -94,7 +94,7 @@ const GenreModal = ({
         >
             <ModalOverlay />
             <ModalContent
-                h="90vh"
+                h="88vh"
                 rounded={20}
                 m={6}
                 bg="brand.backgroundPrimary"
