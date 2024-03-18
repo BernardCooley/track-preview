@@ -51,11 +51,10 @@ const SignUp = () => {
     const [showPassword, setShowPassword] = useState<boolean>(false);
     const [submitting, setSubmitting] = useState(false);
     const [submitted, setSubmitted] = useState(false);
-    const router = useRouter();
     const [authError, setAuthError] = useState<string | null>(null);
     const toast = useToast();
     const id = "registerToast";
-    const [email, setEmail] = useState("bernardcooley@gmail.com");
+    const [email, setEmail] = useState("");
 
     const showToast = useCallback(
         ({ status, title, description }: ToastProps) => {
