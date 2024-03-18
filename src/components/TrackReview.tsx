@@ -261,6 +261,8 @@ const TrackReview = memo(
                 >
                     {currentTrack && !animate && (
                         <TrackReviewCard
+                            profileLoaded={userProfile ? true : false}
+                            autoplayLoading={autoplayLoading}
                             onAutoPlayToggle={async () => {
                                 setAutoplayLoading(true);
                                 const newProfile = await mutateUserProfile({

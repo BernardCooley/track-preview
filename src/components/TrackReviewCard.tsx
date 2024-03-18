@@ -6,6 +6,7 @@ import {
     Collapse,
     Flex,
     Icon,
+    Spinner,
     Tag,
     Text,
 } from "@chakra-ui/react";
@@ -33,6 +34,8 @@ interface Props {
     setCurrentTrack: (track: Track) => void;
     onAutoPlayToggle: () => void;
     preferredAutoPlay: boolean;
+    profileLoaded: boolean;
+    autoplayLoading?: boolean;
 }
 
 const TrackReviewCard = ({
@@ -49,6 +52,8 @@ const TrackReviewCard = ({
     setCurrentTrack,
     onAutoPlayToggle,
     preferredAutoPlay,
+    profileLoaded,
+    autoplayLoading = false,
 }: Props) => {
     const indexOfCurrentTrack = trackList.findIndex(
         (t) => t.id === currentTrack.id
@@ -245,7 +250,18 @@ const TrackReviewCard = ({
                                         onClick={onAutoPlayToggle}
                                         opacity={preferredAutoPlay ? 1 : 0.5}
                                     >
-                                        <Text userSelect="none">AutoPlay</Text>
+                                        {profileLoaded && !autoplayLoading ? (
+                                            <Text userSelect="none">
+                                                AutoPlay
+                                            </Text>
+                                        ) : (
+                                            <Box w="full">
+                                                <Spinner
+                                                    color="brand.primary"
+                                                    size="xs"
+                                                />
+                                            </Box>
+                                        )}
                                     </Box>,
                                 ]}
                             />
