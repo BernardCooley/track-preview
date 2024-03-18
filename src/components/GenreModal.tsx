@@ -94,6 +94,7 @@ const GenreModal = ({
         >
             <ModalOverlay />
             <ModalContent
+                h="90vh"
                 rounded={20}
                 m={6}
                 bg="brand.backgroundPrimary"
@@ -111,8 +112,14 @@ const GenreModal = ({
                     gap={4}
                     alignItems="flex-end"
                 >
-                    <Flex width="full" direction="column" gap={4}>
-                        <Text fontSize="xl" textAlign="center">
+                    <Flex
+                        h="full"
+                        width="full"
+                        direction="column"
+                        gap={4}
+                        alignItems="flex-end"
+                    >
+                        <Text fontSize="xl" textAlign="center" w="full">
                             Select genre
                         </Text>
                         {isSearching ? (
@@ -161,7 +168,7 @@ const GenreModal = ({
                                 }
                             />
                         ) : (
-                            <Flex justifyContent="flex-start">
+                            <Flex justifyContent="flex-start" w="full">
                                 <IconButton
                                     color="brand.primary"
                                     fontSize="2xl"
@@ -190,6 +197,7 @@ const GenreModal = ({
                             recentGenres &&
                             recentGenres.length > 0 && (
                                 <Flex
+                                    w="full"
                                     direction="column"
                                     border="1px solid"
                                     borderColor="brand.backgroundTertiary"
@@ -218,7 +226,7 @@ const GenreModal = ({
                                             </Button>
                                         )}
                                     </Flex>
-                                    <Flex flexWrap="wrap" gap={4}>
+                                    <Flex flexWrap="wrap" gap={2}>
                                         {recentGenres.map((gen) => (
                                             <Tag
                                                 width="auto"
@@ -265,14 +273,15 @@ const GenreModal = ({
                             )}
 
                         <Flex
+                            w="full"
                             flexWrap="wrap"
-                            maxH="300px"
                             overflow="scroll"
                             gap={4}
                             border="1px solid"
                             borderColor="brand.backgroundTertiary"
                             rounded={6}
                             p={2}
+                            mb="56px"
                         >
                             {!isSearching && (
                                 <Tag
@@ -384,10 +393,17 @@ const GenreModal = ({
                                 )}
                             </Flex>
                         </Flex>
+                        <Button
+                            position="absolute"
+                            bottom="16px"
+                            p={4}
+                            w="100px"
+                            onClick={onCancel}
+                            variant="cancel"
+                        >
+                            Cancel
+                        </Button>
                     </Flex>
-                    <Button w="100px" onClick={onCancel} variant="cancel">
-                        Cancel
-                    </Button>
                 </Flex>
             </ModalContent>
         </Modal>
