@@ -14,6 +14,7 @@ import {
     IconButton,
     ToastProps,
     useToast,
+    Text,
 } from "@chakra-ui/react";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -49,10 +50,12 @@ const schema: ZodType<FormData> = z
 const SignUp = () => {
     const [showPassword, setShowPassword] = useState<boolean>(false);
     const [submitting, setSubmitting] = useState(false);
+    const [submitted, setSubmitted] = useState(false);
     const router = useRouter();
     const [authError, setAuthError] = useState<string | null>(null);
     const toast = useToast();
     const id = "registerToast";
+    const [email, setEmail] = useState("bernardcooley@gmail.com");
 
     const showToast = useCallback(
         ({ status, title, description }: ToastProps) => {
@@ -84,6 +87,7 @@ const SignUp = () => {
     });
 
     const performRegister = async (formData: FormData) => {
+        setEmail(formData.email);
         setSubmitting(true);
         let newUser: UserCredential | null = null;
 
@@ -119,14 +123,8 @@ const SignUp = () => {
             try {
                 await SendVerificationEmail(newUser.user);
 
-                showToast({
-                    title: "Verification email sent.",
-                    description: "Please check your inbox.",
-                    status: "info",
-                });
-
-                router.push("/loginRegister?login=true");
                 setAuthError(null);
+                setSubmitted(true);
             } catch (error) {
                 showToast({
                     title: "Error sending verification email.",
@@ -141,107 +139,122 @@ const SignUp = () => {
 
     return (
         <Flex direction="column" w={["100%", "100%", "70%", "60%"]}>
-            <form onSubmit={handleSubmit(performRegister)}>
-                <Flex
-                    direction="column"
-                    gap="18px"
-                    p={[6, 12, 20]}
-                    pt={10}
-                    justifyContent="space-between"
-                >
-                    <Flex direction="column" gap={8}>
-                        <TextInput
-                            required={true}
-                            title="Email"
-                            size="lg"
-                            fieldProps={register("email")}
-                            error={errors.email?.message}
-                        />
-                        <TextInput
-                            type={showPassword ? "text" : "password"}
-                            required={true}
-                            title="Password"
-                            size="lg"
-                            fieldProps={register("password")}
-                            error={errors.password?.message}
-                            rightIcon={
-                                <IconButton
-                                    _hover={{
-                                        bg: "transparent",
-                                        color: "brand.primary",
-                                        transform: "scale(1.2)",
-                                    }}
-                                    shadow="lg"
-                                    height="30px"
-                                    position="absolute"
-                                    right={2}
-                                    top={8}
-                                    onClick={() =>
-                                        setShowPassword((prev) => !prev)
-                                    }
-                                    variant="ghost"
-                                    h={1 / 2}
-                                    colorScheme="teal"
-                                    aria-label="Show password"
-                                    fontSize="3xl"
-                                    icon={
-                                        showPassword ? (
-                                            <VisibilityIcon fontSize="inherit" />
-                                        ) : (
-                                            <VisibilityOffIcon fontSize="inherit" />
-                                        )
-                                    }
-                                />
-                            }
-                        />
-                        <TextInput
-                            type={showPassword ? "text" : "password"}
-                            required={true}
-                            title="Confirm password"
-                            size="lg"
-                            fieldProps={register("confirmPassword")}
-                            error={errors.confirmPassword?.message}
-                            rightIcon={
-                                <IconButton
-                                    _hover={{
-                                        bg: "transparent",
-                                        color: "brand.primary",
-                                        transform: "scale(1.2)",
-                                    }}
-                                    shadow="lg"
-                                    height="30px"
-                                    position="absolute"
-                                    right={2}
-                                    top={8}
-                                    onClick={() =>
-                                        setShowPassword((prev) => !prev)
-                                    }
-                                    variant="ghost"
-                                    h={1 / 2}
-                                    colorScheme="teal"
-                                    aria-label="Show password"
-                                    fontSize="3xl"
-                                    icon={
-                                        showPassword ? (
-                                            <VisibilityIcon fontSize="inherit" />
-                                        ) : (
-                                            <VisibilityOffIcon fontSize="inherit" />
-                                        )
-                                    }
-                                />
-                            }
-                        />
-                        <Button
-                            isLoading={submitting}
-                            type="submit"
-                            variant="primary"
-                            onClick={handleSubmit(performRegister)}
-                        >
-                            Register
-                        </Button>
+            {!submitted ? (
+                <form onSubmit={handleSubmit(performRegister)}>
+                    <Flex
+                        direction="column"
+                        gap="18px"
+                        p={[6, 12, 20]}
+                        pt={10}
+                        justifyContent="space-between"
+                    >
+                        <Flex direction="column" gap={8}>
+                            <TextInput
+                                required={true}
+                                title="Email"
+                                size="lg"
+                                fieldProps={register("email")}
+                                error={errors.email?.message}
+                            />
+                            <TextInput
+                                type={showPassword ? "text" : "password"}
+                                required={true}
+                                title="Password"
+                                size="lg"
+                                fieldProps={register("password")}
+                                error={errors.password?.message}
+                                rightIcon={
+                                    <IconButton
+                                        _hover={{
+                                            bg: "transparent",
+                                            color: "brand.primary",
+                                            transform: "scale(1.2)",
+                                        }}
+                                        shadow="lg"
+                                        height="30px"
+                                        position="absolute"
+                                        right={2}
+                                        top={8}
+                                        onClick={() =>
+                                            setShowPassword((prev) => !prev)
+                                        }
+                                        variant="ghost"
+                                        h={1 / 2}
+                                        colorScheme="teal"
+                                        aria-label="Show password"
+                                        fontSize="3xl"
+                                        icon={
+                                            showPassword ? (
+                                                <VisibilityIcon fontSize="inherit" />
+                                            ) : (
+                                                <VisibilityOffIcon fontSize="inherit" />
+                                            )
+                                        }
+                                    />
+                                }
+                            />
+                            <TextInput
+                                type={showPassword ? "text" : "password"}
+                                required={true}
+                                title="Confirm password"
+                                size="lg"
+                                fieldProps={register("confirmPassword")}
+                                error={errors.confirmPassword?.message}
+                                rightIcon={
+                                    <IconButton
+                                        _hover={{
+                                            bg: "transparent",
+                                            color: "brand.primary",
+                                            transform: "scale(1.2)",
+                                        }}
+                                        shadow="lg"
+                                        height="30px"
+                                        position="absolute"
+                                        right={2}
+                                        top={8}
+                                        onClick={() =>
+                                            setShowPassword((prev) => !prev)
+                                        }
+                                        variant="ghost"
+                                        h={1 / 2}
+                                        colorScheme="teal"
+                                        aria-label="Show password"
+                                        fontSize="3xl"
+                                        icon={
+                                            showPassword ? (
+                                                <VisibilityIcon fontSize="inherit" />
+                                            ) : (
+                                                <VisibilityOffIcon fontSize="inherit" />
+                                            )
+                                        }
+                                    />
+                                }
+                            />
+                            <Button
+                                isLoading={submitting}
+                                type="submit"
+                                variant="primary"
+                                onClick={handleSubmit(performRegister)}
+                            >
+                                Register
+                            </Button>
+                        </Flex>
                     </Flex>
+                </form>
+            ) : (
+                <Flex direction="column" alignItems="center" gap={10} pt={20}>
+                    <Text textAlign="center" fontSize="2xl">
+                        Registration successful
+                    </Text>
+                    <Text w="80%" textAlign="center" fontSize="lg">
+                        A confirmation email has been sent to{" "}
+                        <strong>{email}</strong>.
+                    </Text>
+                    <Text w="80%" textAlign="center" fontSize="lg">
+                        Please check your email to verify your new account.
+                    </Text>
                 </Flex>
-            </form>
+            )}
             {/* TODO - Message not showing up */}
             {authError && (
                 <Box h="16px" mt="8px">

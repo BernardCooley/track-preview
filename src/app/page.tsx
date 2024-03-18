@@ -12,14 +12,15 @@ import {
     Tr,
 } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
-import { auth } from "../../firebase/firebaseInit";
+import { useAuthContext } from "../../Contexts/AuthContext";
 
 export default function Home() {
+    const { user } = useAuthContext();
     const router = useRouter();
     const listItems = [
-        "Listen to a random track based on genre and release year range",
-        "Like or dislike the track",
-        "Dislikes are never seen again. Likes are moved to the next review step",
+        "Listen to a sample of random track based on your selection of genre and release year",
+        "Mark each track as liked or disliked",
+        "Dislikes are never seen again. Likes are moved to the next step for later review",
         "A new track is loaded after each like or dislike",
     ];
 
@@ -87,11 +88,11 @@ export default function Home() {
                     </TableContainer>
                 </Flex>
                 <Button
-                    onClick={() =>
+                    onClick={() => {
                         router.push(
-                            auth ? "/explore" : "/loginRegister?login=true"
-                        )
-                    }
+                            user ? "/explore" : "/loginRegister?login=true"
+                        );
+                    }}
                     variant="primary"
                 >
                     Get Started
