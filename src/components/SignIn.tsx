@@ -20,6 +20,7 @@ import {
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { LoginUser } from "../../firebase/utils";
+import { useLocalStorage } from "usehooks-ts";
 
 interface FormData {
     email: string;
@@ -34,6 +35,10 @@ const schema: ZodType<FormData> = z.object({
 });
 
 const SignIn = () => {
+    const [_, setHasPreviouslyLoggedIn] = useLocalStorage<boolean>(
+        "has-previously-logged-in",
+        false
+    );
     const searchParams = useSearchParams();
     const isAttemptingAccountEdit = searchParams.get("isAttemptingAccountEdit");
     const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -92,6 +97,7 @@ const SignIn = () => {
             }
             setSubmitting(false);
             setAuthError(null);
+            setHasPreviouslyLoggedIn(true);
         } catch (error) {
             showToast({
                 title: "Error signing in.",

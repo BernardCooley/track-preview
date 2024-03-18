@@ -15,6 +15,7 @@ import React, { useCallback, useEffect } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import SignIn from "@/components/SignIn";
 import SignUp from "@/components/SignUp";
+import { useReadLocalStorage } from "usehooks-ts";
 
 const AuthPage = () => {
     const router = useRouter();
@@ -25,13 +26,16 @@ const AuthPage = () => {
     const isAccountDeleted = searchParams.get("accountDeleted");
     const toast = useToast();
     const id = "loginRegisterToast";
+    const hasPreviouslyLoggedIn = useReadLocalStorage(
+        "has-previously-logged-in"
+    );
 
     const showToast = useCallback(
         ({ status, title, description }: ToastProps) => {
             if (!toast.isActive(id)) {
                 toast({
                     id,
-                    title: title || "An error has occured.",
+                    title: title || "An error has occurred.",
                     description: description || "Please try again later.",
                     status: status,
                     duration: 5000,
@@ -90,7 +94,9 @@ const AuthPage = () => {
                 PHONIQUEST
             </Text>
             <Tabs
-                defaultIndex={isLogin === "true" ? 0 : 1}
+                defaultIndex={
+                    isLogin === "true" || hasPreviouslyLoggedIn ? 0 : 1
+                }
                 onChange={(index) => {
                     router.push(
                         `/loginRegister?login=${index === 0 ? "true" : "false"}`
