@@ -45,13 +45,13 @@ export default function Home() {
             <Flex
                 direction="column"
                 alignItems="center"
-                gap={10}
+                gap={8}
                 p={6}
                 h="full"
                 w="full"
             >
                 <Text fontSize={["2xl", "3xl"]}>Welcome to Phoniquest</Text>
-                <Flex w="full" maxW="500px" pb={20}>
+                <Flex w="full" maxW="500px" pb={10}>
                     <TableContainer
                         w="full"
                         overflow="hidden"
