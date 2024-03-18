@@ -41,16 +41,16 @@ const TracklistTable = ({
         return {
             fontSize: "md",
             outlineOffset: -2,
-            outline: !isCurrentTrack ? "1px solid" : "none",
-            outlineColor: !isCurrentTrack ? "brand.primary" : "transparent",
+            outline: isCurrentTrack ? "1px solid" : "none",
+            outlineColor: isCurrentTrack ? "brand.primary" : "transparent",
             color: "brand.textPrimaryLight",
             _hover: {
                 cursor: "pointer",
-                backgroundColor: !isCurrentTrack
+                backgroundColor: isCurrentTrack
                     ? "brand.backgroundTertiaryOpaque"
                     : "brand.backgroundTertiaryOpaque2",
             },
-            bg: !isCurrentTrack
+            bg: isCurrentTrack
                 ? "brand.backgroundTertiaryOpaque"
                 : "transparent",
             onClick: () => {
