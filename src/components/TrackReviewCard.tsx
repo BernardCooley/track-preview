@@ -243,7 +243,7 @@ const TrackReviewCard = ({
                                         key="AutoplayButton"
                                         w="66px"
                                         onClick={onAutoPlayToggle}
-                                        opacity={preferredAutoPlay ? 1 : 0.3}
+                                        opacity={preferredAutoPlay ? 1 : 0.5}
                                     >
                                         <Text userSelect="none">AutoPlay</Text>
                                     </Box>,
