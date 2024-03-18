@@ -1,6 +1,7 @@
 "use client";
 import {
     Box,
+    Center,
     Flex,
     Tab,
     TabList,
@@ -11,11 +12,14 @@ import {
     ToastProps,
     useToast,
 } from "@chakra-ui/react";
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import SignIn from "@/components/SignIn";
 import SignUp from "@/components/SignUp";
 import { useReadLocalStorage } from "usehooks-ts";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../../../../firebase/firebaseInit";
+import Loading from "@/components/Loading";
 
 const AuthPage = () => {
     const router = useRouter();
@@ -29,6 +33,7 @@ const AuthPage = () => {
     const hasPreviouslyLoggedIn = useReadLocalStorage(
         "has-previously-logged-in"
     );
+    const [loading, setLoading] = useState(true);
 
     const showToast = useCallback(
         ({ status, title, description }: ToastProps) => {
@@ -45,6 +50,20 @@ const AuthPage = () => {
         },
         [toast]
     );
+
+    const isUserLoggedIn = useCallback(async () => {
+        onAuthStateChanged(auth, (user) => {
+            if (user && user.email && user.uid) {
+                router.push("/explore");
+            } else {
+                setLoading(false);
+            }
+        });
+    }, [router]);
+
+    useEffect(() => {
+        isUserLoggedIn();
+    }, [isUserLoggedIn]);
 
     useEffect(() => {
         if (isPasswordReset) {
@@ -84,47 +103,65 @@ const AuthPage = () => {
     };
 
     return (
-        <Box>
-            <Text
-                py={10}
-                textAlign="center"
-                fontSize={["3xl", "4xl", "5xl", "6xl"]}
-                fontFamily="brand"
-            >
-                PHONIQUEST
-            </Text>
-            <Tabs
-                defaultIndex={
-                    isLogin === "true" || hasPreviouslyLoggedIn ? 0 : 1
-                }
-                onChange={(index) => {
-                    router.push(
-                        `/loginRegister?login=${index === 0 ? "true" : "false"}`
-                    );
-                }}
-                isFitted
-                variant="solid-rounded"
-                colorScheme="primary"
-            >
-                <TabList px={[10, 16, 60, 80]} gap={2}>
-                    <Tab>Sign in</Tab>
-                    <Tab>Register</Tab>
-                </TabList>
+        <>
+            {loading && (
+                <Center
+                    zIndex={150}
+                    top="200px"
+                    right="50%"
+                    transform={`translate(50%, 0)`}
+                    position="absolute"
+                    px={4}
+                >
+                    <Loading />
+                </Center>
+            )}
+            {!loading && (
+                <Box>
+                    <Text
+                        py={10}
+                        textAlign="center"
+                        fontSize={["3xl", "4xl", "5xl", "6xl"]}
+                        fontFamily="brand"
+                    >
+                        PHONIQUEST
+                    </Text>
+                    <Tabs
+                        defaultIndex={
+                            isLogin === "true" || hasPreviouslyLoggedIn ? 0 : 1
+                        }
+                        onChange={(index) => {
+                            router.push(
+                                `/loginRegister?login=${
+                                    index === 0 ? "true" : "false"
+                                }`
+                            );
+                        }}
+                        isFitted
+                        variant="solid-rounded"
+                        colorScheme="primary"
+                    >
+                        <TabList px={[10, 16, 60, 80]} gap={2}>
+                            <Tab>Sign in</Tab>
+                            <Tab>Register</Tab>
+                        </TabList>
 
-                <TabPanels>
-                    <TabPanel>
-                        <TabContainer>
-                            <SignIn />
-                        </TabContainer>
-                    </TabPanel>
-                    <TabPanel>
-                        <TabContainer>
-                            <SignUp />
-                        </TabContainer>
-                    </TabPanel>
-                </TabPanels>
-            </Tabs>
-        </Box>
+                        <TabPanels>
+                            <TabPanel>
+                                <TabContainer>
+                                    <SignIn />
+                                </TabContainer>
+                            </TabPanel>
+                            <TabPanel>
+                                <TabContainer>
+                                    <SignUp />
+                                </TabContainer>
+                            </TabPanel>
+                        </TabPanels>
+                    </Tabs>
+                </Box>
+            )}
+        </>
     );
 };
 
