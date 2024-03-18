@@ -221,6 +221,7 @@ const GenreModal = ({
                                     <Flex flexWrap="wrap" gap={4}>
                                         {recentGenres.map((gen) => (
                                             <Tag
+                                                width="auto"
                                                 userSelect="none"
                                                 padding={2}
                                                 onClick={() =>
@@ -275,6 +276,7 @@ const GenreModal = ({
                         >
                             {!isSearching && (
                                 <Tag
+                                    width="auto"
                                     onClick={() => {
                                         onGenreSelect("all");
                                         setSearchValue("");
@@ -324,6 +326,7 @@ const GenreModal = ({
                                                 {genreSection.genres.map(
                                                     (gen) => (
                                                         <Tag
+                                                            width="auto"
                                                             onClick={() => {
                                                                 onGenreSelect(
                                                                     gen
