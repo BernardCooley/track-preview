@@ -182,14 +182,13 @@ const TrackReview = memo(
                 >
                     {user?.uid && (
                         <FilterTags
+                            reviewStep={reviewStep}
                             onYearClick={() =>
                                 setShowYearSelector((prev) => !prev)
                             }
                             onGenreClick={() =>
                                 setShowGenreSelector((prev) => !prev)
                             }
-                            showDates={reviewStep === 1 ? true : false}
-                            showGenre={reviewStep === 1 ? true : false}
                             profileLoaded={userProfile ? true : false}
                             genre={userProfile?.genre}
                             yearRange={
