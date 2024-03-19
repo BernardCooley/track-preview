@@ -37,7 +37,8 @@ const FullTrackLinks = ({ currentTrack }: Props) => {
                 {links.map((link) => (
                     <Link
                         rounded="12px"
-                        p={2}
+                        py={1}
+                        px={2}
                         key={link.title}
                         isExternal
                         href={link.url}
