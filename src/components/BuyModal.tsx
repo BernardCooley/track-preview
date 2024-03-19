@@ -60,7 +60,7 @@ const BuyModal = ({
                                 w="100%"
                             >
                                 <BuyLink
-                                    track={reviewTracks[4][trackToBuy!]}
+                                    track={reviewTracks[4].tracks[trackToBuy!]}
                                     buyLink={buyLink}
                                 />
                             </GridItem>

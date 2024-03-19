@@ -97,7 +97,7 @@ export const useTrackReview = (reviewStep: number) => {
                 const tracks = await getTracks();
                 setFetchAttempted(true);
                 if (tracks && tracks.length > 0) {
-                    updateReviewTracks(reviewStep, tracks);
+                    updateReviewTracks(reviewStep, tracks, 0);
                     setLoading(false);
                     setNoTracks(false);
                     setLoadMoreTracks(false);
@@ -113,9 +113,13 @@ export const useTrackReview = (reviewStep: number) => {
     );
 
     useEffect(() => {
-        if (reviewTracks[reviewStep].length > 0) {
+        if (reviewTracks[reviewStep].tracks.length > 0) {
             setLoading(false);
-            setCurrentTrack(reviewTracks[reviewStep][indexOfTrack] as Track);
+            setCurrentTrack(
+                reviewTracks[reviewStep].tracks[
+                    reviewTracks[reviewStep].currentTrack
+                ] as Track
+            );
         } else {
             setCurrentTrack(null);
             setLoading(false);
@@ -126,7 +130,7 @@ export const useTrackReview = (reviewStep: number) => {
                 setNoTracks(true);
             }
         }
-    }, [reviewTracks[reviewStep]]);
+    }, [reviewTracks[reviewStep].tracks]);
 
     useEffect(() => {
         if (
@@ -137,7 +141,7 @@ export const useTrackReview = (reviewStep: number) => {
             onGetTracks(
                 reviewStep === 1
                     ? changesMade[reviewStep as keyof typeof changesMade] ||
-                          reviewTracks[reviewStep].length === 0
+                          reviewTracks[reviewStep].tracks.length === 0
                     : changesMade[reviewStep as keyof typeof changesMade]
             );
         }
@@ -169,7 +173,7 @@ export const useTrackReview = (reviewStep: number) => {
         try {
             if (currentTrack && user?.uid) {
                 setIndexOfTrack(
-                    reviewTracks[reviewStep].findIndex(
+                    reviewTracks[reviewStep].tracks.findIndex(
                         (t) => t.id === currentTrack.id
                     )
                 );
@@ -177,8 +181,8 @@ export const useTrackReview = (reviewStep: number) => {
                 setLoading(true);
                 const track = { ...currentTrack };
 
-                if (reviewTracks[reviewStep].length > 0) {
-                    if (reviewTracks[reviewStep].length === 1) {
+                if (reviewTracks[reviewStep].tracks.length > 0) {
+                    if (reviewTracks[reviewStep].tracks.length === 1) {
                         onGetTracks(
                             changesMade[reviewStep as keyof typeof changesMade]
                         );
@@ -199,9 +203,10 @@ export const useTrackReview = (reviewStep: number) => {
 
                     updateReviewTracks(
                         reviewStep,
-                        reviewTracks[reviewStep].filter(
-                            (_, index) => index !== indexOfTrack
-                        )
+                        reviewTracks[reviewStep].tracks.filter(
+                            (t) => t.id !== track.id
+                        ),
+                        0
                     );
                 }
                 updateChangesMade(reviewStep + 1, true);
@@ -278,5 +283,6 @@ export const useTrackReview = (reviewStep: number) => {
         autoplayLoading,
         setAutoplayLoading,
         reviewTracks,
+        updateReviewTracks,
     };
 };

@@ -4,7 +4,11 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import { Track } from "../../types";
 
 interface Props {
-    updateReviewTracks: (step: number, tracks: any) => void;
+    updateReviewTracks: (
+        step: number,
+        tracks: Track[],
+        currentTrackId: number
+    ) => void;
     updatePreviousTracks: (tracks: Track[]) => void;
     updateCurrentReleaseTrack: (track: Track | null) => void;
     previousTracks: Track[];
@@ -24,7 +28,7 @@ const ReleaseHeader = ({
                 variant="primary"
                 leftIcon={<ChevronLeftIcon />}
                 onClick={() => {
-                    updateReviewTracks(4, previousTracks);
+                    updateReviewTracks(4, previousTracks, 0);
                     updatePreviousTracks([]);
 
                     updateCurrentReleaseTrack(null);

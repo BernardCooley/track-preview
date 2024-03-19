@@ -30,6 +30,7 @@ const TrackReview = memo(
     ({ reviewStep }: Props) => {
         const {
             reviewTracks,
+            updateReviewTracks,
             recentGenres,
             setRecentGenres,
             user,
@@ -57,6 +58,8 @@ const TrackReview = memo(
         const { isOpen: isShowingTracklist, onToggle: toggleTracklist } =
             useDisclosure();
         const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+        const animationDuration = 0.6;
+        const [animate, setAnimate] = useState<"like" | "dislike" | null>(null);
 
         useEffect(() => {
             const handleResize = () => {
@@ -70,8 +73,15 @@ const TrackReview = memo(
             };
         }, []);
 
-        const animationDuration = 0.6;
-        const [animate, setAnimate] = useState<"like" | "dislike" | null>(null);
+        useEffect(() => {
+            if (currentTrack) {
+                updateReviewTracks(
+                    reviewStep,
+                    reviewTracks[reviewStep].tracks,
+                    reviewTracks[reviewStep].tracks.indexOf(currentTrack) || 0
+                );
+            }
+        }, [currentTrack]);
 
         useEffect(() => {
             setAnimate(null);
@@ -250,7 +260,7 @@ const TrackReview = memo(
                                 setAutoplayLoading(false);
                             }}
                             preferredAutoPlay={userProfile?.autoplay || false}
-                            trackList={reviewTracks[reviewStep]}
+                            trackList={reviewTracks[reviewStep].tracks}
                             setCurrentTrack={setCurrentTrack}
                             isOpen={reviewStep === 1 || !isShowingTracklist}
                             autoplay={userProfile?.autoplay || false}

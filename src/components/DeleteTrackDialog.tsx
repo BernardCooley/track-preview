@@ -66,12 +66,17 @@ const DeleteTrackDialog = forwardRef(
                                 >
                                     <Text fontSize="xl" fontWeight="bold">
                                         {
-                                            reviewTracks[4][trackToDelete!]
-                                                ?.artist
+                                            reviewTracks[4].tracks[
+                                                trackToDelete!
+                                            ]?.artist
                                         }
                                     </Text>
                                     <Text fontSize="md" fontWeight="bold">
-                                        {reviewTracks[4][trackToDelete!]?.title}
+                                        {
+                                            reviewTracks[4].tracks[
+                                                trackToDelete!
+                                            ]?.title
+                                        }
                                     </Text>
                                 </Flex>
                                 <Text>

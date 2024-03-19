@@ -40,7 +40,7 @@ export const useTrackList = () => {
         if (user && (trackToDelete || trackToDelete === 0)) {
             try {
                 await updateTrackReviewStep({
-                    trackId: reviewTracks[4][trackToDelete].id,
+                    trackId: reviewTracks[4].tracks[trackToDelete].id,
                     reviewStep: 4,
                     like: false,
                     userId: user.uid,
@@ -48,15 +48,15 @@ export const useTrackList = () => {
 
                 updateCurrentlyPlaying(undefined);
 
-                const filteredTracks: Track[] = reviewTracks[4].filter(
-                    (t) => t.id !== reviewTracks[4][trackToDelete].id
+                const filteredTracks: Track[] = reviewTracks[4].tracks.filter(
+                    (t) => t.id !== reviewTracks[4].tracks[trackToDelete].id
                 );
 
                 if (filteredTracks.length > 0) {
-                    updateReviewTracks(4, filteredTracks);
+                    updateReviewTracks(4, filteredTracks, 0);
                 } else {
                     setNoTracks(true);
-                    updateReviewTracks(4, []);
+                    updateReviewTracks(4, [], 0);
                 }
                 onClose();
                 setTrackToDelete(null);
@@ -82,7 +82,7 @@ export const useTrackList = () => {
 
     const getTracks = useCallback(
         async (track: Track | null) => {
-            updateReviewTracks(4, []);
+            updateReviewTracks(4, [], 0);
             setNoTracks(false);
             setLoading(true);
             if (user?.uid) {
@@ -98,7 +98,7 @@ export const useTrackList = () => {
                           });
 
                     if (fetchedTracks && fetchedTracks.length > 0) {
-                        updateReviewTracks(4, fetchedTracks);
+                        updateReviewTracks(4, fetchedTracks, 0);
                         updateChangesMade(4, false);
                         setLoading(false);
                     } else {

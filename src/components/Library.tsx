@@ -46,7 +46,7 @@ const Library = () => {
     } = useTrackList();
 
     useEffect(() => {
-        if (changesMade[4] || reviewTracks[4].length === 0) {
+        if (changesMade[4] || reviewTracks[4].tracks.length === 0) {
             getTracks(null);
         }
     }, [user]);

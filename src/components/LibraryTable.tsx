@@ -42,7 +42,11 @@ interface Props {
     updateCurrentReleaseTrack: (track: Track) => void;
     updatePreviousTracks: (tracks: Track[]) => void;
     getTracks: (track: Track) => void;
-    updateReviewTracks: (reviewStep: number, tracks: Track[]) => void;
+    updateReviewTracks: (
+        reviewStep: number,
+        tracks: Track[],
+        currentTrackIndex: number
+    ) => void;
     setSortBy: React.Dispatch<React.SetStateAction<keyof Track | "">>;
     setSortDirection: React.Dispatch<React.SetStateAction<SortDirection>>;
 }
@@ -68,27 +72,27 @@ const LibraryTable = ({
     const sortTracks = (field: TrackKeys) => {
         const order = sortBy === field ? sortDirection : "asc";
 
-        const sortedTracks = [...reviewTracks[4]].sort((a, b) => {
+        const sortedTracks = [...reviewTracks[4].tracks].sort((a, b) => {
             if (a[field] < b[field]) return order === "asc" ? -1 : 1;
             if (a[field] > b[field]) return order === "asc" ? 1 : -1;
             return 0;
         });
 
-        updateReviewTracks(4, sortedTracks);
+        updateReviewTracks(4, sortedTracks, 0);
         setSortBy(field);
         setSortDirection(order === "asc" ? "desc" : "asc");
     };
 
     const gotToRelease = (index: number) => {
-        updateCurrentReleaseTrack(reviewTracks[4][index]);
+        updateCurrentReleaseTrack(reviewTracks[4].tracks[index]);
         if (
             currentReleaseTrack?.releaseTitle !==
-                reviewTracks[4][index].releaseTitle &&
+                reviewTracks[4].tracks[index].releaseTitle &&
             currentReleaseTrack?.releaseDate !==
-                reviewTracks[4][index].releaseDate
+                reviewTracks[4].tracks[index].releaseDate
         ) {
-            updatePreviousTracks(reviewTracks[4]);
-            getTracks(reviewTracks[4][index]);
+            updatePreviousTracks(reviewTracks[4].tracks);
+            getTracks(reviewTracks[4].tracks[index]);
             setClickDisabled(false);
         }
     };
@@ -210,7 +214,7 @@ const LibraryTable = ({
                     </Tr>
                 </Thead>
                 <Tbody>
-                    {reviewTracks[4].map((track, index) => (
+                    {reviewTracks[4].tracks.map((track, index) => (
                         <Tr
                             key={track.id}
                             {...getTrProps(
@@ -357,7 +361,7 @@ const LibraryTable = ({
                     </Tr>
                 </Thead>
                 <Tbody>
-                    {reviewTracks[4].map((track, index) => (
+                    {reviewTracks[4].tracks.map((track, index) => (
                         <Tr
                             key={track.id}
                             {...getTrProps(

@@ -108,7 +108,7 @@ const TracklistTable = ({
                 >
                     <Table variant="primary">
                         <Tbody>
-                            {tracklist[reviewStep].map((track, index) => {
+                            {tracklist[reviewStep].tracks.map((track) => {
                                 const isCurrentTrack =
                                     currentlyPlaying?.previewUrl ===
                                     track.previewUrl;
@@ -187,7 +187,9 @@ const TracklistTable = ({
                                                 <Text
                                                     px={2}
                                                     noOfLines={2}
-                                                    sx={{ textWrap: "wrap" }}
+                                                    sx={{
+                                                        textWrap: "wrap",
+                                                    }}
                                                 >
                                                     {genre}
                                                 </Text>

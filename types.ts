@@ -50,7 +50,7 @@ export interface YearRange {
 }
 
 export interface ReviewTracks {
-    [key: number]: Track[];
+    [key: number]: { tracks: Track[]; currentTrack: number };
 }
 
 export type BuyPlatforms =

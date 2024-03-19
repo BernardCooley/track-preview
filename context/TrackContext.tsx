@@ -7,7 +7,11 @@ interface TrackContextProps {
     currentlyPlaying: string | undefined;
     updateCurrentlyPlaying: (trackId: string | undefined) => void;
     reviewTracks: ReviewTracks;
-    updateReviewTracks: (reviewStep: number, tracks: Track[]) => void;
+    updateReviewTracks: (
+        reviewStep: number,
+        tracks: Track[],
+        currentTrackIndex: number
+    ) => void;
     currentReleaseTrack: Track | null;
     updateCurrentReleaseTrack: (track: Track | null) => void;
     previousTracks: Track[];
@@ -37,10 +41,22 @@ export const useTrackContext = () => {
 export const TrackContextProvider = ({ children }: { children: ReactNode }) => {
     const [currentlyPlaying, setCurrentlyPlaying] = useState<string>("");
     const [reviewTracks, setReviewTracks] = useState<ReviewTracks>({
-        1: [],
-        2: [],
-        3: [],
-        4: [],
+        1: {
+            tracks: [],
+            currentTrack: 0,
+        },
+        2: {
+            tracks: [],
+            currentTrack: 0,
+        },
+        3: {
+            tracks: [],
+            currentTrack: 0,
+        },
+        4: {
+            tracks: [],
+            currentTrack: 0,
+        },
     });
     const [currentReleaseTrack, setCurrentReleaseTrack] =
         useState<Track | null>(null);
@@ -59,11 +75,21 @@ export const TrackContextProvider = ({ children }: { children: ReactNode }) => {
         setCurrentlyPlaying(trackId || "");
     };
 
-    const updateReviewTracks = (reviewStep: number, tracks: Track[]) => {
-        setReviewTracks((prevReviewTracks) => ({
-            ...prevReviewTracks,
-            [reviewStep]: tracks,
-        }));
+    const updateReviewTracks = (
+        reviewStep: number,
+        tracks: Track[],
+        currentTrackIndex: number
+    ) => {
+        setReviewTracks(
+            (prevReviewTracks) =>
+                ({
+                    ...prevReviewTracks,
+                    [reviewStep]: {
+                        tracks,
+                        currentTrack: currentTrackIndex,
+                    },
+                } as ReviewTracks)
+        );
     };
 
     const updateCurrentReleaseTrack = (track: Track | null) => {
