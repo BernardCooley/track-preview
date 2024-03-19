@@ -86,7 +86,7 @@ const TrackReview = memo(
         }, [animate]);
 
         return (
-            <Box px={[0, 8]} position="relative" height="full">
+            <Box px={0} position="relative" height="full">
                 {loading && !animate && (
                     <Center
                         zIndex={150}

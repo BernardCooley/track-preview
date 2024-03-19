@@ -9,16 +9,24 @@ interface Props {
 const ToggleTracklist = ({ toggleTracklist, isShowingTracklist }: Props) => {
     return (
         <Button
+            rounded="none"
+            roundedBottomLeft={isShowingTracklist ? 0 : 8}
+            bg={
+                isShowingTracklist
+                    ? "transparent"
+                    : "brand.backgroundTertiaryOpaque3"
+            }
+            color="brand.textPrimaryLight"
             position="absolute"
             onClick={toggleTracklist}
             variant="ghost"
-            right={[1, 4]}
+            right={0}
             top={0}
             fontSize="md"
             colorScheme="teal"
             _hover={{
-                bg: "transparent",
-                color: "brand.primary",
+                bg: "brand.backgroundTertiaryOpaque",
+                color: "brand.textPrimary",
             }}
             shadow="none"
         >
