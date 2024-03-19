@@ -514,7 +514,7 @@ const Settings = () => {
                 </Button>
                 <Button
                     position="absolute"
-                    bottom={8}
+                    bottom={16}
                     right={8}
                     colorScheme="teal"
                     size="sm"
