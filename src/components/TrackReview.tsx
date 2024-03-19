@@ -253,7 +253,6 @@ const TrackReview = memo(
                     transition={"all 0.5s ease"}
                     opacity={animate ? 0 : 1}
                     position="relative"
-                    gap={4}
                     direction="column"
                 >
                     {currentTrack && !animate && (

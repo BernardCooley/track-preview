@@ -4,6 +4,7 @@ import {
     Card,
     CardBody,
     Collapse,
+    Divider,
     Flex,
     Icon,
     Spinner,
@@ -19,6 +20,7 @@ import AudioPlayer, { RHAP_UI } from "react-h5-audio-player";
 import "react-h5-audio-player/lib/styles.css";
 import SkipNextIcon from "@mui/icons-material/SkipNext";
 import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
+import FullTrackLinks from "./FullTrackLinks";
 
 interface Props {
     loadingMessage?: string;
@@ -116,6 +118,7 @@ const TrackReviewCard = ({
                             </Flex>
                         </Flex>
                         <Flex
+                            direction="column"
                             w="full"
                             bg="brand.backgroundTertiaryOpaque3"
                             color="brand.textPrimary"
@@ -242,6 +245,8 @@ const TrackReviewCard = ({
                                     </Box>,
                                 ]}
                             />
+                            <Divider />
+                            <FullTrackLinks currentTrack={currentTrack} />
                         </Flex>
                     </CardBody>
                 </Card>
