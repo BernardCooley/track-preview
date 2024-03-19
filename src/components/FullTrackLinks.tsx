@@ -6,9 +6,10 @@ import { FaSpotify, FaSoundcloud } from "react-icons/fa";
 
 interface Props {
     currentTrack: Track;
+    onLinkClicked: () => void;
 }
 
-const FullTrackLinks = ({ currentTrack }: Props) => {
+const FullTrackLinks = ({ currentTrack, onLinkClicked }: Props) => {
     const links = [
         {
             url: `https://www.youtube.com/results?search_query=${currentTrack.artist}+${currentTrack.title}+${currentTrack.releaseTitle}`,
@@ -36,6 +37,7 @@ const FullTrackLinks = ({ currentTrack }: Props) => {
             <Flex w="full" justifyContent="space-around" flexWrap="wrap">
                 {links.map((link) => (
                     <Link
+                        onClick={onLinkClicked}
                         rounded="12px"
                         py={1}
                         px={2}

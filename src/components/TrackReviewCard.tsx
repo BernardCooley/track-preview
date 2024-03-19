@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useRef } from "react";
 import {
     Box,
+    Button,
     Card,
     CardBody,
     Collapse,
@@ -62,6 +63,7 @@ const TrackReviewCard = ({
     toggleTracklist,
     isShowingTracklist,
 }: Props) => {
+    const playerRef = useRef<AudioPlayer>(null);
     const indexOfCurrentTrack = trackList.findIndex(
         (t) => t.id === currentTrack.id
     );
@@ -144,6 +146,7 @@ const TrackReviewCard = ({
                             color="brand.textPrimary"
                         >
                             <AudioPlayer
+                                ref={playerRef}
                                 style={{ backgroundColor: "transparent" }}
                                 autoPlayAfterSrcChange={autoplay}
                                 header={
@@ -266,7 +269,14 @@ const TrackReviewCard = ({
                                 ]}
                             />
                             <Divider />
-                            <FullTrackLinks currentTrack={currentTrack} />
+                            <FullTrackLinks
+                                onLinkClicked={() => {
+                                    if (playerRef.current) {
+                                        playerRef?.current?.audio.current?.pause();
+                                    }
+                                }}
+                                currentTrack={currentTrack}
+                            />
                         </Flex>
                     </CardBody>
                 </Card>
