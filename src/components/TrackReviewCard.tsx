@@ -145,7 +145,7 @@ const TrackReviewCard = ({
                         >
                             <AudioPlayer
                                 style={{ backgroundColor: "transparent" }}
-                                autoPlayAfterSrcChange={true}
+                                autoPlayAfterSrcChange={autoplay}
                                 header={
                                     <Flex
                                         alignItems="center"
