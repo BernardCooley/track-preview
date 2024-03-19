@@ -75,9 +75,6 @@ const TrackReview = memo(
 
         useEffect(() => {
             setAnimate(null);
-            if (isShowingTracklist) {
-                toggleTracklist();
-            }
         }, [reviewStep]);
 
         useEffect(() => {
@@ -174,16 +171,14 @@ const TrackReview = memo(
                     onConfirm={(val) => onYearConfirm(val)}
                     onCancel={() => setShowYearSelector(false)}
                 />
-                <Flex
+
+                <Box
                     px={[4, 0]}
                     w="full"
-                    alignItems="baseline"
-                    justifyContent="space-between"
-                    direction="column"
-                    pb={4}
-                    gap={2}
+                    py={reviewStep === 1 ? 4 : 0}
                     zIndex={200}
-                    minH="46px"
+                    h={reviewStep === 1 ? "46px" : "0px"}
+                    transition="all 0.3s ease-in-out"
                 >
                     {user?.uid && (
                         <FilterTags
@@ -205,26 +200,7 @@ const TrackReview = memo(
                             }
                         />
                     )}
-                </Flex>
-
-                {!noTracks && !loading && reviewStep > 1 && reviewStep < 4 && (
-                    <Button
-                        onClick={toggleTracklist}
-                        variant="ghost"
-                        position="absolute"
-                        right={[1, 4]}
-                        top={0}
-                        fontSize="md"
-                        colorScheme="teal"
-                        _hover={{
-                            bg: "transparent",
-                            color: "brand.primary",
-                        }}
-                        shadow="none"
-                    >
-                        {isShowingTracklist ? "Hide" : "Show"} tracklist
-                    </Button>
-                )}
+                </Box>
 
                 {animate && (
                     <RecordAnimation
@@ -254,9 +230,15 @@ const TrackReview = memo(
                     opacity={animate ? 0 : 1}
                     position="relative"
                     direction="column"
+                    pt={reviewStep === 1 ? "16px" : "0px"}
                 >
                     {currentTrack && !animate && (
                         <TrackReviewCard
+                            noTracks={noTracks}
+                            loading={loading}
+                            reviewStep={reviewStep}
+                            toggleTracklist={toggleTracklist}
+                            isShowingTracklist={isShowingTracklist}
                             profileLoaded={userProfile ? true : false}
                             autoplayLoading={autoplayLoading}
                             onAutoPlayToggle={async () => {
@@ -285,8 +267,12 @@ const TrackReview = memo(
                     )}
                     {!animate && reviewStep > 1 && reviewStep < 4 && (
                         <TracklistTable
-                            isOpen={isShowingTracklist}
+                            noTracks={noTracks}
+                            loading={loading}
                             reviewStep={reviewStep}
+                            toggleTracklist={toggleTracklist}
+                            isShowingTracklist={isShowingTracklist}
+                            isOpen={isShowingTracklist}
                             tracklist={reviewTracks}
                             currentlyPlaying={currentTrack}
                             updateCurrentlyPlaying={(track) => {

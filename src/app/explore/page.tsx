@@ -113,7 +113,7 @@ export default function Explore() {
             <Center h="full">
                 <Flex direction="column" w="full" h="full">
                     <Stack
-                        spacing="4"
+                        spacing={0}
                         w="full"
                         position="relative"
                         transition="ease-in-out"

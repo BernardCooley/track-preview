@@ -21,6 +21,7 @@ import "react-h5-audio-player/lib/styles.css";
 import SkipNextIcon from "@mui/icons-material/SkipNext";
 import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
 import FullTrackLinks from "./FullTrackLinks";
+import ToggleTracklist from "./ToggleTracklist";
 
 interface Props {
     loadingMessage?: string;
@@ -35,6 +36,11 @@ interface Props {
     preferredAutoPlay: boolean;
     profileLoaded: boolean;
     autoplayLoading?: boolean;
+    noTracks: boolean;
+    loading: boolean;
+    reviewStep: number;
+    toggleTracklist: () => void;
+    isShowingTracklist: boolean;
 }
 
 const TrackReviewCard = ({
@@ -50,6 +56,11 @@ const TrackReviewCard = ({
     preferredAutoPlay,
     profileLoaded,
     autoplayLoading = false,
+    noTracks,
+    loading,
+    reviewStep,
+    toggleTracklist,
+    isShowingTracklist,
 }: Props) => {
     const indexOfCurrentTrack = trackList.findIndex(
         (t) => t.id === currentTrack.id
@@ -89,11 +100,20 @@ const TrackReviewCard = ({
                         p={0}
                         as={Flex}
                         direction="column"
-                        alignItems="center"
+                        alignItems="flex-end"
                         justifyContent="space-between"
                         bgImage={currentTrack.thumbnail}
                         bgSize="cover"
                     >
+                        {!noTracks &&
+                            !loading &&
+                            reviewStep > 1 &&
+                            reviewStep < 4 && (
+                                <ToggleTracklist
+                                    toggleTracklist={toggleTracklist}
+                                    isShowingTracklist={isShowingTracklist}
+                                />
+                            )}
                         <Flex
                             direction="column"
                             h="full"
