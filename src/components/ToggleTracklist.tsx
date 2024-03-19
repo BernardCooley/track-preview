@@ -16,7 +16,11 @@ const ToggleTracklist = ({ toggleTracklist, isShowingTracklist }: Props) => {
                     ? "transparent"
                     : "brand.backgroundTertiaryOpaque3"
             }
-            color="brand.textPrimaryLight"
+            color={
+                isShowingTracklist
+                    ? "brand.textPrimaryLight"
+                    : "brand.textPrimary"
+            }
             position="absolute"
             onClick={toggleTracklist}
             variant="ghost"
@@ -26,7 +30,6 @@ const ToggleTracklist = ({ toggleTracklist, isShowingTracklist }: Props) => {
             colorScheme="teal"
             _hover={{
                 bg: "brand.backgroundTertiaryOpaque",
-                color: "brand.textPrimary",
             }}
             shadow="none"
         >
