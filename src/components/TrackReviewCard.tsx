@@ -13,8 +13,8 @@ import {
     Text,
 } from "@chakra-ui/react";
 import { Track } from "../../types";
-import BouncingDotsLoader from "./BouncingLoaderDots";
 import ThumbDownAltTwoToneIcon from "@mui/icons-material/ThumbDownAltTwoTone";
+import BouncingDotsLoader from "./BouncingLoaderDots";
 import ThumbUpAltTwoToneIcon from "@mui/icons-material/ThumbUpAltTwoTone";
 import TrackCardIcon from "./TrackCardIcon";
 import AudioPlayer, { RHAP_UI } from "react-h5-audio-player";
