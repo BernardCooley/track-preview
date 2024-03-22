@@ -94,7 +94,6 @@ const TracklistTable = ({
                 )}
 
                 <TableContainer
-                    pt={10}
                     transition="padding 0.2s ease-in-out"
                     maxH="68vh"
                     overflowY="scroll"

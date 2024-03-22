@@ -10,7 +10,7 @@ const ToggleTracklist = ({ toggleTracklist, isShowingTracklist }: Props) => {
     return (
         <Button
             rounded="none"
-            roundedBottomLeft={isShowingTracklist ? 0 : 8}
+            roundedBottomLeft={8}
             bg={
                 isShowingTracklist
                     ? "transparent"
@@ -21,11 +21,8 @@ const ToggleTracklist = ({ toggleTracklist, isShowingTracklist }: Props) => {
                     ? "brand.textPrimaryLight"
                     : "brand.textPrimary"
             }
-            position="absolute"
             onClick={toggleTracklist}
             variant="ghost"
-            right={0}
-            top={0}
             fontSize="md"
             colorScheme="teal"
             _hover={{
@@ -33,7 +30,7 @@ const ToggleTracklist = ({ toggleTracklist, isShowingTracklist }: Props) => {
             }}
             shadow="none"
         >
-            {isShowingTracklist ? "Show player" : "Show tracklist"}
+            {`Show ${isShowingTracklist ? "player" : "tracklist"}`}
         </Button>
     );
 };
