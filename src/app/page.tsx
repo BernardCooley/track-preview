@@ -1,16 +1,6 @@
 "use client";
 
-import {
-    Box,
-    Button,
-    Flex,
-    Table,
-    TableContainer,
-    Tbody,
-    Td,
-    Text,
-    Tr,
-} from "@chakra-ui/react";
+import { Box, Button, Flex, Text, VStack } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
 import { useAuthContext } from "../../Contexts/AuthContext";
 
@@ -18,10 +8,11 @@ export default function Home() {
     const { user } = useAuthContext();
     const router = useRouter();
     const listItems = [
-        "Listen to a sample of random track based on your selection of genre and release year",
-        "Mark each track as liked or disliked",
+        "Listen to a random song",
+        "Like or dislike each song",
         "Dislikes are never seen again. Likes are moved to the next step for later review",
         "A new track is loaded after each like or dislike",
+        "Manage or buy your liked tracks from the library",
     ];
 
     return (
@@ -45,47 +36,41 @@ export default function Home() {
             <Flex
                 direction="column"
                 alignItems="center"
-                gap={8}
+                gap={6}
                 p={6}
                 h="full"
                 w="full"
             >
                 <Text fontSize={["2xl", "3xl"]}>Welcome to Phoniquest</Text>
                 <Flex w="full" maxW="500px" pb={10}>
-                    <TableContainer
-                        w="full"
-                        overflow="hidden"
-                        sx={{
-                            textWrap: "wrap",
-                        }}
-                    >
-                        <Table variant="unstyled">
-                            <Tbody>
-                                {listItems.map((item) => (
-                                    <Tr key={item} h={20}>
-                                        <Td pr={4}>
-                                            <Box
-                                                w="30px"
-                                                h="15px"
-                                                backgroundImage={
-                                                    "url(/logo_1x.png)"
-                                                }
-                                                backgroundSize="100% 100%"
-                                                backgroundRepeat="no-repeat"
-                                            ></Box>
-                                        </Td>
-                                        <Td
-                                            fontSize={["lg", "xl"]}
-                                            lineHeight={[6, 8]}
-                                            p={0}
-                                        >
-                                            {item}
-                                        </Td>
-                                    </Tr>
-                                ))}
-                            </Tbody>
-                        </Table>
-                    </TableContainer>
+                    <VStack gap={6}>
+                        {listItems.map((item) => (
+                            <Flex
+                                alignItems="center"
+                                key={item}
+                                gap={2}
+                                justifyContent="flex-start"
+                                w="full"
+                            >
+                                <Box
+                                    w="30px"
+                                    h="15px"
+                                    minW="30px"
+                                    backgroundImage={"url(/logo_1x.png)"}
+                                    backgroundSize="100% 100%"
+                                    backgroundRepeat="no-repeat"
+                                ></Box>
+
+                                <Text
+                                    fontSize={["lg", "xl"]}
+                                    lineHeight={[8, 10]}
+                                    p={0}
+                                >
+                                    {item}
+                                </Text>
+                            </Flex>
+                        ))}
+                    </VStack>
                 </Flex>
                 <Button
                     onClick={() => {
