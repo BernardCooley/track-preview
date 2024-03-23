@@ -33,7 +33,8 @@ const FullTrackLinks = ({ currentTrack, onLinkClicked }: Props) => {
                     <Link
                         onClick={onLinkClicked}
                         rounded="12px"
-                        py={1}
+                        pt={0}
+                        pb={1}
                         px={2}
                         key={link.title}
                         isExternal
