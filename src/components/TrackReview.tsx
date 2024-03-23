@@ -55,10 +55,11 @@ const TrackReview = memo(
             onYearConfirm,
         } = useTrackReview(reviewStep);
 
+        const [animationImage, setAnimationImage] = useState<string>("");
         const { isOpen: isShowingTracklist, onToggle: toggleTracklist } =
             useDisclosure();
         const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-        const animationDuration = 0.6;
+        const animationDuration = 0.7;
         const [animate, setAnimate] = useState<"like" | "dislike" | null>(null);
 
         useEffect(() => {
@@ -216,7 +217,7 @@ const TrackReview = memo(
                         animate={animate}
                         leftPosition={(windowWidth / 4) * reviewStep}
                         animationDuration={animationDuration}
-                        image={currentTrack?.thumbnail || ""}
+                        image={animationImage}
                     />
                 )}
 
@@ -268,6 +269,9 @@ const TrackReview = memo(
                             onLikeOrDislike={async (val) => {
                                 await likeOrDislike(val);
                                 setAnimate(val ? "like" : "dislike");
+                                setAnimationImage(
+                                    currentTrack?.thumbnail || ""
+                                );
                             }}
                             onAudioPlay={() => {
                                 setIsPlaying(true);

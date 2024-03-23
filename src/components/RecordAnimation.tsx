@@ -49,8 +49,8 @@ const RecordAnimation = ({
             <Box
                 bgImage={image}
                 bgSize="cover"
-                w="30%"
-                h="30%"
+                w="100%"
+                h="50%"
                 rounded="full"
                 bgPosition="center"
             ></Box>
