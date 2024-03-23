@@ -245,12 +245,28 @@ const TrackReviewCard = ({
                                     RHAP_UI.MAIN_CONTROLS,
                                     <Box
                                         key="AutoplayButton"
-                                        w="66px"
+                                        rounded="full"
+                                        w="84px"
+                                        py={1}
+                                        px={2}
                                         onClick={onAutoPlayToggle}
-                                        opacity={preferredAutoPlay ? 1 : 0.5}
+                                        border="1px solid"
+                                        borderColor="brand.textPrimary"
+                                        bg={
+                                            preferredAutoPlay
+                                                ? "brand.textPrimary"
+                                                : "transparent"
+                                        }
                                     >
                                         {profileLoaded && !autoplayLoading ? (
-                                            <Text userSelect="none">
+                                            <Text
+                                                color={
+                                                    preferredAutoPlay
+                                                        ? "black"
+                                                        : "brand.textPrimary"
+                                                }
+                                                userSelect="none"
+                                            >
                                                 AutoPlay
                                             </Text>
                                         ) : (
