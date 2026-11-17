@@ -8,13 +8,7 @@ import {
     IconButton,
     Image,
     Table,
-    TableContainer,
-    Tbody,
-    Td,
     Text,
-    Th,
-    Thead,
-    Tr,
 } from "@chakra-ui/react";
 import { ReviewTracks, SortDirection, Track } from "../../types";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
@@ -112,19 +106,20 @@ const LibraryTable = ({
     ) => {
         const isPlaying = playingTrackId === track.id;
         return {
-            fontSize: "md",
-            rounded: 10,
-            outlineOffset: -2,
+            fontSize: "sm",
+            transition: "all 0.15s ease",
             outline: isPlaying ? "1px solid" : "none",
             outlineColor: isPlaying ? "brand.primary" : "transparent",
-            color: "brand.textPrimaryLight",
+            outlineOffset: -1,
+            rounded: "lg",
+            color: "brand.textSecondary",
             _hover: {
                 cursor: "pointer",
-                backgroundColor: isPlaying
-                    ? "brand.backgroundTertiaryOpaque"
-                    : "brand.backgroundTertiaryOpaque2",
+                bg: isPlaying
+                    ? "brand.primarySubtle"
+                    : "brand.surfaceHover",
             },
-            bg: isPlaying ? "brand.backgroundTertiaryOpaque" : "transparent",
+            bg: isPlaying ? "brand.primarySubtle" : "transparent",
             onClick: async () => {
                 if (!clickDisabled) {
                     if (playingTrackId === track.id) {
@@ -141,84 +136,113 @@ const LibraryTable = ({
     };
 
     const TableHeading = ({ title }: TableHeadingProps) => {
+        const isActive = sortBy === title;
         return (
-            <Flex
-                position="relative"
-                as={Button}
-                variant="unstyled"
-                border="none"
-                shadow="none"
+            <Button
+                variant="ghost"
                 onClick={() => sortTracks(title as TrackKeys)}
-                textDecoration={sortBy === title ? "underline" : "none"}
+                height="auto"
+                px={2}
+                py={1}
+                shadow="none"
+                color={isActive ? "brand.primary" : "brand.textMuted"}
+                fontWeight={isActive ? "semibold" : "medium"}
+                fontSize="xs"
+                textTransform="uppercase"
+                letterSpacing="wider"
+                _hover={{
+                    color: "brand.textSecondary",
+                    bg: "transparent",
+                }}
             >
                 <Text>{camelcaseToTitleCase(title)}</Text>
-                {sortBy === title && (
+                {isActive && (
                     <Box
-                        top={2}
-                        right={-6}
-                        position="absolute"
-                        transform={
-                            sortBy === title && sortDirection === "asc"
-                                ? ""
-                                : "rotate(180deg)"
-                        }
+                        transform={sortDirection === "asc" ? "" : "rotate(180deg)"}
+                        transition="transform 0.2s ease"
+                        ml={1}
                     >
-                        <KeyboardArrowUpIcon />
+                        <KeyboardArrowUpIcon style={{ fontSize: "16px" }} />
                     </Box>
                 )}
-            </Flex>
+            </Button>
         );
     };
 
+    const ActionButtons = ({ index }: { index: number }) => (
+        <Flex alignItems="center" gap={1}>
+            <IconButton
+                onMouseEnter={() => setClickDisabled(true)}
+                onMouseLeave={() => setClickDisabled(false)}
+                color="brand.primary"
+                fontSize="xl"
+                bg="transparent"
+                shadow="none"
+                onClick={(e) => {
+                    e.stopPropagation();
+                    setTrackToBuy(index);
+                }}
+                rounded="full"
+                variant="tertiary"
+                aria-label="buy track"
+                size="sm"
+            >
+                <ShopIcon fontSize="inherit" />
+            </IconButton>
+            <TrackMenuOptions
+                onMouseEnter={() => setClickDisabled(true)}
+                onMouseLeave={() => setClickDisabled(false)}
+                onTrackDelete={() => setTrackToDelete(index)}
+                onViewRelease={() => gotToRelease(index)}
+                index={index}
+            />
+        </Flex>
+    );
+
     return (
-        <TableContainer
+        <Box
             transition="padding 0.2s ease-in-out"
-            pb={currentlyPlaying ? 14 : 0}
-            maxH={currentReleaseTrack || currentlyPlaying ? "70vh" : "75vh"}
-            overflowY="scroll"
-            sx={{
-                "::-webkit-scrollbar": {
-                    display: "none",
+            pb={currentlyPlaying ? 20 : 4}
+            maxH={currentReleaseTrack || currentlyPlaying ? "70vh" : "78vh"}
+            overflowY="auto"
+            overflowX="auto"
+            css={{
+                "&::-webkit-scrollbar": {
+                    width: "4px",
+                },
+                "&::-webkit-scrollbar-track": {
+                    background: "transparent",
+                },
+                "&::-webkit-scrollbar-thumb": {
+                    background: "var(--chakra-colors-brand-scrollbar-thumb)",
+                    borderRadius: "4px",
                 },
             }}
-            shadow="2xl"
-            rounded="2xl"
         >
-            <Table variant="primary" display={["none", "none", "table"]}>
-                <Thead>
-                    <Tr>
-                        <Th pl={4}>
+            {/* Desktop table */}
+            <Table.Root display={["none", "none", "table"]}>
+                <Table.Header>
+                    <Table.Row>
+                        <Table.ColumnHeader color="brand.textMuted" py={2} px={2}>
                             <TableHeading title="title" />
-                        </Th>
-                        <Th>
+                        </Table.ColumnHeader>
+                        <Table.ColumnHeader color="brand.textMuted" py={2} px={2}>
                             <TableHeading title="releaseTitle" />
-                        </Th>
-                        <Th>
+                        </Table.ColumnHeader>
+                        <Table.ColumnHeader color="brand.textMuted" py={2} px={2}>
                             <TableHeading title="genre" />
-                        </Th>
-                        <Th>
+                        </Table.ColumnHeader>
+                        <Table.ColumnHeader color="brand.textMuted" py={2} px={2}>
                             <TableHeading title="releaseDate" />
-                        </Th>
+                        </Table.ColumnHeader>
                         {!currentReleaseTrack && (
-                            <Th>
-                                <Box
-                                    as={Button}
-                                    variant="unstyled"
-                                    border="none"
-                                    shadow="none"
-                                    _hover={{
-                                        cursor: "default",
-                                    }}
-                                >
-                                    <br />
-                                </Box>
-                            </Th>
+                            <Table.ColumnHeader py={2} px={2} w="80px" />
                         )}
-                    </Tr>
-                </Thead>
-                <Tbody>
+                    </Table.Row>
+                </Table.Header>
+                <Table.Body>
                     {reviewTracks[4].tracks.map((track, index) => (
-                        <Tr
+                        <Table.Row
                             key={track.id}
                             {...getTrProps(
                                 track,
@@ -226,144 +250,90 @@ const LibraryTable = ({
                                 clickDisabled,
                                 updateCurrentlyPlaying
                             )}
+                            borderBottom="1px solid"
+                            borderBottomColor="brand.divider"
                         >
-                            <Td>
-                                <Flex
-                                    alignItems="center"
-                                    gap={6}
-                                    justifyContent="flex-start"
-                                    pl={4}
-                                >
+                            <Table.Cell py={3} px={2}>
+                                <Flex alignItems="center" gap={4} pl={2}>
                                     <Image
-                                        rounded="full"
-                                        w={16}
-                                        h={16}
+                                        rounded="lg"
+                                        w={12}
+                                        h={12}
                                         src={track.thumbnail}
                                         alt=""
-                                    ></Image>
-                                    <Flex direction="column" gap={2}>
+                                        objectFit="cover"
+                                    />
+                                    <Flex direction="column" gap={0.5}>
                                         <Text
-                                            noOfLines={3}
-                                            fontSize={"md"}
-                                            color={"brand.textPrimary"}
-                                            maxW={32}
-                                            sx={{
-                                                textWrap: "wrap",
-                                            }}
+                                            lineClamp={2}
+                                            fontSize="sm"
+                                            color="brand.textPrimary"
+                                            maxW={36}
+                                            css={{ textWrap: "wrap" }}
                                             fontWeight={
-                                                playingTrackId !== track.id
-                                                    ? "normal"
-                                                    : "bold"
+                                                playingTrackId === track.id
+                                                    ? "semibold"
+                                                    : "normal"
                                             }
                                         >
                                             {track.title}
                                         </Text>
                                         <Text
-                                            fontSize="sm"
-                                            maxW={32}
-                                            sx={{
-                                                textWrap: "wrap",
-                                            }}
-                                            fontWeight={
-                                                playingTrackId !== track.id
-                                                    ? "normal"
-                                                    : "bold"
-                                            }
+                                            fontSize="xs"
+                                            color="brand.textMuted"
+                                            maxW={36}
+                                            css={{ textWrap: "wrap" }}
                                         >
                                             {track.artist}
                                         </Text>
                                     </Flex>
                                 </Flex>
-                            </Td>
+                            </Table.Cell>
 
-                            <Td>
-                                <Text maxW={48} sx={{ textWrap: "wrap" }}>
+                            <Table.Cell py={3} px={2}>
+                                <Text maxW={48} css={{ textWrap: "wrap" }} fontSize="sm">
                                     {track.releaseTitle}
                                 </Text>
-                            </Td>
-                            <Td>
-                                <Text maxW={20} sx={{ textWrap: "wrap" }}>
+                            </Table.Cell>
+                            <Table.Cell py={3} px={2}>
+                                <Text maxW={20} css={{ textWrap: "wrap" }} fontSize="sm">
                                     {track.genre}
                                 </Text>
-                            </Td>
-
-                            <Td>
-                                {getFormattedDate(track.releaseDate) ||
-                                    track.releaseYear}
-                            </Td>
+                            </Table.Cell>
+                            <Table.Cell py={3} px={2}>
+                                <Text fontSize="sm">
+                                    {getFormattedDate(track.releaseDate) ||
+                                        track.releaseYear}
+                                </Text>
+                            </Table.Cell>
                             {!currentReleaseTrack && (
-                                <Td>
-                                    <Flex alignItems="center">
-                                        <IconButton
-                                            onMouseEnter={() =>
-                                                setClickDisabled(true)
-                                            }
-                                            onMouseLeave={() =>
-                                                setClickDisabled(false)
-                                            }
-                                            color="brand.primary"
-                                            fontSize="2xl"
-                                            bg="transparent"
-                                            shadow="none"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                setTrackToBuy(index);
-                                            }}
-                                            position="relative"
-                                            rounded="full"
-                                            variant="ghost"
-                                            aria-label="buy track"
-                                            icon={
-                                                <ShopIcon fontSize="inherit" />
-                                            }
-                                            _hover={{
-                                                bg: "transparent",
-                                            }}
-                                            _focusVisible={{
-                                                outline: "none",
-                                            }}
-                                        />
-                                        <TrackMenuOptions
-                                            onMouseEnter={() =>
-                                                setClickDisabled(true)
-                                            }
-                                            onMouseLeave={() =>
-                                                setClickDisabled(false)
-                                            }
-                                            onTrackDelete={() =>
-                                                setTrackToDelete(index)
-                                            }
-                                            onViewRelease={() =>
-                                                gotToRelease(index)
-                                            }
-                                            index={index}
-                                        />
-                                    </Flex>
-                                </Td>
+                                <Table.Cell py={3} px={2}>
+                                    <ActionButtons index={index} />
+                                </Table.Cell>
                             )}
-                        </Tr>
+                        </Table.Row>
                     ))}
-                </Tbody>
-            </Table>
-            <Table variant="primary" display={["table", "table", "none"]}>
-                <Thead>
-                    <Tr>
-                        <Th pl={4}>
+                </Table.Body>
+            </Table.Root>
+
+            {/* Mobile table */}
+            <Table.Root display={["table", "table", "none"]}>
+                <Table.Header>
+                    <Table.Row>
+                        <Table.ColumnHeader color="brand.textMuted" py={2} px={2}>
                             <TableHeading title="title" />
-                        </Th>
-                        <Th>
+                        </Table.ColumnHeader>
+                        <Table.ColumnHeader color="brand.textMuted" py={2} px={2}>
                             <TableHeading title="genre" />
-                        </Th>
+                        </Table.ColumnHeader>
                         {!currentReleaseTrack && (
-                            <Th>
-                                <br />
-                            </Th>
+                            <Table.ColumnHeader py={2} px={2} w="70px" />
                         )}
-                    </Tr>
-                </Thead>
-                <Tbody>
+                    </Table.Row>
+                </Table.Header>
+                <Table.Body>
                     {reviewTracks[4].tracks.map((track, index) => (
-                        <Tr
+                        <Table.Row
                             key={track.id}
                             {...getTrProps(
                                 track,
@@ -371,75 +341,64 @@ const LibraryTable = ({
                                 clickDisabled,
                                 updateCurrentlyPlaying
                             )}
-                            fontSize="sm"
+                            borderBottom="1px solid"
+                            borderBottomColor="brand.divider"
                         >
-                            <Td>
-                                <Flex
-                                    alignItems="center"
-                                    gap={3}
-                                    justifyContent="flex-start"
-                                    pl={4}
-                                >
+                            <Table.Cell py={2.5} px={2}>
+                                <Flex alignItems="center" gap={3} pl={2}>
                                     <Image
-                                        rounded="full"
-                                        w={14}
-                                        h={14}
+                                        rounded="lg"
+                                        w={11}
+                                        h={11}
                                         src={track.thumbnail}
                                         alt=""
-                                    ></Image>
+                                        objectFit="cover"
+                                    />
                                     <Flex
                                         direction="column"
-                                        maxW={[32, 40]}
-                                        gap={1}
+                                        maxW={[28, 36]}
+                                        gap={0.5}
                                     >
                                         <Text
-                                            isTruncated={
-                                                playingTrackId !== track.id
-                                            }
-                                            color={"brand.textPrimary"}
-                                            sx={{
+                                            truncate={playingTrackId !== track.id}
+                                            color="brand.textPrimary"
+                                            fontSize="sm"
+                                            css={{
                                                 textWrap:
                                                     playingTrackId !== track.id
                                                         ? "nowrap"
                                                         : "wrap",
                                             }}
                                             fontWeight={
-                                                playingTrackId !== track.id
-                                                    ? "normal"
-                                                    : "bold"
+                                                playingTrackId === track.id
+                                                    ? "semibold"
+                                                    : "normal"
                                             }
                                         >
                                             {track.title}
                                         </Text>
                                         <Text
-                                            isTruncated={
-                                                playingTrackId !== track.id
-                                            }
+                                            truncate={playingTrackId !== track.id}
                                             fontSize="xs"
+                                            color="brand.textMuted"
                                             maxW={24}
-                                            sx={{
+                                            css={{
                                                 textWrap:
                                                     playingTrackId !== track.id
                                                         ? "nowrap"
                                                         : "wrap",
                                             }}
-                                            fontWeight={
-                                                playingTrackId !== track.id
-                                                    ? "normal"
-                                                    : "bold"
-                                            }
                                         >
                                             {track.artist}
                                         </Text>
                                     </Flex>
                                 </Flex>
-                            </Td>
-                            <Td>
+                            </Table.Cell>
+                            <Table.Cell py={2.5} px={2}>
                                 <Text
-                                    isTruncated={
-                                        playingTrackId !== track.id
-                                    }
-                                    sx={{
+                                    truncate={playingTrackId !== track.id}
+                                    fontSize="xs"
+                                    css={{
                                         textWrap:
                                             playingTrackId !== track.id
                                                 ? "nowrap"
@@ -448,63 +407,17 @@ const LibraryTable = ({
                                 >
                                     {track.genre}
                                 </Text>
-                            </Td>
+                            </Table.Cell>
                             {!currentReleaseTrack && (
-                                <Td>
-                                    <Flex alignItems="center">
-                                        <IconButton
-                                            left={2}
-                                            onMouseEnter={() =>
-                                                setClickDisabled(true)
-                                            }
-                                            onMouseLeave={() =>
-                                                setClickDisabled(false)
-                                            }
-                                            color="brand.primary"
-                                            fontSize="2xl"
-                                            bg="transparent"
-                                            shadow="none"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                setTrackToBuy(index);
-                                            }}
-                                            position="relative"
-                                            rounded="full"
-                                            variant="ghost"
-                                            aria-label="buy track"
-                                            icon={
-                                                <ShopIcon fontSize="inherit" />
-                                            }
-                                            _hover={{
-                                                bg: "transparent",
-                                            }}
-                                            _focusVisible={{
-                                                outline: "none",
-                                            }}
-                                        />
-                                        <TrackMenuOptions
-                                            onMouseEnter={() =>
-                                                setClickDisabled(true)
-                                            }
-                                            onMouseLeave={() =>
-                                                setClickDisabled(false)
-                                            }
-                                            onTrackDelete={() =>
-                                                setTrackToDelete(index)
-                                            }
-                                            onViewRelease={() =>
-                                                gotToRelease(index)
-                                            }
-                                            index={index}
-                                        />
-                                    </Flex>
-                                </Td>
+                                <Table.Cell py={2.5} px={2}>
+                                    <ActionButtons index={index} />
+                                </Table.Cell>
                             )}
-                        </Tr>
+                        </Table.Row>
                     ))}
-                </Tbody>
-            </Table>
-        </TableContainer>
+                </Table.Body>
+            </Table.Root>
+        </Box>
     );
 };
 

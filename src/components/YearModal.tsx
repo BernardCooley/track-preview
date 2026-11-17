@@ -1,12 +1,11 @@
 "use client";
 
 import {
+    Box,
     Button,
-    Divider,
+    Dialog,
     Flex,
-    Modal,
-    ModalContent,
-    ModalOverlay,
+    Separator,
     Text,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
@@ -53,115 +52,192 @@ const YearModal = ({
 
     const sliderMarks = ["1960", "1980", "2000", getCurrentYear()];
 
-    return (
-        <Modal
-            isCentered={true}
-            isOpen={showYearSelector}
-            onClose={() => setShowYearSelector(false)}
+    const DecadeTag = ({ title, isActive, onClick }: { title: string; isActive: boolean; onClick: () => void }) => (
+        <Box
+            as="button"
+            onClick={onClick}
+            px={3}
+            py={1.5}
+            fontSize="sm"
+            fontWeight={isActive ? "medium" : "normal"}
+            rounded="md"
+            cursor="pointer"
+            position="relative"
+            transition="all 0.15s ease"
+            color={isActive ? "brand.primary" : "brand.textPrimary"}
+            borderLeft={isActive ? "2px solid" : "2px solid transparent"}
+            borderLeftColor={isActive ? "brand.primary" : "transparent"}
+            css={{
+                backdropFilter: "blur(8px)",
+                WebkitBackdropFilter: "blur(8px)",
+                background: isActive
+                    ? "color-mix(in srgb, var(--chakra-colors-brand-primary) 10%, transparent)"
+                    : "var(--chakra-colors-brand-surface)",
+                boxShadow: "0 1px 3px rgba(0, 0, 0, 0.06)",
+                "&:hover": {
+                    background: isActive
+                        ? "color-mix(in srgb, var(--chakra-colors-brand-primary) 15%, transparent)"
+                        : "var(--chakra-colors-brand-surface-hover)",
+                    boxShadow: "0 2px 6px rgba(0, 0, 0, 0.08)",
+                },
+            }}
         >
-            <ModalOverlay />
-            <ModalContent
-                rounded={20}
-                m={6}
-                bg="brand.backgroundPrimary"
-                shadow="2xl"
-                border="1px solid"
-                borderColor="brand.primary"
-            >
-                <Flex
-                    h="full"
-                    w="full"
-                    bg="brand.backgroundPrimary"
-                    rounded={20}
-                    p={showYearSelector ? 4 : 0}
+            {title}
+        </Box>
+    );
+
+    return (
+        <Dialog.Root
+            placement="center"
+            open={showYearSelector}
+            onOpenChange={(details) => { if (!details.open) setShowYearSelector(false); }}
+        >
+            <Dialog.Backdrop />
+            <Dialog.Positioner>
+                <Dialog.Content
+                    rounded="modal"
+                    m={[3, 6]}
+                    bg="brand.bg"
+                    shadow="2xl"
+                    border="1px solid"
+                    borderColor="brand.border"
+                    overflow="hidden"
                 >
-                    <Flex w="full" direction="column" gap={4}>
-                        <Text fontSize="xl" textAlign="center">
-                            Select Year Range
-                        </Text>
+                    <Flex
+                        w="full"
+                        direction="column"
+                    >
                         <Flex
-                            justifyContent="space-between"
-                            gap={1}
-                            flexWrap="wrap"
+                            px={[4, 5]}
+                            pt={[4, 5]}
+                            pb={3}
+                            direction="column"
+                            gap={4}
                         >
-                            {decades.map((decade, index) => (
-                                <Button
-                                    _focusVisible={{
-                                        boxShadow: "none",
-                                    }}
-                                    fontSize={
-                                        decadeIndex === index ? "lg" : "md"
-                                    }
-                                    color={
-                                        decadeIndex === index
-                                            ? "brand.textPrimary"
-                                            : "brand.textPrimaryLight"
-                                    }
-                                    outline="1px solid"
-                                    outlineColor={
-                                        decadeIndex === index
-                                            ? "brand.primary"
-                                            : decadeIndex === null
-                                            ? "transparent"
-                                            : "brand.backgroundSecondary"
-                                    }
-                                    key={decade.title}
-                                    onClick={() => {
-                                        setDecadeIndex(index);
-                                    }}
-                                    variant="tertiary"
+                            <Flex justifyContent="space-between" alignItems="center">
+                                <Text
+                                    fontSize="lg"
+                                    fontWeight="semibold"
+                                    color="brand.textPrimary"
+                                    letterSpacing="-0.01em"
                                 >
-                                    {decade.title}
-                                </Button>
-                            ))}
-                        </Flex>
-                        <Flex w="full" mt={6} px={8} direction="column" gap={6}>
-                            <Text
-                                fontSize="xl"
-                                textAlign="center"
-                            >{`${sliderValue[0]} - ${sliderValue[1]}`}</Text>
-                            <RangeSlider
-                                min={1960}
-                                max={2023}
-                                defaultValue={[yearRange?.from, yearRange?.to]}
-                                value={sliderValue}
-                                onInput={(val: any) => {
-                                    setSliderValue(val as number[]);
-                                    setDecadeIndex(null);
-                                }}
-                            />
-                            <Flex justifyContent="space-between" h={8}>
-                                {sliderMarks.map((year) => (
-                                    <Flex
-                                        key={year}
-                                        direction="column"
-                                        alignItems="center"
-                                    >
-                                        <Divider orientation="vertical" />
-                                        <Text userSelect="none">{year}</Text>
-                                    </Flex>
+                                    Year Range
+                                </Text>
+                                {(() => {
+                                    const hasFilter = sliderValue[0] !== 1960 || sliderValue[1] !== getCurrentYear();
+                                    return (
+                                        <Button
+                                            onClick={() => {
+                                                setSliderValue([1960, getCurrentYear()]);
+                                                setDecadeIndex(null);
+                                            }}
+                                            variant="ghost"
+                                            color={hasFilter ? "brand.primary" : "brand.textMuted"}
+                                            fontWeight={hasFilter ? "medium" : "normal"}
+                                            height="auto"
+                                            px={1}
+                                            fontSize="xs"
+                                            shadow="none"
+                                            _hover={{ color: hasFilter ? "brand.primaryHover" : "brand.primary" }}
+                                        >
+                                            Clear
+                                        </Button>
+                                    );
+                                })()}
+                            </Flex>
+
+                            <Flex
+                                justifyContent="center"
+                                gap={1.5}
+                                flexWrap="wrap"
+                            >
+                                {decades.map((decade, index) => (
+                                    <DecadeTag
+                                        key={decade.title}
+                                        title={decade.title}
+                                        isActive={decadeIndex === index}
+                                        onClick={() => setDecadeIndex(index)}
+                                    />
                                 ))}
                             </Flex>
                         </Flex>
-                        <Flex gap={4} mt={6} justifyContent="flex-end">
-                            <Button
-                                isDisabled={
-                                    sliderValue[0] === 1960 &&
-                                    sliderValue[1] === getCurrentYear()
-                                }
-                                onClick={() => {
-                                    setSliderValue([1960, getCurrentYear()]);
-                                }}
-                                variant="primary"
+
+                        <Box
+                            h="1px"
+                            bg="brand.divider"
+                            mx={[4, 5]}
+                        />
+
+                        <Flex w="full" px={[4, 5]} py={5} direction="column" gap={5}>
+                            <Text
+                                fontSize="xl"
+                                fontWeight="semibold"
+                                textAlign="center"
+                                color="brand.primary"
                             >
-                                All years
+                                {sliderValue[0]} - {sliderValue[1]}
+                            </Text>
+                            <Box px={[0, 2]}>
+                                <RangeSlider
+                                    min={1960}
+                                    max={2023}
+                                    defaultValue={[yearRange?.from, yearRange?.to]}
+                                    value={sliderValue}
+                                    onInput={(val: any) => {
+                                        setSliderValue(val as number[]);
+                                        setDecadeIndex(null);
+                                    }}
+                                />
+                                <Flex justifyContent="space-between" h={6} mt={2}>
+                                    {sliderMarks.map((year) => (
+                                        <Flex
+                                            key={year}
+                                            direction="column"
+                                            alignItems="center"
+                                            gap={1}
+                                        >
+                                            <Separator
+                                                orientation="vertical"
+                                                borderColor="brand.border"
+                                            />
+                                            <Text
+                                                fontSize="xs"
+                                                color="brand.textMuted"
+                                                userSelect="none"
+                                            >
+                                                {year}
+                                            </Text>
+                                        </Flex>
+                                    ))}
+                                </Flex>
+                            </Box>
+                        </Flex>
+
+                        <Flex
+                            gap={3}
+                            px={[4, 5]}
+                            py={4}
+                            css={{
+                                backdropFilter: "blur(16px)",
+                                WebkitBackdropFilter: "blur(16px)",
+                                background: "color-mix(in srgb, var(--chakra-colors-brand-bg) 80%, transparent)",
+                                borderTop: "1px solid var(--chakra-colors-brand-divider)",
+                            }}
+                        >
+                            <Button
+                                flex="0 0 auto"
+                                onClick={() => onCancel()}
+                                variant="cancel"
+                            >
+                                Cancel
                             </Button>
                             <Button
-                                isDisabled={
+                                flex={1}
+                                disabled={
                                     sliderValue[0] === yearRange.from &&
                                     sliderValue[1] === yearRange.to
                                 }
-                                isLoading={setButtonLoading}
+                                loading={setButtonLoading}
                                 onClick={() => {
                                     setSetButtonLoading(true);
                                     onConfirm({
@@ -174,16 +250,13 @@ const YearModal = ({
                                 }}
                                 variant="primary"
                             >
-                                Confirm
-                            </Button>
-                            <Button onClick={() => onCancel()} variant="cancel">
-                                Cancel
+                                Apply
                             </Button>
                         </Flex>
                     </Flex>
-                </Flex>
-            </ModalContent>
-        </Modal>
+                </Dialog.Content>
+            </Dialog.Positioner>
+        </Dialog.Root>
     );
 };
 

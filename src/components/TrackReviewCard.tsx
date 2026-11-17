@@ -2,13 +2,10 @@ import React, { useRef } from "react";
 import {
     Box,
     Card,
-    CardBody,
-    Collapse,
-    Divider,
+    Collapsible,
     Flex,
-    Icon,
+    Separator,
     Spinner,
-    Tag,
     Text,
 } from "@chakra-ui/react";
 import { Track } from "../../types";
@@ -70,235 +67,270 @@ const TrackReviewCard = ({
     );
 
     return (
-        <Collapse in={isOpen} animateOpacity>
-            <Flex h="auto" justify="center" w="full">
-                {loadingMessage && loadingMessage.length > 0 && (
-                    <Box
-                        position="absolute"
-                        top="50%"
-                        transform="translate(50%, 0)"
-                        right="50%"
-                        zIndex={300}
-                    >
-                        <Tag size="lg" variant="loading" colorScheme="white">
-                            <Flex alignItems="center" gap={4}>
-                                <Text fontSize="xl">{loadingMessage}</Text>
-                                <BouncingDotsLoader />
-                            </Flex>
-                        </Tag>
-                    </Box>
-                )}
-                <Card
-                    w="full"
-                    size="md"
-                    backgroundColor="transparent"
-                    opacity={
-                        loadingMessage && loadingMessage.length > 0 ? 0.2 : 1
-                    }
-                >
-                    <CardBody
+        <Collapsible.Root open={isOpen} style={{ display: "flex", flexDirection: "column", flex: 1 }}>
+            <Collapsible.Content style={{ display: "flex", flexDirection: "column", flex: 1 }}>
+                <Flex justify="center" w="full" position="relative" flex={1}>
+                    {loadingMessage && loadingMessage.length > 0 && (
+                        <Flex
+                            position="absolute"
+                            top="50%"
+                            left="50%"
+                            transform="translate(-50%, -50%)"
+                            zIndex={300}
+                            bg="brand.surfaceRaised"
+                            border="1px solid"
+                            borderColor="brand.border"
+                            rounded="lg"
+                            px={5}
+                            py={3}
+                            shadow="lg"
+                            alignItems="center"
+                            gap={3}
+                        >
+                            <Text fontSize="md" color="brand.textPrimary">
+                                {loadingMessage}
+                            </Text>
+                            <BouncingDotsLoader />
+                        </Flex>
+                    )}
+
+                    <Card.Root
                         w="full"
-                        minH="456px"
-                        h={["full", "unset"]}
-                        p={0}
-                        as={Flex}
-                        direction="column"
-                        alignItems="flex-end"
-                        justifyContent="space-between"
-                        bgImage={currentTrack.thumbnail}
-                        bgSize="cover"
+                        flex={1}
+                        bg="transparent"
+                        shadow="none"
+                        border="none"
+                        opacity={
+                            loadingMessage && loadingMessage.length > 0 ? 0.2 : 1
+                        }
+                        transition="opacity 0.3s ease"
+                        display="flex"
+                        flexDirection="column"
                     >
-                        {!noTracks &&
-                            !loading &&
-                            reviewStep > 1 &&
-                            reviewStep < 4 && (
-                                <ToggleTracklist
-                                    toggleTracklist={toggleTracklist}
-                                    isShowingTracklist={isShowingTracklist}
-                                />
-                            )}
-                        <Flex
-                            direction="column"
-                            h="full"
+                        <Card.Body
                             w="full"
-                            justifyContent="center"
-                            pt={10}
-                            height="256px"
+                            flex={1}
+                            p={0}
+                            display="flex"
+                            flexDirection="column"
+                            justifyContent="space-between"
+                            bgImage={`url(${currentTrack.thumbnail})`}
+                            bgSize="cover"
+                            backgroundPosition="center"
+                            position="relative"
+                            overflow="hidden"
+                            _before={{
+                                content: '""',
+                                position: "absolute",
+                                inset: 0,
+                                bg: "linear-gradient(to bottom, color-mix(in srgb, var(--chakra-colors-brand-bg) 30%, transparent) 0%, color-mix(in srgb, var(--chakra-colors-brand-bg) 85%, transparent) 60%, color-mix(in srgb, var(--chakra-colors-brand-bg) 95%, transparent) 100%)",
+                            }}
                         >
-                            <Flex w="full" justifyContent="space-around">
-                                <TrackCardIcon
-                                    ariaLabel="dislike button"
-                                    onClick={async () => onLikeOrDislike(false)}
-                                    colorScheme="red"
-                                    Icon={ThumbDownAltTwoToneIcon}
+                            {!noTracks &&
+                                !loading &&
+                                reviewStep > 1 &&
+                                reviewStep < 4 && (
+                                    <Box position="relative" zIndex={1} alignSelf="flex-end">
+                                        <ToggleTracklist
+                                            toggleTracklist={toggleTracklist}
+                                            isShowingTracklist={isShowingTracklist}
+                                        />
+                                    </Box>
+                                )}
+
+                            <Flex
+                                direction="column"
+                                flex={1}
+                                w="full"
+                                justifyContent="center"
+                                pt={[8, 10]}
+                                pb={4}
+                                position="relative"
+                                zIndex={1}
+                            >
+                                <Flex w="full" justifyContent="center" gap={[8, 12]}>
+                                    <TrackCardIcon
+                                        ariaLabel="dislike button"
+                                        onClick={async () => onLikeOrDislike(false)}
+                                        colorPalette="red"
+                                        Icon={ThumbDownAltTwoToneIcon}
+                                    />
+                                    <TrackCardIcon
+                                        ariaLabel="like button"
+                                        onClick={async () => onLikeOrDislike(true)}
+                                        colorPalette="green"
+                                        Icon={ThumbUpAltTwoToneIcon}
+                                    />
+                                </Flex>
+                            </Flex>
+
+                            <Flex
+                                direction="column"
+                                w="full"
+                                position="relative"
+                                zIndex={1}
+                            >
+                                <AudioPlayer
+                                    ref={playerRef}
+                                    style={{ backgroundColor: "transparent" }}
+                                    autoPlayAfterSrcChange={autoplay}
+                                    header={
+                                        <Flex
+                                            data-track-info
+                                            alignItems="center"
+                                            direction="column"
+                                            gap={1}
+                                            pb={2}
+                                        >
+                                            <Text
+                                                textAlign="center"
+                                                w="full"
+                                                fontSize={["xl", "2xl"]}
+                                                fontWeight="semibold"
+                                                lineClamp={2}
+                                                color="brand.textPrimary"
+                                            >
+                                                {currentTrack.title}
+                                            </Text>
+                                            <Text
+                                                textAlign="center"
+                                                lineClamp={2}
+                                                fontSize={["md", "lg"]}
+                                                color="brand.textSecondary"
+                                            >
+                                                {currentTrack.artist}
+                                            </Text>
+                                            <Flex
+                                                py={1}
+                                                fontSize="sm"
+                                                justifyContent="space-between"
+                                                w="full"
+                                                color="brand.textMuted"
+                                            >
+                                                <Text lineClamp={1}>
+                                                    {currentTrack.genre}
+                                                </Text>
+                                                <Text whiteSpace="nowrap">
+                                                    {currentTrack.releaseYear}
+                                                </Text>
+                                            </Flex>
+                                        </Flex>
+                                    }
+                                    autoPlay={autoplay}
+                                    src={previewUrl || undefined}
+                                    showJumpControls={false}
+                                    showSkipControls={true}
+                                    onClickNext={() => {
+                                        indexOfCurrentTrack < trackList.length - 1
+                                            ? setCurrentTrack(
+                                                  trackList[indexOfCurrentTrack + 1]
+                                              )
+                                            : undefined;
+                                    }}
+                                    onClickPrevious={() => {
+                                        indexOfCurrentTrack > 0
+                                            ? setCurrentTrack(
+                                                  trackList[indexOfCurrentTrack - 1]
+                                              )
+                                            : undefined;
+                                    }}
+                                    onPlay={onAudioPlay}
+                                    customIcons={{
+                                        previous:
+                                            indexOfCurrentTrack > 0 ? (
+                                                <SkipPreviousIcon
+                                                    style={{ fontSize: "28px" }}
+                                                />
+                                            ) : (
+                                                <Box></Box>
+                                            ),
+                                        next:
+                                            indexOfCurrentTrack <
+                                            trackList.length - 1 ? (
+                                                <SkipNextIcon
+                                                    style={{ fontSize: "28px" }}
+                                                />
+                                            ) : (
+                                                <Box></Box>
+                                            ),
+                                    }}
+                                    onEnded={() => {
+                                        indexOfCurrentTrack <
+                                            trackList.length - 1 && autoplay
+                                            ? setCurrentTrack(
+                                                  trackList[indexOfCurrentTrack + 1]
+                                              )
+                                            : undefined;
+                                    }}
+                                    customVolumeControls={[]}
+                                    customControlsSection={[
+                                        RHAP_UI.ADDITIONAL_CONTROLS,
+                                        RHAP_UI.MAIN_CONTROLS,
+                                        <Box
+                                            key="AutoplayButton"
+                                            rounded="full"
+                                            py={1}
+                                            px={3}
+                                            onClick={onAutoPlayToggle}
+                                            border="1px solid"
+                                            borderColor={
+                                                preferredAutoPlay
+                                                    ? "brand.primary"
+                                                    : "brand.border"
+                                            }
+                                            bg={
+                                                preferredAutoPlay
+                                                    ? "brand.primarySubtle"
+                                                    : "transparent"
+                                            }
+                                            cursor="pointer"
+                                            transition="all 0.2s ease"
+                                            _hover={{
+                                                borderColor: "brand.primary",
+                                            }}
+                                        >
+                                            {profileLoaded && !autoplayLoading ? (
+                                                <Text
+                                                    fontSize="xs"
+                                                    fontWeight="medium"
+                                                    color={
+                                                        preferredAutoPlay
+                                                            ? "brand.primary"
+                                                            : "brand.textSecondary"
+                                                    }
+                                                    userSelect="none"
+                                                >
+                                                    AutoPlay
+                                                </Text>
+                                            ) : (
+                                                <Flex
+                                                    w="full"
+                                                    justifyContent="center"
+                                                >
+                                                    <Spinner
+                                                        color="brand.primary"
+                                                        size="xs"
+                                                    />
+                                                </Flex>
+                                            )}
+                                        </Box>,
+                                    ]}
                                 />
-                                <TrackCardIcon
-                                    ariaLabel="like button"
-                                    onClick={async () => onLikeOrDislike(true)}
-                                    colorScheme="green"
-                                    Icon={ThumbUpAltTwoToneIcon}
+                                <Separator borderColor="brand.divider" />
+                                <FullTrackLinks
+                                    onLinkClicked={() => {
+                                        if (playerRef.current) {
+                                            playerRef?.current?.audio.current?.pause();
+                                        }
+                                    }}
+                                    currentTrack={currentTrack}
                                 />
                             </Flex>
-                        </Flex>
-                        <Flex
-                            direction="column"
-                            w="full"
-                            bg="brand.backgroundTertiaryOpaque3"
-                            color="brand.textPrimary"
-                        >
-                            <AudioPlayer
-                                ref={playerRef}
-                                style={{ backgroundColor: "transparent" }}
-                                autoPlayAfterSrcChange={autoplay}
-                                header={
-                                    <Flex
-                                        alignItems="center"
-                                        direction="column"
-                                        position="relative"
-                                        gap={[1, 2]}
-                                    >
-                                        <Text
-                                            textAlign="center"
-                                            w="full"
-                                            fontSize={["2xl", "3xl"]}
-                                            noOfLines={2}
-                                            pb="2px"
-                                        >
-                                            {currentTrack.title}
-                                        </Text>
-                                        <Text
-                                            textAlign="center"
-                                            noOfLines={2}
-                                            fontSize={["lg", "xl"]}
-                                            pb="2px"
-                                        >
-                                            {currentTrack.artist}
-                                        </Text>
-                                        <Flex
-                                            py={1}
-                                            fontSize={["md", "lg"]}
-                                            justifyContent="space-between"
-                                            w="full"
-                                        >
-                                            <Text noOfLines={1}>
-                                                {currentTrack.genre}
-                                            </Text>
-                                            <Text
-                                                sx={{
-                                                    textWrap: "nowrap",
-                                                }}
-                                            >
-                                                {currentTrack.releaseYear}
-                                            </Text>
-                                        </Flex>
-                                    </Flex>
-                                }
-                                autoPlay={autoplay}
-                                src={previewUrl || ""}
-                                showJumpControls={false}
-                                showSkipControls={true}
-                                onClickNext={() => {
-                                    indexOfCurrentTrack < trackList.length - 1
-                                        ? setCurrentTrack(
-                                              trackList[indexOfCurrentTrack + 1]
-                                          )
-                                        : undefined;
-                                }}
-                                onClickPrevious={() => {
-                                    indexOfCurrentTrack > 0
-                                        ? setCurrentTrack(
-                                              trackList[indexOfCurrentTrack - 1]
-                                          )
-                                        : undefined;
-                                }}
-                                onPlay={onAudioPlay}
-                                customIcons={{
-                                    previous:
-                                        indexOfCurrentTrack > 0 ? (
-                                            <Icon
-                                                fontSize="34"
-                                                as={SkipPreviousIcon}
-                                            />
-                                        ) : (
-                                            <Box></Box>
-                                        ),
-                                    next:
-                                        indexOfCurrentTrack <
-                                        trackList.length - 1 ? (
-                                            <Icon
-                                                fontSize="34"
-                                                as={SkipNextIcon}
-                                            />
-                                        ) : (
-                                            <Box></Box>
-                                        ),
-                                }}
-                                onEnded={() => {
-                                    indexOfCurrentTrack <
-                                        trackList.length - 1 && autoplay
-                                        ? setCurrentTrack(
-                                              trackList[indexOfCurrentTrack + 1]
-                                          )
-                                        : undefined;
-                                }}
-                                customVolumeControls={[]}
-                                customControlsSection={[
-                                    RHAP_UI.ADDITIONAL_CONTROLS,
-                                    RHAP_UI.MAIN_CONTROLS,
-                                    <Box
-                                        key="AutoplayButton"
-                                        rounded="full"
-                                        w="84px"
-                                        py={1}
-                                        px={2}
-                                        onClick={onAutoPlayToggle}
-                                        border="1px solid"
-                                        borderColor="brand.textPrimary"
-                                        bg={
-                                            preferredAutoPlay
-                                                ? "brand.textPrimary"
-                                                : "transparent"
-                                        }
-                                    >
-                                        {profileLoaded && !autoplayLoading ? (
-                                            <Text
-                                                color={
-                                                    preferredAutoPlay
-                                                        ? "black"
-                                                        : "brand.textPrimary"
-                                                }
-                                                userSelect="none"
-                                            >
-                                                AutoPlay
-                                            </Text>
-                                        ) : (
-                                            <Flex
-                                                w="full"
-                                                justifyContent="center"
-                                            >
-                                                <Spinner
-                                                    color="brand.primary"
-                                                    size="xs"
-                                                />
-                                            </Flex>
-                                        )}
-                                    </Box>,
-                                ]}
-                            />
-                            <Divider />
-                            <FullTrackLinks
-                                onLinkClicked={() => {
-                                    if (playerRef.current) {
-                                        playerRef?.current?.audio.current?.pause();
-                                    }
-                                }}
-                                currentTrack={currentTrack}
-                            />
-                        </Flex>
-                    </CardBody>
-                </Card>
-            </Flex>
-        </Collapse>
+                        </Card.Body>
+                    </Card.Root>
+                </Flex>
+            </Collapsible.Content>
+        </Collapsible.Root>
     );
 };
 

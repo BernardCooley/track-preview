@@ -1,14 +1,9 @@
 import {
     Box,
+    Field,
     Flex,
-    FormControl,
-    FormErrorMessage,
-    FormHelperText,
-    FormLabel,
     Input,
     InputGroup,
-    InputLeftElement,
-    InputRightElement,
 } from "@chakra-ui/react";
 import React, {
     CSSProperties,
@@ -21,7 +16,7 @@ import React, {
 interface Props {
     placeholder?: string;
     height?: string;
-    size: string;
+    size: "sm" | "md" | "lg" | "xl" | "2xl" | "2xs" | "xs";
     title?: string;
     error?: string;
     helperText?: string;
@@ -41,7 +36,7 @@ export const TextInput = forwardRef(
     (
         {
             placeholder = "",
-            height = "70px",
+            height = "48px",
             size,
             title = "",
             error,
@@ -60,34 +55,40 @@ export const TextInput = forwardRef(
         ref: LegacyRef<HTMLInputElement>
     ) => {
         return (
-            <FormControl isInvalid={error ? true : false} style={styles}>
-                <FormLabel fontSize="lg" mb={0}>
-                    <Flex>
-                        <Box>{title}</Box>
-                        {required && (
-                            <Box color="gpRed.500" pl={1}>
-                                *
-                            </Box>
-                        )}
-                    </Flex>
-                </FormLabel>
-                {allowHelperText && (
-                    <FormHelperText
+            <Field.Root invalid={error ? true : false} style={styles}>
+                {title && (
+                    <Field.Label
                         fontSize="sm"
-                        py={2}
+                        fontWeight="medium"
+                        color="brand.textSecondary"
+                        mb={1}
+                    >
+                        <Flex>
+                            <Box>{title}</Box>
+                            {required && (
+                                <Box color="brand.error" pl={1}>
+                                    *
+                                </Box>
+                            )}
+                        </Flex>
+                    </Field.Label>
+                )}
+                {allowHelperText && helperText && (
+                    <Field.HelperText
+                        fontSize="xs"
+                        py={1}
                         mt={0}
-                        color="brand.lightTitle"
+                        color="brand.textMuted"
                     >
                         {helperText}
-                    </FormHelperText>
+                    </Field.HelperText>
                 )}
-                <InputGroup>
-                    {leftIcon && (
-                        <InputLeftElement>{leftIcon}</InputLeftElement>
-                    )}
+                <InputGroup
+                    startElement={leftIcon}
+                    endElement={rightIcon}
+                >
                     <Input
-                        isReadOnly={isReadOnly}
-                        variant={variant}
+                        readOnly={isReadOnly}
                         ref={ref}
                         type={type}
                         placeholder={placeholder}
@@ -96,17 +97,35 @@ export const TextInput = forwardRef(
                         boxSizing="border-box"
                         size={size}
                         aria-label={title}
+                        bg="brand.inputBg"
+                        border="1px solid"
+                        borderColor="brand.inputBorder"
+                        rounded="input"
+                        color="brand.textPrimary"
+                        fontSize="md"
+                        pl={4}
+                        transition="all 0.2s ease"
+                        _placeholder={{
+                            color: "brand.textMuted",
+                        }}
+                        _focus={{
+                            borderColor: "brand.borderFocus",
+                            shadow: "0 0 0 1px var(--chakra-colors-brand-border-focus)",
+                        }}
+                        _invalid={{
+                            borderColor: "brand.error",
+                            shadow: "0 0 0 1px var(--chakra-colors-brand-error)",
+                        }}
                     />
-                    {rightIcon && (
-                        <InputRightElement>{rightIcon}</InputRightElement>
-                    )}
                 </InputGroup>
                 {allowErrors && (
-                    <Box h="16px" mt="8px">
-                        <FormErrorMessage>{error}</FormErrorMessage>
+                    <Box h="16px" mt="6px">
+                        <Field.ErrorText fontSize="xs">
+                            {error}
+                        </Field.ErrorText>
                     </Box>
                 )}
-            </FormControl>
+            </Field.Root>
         );
     }
 );

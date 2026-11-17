@@ -1,71 +1,67 @@
 import {
-    Divider,
+    Box,
     Flex,
     IconButton,
     Text,
     useDisclosure,
 } from "@chakra-ui/react";
-import React, { forwardRef } from "react";
+import React from "react";
 import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import MenuDrawer from "./MenuDrawer";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const Header = forwardRef<HTMLButtonElement | undefined>((menuButtonRef) => {
+const Header = () => {
     const pathname = usePathname();
-    const { isOpen, onOpen, onClose } = useDisclosure();
+    const { open: isOpen, onOpen, onClose } = useDisclosure();
+
     return (
         <>
-            <MenuDrawer
-                ref={menuButtonRef as any}
-                isOpen={isOpen}
-                onClose={onClose}
-            />
-            <IconButton
-                _hover={{
-                    bg: "transparent",
-                    color: "brand.primary",
-                    transform: "scale(1.2)",
-                }}
-                shadow="lg"
-                height="30px"
-                position="absolute"
-                right={6}
-                top={12}
-                onClick={onOpen}
-                variant="ghost"
-                h={1 / 2}
-                colorScheme="teal"
-                aria-label="Show password"
-                fontSize="3xl"
-                icon={<MenuOpenIcon fontSize="inherit" />}
-            />
-            <Flex w="full" justifyContent="center" mt={6}>
-                <Flex
-                    alignItems="center"
-                    height="50px"
-                    fontSize={["3xl", "5xl"]}
-                    fontFamily="brand"
-                    backgroundImage={"url(/logo_1x.png)"}
-                    backgroundSize="100% 100%"
-                    backgroundRepeat="no-repeat"
+            <MenuDrawer isOpen={isOpen} onClose={onClose} />
+            <Box
+                w="full"
+                borderBottom="1px solid"
+                borderBottomColor="brand.divider"
+                bg="brand.bg"
+                position="sticky"
+                top={0}
+                zIndex={100}
+            >
+            <Flex
+                maxW={["none", "none", "none", "1000px"]}
+                mx="auto"
+                justifyContent="space-between"
+                alignItems="center"
+                px={[4, 6]}
+                py={3}
+            >
+                <Link href={pathname !== "/explore" ? "/explore" : ""}>
+                    <Text
+                        userSelect="none"
+                        fontSize={["lg", "xl"]}
+                        fontFamily="brand"
+                        color="brand.textPrimary"
+                        letterSpacing="wide"
+                        _hover={{
+                            color: "brand.primary",
+                        }}
+                        transition="color 0.2s ease"
+                    >
+                        PHONIQUEST
+                    </Text>
+                </Link>
+                <IconButton
+                    variant="tertiary"
+                    onClick={onOpen}
+                    aria-label="Open menu"
+                    color="brand.textSecondary"
                 >
-                    <Link href={pathname !== "/explore" ? "/explore" : ""}>
-                        <Text
-                            userSelect="none"
-                            fontSize="2xl"
-                            color="brand.backgroundLightPrimary"
-                        >
-                            PHONIQUEST
-                        </Text>
-                    </Link>
-                </Flex>
+                    <MenuOpenIcon fontSize="small" />
+                </IconButton>
             </Flex>
-            <Divider mt={4} />
+            </Box>
         </>
     );
-});
-
-Header.displayName = "Header";
+};
 
 export default Header;

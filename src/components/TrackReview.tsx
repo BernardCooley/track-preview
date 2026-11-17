@@ -6,7 +6,6 @@ import {
     Button,
     Center,
     Flex,
-    Icon,
     Text,
     useDisclosure,
 } from "@chakra-ui/react";
@@ -19,7 +18,6 @@ import { mutateUserProfile } from "@/bff/bff";
 import { genres } from "../../data/genres";
 import { useTrackReview } from "@/hooks/useTrackReview";
 import RecordAnimation from "./RecordAnimation";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import TracklistTable from "./TracklistTable";
 
 interface Props {
@@ -57,25 +55,10 @@ const TrackReview = memo(
         } = useTrackReview(reviewStep);
 
         const [animationImage, setAnimationImage] = useState<string>("");
-        const { isOpen: isShowingTracklist, onToggle: toggleTracklist } =
+        const { open: isShowingTracklist, onToggle: toggleTracklist } =
             useDisclosure();
-        const [windowWidth, setWindowWidth] = useState(0);
-        const animationDuration = 0.7;
+        const animationDuration = 1.4;
         const [animate, setAnimate] = useState<"like" | "dislike" | null>(null);
-
-        useEffect(() => {
-            setWindowWidth(window.innerWidth);
-
-            const handleResize = () => {
-                setWindowWidth(window.innerWidth);
-            };
-
-            window.addEventListener("resize", handleResize);
-
-            return () => {
-                window.removeEventListener("resize", handleResize);
-            };
-        }, []);
 
         useEffect(() => {
             if (currentTrack) {
@@ -100,28 +83,15 @@ const TrackReview = memo(
         }, [animate]);
 
         return (
-            <Box px={0} position="relative" height="full">
+            <Flex direction="column" position="relative" h="full" overflow="auto">
                 {loading && !animate && (
-                    <Center
-                        zIndex={150}
-                        top="200px"
-                        right="50%"
-                        transform={`translate(50%, 0)`}
-                        position="absolute"
-                        px={4}
-                    >
+                    <Center position="absolute" inset={0} zIndex={150} pt={24}>
                         <Loading />
                     </Center>
                 )}
+
                 {fetchAttempted && !noTracks && !loading && loadMoreTracks && (
-                    <Center
-                        zIndex={150}
-                        top="200px"
-                        right="50%"
-                        transform={`translate(50%, 0)`}
-                        position="absolute"
-                        px={4}
-                    >
+                    <Center position="absolute" inset={0} zIndex={150} pt={24}>
                         <Button
                             onClick={() => onGetTracks(true)}
                             variant="primary"
@@ -130,16 +100,16 @@ const TrackReview = memo(
                         </Button>
                     </Center>
                 )}
+
                 {noTracks && !loading && reviewStep > 1 && (
-                    <Center>
+                    <Center pt={24}>
                         <Badge
-                            zIndex={150}
-                            top="200px"
-                            position="absolute"
                             variant="outline"
-                            colorScheme="teal"
-                            fontSize={["24px", "36px"]}
+                            colorPalette="teal"
+                            fontSize={["md", "lg"]}
                             px={4}
+                            py={2}
+                            rounded="lg"
                         >
                             All done on this step
                         </Badge>
@@ -147,20 +117,18 @@ const TrackReview = memo(
                 )}
 
                 {noTracks && !loading && reviewStep === 1 && (
-                    <Text
-                        textAlign="center"
-                        mt={20}
-                        gap={4}
-                        top="100%"
-                        transform="translate(50%, 0)"
-                        right="50%"
-                        p={6}
-                        position="absolute"
-                    >
-                        No tracks found. Please try again with different
-                        filters.
-                    </Text>
+                    <Center pt={24} px={6}>
+                        <Text
+                            textAlign="center"
+                            color="brand.textSecondary"
+                            fontSize="md"
+                        >
+                            No tracks found. Please try again with different
+                            filters.
+                        </Text>
+                    </Center>
                 )}
+
                 <GenreModal
                     onCancel={() => setShowGenreSelector(false)}
                     showGenreSelector={showGenreSelector}
@@ -176,74 +144,50 @@ const TrackReview = memo(
                 <YearModal
                     showYearSelector={showYearSelector}
                     setShowYearSelector={setShowYearSelector}
-                    yearRange={
-                        {
-                            from: userProfile?.yearFrom || 1960,
-                            to: userProfile?.yearTo || getCurrentYear(),
-                        } || { from: 1960, to: getCurrentYear() }
-                    }
+                    yearRange={{
+                        from: userProfile?.yearFrom || 1960,
+                        to: userProfile?.yearTo || getCurrentYear(),
+                    }}
                     onConfirm={(val) => onYearConfirm(val)}
                     onCancel={() => setShowYearSelector(false)}
                 />
 
-                <Box
-                    px={[4, 0]}
-                    w="full"
-                    py={reviewStep === 1 ? 4 : 0}
-                    zIndex={200}
-                    h={reviewStep === 1 ? "46px" : "0px"}
-                    transition="all 0.3s ease-in-out"
-                >
-                    {user?.uid && (
-                        <FilterTags
-                            reviewStep={reviewStep}
-                            onYearClick={() =>
-                                setShowYearSelector((prev) => !prev)
-                            }
-                            onGenreClick={() =>
-                                setShowGenreSelector((prev) => !prev)
-                            }
-                            profileLoaded={userProfile ? true : false}
-                            genres={userProfile?.genres}
-                            yearRange={
-                                {
+                {reviewStep === 1 && (
+                    <Box px={[4, 6]} py={3}>
+                        {user?.uid && (
+                            <FilterTags
+                                reviewStep={reviewStep}
+                                onYearClick={() =>
+                                    setShowYearSelector((prev) => !prev)
+                                }
+                                onGenreClick={() =>
+                                    setShowGenreSelector((prev) => !prev)
+                                }
+                                profileLoaded={userProfile ? true : false}
+                                genres={userProfile?.genres}
+                                yearRange={{
                                     from: userProfile?.yearFrom || 1960,
                                     to: userProfile?.yearTo || getCurrentYear(),
-                                } || { from: 1960, to: getCurrentYear() }
-                            }
-                        />
-                    )}
-                </Box>
+                                }}
+                            />
+                        )}
+                    </Box>
+                )}
 
                 {animate && (
                     <RecordAnimation
                         animate={animate}
-                        leftPosition={(windowWidth / 4) * reviewStep}
+                        reviewStep={reviewStep}
                         animationDuration={animationDuration}
                         image={animationImage}
                     />
                 )}
 
-                {animate === "dislike" && (
-                    <Flex
-                        position="absolute"
-                        top={300}
-                        width="full"
-                        justifyContent="center"
-                    >
-                        <Icon
-                            fontSize={["100px", "200px"]}
-                            as={DeleteOutlineIcon}
-                        />
-                    </Flex>
-                )}
-
                 <Flex
-                    transition={"all 0.5s ease"}
+                    transition="opacity 0.4s ease"
                     opacity={animate ? 0 : 1}
-                    position="relative"
                     direction="column"
-                    pt={reviewStep === 1 ? "16px" : "0px"}
+                    flex={1}
                 >
                     {currentTrack && !animate && (
                         <TrackReviewCard
@@ -299,7 +243,7 @@ const TrackReview = memo(
                         />
                     )}
                 </Flex>
-            </Box>
+            </Flex>
         );
     },
     (prevProps, nextProps) => {

@@ -12,20 +12,16 @@ interface Props {
 const Loading = ({ progress, loadingText, showLoadingBar = false }: Props) => {
     return (
         <Flex
-            gap={2}
+            gap={3}
             direction="column"
             alignItems="center"
-            position="absolute"
-            top="100%"
-            transform="translate(50%, 0)"
-            right="50%"
         >
             <Flex alignItems="center" gap={2} direction="column">
                 {loadingText && (
                     <Text
                         textAlign="center"
                         color="brand.primary"
-                        fontSize="xl"
+                        fontSize="md"
                     >
                         {loadingText}
                     </Text>
@@ -39,19 +35,21 @@ const Loading = ({ progress, loadingText, showLoadingBar = false }: Props) => {
                     position="relative"
                 >
                     <Text
-                        fontSize="xl"
+                        fontSize="lg"
                         position="absolute"
                         top="50%"
                         transform="translate(0, -50%)"
                         color="brand.primary"
+                        fontWeight="medium"
                     >
                         {Math.ceil(progress)}%
                     </Text>
                     <Circle
-                        style={{ height: "100px" }}
+                        style={{ height: "80px" }}
                         percent={progress}
                         strokeWidth={4}
                         strokeColor="#11999e"
+                        trailColor="var(--chakra-colors-brand-progress-trail)"
                     />
                 </Flex>
             )}

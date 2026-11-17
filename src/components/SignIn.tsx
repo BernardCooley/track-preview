@@ -9,14 +9,13 @@ import { TextInput } from "@/components/TextInput";
 import {
     Box,
     Button,
+    Field,
     Flex,
-    FormErrorMessage,
     IconButton,
     Link,
     Text,
-    ToastProps,
-    useToast,
 } from "@chakra-ui/react";
+import { toaster } from "@/components/toaster";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { LoginUser } from "../../firebase/utils";
@@ -45,23 +44,19 @@ const SignIn = () => {
     const [submitting, setSubmitting] = useState(false);
     const router = useRouter();
     const [authError, setAuthError] = useState<string | null>(null);
-    const toast = useToast();
     const id = "loginToast";
 
     const showToast = useCallback(
-        ({ status, title, description }: ToastProps) => {
-            if (!toast.isActive(id)) {
-                toast({
-                    id,
-                    title: title || "An error has occured.",
-                    description: description || "Please try again later.",
-                    status: status,
-                    duration: 5000,
-                    isClosable: true,
-                });
-            }
+        ({ type, title, description }: { type?: string; title?: string; description?: string }) => {
+            toaster.create({
+                id,
+                title: title || "An error has occured.",
+                description: description || "Please try again later.",
+                type: (type as "success" | "error" | "warning" | "info") || "error",
+                duration: 5000,
+            });
         },
-        [toast]
+        []
     );
 
     const {
@@ -89,7 +84,7 @@ const SignIn = () => {
                 }
             } else {
                 showToast({
-                    status: "error",
+                    type: "error",
                     title: "Email not verified",
                     description:
                         "Please check your email to verify your account.",
@@ -103,14 +98,13 @@ const SignIn = () => {
                 title: "Error signing in.",
                 description:
                     "Please check your email and password and try again.",
-                status: "error",
+                type: "error",
             });
 
             setTimeout(() => {
                 setSubmitting(false);
             }, 5000);
 
-            // TODO error not being thrown or caught - FIX
             setAuthError(
                 "Error signing in. Please check your email and password and try again."
             );
@@ -118,89 +112,76 @@ const SignIn = () => {
     };
 
     return (
-        <Flex direction="column" w={["100%", "100%", "70%", "60%"]}>
+        <Flex direction="column" w="full" maxW="420px" mx="auto">
             <form
                 onSubmit={handleSubmit(performLogin)}
                 style={{ height: "100%" }}
             >
                 <Flex
                     direction="column"
-                    gap="18px"
-                    p={[6, 12, 20]}
-                    pt={10}
-                    justifyContent="space-between"
-                    height="full"
+                    gap={5}
+                    p={[5, 6]}
                 >
-                    <Flex direction="column" gap={8}>
-                        <TextInput
-                            required={true}
-                            title="Email"
-                            size="md"
-                            fieldProps={register("email")}
-                            error={errors.email?.message}
-                        />
-                        <TextInput
-                            type={showPassword ? "text" : "password"}
-                            required={true}
-                            title="Password"
-                            size="md"
-                            fieldProps={register("password")}
-                            error={errors.password?.message}
-                            rightIcon={
-                                <IconButton
-                                    _hover={{
-                                        bg: "transparent",
-                                        color: "brand.primary",
-                                        transform: "scale(1.2)",
-                                    }}
-                                    shadow="lg"
-                                    height="30px"
-                                    position="absolute"
-                                    right={2}
-                                    top={8}
-                                    onClick={() =>
-                                        setShowPassword((prev) => !prev)
-                                    }
-                                    variant="ghost"
-                                    h={1 / 2}
-                                    colorScheme="teal"
-                                    aria-label="Show password"
-                                    fontSize="3xl"
-                                    icon={
-                                        showPassword ? (
-                                            <VisibilityIcon fontSize="inherit" />
-                                        ) : (
-                                            <VisibilityOffIcon fontSize="inherit" />
-                                        )
-                                    }
-                                />
-                            }
-                        />
-                        <Button
-                            isLoading={submitting}
-                            type="submit"
-                            variant="primary"
-                            onClick={handleSubmit(performLogin)}
-                        >
-                            Sign In
-                        </Button>
-                        <Flex gap={2}>
-                            <Link
-                                href="/resetPassword"
-                                variant="link"
-                                colorScheme="primary"
+                    <TextInput
+                        required={true}
+                        title="Email"
+                        size="md"
+                        fieldProps={register("email")}
+                        error={errors.email?.message}
+                    />
+                    <TextInput
+                        type={showPassword ? "text" : "password"}
+                        required={true}
+                        title="Password"
+                        size="md"
+                        fieldProps={register("password")}
+                        error={errors.password?.message}
+                        rightIcon={
+                            <IconButton
+                                position="absolute"
+                                right={2}
+                                top="50%"
+                                transform="translateY(-50%)"
+                                variant="tertiary"
+                                onClick={() =>
+                                    setShowPassword((prev) => !prev)
+                                }
+                                aria-label="Toggle password visibility"
+                                color="brand.textMuted"
                             >
-                                <Text>Forgot password</Text>
-                            </Link>
-                        </Flex>
-                    </Flex>
+                                {showPassword ? (
+                                    <VisibilityIcon fontSize="small" />
+                                ) : (
+                                    <VisibilityOffIcon fontSize="small" />
+                                )}
+                            </IconButton>
+                        }
+                    />
+                    <Button
+                        loading={submitting}
+                        type="submit"
+                        variant="primary"
+                        w="full"
+                        onClick={handleSubmit(performLogin)}
+                    >
+                        Sign In
+                    </Button>
+                    <Link
+                        href="/resetPassword"
+                        variant="primary"
+                        fontSize="sm"
+                    >
+                        Forgot password?
+                    </Link>
                 </Flex>
             </form>
-            {/* TODO - add forgot password link
-                TODO - Message not showing up */}
             {authError && (
-                <Box h="16px" mt="8px">
-                    <FormErrorMessage>{authError}</FormErrorMessage>
+                <Box px={[5, 6]}>
+                    <Field.Root invalid>
+                        <Field.ErrorText fontSize="sm">
+                            {authError}
+                        </Field.ErrorText>
+                    </Field.Root>
                 </Box>
             )}
         </Flex>

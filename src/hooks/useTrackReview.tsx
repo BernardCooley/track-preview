@@ -9,7 +9,7 @@ import {
     updateTrackReviewStep,
 } from "@/bff/bff";
 import { useLocalStorage } from "usehooks-ts";
-import { useToast, ToastProps } from "@chakra-ui/react";
+import { toaster } from "@/components/toaster";
 import { Track, YearRange } from "../../types";
 import { User as UserProfile } from "@prisma/client";
 
@@ -30,7 +30,6 @@ export const useTrackReview = (reviewStep: number) => {
     const [showGenreSelector, setShowGenreSelector] = useState<boolean>(false);
     const [listened, setListened] = useState<boolean>(false);
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
-    const toast = useToast();
     const id = "review-toast";
     const [loading, setLoading] = useState<boolean>(true);
     const [loadMoreTracks, setLoadMoreTracks] = useState<boolean>(false);
@@ -55,14 +54,32 @@ export const useTrackReview = (reviewStep: number) => {
     }, [userProfile]);
 
     useEffect(() => {
+        let revoked = false;
+        let objectUrl = "";
+
         if (currentTrack) {
             setListened(false);
             setIsPlaying(false);
             setResolvedPreviewUrl("");
-            resolvePreviewUrl(currentTrack.id).then((url) => {
-                if (url) setResolvedPreviewUrl(url);
+            resolvePreviewUrl(currentTrack.id).then(async (proxyUrl) => {
+                if (!proxyUrl || revoked) return;
+                try {
+                    const res = await fetch(proxyUrl);
+                    if (!res.ok || revoked) return;
+                    const blob = await res.blob();
+                    if (revoked) return;
+                    objectUrl = URL.createObjectURL(blob);
+                    setResolvedPreviewUrl(objectUrl);
+                } catch {
+                    // fall through — no preview available
+                }
             });
         }
+
+        return () => {
+            revoked = true;
+            if (objectUrl) URL.revokeObjectURL(objectUrl);
+        };
     }, [currentTrack]);
 
     const getTracks = useCallback(async () => {
@@ -160,19 +177,16 @@ export const useTrackReview = (reviewStep: number) => {
     }, [hasUserProfileChanged]);
 
     const showToast = useCallback(
-        ({ status, title, description }: ToastProps) => {
-            if (!toast.isActive(id)) {
-                toast({
-                    id,
-                    title: title || "An error has occured.",
-                    description: description || "Please try again later.",
-                    status: status,
-                    duration: 5000,
-                    isClosable: true,
-                });
-            }
+        ({ type, title, description }: { type?: string; title?: string; description?: string }) => {
+            toaster.create({
+                id,
+                title: title || "An error has occured.",
+                description: description || "Please try again later.",
+                type: (type as "success" | "error" | "warning" | "info") || "error",
+                duration: 5000,
+            });
         },
-        [toast]
+        []
     );
 
     const likeOrDislike = async (like: boolean) => {
@@ -219,7 +233,7 @@ export const useTrackReview = (reviewStep: number) => {
             }
         } catch (error) {
             showToast({
-                status: "error",
+                type: "error",
                 title: "Error saving track",
             });
         }
@@ -286,7 +300,6 @@ export const useTrackReview = (reviewStep: number) => {
         setListened,
         isPlaying,
         setIsPlaying,
-        toast,
         id,
         loading,
         setLoading,

@@ -28,7 +28,6 @@ const Library = () => {
         onClose,
         buyModalIsOpen,
         onBuyModalOpen,
-        cancelRef,
         trackToDelete,
         setTrackToDelete,
         trackToBuy,
@@ -70,34 +69,28 @@ const Library = () => {
     }, [noTracks]);
 
     return (
-        <Flex px={0} position="relative" pb={20} direction="column">
+        <Flex position="relative" direction="column" h="full" overflow="auto">
             {loading && (
-                <Center
-                    zIndex={150}
-                    top="200px"
-                    right="50%"
-                    transform={`translate(50%, 0)`}
-                    position="absolute"
-                    px={4}
-                >
+                <Center position="absolute" inset={0} zIndex={150} pt={24}>
                     <Loading />
                 </Center>
             )}
+
             {!loading && noTracks && (
-                <Center>
+                <Center pt={24}>
                     <Badge
-                        zIndex={150}
-                        top="200px"
-                        position="absolute"
                         variant="outline"
-                        colorScheme="teal"
-                        fontSize={["24px", "36px"]}
+                        colorPalette="teal"
+                        fontSize={["md", "lg"]}
                         px={4}
+                        py={2}
+                        rounded="lg"
                     >
-                        All done on this step
+                        Your library is empty
                     </Badge>
                 </Center>
             )}
+
             <BuyModal
                 buyModalIsOpen={buyModalIsOpen}
                 closeBuyModal={closeBuyModal}
@@ -112,7 +105,6 @@ const Library = () => {
                 reviewTracks={reviewTracks}
                 trackToDelete={trackToDelete}
                 deleteTrack={deleteTrack}
-                ref={cancelRef}
             />
 
             {currentReleaseTrack && (
@@ -124,27 +116,26 @@ const Library = () => {
                     currentReleaseTrack={currentReleaseTrack}
                 />
             )}
+
             {!loading && !noTracks && (
-                <Flex direction="column">
-                    <LibraryTable
-                        sortBy={sortBy}
-                        sortDirection={sortDirection}
-                        currentReleaseTrack={currentReleaseTrack}
-                        reviewTracks={reviewTracks}
-                        currentlyPlaying={currentlyPlaying}
-                        clickDisabled={clickDisabled}
-                        updateCurrentlyPlaying={updateCurrentlyPlaying}
-                        setClickDisabled={setClickDisabled}
-                        setTrackToBuy={setTrackToBuy}
-                        setTrackToDelete={setTrackToDelete}
-                        updateCurrentReleaseTrack={updateCurrentReleaseTrack}
-                        updatePreviousTracks={updatePreviousTracks}
-                        getTracks={getTracks}
-                        updateReviewTracks={updateReviewTracks}
-                        setSortBy={setSortBy}
-                        setSortDirection={setSortDirection}
-                    />
-                </Flex>
+                <LibraryTable
+                    sortBy={sortBy}
+                    sortDirection={sortDirection}
+                    currentReleaseTrack={currentReleaseTrack}
+                    reviewTracks={reviewTracks}
+                    currentlyPlaying={currentlyPlaying}
+                    clickDisabled={clickDisabled}
+                    updateCurrentlyPlaying={updateCurrentlyPlaying}
+                    setClickDisabled={setClickDisabled}
+                    setTrackToBuy={setTrackToBuy}
+                    setTrackToDelete={setTrackToDelete}
+                    updateCurrentReleaseTrack={updateCurrentReleaseTrack}
+                    updatePreviousTracks={updatePreviousTracks}
+                    getTracks={getTracks}
+                    updateReviewTracks={updateReviewTracks}
+                    setSortBy={setSortBy}
+                    setSortDirection={setSortDirection}
+                />
             )}
         </Flex>
     );

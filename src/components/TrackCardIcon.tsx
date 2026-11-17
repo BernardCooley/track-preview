@@ -3,7 +3,7 @@ import React, { ElementType } from "react";
 
 interface Props {
     Icon: ElementType;
-    colorScheme?: string;
+    colorPalette?: string;
     onClick: () => void;
     ariaLabel: string;
     isDisabled?: boolean;
@@ -12,7 +12,7 @@ interface Props {
 
 const TrackCardIcon = ({
     Icon,
-    colorScheme = "black",
+    colorPalette = "black",
     onClick,
     ariaLabel,
     isDisabled = false,
@@ -20,34 +20,40 @@ const TrackCardIcon = ({
 }: Props) => {
     return (
         <IconButton
-            isDisabled={isDisabled}
-            p={[4, 6]}
+            disabled={isDisabled}
+            p={[4, 5]}
             shadow="none"
             onClick={onClick}
             variant="ghost"
             w="auto"
             h="auto"
-            colorScheme={colorScheme}
+            colorPalette={colorPalette}
             aria-label={ariaLabel}
-            fontSize={["50px", "60px", "70px"]}
-            backgroundColor="brand.backgroundTertiaryOpaque"
+            fontSize={["44px", "56px", "64px"]}
+            bg="brand.surface"
+            border="1px solid"
+            borderColor="brand.border"
             rounded="full"
-            icon={<Icon fontSize="inherit" />}
-            _selected={
-                canHover
-                    ? {
-                          transform: "scale(1.2)",
-                      }
-                    : {}
-            }
+            transition="all 0.2s ease"
             _hover={
                 canHover
                     ? {
-                          transform: "scale(1.2)",
+                          transform: "scale(1.1)",
+                          shadow: "lg",
+                          borderColor: "brand.borderHover",
                       }
                     : {}
             }
-        />
+            _active={
+                canHover
+                    ? {
+                          transform: "scale(0.95)",
+                      }
+                    : {}
+            }
+        >
+            <Icon fontSize="inherit" />
+        </IconButton>
     );
 };
 

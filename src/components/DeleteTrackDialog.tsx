@@ -1,13 +1,8 @@
-import React, { LegacyRef, RefObject, forwardRef } from "react";
+import React from "react";
 import {
-    AlertDialog,
-    AlertDialogBody,
-    AlertDialogContent,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogOverlay,
     Box,
     Button,
+    Dialog,
     Flex,
     Text,
 } from "@chakra-ui/react";
@@ -22,91 +17,91 @@ interface Props {
     deleteTrack: () => void;
 }
 
-const DeleteTrackDialog = forwardRef(
-    (
-        {
-            isOpen,
-            onClose,
-            closeDialog,
-            reviewTracks,
-            trackToDelete,
-            deleteTrack,
-        }: Props,
-        ref: LegacyRef<HTMLButtonElement>
-    ) => {
-        return (
-            <AlertDialog
-                isOpen={isOpen}
-                leastDestructiveRef={ref as RefObject<HTMLButtonElement>}
-                onClose={() => {
+const DeleteTrackDialog = ({
+    isOpen,
+    onClose,
+    closeDialog,
+    reviewTracks,
+    trackToDelete,
+    deleteTrack,
+}: Props) => {
+    return (
+        <Dialog.Root
+            role="alertdialog"
+            open={isOpen}
+            onOpenChange={(details) => {
+                if (!details.open) {
                     onClose();
                     closeDialog();
-                }}
-            >
-                <AlertDialogOverlay>
-                    <AlertDialogContent
-                        m={6}
-                        bg="brand.backgroundPrimary"
-                        shadow="2xl"
-                        border="1px solid"
-                        borderColor="brand.primary"
+                }
+            }}
+        >
+            <Dialog.Backdrop />
+            <Dialog.Positioner>
+                <Dialog.Content
+                    m={[3, 6]}
+                    bg="brand.bg"
+                    shadow="2xl"
+                    border="1px solid"
+                    borderColor="brand.border"
+                    rounded="modal"
+                >
+                    <Dialog.Header
+                        fontSize="lg"
+                        fontWeight="semibold"
+                        color="brand.textPrimary"
+                        borderBottom="1px solid"
+                        borderBottomColor="brand.divider"
                     >
-                        <AlertDialogHeader fontSize="lg" fontWeight="bold">
-                            Delete Track
-                        </AlertDialogHeader>
+                        Delete Track
+                    </Dialog.Header>
 
-                        <AlertDialogBody>
-                            <Flex direction="column" gap={2}>
-                                <Text>Are you sure you want to delete...</Text>
-                                <Flex
-                                    direction="column"
-                                    bg="brand.backgroundTertiaryOpaque"
-                                    p={2}
-                                    rounded="md"
+                    <Dialog.Body py={5}>
+                        <Flex direction="column" gap={3}>
+                            <Text color="brand.textSecondary">
+                                Are you sure you want to delete...
+                            </Text>
+                            <Box
+                                bg="brand.surface"
+                                border="1px solid"
+                                borderColor="brand.border"
+                                p={3}
+                                rounded="lg"
+                            >
+                                <Text
+                                    fontSize="md"
+                                    fontWeight="semibold"
+                                    color="brand.textPrimary"
                                 >
-                                    <Text fontSize="xl" fontWeight="bold">
-                                        {
-                                            reviewTracks[4].tracks[
-                                                trackToDelete!
-                                            ]?.artist
-                                        }
-                                    </Text>
-                                    <Text fontSize="md" fontWeight="bold">
-                                        {
-                                            reviewTracks[4].tracks[
-                                                trackToDelete!
-                                            ]?.title
-                                        }
-                                    </Text>
-                                </Flex>
-                                <Text>
-                                    You cannot undo this action afterwards.
+                                    {reviewTracks[4].tracks[trackToDelete!]?.artist}
                                 </Text>
-                            </Flex>
-                        </AlertDialogBody>
+                                <Text fontSize="sm" color="brand.textSecondary">
+                                    {reviewTracks[4].tracks[trackToDelete!]?.title}
+                                </Text>
+                            </Box>
+                            <Text fontSize="sm" color="brand.textMuted">
+                                You cannot undo this action afterwards.
+                            </Text>
+                        </Flex>
+                    </Dialog.Body>
 
-                        <AlertDialogFooter>
-                            <Button
-                                variant="primary"
-                                ref={ref}
-                                onClick={closeDialog}
-                            >
-                                Cancel
-                            </Button>
-                            <Button
-                                colorScheme="red"
-                                onClick={deleteTrack}
-                                ml={3}
-                            >
-                                Delete
-                            </Button>
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                </AlertDialogOverlay>
-            </AlertDialog>
-        );
-    }
-);
+                    <Dialog.Footer
+                        borderTop="1px solid"
+                        borderTopColor="brand.divider"
+                        gap={3}
+                    >
+                        <Button variant="outline" onClick={closeDialog}>
+                            Cancel
+                        </Button>
+                        <Button variant="warning" onClick={deleteTrack}>
+                            Delete
+                        </Button>
+                    </Dialog.Footer>
+                </Dialog.Content>
+            </Dialog.Positioner>
+        </Dialog.Root>
+    );
+};
 
 DeleteTrackDialog.displayName = "DeleteTrackDialog";
 

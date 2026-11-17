@@ -23,39 +23,53 @@ const ReleaseHeader = ({
     currentReleaseTrack,
 }: Props) => {
     return (
-        <Flex gap={4} w="full" alignItems="center" top={-1} p={2} wrap="wrap">
+        <Flex
+            gap={4}
+            w="full"
+            alignItems="center"
+            px={[3, 4]}
+            py={3}
+            borderBottom="1px solid"
+            borderBottomColor="brand.divider"
+            bg="brand.surfaceRaised"
+            flexWrap="wrap"
+        >
             <Button
-                variant="primary"
-                leftIcon={<ChevronLeftIcon />}
+                variant="outline"
+                height="36px"
+                px={3}
+                fontSize="sm"
                 onClick={() => {
                     updateReviewTracks(4, previousTracks, 0);
                     updatePreviousTracks([]);
-
                     updateCurrentReleaseTrack(null);
                 }}
             >
+                <ChevronLeftIcon style={{ fontSize: "18px" }} />
                 Library
             </Button>
-            <Flex direction="column">
-                <Flex gap={2}>
-                    <Text
-                        noOfLines={1}
-                        fontSize="md"
-                        color="brand.textPrimaryLight"
-                    >
+            <Flex direction="column" gap={0.5}>
+                <Flex gap={2} alignItems="baseline">
+                    <Text fontSize="xs" color="brand.textMuted">
                         Artist:
                     </Text>
-                    <Text noOfLines={2}>{currentReleaseTrack.artist}</Text>
-                </Flex>
-                <Flex gap={2}>
                     <Text
-                        noOfLines={1}
-                        fontSize="md"
-                        color="brand.textPrimaryLight"
+                        fontSize="sm"
+                        color="brand.textPrimary"
+                        lineClamp={1}
                     >
-                        Release title:
+                        {currentReleaseTrack.artist}
                     </Text>
-                    <Text noOfLines={2}>
+                </Flex>
+                <Flex gap={2} alignItems="baseline">
+                    <Text fontSize="xs" color="brand.textMuted">
+                        Release:
+                    </Text>
+                    <Text
+                        fontSize="sm"
+                        color="brand.textPrimary"
+                        lineClamp={1}
+                    >
                         {currentReleaseTrack.releaseTitle}
                     </Text>
                 </Flex>

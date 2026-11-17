@@ -1,47 +1,70 @@
-import React, { forwardRef } from "react";
+import React from "react";
 import {
-    Divider,
+    Box,
     Drawer,
-    DrawerBody,
-    DrawerCloseButton,
-    DrawerContent,
-    DrawerFooter,
-    DrawerHeader,
-    DrawerOverlay,
     Flex,
+    Separator,
+    Text,
 } from "@chakra-ui/react";
 import { usePathname } from "next/navigation";
 import MenuDrawerItem from "./MenuDrawerItem";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+import LightModeIcon from "@mui/icons-material/LightMode";
+import DarkModeIcon from "@mui/icons-material/DarkMode";
+import { useThemeContext } from "../../context/ThemeContext";
 
 interface Props {
     isOpen: boolean;
     onClose: () => void;
 }
 
-const MenuDrawer = forwardRef<HTMLButtonElement | undefined, Props>(
-    ({ isOpen, onClose }, btnRef) => {
-        const pathname = usePathname();
+const MenuDrawer = ({ isOpen, onClose }: Props) => {
+    const pathname = usePathname();
+    const { appearance, toggleAppearance } = useThemeContext();
 
-        return (
-            <Drawer
-                isOpen={isOpen}
-                placement="right"
-                onClose={onClose}
-                finalFocusRef={btnRef as any}
-            >
-                <DrawerOverlay />
-                <DrawerContent bgGradient="linear(to-b, brand.backgroundPrimary, brand.backgroundSecondary)">
-                    <DrawerCloseButton top={4} fontSize="md" />
-                    <DrawerHeader>Menu</DrawerHeader>
-                    <Divider />
-                    <DrawerBody>
-                        <Flex
-                            direction="column"
-                            gap={6}
-                            pt={4}
-                            alignItems="center"
+    return (
+        <Drawer.Root
+            open={isOpen}
+            placement="end"
+            onOpenChange={(details) => { if (!details.open) onClose(); }}
+        >
+            <Drawer.Backdrop />
+            <Drawer.Positioner>
+                <Drawer.Content
+                    bg="brand.bg"
+                    borderLeft="1px solid"
+                    borderLeftColor="brand.border"
+                >
+                    <Flex
+                        px={5}
+                        pt={5}
+                        pb={3}
+                        alignItems="center"
+                        justifyContent="space-between"
+                    >
+                        <Text
+                            fontSize="xl"
+                            fontWeight="semibold"
+                            color="brand.textPrimary"
+                            letterSpacing="-0.01em"
                         >
+                            Menu
+                        </Text>
+                        <Drawer.CloseTrigger
+                            position="relative"
+                            top="auto"
+                            right="auto"
+                            color="brand.textMuted"
+                            _hover={{ color: "brand.textPrimary" }}
+                        />
+                    </Flex>
+                    <Box
+                        h="1px"
+                        bg="brand.divider"
+                        mx={5}
+                    />
+                    <Drawer.Body pt={6}>
+                        <Flex direction="column" gap={2}>
                             <MenuDrawerItem
                                 pathname={pathname}
                                 linkText="Home"
@@ -53,23 +76,57 @@ const MenuDrawer = forwardRef<HTMLButtonElement | undefined, Props>(
                                 href="/account"
                             />
                         </Flex>
-                    </DrawerBody>
 
-                    <Divider />
+                        <Separator borderColor="brand.divider" my={4} />
 
-                    <DrawerFooter>
+                        <Flex
+                            alignItems="center"
+                            gap={3}
+                            px={3}
+                            py={2}
+                            rounded="lg"
+                            cursor="pointer"
+                            transition="all 0.2s ease"
+                            _hover={{
+                                bg: "brand.surfaceHover",
+                            }}
+                            onClick={toggleAppearance}
+                        >
+                            <Flex
+                                color="brand.primary"
+                                fontSize="sm"
+                            >
+                                {appearance === "light" ? (
+                                    <DarkModeIcon style={{ fontSize: "20px" }} />
+                                ) : (
+                                    <LightModeIcon style={{ fontSize: "20px" }} />
+                                )}
+                            </Flex>
+                            <Text
+                                fontSize="md"
+                                fontWeight="medium"
+                                color="brand.textSecondary"
+                            >
+                                {appearance === "light" ? "Dark mode" : "Light mode"}
+                            </Text>
+                        </Flex>
+                    </Drawer.Body>
+
+                    <Separator borderColor="brand.divider" />
+
+                    <Drawer.Footer justifyContent="flex-start">
                         <MenuDrawerItem
                             pathname={pathname}
                             linkText="Contact"
                             href="mailto:info@phoniquest.com"
-                            icon={<OpenInNewIcon />}
+                            icon={<OpenInNewIcon style={{ fontSize: "16px" }} />}
                         />
-                    </DrawerFooter>
-                </DrawerContent>
-            </Drawer>
-        );
-    }
-);
+                    </Drawer.Footer>
+                </Drawer.Content>
+            </Drawer.Positioner>
+        </Drawer.Root>
+    );
+};
 
 MenuDrawer.displayName = "MenuDrawer";
 

@@ -44,7 +44,6 @@ const PasswordReset = ({}: Props) => {
             setSubmitting(false);
             router.push("/loginRegister?login=true?passwordReset=true");
         } catch (error) {
-            // TODO error not being thrown or caught - FIX
             setAuthError(
                 "Error sending password reset email. Please check your email and password and try again."
             );
@@ -52,79 +51,84 @@ const PasswordReset = ({}: Props) => {
     };
 
     return (
-        <Box
-            backgroundImage={"url(/logo_background_4x.png)"}
-            backgroundSize="90%"
-            backgroundRepeat="no-repeat"
-            backgroundPosition="center 300px"
-            height="100vh"
+        <Flex
+            h="100dvh"
+            direction="column"
+            alignItems="center"
+            px={[4, 6]}
         >
-            <IconButton
-                _hover={{
-                    bg: "transparent",
-                    color: "brand.primary",
-                    transform: "scale(1.2)",
-                }}
-                shadow="lg"
-                height="30px"
-                position="absolute"
-                left={6}
-                top={12}
-                onClick={() => router.push("/loginRegister?login=true")}
-                variant="ghost"
-                h={1 / 2}
-                colorScheme="teal"
-                aria-label="Show password"
-                fontSize="3xl"
-                icon={<ArrowBackIosNewIcon fontSize="inherit" />}
-            />
-            <Text
-                py={10}
-                textAlign="center"
-                fontSize={["3xl", "4xl", "5xl", "6xl"]}
-                fontFamily="brand"
-            >
-                PHONIQUEST
-            </Text>
+            <Flex w="full" maxW="480px" pt={[6, 8]}>
+                <IconButton
+                    variant="tertiary"
+                    onClick={() => router.push("/loginRegister?login=true")}
+                    aria-label="Back to login"
+                    color="brand.textSecondary"
+                >
+                    <ArrowBackIosNewIcon fontSize="small" />
+                </IconButton>
+            </Flex>
+
             <Flex
-                direction="column"
-                w={["100%", "100%", "70%", "60%"]}
-                padding={4}
+                pt={[4, 6]}
+                pb={[4, 6]}
+                justifyContent="center"
             >
+                <Text
+                    fontSize={["3xl", "4xl", "5xl"]}
+                    fontFamily="brand"
+                    color="brand.textPrimary"
+                    letterSpacing="wider"
+                >
+                    PHONIQUEST
+                </Text>
+            </Flex>
+
+            <Box
+                w="full"
+                maxW="480px"
+                flex={1}
+                bg="brand.cardBg"
+                border="1px solid"
+                borderColor="brand.border"
+                roundedTop="card"
+                roundedBottom="none"
+                p={[5, 6]}
+            >
+                <Text
+                    fontSize="lg"
+                    fontWeight="semibold"
+                    color="brand.textPrimary"
+                    mb={6}
+                >
+                    Reset password
+                </Text>
+
                 <form
                     onSubmit={handleSubmit(performPasswordReset)}
                     style={{ height: "100%" }}
                 >
-                    <Flex
-                        direction="column"
-                        gap="18px"
-                        p={[6, 12, 20]}
-                        pt={10}
-                        justifyContent="space-between"
-                        height="full"
-                    >
-                        <Flex direction="column" gap={8}>
-                            <TextInput
-                                helperText="Please enter your email address and we will send you a link to reset your password."
-                                required={true}
-                                title="Email"
-                                size="md"
-                                fieldProps={register("email")}
-                                error={errors.email?.message}
-                            />
-                            <Button
-                                isLoading={submitting}
-                                type="submit"
-                                variant="primary"
-                                onClick={handleSubmit(performPasswordReset)}
-                            >
-                                Reset password
-                            </Button>
-                        </Flex>
+                    <Flex direction="column" gap={5}>
+                        <TextInput
+                            helperText="Enter your email address and we'll send you a link to reset your password."
+                            required={true}
+                            title="Email"
+                            size="md"
+                            fieldProps={register("email")}
+                            error={errors.email?.message}
+                        />
+                        <Button
+                            loading={submitting}
+                            type="submit"
+                            variant="primary"
+                            w="full"
+                            onClick={handleSubmit(performPasswordReset)}
+                        >
+                            Reset password
+                        </Button>
                     </Flex>
                 </form>
-            </Flex>
-        </Box>
+            </Box>
+        </Flex>
     );
 };
 

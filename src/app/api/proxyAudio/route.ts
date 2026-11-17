@@ -9,7 +9,7 @@ export async function GET(req: Request) {
     }
 
     try {
-        const response = await fetch(url, {
+        const upstream = await fetch(url, {
             headers: {
                 "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
                 "Accept": "*/*",
@@ -19,19 +19,44 @@ export async function GET(req: Request) {
             },
         });
 
-        if (!response.ok) {
+        if (!upstream.ok) {
             return NextResponse.json(
-                { error: `Upstream returned ${response.status}` },
-                { status: response.status }
+                { error: `Upstream returned ${upstream.status}` },
+                { status: upstream.status }
             );
         }
 
-        const audioBuffer = await response.arrayBuffer();
+        const fullBuffer = await upstream.arrayBuffer();
+        const total = fullBuffer.byteLength;
+        const contentType = upstream.headers.get("Content-Type") || "audio/mpeg";
 
-        return new NextResponse(audioBuffer, {
+        const rangeHeader = req.headers.get("Range");
+        if (rangeHeader) {
+            const match = rangeHeader.match(/bytes=(\d+)-(\d*)/);
+            if (match) {
+                const start = parseInt(match[1], 10);
+                const end = match[2] ? parseInt(match[2], 10) : total - 1;
+                const slice = fullBuffer.slice(start, end + 1);
+
+                return new NextResponse(slice, {
+                    status: 206,
+                    headers: {
+                        "Content-Type": contentType,
+                        "Content-Length": String(slice.byteLength),
+                        "Content-Range": `bytes ${start}-${end}/${total}`,
+                        "Accept-Ranges": "bytes",
+                        "Cache-Control": "public, max-age=86400",
+                    },
+                });
+            }
+        }
+
+        return new NextResponse(fullBuffer, {
+            status: 200,
             headers: {
-                "Content-Type": response.headers.get("Content-Type") || "audio/mpeg",
-                "Content-Length": String(audioBuffer.byteLength),
+                "Content-Type": contentType,
+                "Content-Length": String(total),
+                "Accept-Ranges": "bytes",
                 "Cache-Control": "public, max-age=86400",
             },
         });

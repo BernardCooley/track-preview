@@ -1,7 +1,8 @@
-import { Box, Flex, Spinner, Tag, Text } from "@chakra-ui/react";
+import { Flex, Spinner, Text } from "@chakra-ui/react";
 import React from "react";
 import { getCurrentYear } from "../../utils";
 import { YearRange } from "../../types";
+import { Button } from "@chakra-ui/react";
 
 interface Props {
     genres?: string[] | null;
@@ -19,6 +20,17 @@ function getGenreLabel(genres?: string[] | null): string {
     return `${genres.length} genres`;
 }
 
+function hasGenreFilter(genres?: string[] | null): boolean {
+    if (!genres || genres.length === 0) return false;
+    if (genres.some((g) => g.toLowerCase() === "all")) return false;
+    return true;
+}
+
+function hasYearFilter(yearRange?: YearRange | null): boolean {
+    if (!yearRange) return false;
+    return yearRange.from !== 1960 || yearRange.to !== getCurrentYear();
+}
+
 const FilterTags = ({
     genres,
     yearRange,
@@ -27,47 +39,48 @@ const FilterTags = ({
     onYearClick,
     reviewStep,
 }: Props) => {
-    return (
-        <Flex transition="opacity 0.3s" opacity={reviewStep === 1 ? 1 : 0}>
-            <Flex gap={2} w="full" flexWrap="wrap">
-                <Tag
-                    w={genres ? "auto" : "86px"}
-                    variant="filter"
-                    pointerEvents={profileLoaded ? "auto" : "none"}
-                    onClick={onGenreClick}
-                >
-                    {genres ? (
-                        <Text userSelect="none">
-                            {getGenreLabel(genres)}
-                        </Text>
-                    ) : (
-                        <Box w="full">
-                            <Spinner color="brand.primary" size="xs" />
-                        </Box>
-                    )}
-                </Tag>
+    const genreActive = hasGenreFilter(genres);
+    const yearActive = hasYearFilter(yearRange);
 
-                <Tag
-                    w={yearRange && profileLoaded ? "auto" : "76px"}
-                    variant="filter"
-                    onClick={onYearClick}
-                    pointerEvents={profileLoaded ? "auto" : "none"}
-                >
-                    {yearRange && profileLoaded ? (
-                        <Text userSelect="none">
-                            {yearRange.from === 1960 &&
-                            yearRange.to === getCurrentYear()
-                                ? "All years"
-                                : `${yearRange.from} -
-                         ${yearRange?.to}`}
-                        </Text>
-                    ) : (
-                        <Box w="full">
-                            <Spinner color="brand.primary" size="xs" />
-                        </Box>
-                    )}
-                </Tag>
-            </Flex>
+    return (
+        <Flex
+            transition="opacity 0.3s"
+            opacity={reviewStep === 1 ? 1 : 0}
+            gap={2}
+            flexWrap="wrap"
+        >
+            <Button
+                variant={genreActive ? "subtle" : "surface"}
+                onClick={onGenreClick}
+                pointerEvents={profileLoaded ? "auto" : "none"}
+                minW="80px"
+            >
+                {genres ? (
+                    <Text userSelect="none" fontSize="sm">
+                        {getGenreLabel(genres)}
+                    </Text>
+                ) : (
+                    <Spinner color="brand.primary" size="xs" />
+                )}
+            </Button>
+
+            <Button
+                variant={yearActive ? "subtle" : "surface"}
+                onClick={onYearClick}
+                pointerEvents={profileLoaded ? "auto" : "none"}
+                minW="70px"
+            >
+                {yearRange && profileLoaded ? (
+                    <Text userSelect="none" fontSize="sm">
+                        {yearRange.from === 1960 &&
+                        yearRange.to === getCurrentYear()
+                            ? "All years"
+                            : `${yearRange.from} - ${yearRange?.to}`}
+                    </Text>
+                ) : (
+                    <Spinner color="brand.primary" size="xs" />
+                )}
+            </Button>
         </Flex>
     );
 };
