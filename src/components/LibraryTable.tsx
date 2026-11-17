@@ -21,6 +21,7 @@ import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import ShopIcon from "@mui/icons-material/Shop";
 import TrackMenuOptions from "./TrackOptionsMenu";
 import { camelcaseToTitleCase, getFormattedDate } from "../../utils";
+import { resolvePreviewUrl } from "@/bff/bff";
 
 type TrackKeys = keyof Track;
 
@@ -73,8 +74,10 @@ const LibraryTable = ({
         const order = sortBy === field ? sortDirection : "asc";
 
         const sortedTracks = [...reviewTracks[4].tracks].sort((a, b) => {
-            if (a[field] < b[field]) return order === "asc" ? -1 : 1;
-            if (a[field] > b[field]) return order === "asc" ? 1 : -1;
+            const aVal = a[field] ?? "";
+            const bVal = b[field] ?? "";
+            if (aVal < bVal) return order === "asc" ? -1 : 1;
+            if (aVal > bVal) return order === "asc" ? 1 : -1;
             return 0;
         });
 
@@ -97,40 +100,40 @@ const LibraryTable = ({
         }
     };
 
+    const [playingTrackId, setPlayingTrackId] = React.useState<
+        string | undefined
+    >();
+
     const getTrProps = (
         track: Track,
         currentlyPlaying: string | undefined,
         clickDisabled: boolean,
         updateCurrentlyPlaying: (url: string | undefined) => void
     ) => {
+        const isPlaying = playingTrackId === track.id;
         return {
             fontSize: "md",
             rounded: 10,
             outlineOffset: -2,
-            outline:
-                currentlyPlaying === track.previewUrl ? "1px solid" : "none",
-            outlineColor:
-                currentlyPlaying === track.previewUrl
-                    ? "brand.primary"
-                    : "transparent",
+            outline: isPlaying ? "1px solid" : "none",
+            outlineColor: isPlaying ? "brand.primary" : "transparent",
             color: "brand.textPrimaryLight",
             _hover: {
                 cursor: "pointer",
-                backgroundColor:
-                    currentlyPlaying === track.previewUrl
-                        ? "brand.backgroundTertiaryOpaque"
-                        : "brand.backgroundTertiaryOpaque2",
-            },
-            bg:
-                currentlyPlaying === track.previewUrl
+                backgroundColor: isPlaying
                     ? "brand.backgroundTertiaryOpaque"
-                    : "transparent",
-            onClick: () => {
+                    : "brand.backgroundTertiaryOpaque2",
+            },
+            bg: isPlaying ? "brand.backgroundTertiaryOpaque" : "transparent",
+            onClick: async () => {
                 if (!clickDisabled) {
-                    if (currentlyPlaying === track.previewUrl) {
+                    if (playingTrackId === track.id) {
+                        setPlayingTrackId(undefined);
                         updateCurrentlyPlaying(undefined);
                     } else {
-                        updateCurrentlyPlaying(track.previewUrl);
+                        setPlayingTrackId(track.id);
+                        const url = await resolvePreviewUrl(track.id);
+                        updateCurrentlyPlaying(url || track.previewUrl);
                     }
                 }
             },
@@ -248,8 +251,7 @@ const LibraryTable = ({
                                                 textWrap: "wrap",
                                             }}
                                             fontWeight={
-                                                currentlyPlaying !==
-                                                track.previewUrl
+                                                playingTrackId !== track.id
                                                     ? "normal"
                                                     : "bold"
                                             }
@@ -263,8 +265,7 @@ const LibraryTable = ({
                                                 textWrap: "wrap",
                                             }}
                                             fontWeight={
-                                                currentlyPlaying !==
-                                                track.previewUrl
+                                                playingTrackId !== track.id
                                                     ? "normal"
                                                     : "bold"
                                             }
@@ -393,20 +394,17 @@ const LibraryTable = ({
                                     >
                                         <Text
                                             isTruncated={
-                                                currentlyPlaying !==
-                                                track.previewUrl
+                                                playingTrackId !== track.id
                                             }
                                             color={"brand.textPrimary"}
                                             sx={{
                                                 textWrap:
-                                                    currentlyPlaying !==
-                                                    track.previewUrl
+                                                    playingTrackId !== track.id
                                                         ? "nowrap"
                                                         : "wrap",
                                             }}
                                             fontWeight={
-                                                currentlyPlaying !==
-                                                track.previewUrl
+                                                playingTrackId !== track.id
                                                     ? "normal"
                                                     : "bold"
                                             }
@@ -415,21 +413,18 @@ const LibraryTable = ({
                                         </Text>
                                         <Text
                                             isTruncated={
-                                                currentlyPlaying !==
-                                                track.previewUrl
+                                                playingTrackId !== track.id
                                             }
                                             fontSize="xs"
                                             maxW={24}
                                             sx={{
                                                 textWrap:
-                                                    currentlyPlaying !==
-                                                    track.previewUrl
+                                                    playingTrackId !== track.id
                                                         ? "nowrap"
                                                         : "wrap",
                                             }}
                                             fontWeight={
-                                                currentlyPlaying !==
-                                                track.previewUrl
+                                                playingTrackId !== track.id
                                                     ? "normal"
                                                     : "bold"
                                             }
@@ -442,12 +437,11 @@ const LibraryTable = ({
                             <Td>
                                 <Text
                                     isTruncated={
-                                        currentlyPlaying !== track.previewUrl
+                                        playingTrackId !== track.id
                                     }
                                     sx={{
                                         textWrap:
-                                            currentlyPlaying !==
-                                            track.previewUrl
+                                            playingTrackId !== track.id
                                                 ? "nowrap"
                                                 : "wrap",
                                     }}

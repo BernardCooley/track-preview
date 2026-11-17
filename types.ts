@@ -23,6 +23,7 @@ export interface Track {
     platform: string;
     platformId: string;
     releaseDate: string;
+    deezerTrackId?: string;
 }
 
 export interface Review {

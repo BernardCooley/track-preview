@@ -68,6 +68,16 @@ export const formatBuyUrl = (track: Track, platform: BuyPlatforms) => {
     }
 };
 
+export const generateSlug = (artist: string, title: string, platformId: string, genre?: string): string => {
+    const parts = genre
+        ? `${artist}-${title}-${platformId}-${genre}`
+        : `${artist}-${title}-${platformId}`;
+    return parts
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)/g, "");
+};
+
 export const capitaliseWords = (str: string) => {
     return str
         .split(" ")
