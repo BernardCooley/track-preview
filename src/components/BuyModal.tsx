@@ -1,8 +1,11 @@
 import {
+    Box,
     Button,
+    Flex,
     Grid,
     GridItem,
     Dialog,
+    Text,
 } from "@chakra-ui/react";
 import React from "react";
 import BuyLink from "./BuyLink";
@@ -40,44 +43,75 @@ const BuyModal = ({
                     border="1px solid"
                     borderColor="brand.border"
                     rounded="modal"
+                    overflow="hidden"
                 >
-                    <Dialog.Header
-                        color="brand.textPrimary"
-                        fontWeight="semibold"
-                        borderBottom="1px solid"
-                        borderBottomColor="brand.divider"
-                    >
-                        Buy
-                    </Dialog.Header>
-                    <Dialog.CloseTrigger
-                        color="brand.textMuted"
-                        _hover={{ color: "brand.textPrimary" }}
-                    />
-                    <Dialog.Body py={6}>
-                        <Grid templateColumns="repeat(3, 1fr)" gap={4}>
-                            {buyLinks.map((buyLink) => (
-                                <GridItem
-                                    transition="transform 0.15s ease"
-                                    _hover={{
-                                        transform: "scale(1.05)",
-                                    }}
-                                    key={buyLink.platform}
-                                    w="100%"
-                                >
-                                    <BuyLink
-                                        track={reviewTracks[4].tracks[trackToBuy!]}
-                                        buyLink={buyLink}
-                                    />
-                                </GridItem>
-                            ))}
-                        </Grid>
-                    </Dialog.Body>
+                    <Flex direction="column" h="full">
+                        <Flex
+                            px={[4, 5]}
+                            pt={[4, 5]}
+                            pb={3}
+                            alignItems="center"
+                            justifyContent="space-between"
+                        >
+                            <Text
+                                fontSize="lg"
+                                fontWeight="semibold"
+                                color="brand.textPrimary"
+                                letterSpacing="-0.01em"
+                            >
+                                Buy
+                            </Text>
+                            <Dialog.CloseTrigger
+                                position="relative"
+                                top="auto"
+                                right="auto"
+                                color="brand.textMuted"
+                                _hover={{ color: "brand.textPrimary" }}
+                            />
+                        </Flex>
 
-                    <Dialog.Footer borderTop="1px solid" borderTopColor="brand.divider">
-                        <Button variant="outline" onClick={closeBuyModal}>
-                            Close
-                        </Button>
-                    </Dialog.Footer>
+                        <Box
+                            h="1px"
+                            bg="brand.divider"
+                            mx={[4, 5]}
+                        />
+
+                        <Box px={[4, 5]} py={5}>
+                            <Grid templateColumns="repeat(3, 1fr)" gap={4}>
+                                {buyLinks.map((buyLink) => (
+                                    <GridItem
+                                        key={buyLink.platform}
+                                        display="flex"
+                                        justifyContent="center"
+                                        alignItems="center"
+                                        transition="transform 0.15s ease"
+                                        _hover={{ transform: "scale(1.05)" }}
+                                    >
+                                        <BuyLink
+                                            track={reviewTracks[4].tracks[trackToBuy!]}
+                                            buyLink={buyLink}
+                                        />
+                                    </GridItem>
+                                ))}
+                            </Grid>
+                        </Box>
+
+                        <Flex
+                            px={[4, 5]}
+                            py={4}
+                            justifyContent="flex-end"
+                            css={{
+                                backdropFilter: "blur(16px)",
+                                WebkitBackdropFilter: "blur(16px)",
+                                background: "color-mix(in srgb, var(--chakra-colors-brand-bg) 80%, transparent)",
+                                borderTop: "1px solid var(--chakra-colors-brand-divider)",
+                            }}
+                        >
+                            <Button variant="outline" onClick={closeBuyModal}>
+                                Close
+                            </Button>
+                        </Flex>
+                    </Flex>
                 </Dialog.Content>
             </Dialog.Positioner>
         </Dialog.Root>

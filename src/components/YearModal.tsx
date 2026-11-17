@@ -1,6 +1,7 @@
 "use client";
 
 import {
+    Box,
     Button,
     Dialog,
     Flex,
@@ -51,6 +52,40 @@ const YearModal = ({
 
     const sliderMarks = ["1960", "1980", "2000", getCurrentYear()];
 
+    const DecadeTag = ({ title, isActive, onClick }: { title: string; isActive: boolean; onClick: () => void }) => (
+        <Box
+            as="button"
+            onClick={onClick}
+            px={3}
+            py={1.5}
+            fontSize="sm"
+            fontWeight={isActive ? "medium" : "normal"}
+            rounded="md"
+            cursor="pointer"
+            position="relative"
+            transition="all 0.15s ease"
+            color={isActive ? "brand.primary" : "brand.textPrimary"}
+            borderLeft={isActive ? "2px solid" : "2px solid transparent"}
+            borderLeftColor={isActive ? "brand.primary" : "transparent"}
+            css={{
+                backdropFilter: "blur(8px)",
+                WebkitBackdropFilter: "blur(8px)",
+                background: isActive
+                    ? "color-mix(in srgb, var(--chakra-colors-brand-primary) 10%, transparent)"
+                    : "var(--chakra-colors-brand-surface)",
+                boxShadow: "0 1px 3px rgba(0, 0, 0, 0.06)",
+                "&:hover": {
+                    background: isActive
+                        ? "color-mix(in srgb, var(--chakra-colors-brand-primary) 15%, transparent)"
+                        : "var(--chakra-colors-brand-surface-hover)",
+                    boxShadow: "0 2px 6px rgba(0, 0, 0, 0.08)",
+                },
+            }}
+        >
+            {title}
+        </Box>
+    );
+
     return (
         <Dialog.Root
             placement="center"
@@ -66,47 +101,51 @@ const YearModal = ({
                     shadow="2xl"
                     border="1px solid"
                     borderColor="brand.border"
+                    overflow="hidden"
                 >
                     <Flex
                         w="full"
-                        rounded="modal"
-                        p={showYearSelector ? [4, 5] : 0}
                         direction="column"
-                        gap={5}
                     >
-                        <Text
-                            fontSize="lg"
-                            fontWeight="semibold"
-                            textAlign="center"
-                            color="brand.textPrimary"
-                        >
-                            Select Year Range
-                        </Text>
-
                         <Flex
-                            justifyContent="center"
-                            gap={1.5}
-                            flexWrap="wrap"
+                            px={[4, 5]}
+                            pt={[4, 5]}
+                            pb={3}
+                            direction="column"
+                            gap={4}
                         >
-                            {decades.map((decade, index) => (
-                                <Button
-                                    key={decade.title}
-                                    variant={
-                                        decadeIndex === index
-                                            ? "subtle"
-                                            : "surface"
-                                    }
-                                    onClick={() => setDecadeIndex(index)}
-                                    height="34px"
-                                    fontSize="sm"
-                                    px={3}
-                                >
-                                    {decade.title}
-                                </Button>
-                            ))}
+                            <Text
+                                fontSize="lg"
+                                fontWeight="semibold"
+                                color="brand.textPrimary"
+                                letterSpacing="-0.01em"
+                            >
+                                Year Range
+                            </Text>
+
+                            <Flex
+                                justifyContent="center"
+                                gap={1.5}
+                                flexWrap="wrap"
+                            >
+                                {decades.map((decade, index) => (
+                                    <DecadeTag
+                                        key={decade.title}
+                                        title={decade.title}
+                                        isActive={decadeIndex === index}
+                                        onClick={() => setDecadeIndex(index)}
+                                    />
+                                ))}
+                            </Flex>
                         </Flex>
 
-                        <Flex w="full" mt={2} px={[4, 6]} direction="column" gap={5}>
+                        <Box
+                            h="1px"
+                            bg="brand.divider"
+                            mx={[4, 5]}
+                        />
+
+                        <Flex w="full" px={[4, 5]} py={5} direction="column" gap={5}>
                             <Text
                                 fontSize="xl"
                                 fontWeight="semibold"
@@ -115,41 +154,54 @@ const YearModal = ({
                             >
                                 {sliderValue[0]} - {sliderValue[1]}
                             </Text>
-                            <RangeSlider
-                                min={1960}
-                                max={2023}
-                                defaultValue={[yearRange?.from, yearRange?.to]}
-                                value={sliderValue}
-                                onInput={(val: any) => {
-                                    setSliderValue(val as number[]);
-                                    setDecadeIndex(null);
-                                }}
-                            />
-                            <Flex justifyContent="space-between" h={6}>
-                                {sliderMarks.map((year) => (
-                                    <Flex
-                                        key={year}
-                                        direction="column"
-                                        alignItems="center"
-                                        gap={1}
-                                    >
-                                        <Separator
-                                            orientation="vertical"
-                                            borderColor="brand.border"
-                                        />
-                                        <Text
-                                            fontSize="xs"
-                                            color="brand.textMuted"
-                                            userSelect="none"
+                            <Box px={[0, 2]}>
+                                <RangeSlider
+                                    min={1960}
+                                    max={2023}
+                                    defaultValue={[yearRange?.from, yearRange?.to]}
+                                    value={sliderValue}
+                                    onInput={(val: any) => {
+                                        setSliderValue(val as number[]);
+                                        setDecadeIndex(null);
+                                    }}
+                                />
+                                <Flex justifyContent="space-between" h={6} mt={2}>
+                                    {sliderMarks.map((year) => (
+                                        <Flex
+                                            key={year}
+                                            direction="column"
+                                            alignItems="center"
+                                            gap={1}
                                         >
-                                            {year}
-                                        </Text>
-                                    </Flex>
-                                ))}
-                            </Flex>
+                                            <Separator
+                                                orientation="vertical"
+                                                borderColor="brand.border"
+                                            />
+                                            <Text
+                                                fontSize="xs"
+                                                color="brand.textMuted"
+                                                userSelect="none"
+                                            >
+                                                {year}
+                                            </Text>
+                                        </Flex>
+                                    ))}
+                                </Flex>
+                            </Box>
                         </Flex>
 
-                        <Flex gap={3} mt={2} justifyContent="flex-end">
+                        <Flex
+                            gap={3}
+                            px={[4, 5]}
+                            py={4}
+                            justifyContent="flex-end"
+                            css={{
+                                backdropFilter: "blur(16px)",
+                                WebkitBackdropFilter: "blur(16px)",
+                                background: "color-mix(in srgb, var(--chakra-colors-brand-bg) 80%, transparent)",
+                                borderTop: "1px solid var(--chakra-colors-brand-divider)",
+                            }}
+                        >
                             <Button
                                 disabled={
                                     sliderValue[0] === 1960 &&
