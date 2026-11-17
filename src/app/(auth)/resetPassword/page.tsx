@@ -44,7 +44,6 @@ const PasswordReset = ({}: Props) => {
             setSubmitting(false);
             router.push("/loginRegister?login=true?passwordReset=true");
         } catch (error) {
-            // TODO error not being thrown or caught - FIX
             setAuthError(
                 "Error sending password reset email. Please check your email and password and try again."
             );
@@ -73,11 +72,12 @@ const PasswordReset = ({}: Props) => {
                 onClick={() => router.push("/loginRegister?login=true")}
                 variant="ghost"
                 h={1 / 2}
-                colorScheme="teal"
+                colorPalette="teal"
                 aria-label="Show password"
                 fontSize="3xl"
-                icon={<ArrowBackIosNewIcon fontSize="inherit" />}
-            />
+            >
+                <ArrowBackIosNewIcon fontSize="inherit" />
+            </IconButton>
             <Text
                 py={10}
                 textAlign="center"
@@ -113,7 +113,7 @@ const PasswordReset = ({}: Props) => {
                                 error={errors.email?.message}
                             />
                             <Button
-                                isLoading={submitting}
+                                loading={submitting}
                                 type="submit"
                                 variant="primary"
                                 onClick={handleSubmit(performPasswordReset)}

@@ -39,8 +39,9 @@ const MenuDrawerItem = ({ pathname, linkText, href, icon }: Props) => {
                         variant="ghost"
                         aria-label={linkText}
                         fontSize="2xl"
-                        icon={<>{icon}</>}
-                    />
+                    >
+                        {icon}
+                    </IconButton>
                 )}
             </Flex>
         </Link>

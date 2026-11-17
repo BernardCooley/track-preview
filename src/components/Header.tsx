@@ -1,5 +1,5 @@
 import {
-    Divider,
+    Separator,
     Flex,
     IconButton,
     Text,
@@ -13,7 +13,7 @@ import { usePathname } from "next/navigation";
 
 const Header = () => {
     const pathname = usePathname();
-    const { isOpen, onOpen, onClose } = useDisclosure();
+    const { open: isOpen, onOpen, onClose } = useDisclosure();
     return (
         <>
             <MenuDrawer
@@ -34,11 +34,12 @@ const Header = () => {
                 onClick={onOpen}
                 variant="ghost"
                 h={1 / 2}
-                colorScheme="teal"
+                colorPalette="teal"
                 aria-label="Show password"
                 fontSize="3xl"
-                icon={<MenuOpenIcon fontSize="inherit" />}
-            />
+            >
+                <MenuOpenIcon fontSize="inherit" />
+            </IconButton>
             <Flex w="full" justifyContent="center" mt={6}>
                 <Flex
                     alignItems="center"
@@ -60,7 +61,7 @@ const Header = () => {
                     </Link>
                 </Flex>
             </Flex>
-            <Divider mt={4} />
+            <Separator mt={4} />
         </>
     );
 };

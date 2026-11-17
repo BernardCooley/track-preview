@@ -9,13 +9,12 @@ import { TextInput } from "@/components/TextInput";
 import {
     Box,
     Button,
+    Field,
     Flex,
-    FormErrorMessage,
     IconButton,
-    ToastProps,
-    useToast,
     Text,
 } from "@chakra-ui/react";
+import { toaster } from "@/components/toaster";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { UserCredential } from "firebase/auth";
@@ -52,24 +51,20 @@ const SignUp = () => {
     const [submitting, setSubmitting] = useState(false);
     const [submitted, setSubmitted] = useState(false);
     const [authError, setAuthError] = useState<string | null>(null);
-    const toast = useToast();
     const id = "registerToast";
     const [email, setEmail] = useState("");
 
     const showToast = useCallback(
-        ({ status, title, description }: ToastProps) => {
-            if (!toast.isActive(id)) {
-                toast({
-                    id,
-                    title: title || "An error has occured.",
-                    description: description || "Please try again later.",
-                    status: status,
-                    duration: 5000,
-                    isClosable: true,
-                });
-            }
+        ({ type, title, description }: { type?: string; title?: string; description?: string }) => {
+            toaster.create({
+                id,
+                title: title || "An error has occured.",
+                description: description || "Please try again later.",
+                type: (type as "success" | "error" | "warning" | "info") || "error",
+                duration: 5000,
+            });
         },
-        [toast]
+        []
     );
 
     const {
@@ -97,7 +92,7 @@ const SignUp = () => {
                 title: "Error registering.",
                 description:
                     "Please check your email and password and try again.",
-                status: "error",
+                type: "error",
             });
             setAuthError(
                 "Error registering. Please check your email and password and try again."
@@ -115,7 +110,7 @@ const SignUp = () => {
                     title: "Error registering.",
                     description:
                         "Please check your email and password and try again.",
-                    status: "error",
+                    type: "error",
                 });
             }
 
@@ -129,7 +124,7 @@ const SignUp = () => {
                     title: "Error sending verification email.",
                     description:
                         "Please check your email and password and try again.",
-                    status: "error",
+                    type: "error",
                 });
             }
         }
@@ -179,17 +174,16 @@ const SignUp = () => {
                                         }
                                         variant="ghost"
                                         h={1 / 2}
-                                        colorScheme="teal"
+                                        colorPalette="teal"
                                         aria-label="Show password"
                                         fontSize="3xl"
-                                        icon={
-                                            showPassword ? (
-                                                <VisibilityIcon fontSize="inherit" />
-                                            ) : (
-                                                <VisibilityOffIcon fontSize="inherit" />
-                                            )
-                                        }
-                                    />
+                                    >
+                                        {showPassword ? (
+                                            <VisibilityIcon fontSize="inherit" />
+                                        ) : (
+                                            <VisibilityOffIcon fontSize="inherit" />
+                                        )}
+                                    </IconButton>
                                 }
                             />
                             <TextInput
@@ -216,21 +210,20 @@ const SignUp = () => {
                                         }
                                         variant="ghost"
                                         h={1 / 2}
-                                        colorScheme="teal"
+                                        colorPalette="teal"
                                         aria-label="Show password"
                                         fontSize="3xl"
-                                        icon={
-                                            showPassword ? (
-                                                <VisibilityIcon fontSize="inherit" />
-                                            ) : (
-                                                <VisibilityOffIcon fontSize="inherit" />
-                                            )
-                                        }
-                                    />
+                                    >
+                                        {showPassword ? (
+                                            <VisibilityIcon fontSize="inherit" />
+                                        ) : (
+                                            <VisibilityOffIcon fontSize="inherit" />
+                                        )}
+                                    </IconButton>
                                 }
                             />
                             <Button
-                                isLoading={submitting}
+                                loading={submitting}
                                 type="submit"
                                 variant="primary"
                                 onClick={handleSubmit(performRegister)}
@@ -254,10 +247,11 @@ const SignUp = () => {
                     </Text>
                 </Flex>
             )}
-            {/* TODO - Message not showing up */}
             {authError && (
                 <Box h="16px" mt="8px">
-                    <FormErrorMessage>{authError}</FormErrorMessage>
+                    <Field.Root invalid>
+                        <Field.ErrorText>{authError}</Field.ErrorText>
+                    </Field.Root>
                 </Box>
             )}
         </Flex>

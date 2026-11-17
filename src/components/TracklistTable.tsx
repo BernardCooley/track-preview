@@ -2,15 +2,12 @@
 
 import React, { useEffect, useRef } from "react";
 import {
-    Collapse,
+    Box,
+    Collapsible,
     Flex,
     Image,
     Table,
-    TableContainer,
-    Tbody,
-    Td,
     Text,
-    Tr,
 } from "@chakra-ui/react";
 import { ReviewTracks, Track } from "../../types";
 import ToggleTracklist from "./ToggleTracklist";
@@ -84,125 +81,130 @@ const TracklistTable = ({
     };
 
     return (
-        <Collapse in={isOpen} animateOpacity>
-            <Flex direction="column" alignItems="flex-end">
-                {!noTracks && !loading && reviewStep > 1 && reviewStep < 4 && (
-                    <ToggleTracklist
-                        toggleTracklist={toggleTracklist}
-                        isShowingTracklist={isShowingTracklist}
-                    />
-                )}
+        <Collapsible.Root open={isOpen}>
+            <Collapsible.Content>
+                <Flex direction="column" alignItems="flex-end">
+                    {!noTracks && !loading && reviewStep > 1 && reviewStep < 4 && (
+                        <ToggleTracklist
+                            toggleTracklist={toggleTracklist}
+                            isShowingTracklist={isShowingTracklist}
+                        />
+                    )}
 
-                <TableContainer
-                    transition="padding 0.2s ease-in-out"
-                    maxH="68vh"
-                    overflowY="scroll"
-                    sx={{
-                        "::-webkit-scrollbar": {
-                            display: "none",
-                        },
-                    }}
-                    shadow="2xl"
-                    w="full"
-                >
-                    <Table variant="primary">
-                        <Tbody>
-                            {tracklist[reviewStep].tracks.map((track) => {
-                                const isCurrentTrack =
-                                    currentlyPlaying?.previewUrl ===
-                                    track.previewUrl;
-                                const {
-                                    id,
-                                    thumbnail,
-                                    title,
-                                    artist,
-                                    genre,
-                                    releaseYear,
-                                } = track;
-                                return (
-                                    <Tr
-                                        ref={isCurrentTrack ? itemRef : null}
-                                        key={id}
-                                        {...getTrProps(
-                                            track,
-                                            updateCurrentlyPlaying,
-                                            isCurrentTrack
-                                        )}
-                                    >
-                                        <Td pr={2}>
-                                            <Flex
-                                                alignItems="center"
-                                                gap={3}
-                                                justifyContent="flex-start"
-                                                pl={2}
-                                                mb={2}
-                                            >
-                                                <Image
-                                                    rounded="full"
-                                                    w={16}
-                                                    h={16}
-                                                    src={thumbnail}
-                                                    alt=""
-                                                ></Image>
+                    <Box
+                        transition="padding 0.2s ease-in-out"
+                        maxH="68vh"
+                        overflowY="scroll"
+                        overflowX="auto"
+                        css={{
+                            "&::-webkit-scrollbar": {
+                                display: "none",
+                            },
+                        }}
+                        shadow="2xl"
+                        w="full"
+                    >
+                        <Table.Root>
+                            <Table.Body>
+                                {tracklist[reviewStep].tracks.map((track) => {
+                                    const isCurrentTrack =
+                                        currentlyPlaying?.previewUrl ===
+                                        track.previewUrl;
+                                    const {
+                                        id,
+                                        thumbnail,
+                                        title,
+                                        artist,
+                                        genre,
+                                        releaseYear,
+                                    } = track;
+                                    return (
+                                        <Table.Row
+                                            ref={isCurrentTrack ? itemRef : null}
+                                            key={id}
+                                            {...getTrProps(
+                                                track,
+                                                updateCurrentlyPlaying,
+                                                isCurrentTrack
+                                            )}
+                                            borderBottom="1px solid"
+                                            borderBottomColor="brand.backgroundTertiary"
+                                        >
+                                            <Table.Cell color="brand.textPrimaryLight" padding="10px" paddingLeft="0" paddingRight="0" pr={2}>
                                                 <Flex
-                                                    w="full"
-                                                    direction="column"
-                                                    gap={2}
+                                                    alignItems="center"
+                                                    gap={3}
+                                                    justifyContent="flex-start"
+                                                    pl={2}
+                                                    mb={2}
                                                 >
-                                                    <Text
-                                                        noOfLines={3}
-                                                        fontSize={"md"}
-                                                        color={
-                                                            "brand.textPrimary"
-                                                        }
-                                                        sx={{
-                                                            textWrap: "wrap",
-                                                        }}
-                                                        fontWeight={
-                                                            !isCurrentTrack
-                                                                ? "normal"
-                                                                : "bold"
-                                                        }
+                                                    <Image
+                                                        rounded="full"
+                                                        w={16}
+                                                        h={16}
+                                                        src={thumbnail}
+                                                        alt=""
+                                                    ></Image>
+                                                    <Flex
+                                                        w="full"
+                                                        direction="column"
+                                                        gap={2}
                                                     >
-                                                        {title}
-                                                    </Text>
-                                                    <Text
-                                                        fontSize="sm"
-                                                        maxW={32}
-                                                        sx={{
-                                                            textWrap: "wrap",
-                                                        }}
-                                                        fontWeight={
-                                                            !isCurrentTrack
-                                                                ? "normal"
-                                                                : "bold"
-                                                        }
-                                                    >
-                                                        {artist}
-                                                    </Text>
+                                                        <Text
+                                                            lineClamp={3}
+                                                            fontSize={"md"}
+                                                            color={
+                                                                "brand.textPrimary"
+                                                            }
+                                                            css={{
+                                                                textWrap: "wrap",
+                                                            }}
+                                                            fontWeight={
+                                                                !isCurrentTrack
+                                                                    ? "normal"
+                                                                    : "bold"
+                                                            }
+                                                        >
+                                                            {title}
+                                                        </Text>
+                                                        <Text
+                                                            fontSize="sm"
+                                                            maxW={32}
+                                                            css={{
+                                                                textWrap: "wrap",
+                                                            }}
+                                                            fontWeight={
+                                                                !isCurrentTrack
+                                                                    ? "normal"
+                                                                    : "bold"
+                                                            }
+                                                        >
+                                                            {artist}
+                                                        </Text>
+                                                    </Flex>
                                                 </Flex>
-                                            </Flex>
-                                            <Flex justifyContent="space-between">
-                                                <Text
-                                                    px={2}
-                                                    noOfLines={2}
-                                                    sx={{
-                                                        textWrap: "wrap",
-                                                    }}
-                                                >
-                                                    {genre}
-                                                </Text>
-                                                <Text>{releaseYear}</Text>
-                                            </Flex>
-                                        </Td>
-                                    </Tr>
-                                );
-                            })}
-                        </Tbody>
-                    </Table>
-                </TableContainer>
-            </Flex>
-        </Collapse>
+                                                <Flex justifyContent="space-between">
+                                                    <Text
+                                                        px={2}
+                                                        lineClamp={2}
+                                                        css={{
+                                                            textWrap: "wrap",
+                                                        }}
+                                                    >
+                                                        {genre}
+                                                    </Text>
+                                                    <Text>{releaseYear}</Text>
+                                                </Flex>
+                                            </Table.Cell>
+                                        </Table.Row>
+                                    );
+                                })}
+                            </Table.Body>
+                        </Table.Root>
+                    </Box>
+                </Flex>
+            </Collapsible.Content>
+        </Collapsible.Root>
     );
 };
 

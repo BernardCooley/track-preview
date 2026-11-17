@@ -1,5 +1,5 @@
 import React from "react";
-import { Flex, Icon, Link, Text } from "@chakra-ui/react";
+import { Flex, Link, Text } from "@chakra-ui/react";
 import { Track } from "../../types";
 import YouTubeIcon from "@mui/icons-material/YouTube";
 import { FaSpotify } from "react-icons/fa";
@@ -37,17 +37,16 @@ const FullTrackLinks = ({ currentTrack, onLinkClicked }: Props) => {
                         pb={1}
                         px={2}
                         key={link.title}
-                        isExternal
+                        target="_blank"
+                        rel="noopener noreferrer"
                         href={link.url}
                         _hover={{
                             background: "brand.backgroundTertiaryOpaque3",
                         }}
                     >
                         <Flex gap={2} direction="row" alignItems="center">
-                            <Icon
-                                fontSize={["28px", "36px"]}
-                                color={link.color}
-                                as={link.icon}
+                            <link.icon
+                                style={{ fontSize: "28px", color: link.color }}
                             />
                             <Text fontSize={["14px", "18px"]}>
                                 {link.title}

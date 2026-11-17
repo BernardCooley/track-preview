@@ -1,20 +1,14 @@
 "use client";
 import {
-    AlertDialog,
-    AlertDialogBody,
-    AlertDialogContent,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogOverlay,
     Button,
+    Dialog,
     Flex,
     Heading,
     IconButton,
     Text,
-    ToastProps,
     useDisclosure,
-    useToast,
 } from "@chakra-ui/react";
+import { toaster } from "@/components/toaster";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
     DeleteUser,
@@ -40,7 +34,7 @@ import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 
 const Settings = () => {
-    const { isOpen, onOpen, onClose } = useDisclosure();
+    const { open: isOpen, onOpen, onClose } = useDisclosure();
     const cancelRef = useRef<HTMLButtonElement>(null);
     const router = useRouter();
     const [editingEmail, setEditingEmail] = useState<boolean>(false);
@@ -54,25 +48,21 @@ const Settings = () => {
         email: string;
         password: string;
     }>({ email: "", password: "" });
-    const toast = useToast();
     const id = "accountToast";
     const [userAccount, setUserAccount] = useState<UserAccount | null>(null);
     const [showPassword, setShowPassword] = useState<boolean>(false);
 
     const showToast = useCallback(
-        ({ status, title, description, duration }: ToastProps) => {
-            if (!toast.isActive(id)) {
-                toast({
-                    id,
-                    title: title || "An error has occured.",
-                    description: description || "Please try again later.",
-                    status: status,
-                    duration: duration || 5000,
-                    isClosable: true,
-                });
-            }
+        ({ type, title, description, duration }: { type?: string; title?: string; description?: string; duration?: number }) => {
+            toaster.create({
+                id,
+                title: title || "An error has occured.",
+                description: description || "Please try again later.",
+                type: (type as "success" | "error" | "warning" | "info") || "error",
+                duration: duration || 5000,
+            });
         },
-        [toast]
+        []
     );
 
     const isUserLoggedIn = useCallback(async () => {
@@ -115,7 +105,7 @@ const Settings = () => {
                     title: "Email updated.",
                     description:
                         "Your email has been updated. A verification email has been sent to your new email address.",
-                    status: "success",
+                    type: "success",
                 });
 
                 setTimeout(async () => {
@@ -126,7 +116,7 @@ const Settings = () => {
                     showToast({
                         title: "Please log in again to make changes to your account.",
                         description: "Redirecting you to the login page...",
-                        status: "info",
+                        type: "info",
                     });
                     setTimeout(() => {
                         router.push(
@@ -137,7 +127,7 @@ const Settings = () => {
                     showToast({
                         title: "Error updating email.",
                         description: "Please try again later.",
-                        status: "error",
+                        type: "error",
                     });
                 }
             }
@@ -153,7 +143,7 @@ const Settings = () => {
                     title: "Password updated.",
                     description:
                         "Your password has been updated. Please log in again with your new password.",
-                    status: "success",
+                    type: "success",
                 });
 
                 setTimeout(async () => {
@@ -164,7 +154,7 @@ const Settings = () => {
                     showToast({
                         title: "Please log in again to make changes to your account.",
                         description: "Redirecting you to the login page...",
-                        status: "info",
+                        type: "info",
                     });
                     setTimeout(() => {
                         router.push(
@@ -175,7 +165,7 @@ const Settings = () => {
                     showToast({
                         title: "Error updating email.",
                         description: "Please try again later.",
-                        status: "error",
+                        type: "error",
                     });
                 }
             }
@@ -230,15 +220,14 @@ const Settings = () => {
                     onClick={onSaveClick}
                     variant="ghost"
                     h={1 / 2}
-                    colorScheme="teal"
+                    colorPalette="teal"
                     aria-label="Show password"
                     fontSize="3xl"
-                    icon={
-                        touched && !isErrors ? (
-                            <SaveIcon fontSize="inherit" />
-                        ) : undefined
-                    }
-                />
+                >
+                    {touched && !isErrors ? (
+                        <SaveIcon fontSize="inherit" />
+                    ) : undefined}
+                </IconButton>
                 <IconButton
                     _hover={{
                         bg: "transparent",
@@ -256,39 +245,39 @@ const Settings = () => {
                     }}
                     variant="ghost"
                     h={1 / 2}
-                    colorScheme="teal"
+                    colorPalette="teal"
                     aria-label="Show password"
                     fontSize="3xl"
-                    icon={
-                        !isEditing ? (
-                            <EditIcon fontSize="inherit" />
-                        ) : (
-                            <CloseIcon fontSize="inherit" />
-                        )
-                    }
-                />
+                >
+                    {!isEditing ? (
+                        <EditIcon fontSize="inherit" />
+                    ) : (
+                        <CloseIcon fontSize="inherit" />
+                    )}
+                </IconButton>
             </Flex>
         );
     };
 
     return (
         <Flex h="full" m={0} px={[4, 8]} direction="column" alignItems="center">
-            <AlertDialog
-                isOpen={isOpen}
-                leastDestructiveRef={cancelRef}
-                onClose={onClose}
+            <Dialog.Root
+                role="alertdialog"
+                open={isOpen}
+                onOpenChange={(details) => { if (!details.open) onClose(); }}
             >
-                <AlertDialogOverlay>
-                    <AlertDialogContent bg="brand.backgroundSecondary" mx={10}>
-                        <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                <Dialog.Backdrop />
+                <Dialog.Positioner>
+                    <Dialog.Content bg="brand.backgroundSecondary" mx={10}>
+                        <Dialog.Header fontSize="lg" fontWeight="bold">
                             Delete Account
-                        </AlertDialogHeader>
+                        </Dialog.Header>
 
-                        <AlertDialogBody>
+                        <Dialog.Body>
                             {`Are you sure? You can't undo this action afterwards.`}
-                        </AlertDialogBody>
+                        </Dialog.Body>
 
-                        <AlertDialogFooter>
+                        <Dialog.Footer>
                             <Button
                                 ref={cancelRef}
                                 onClick={onClose}
@@ -298,7 +287,7 @@ const Settings = () => {
                             </Button>
 
                             <Button
-                                colorScheme="teal"
+                                colorPalette="teal"
                                 type="button"
                                 variant="warning"
                                 onClick={async () => {
@@ -309,10 +298,10 @@ const Settings = () => {
                             >
                                 Delete account
                             </Button>
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                </AlertDialogOverlay>
-            </AlertDialog>
+                        </Dialog.Footer>
+                    </Dialog.Content>
+                </Dialog.Positioner>
+            </Dialog.Root>
 
             <Header />
             <Flex
@@ -457,17 +446,16 @@ const Settings = () => {
                                         }
                                         variant="ghost"
                                         h={1 / 2}
-                                        colorScheme="teal"
+                                        colorPalette="teal"
                                         aria-label="Show password"
                                         fontSize="3xl"
-                                        icon={
-                                            showPassword ? (
-                                                <VisibilityIcon fontSize="inherit" />
-                                            ) : (
-                                                <VisibilityOffIcon fontSize="inherit" />
-                                            )
-                                        }
-                                    />
+                                    >
+                                        {showPassword ? (
+                                            <VisibilityIcon fontSize="inherit" />
+                                        ) : (
+                                            <VisibilityOffIcon fontSize="inherit" />
+                                        )}
+                                    </IconButton>
                                 }
                             />
                         ) : (
@@ -504,7 +492,7 @@ const Settings = () => {
                 justifyContent="center"
             >
                 <Button
-                    colorScheme="teal"
+                    colorPalette="teal"
                     size="sm"
                     type="button"
                     variant="outline"
@@ -516,7 +504,7 @@ const Settings = () => {
                     position="absolute"
                     bottom={16}
                     right={8}
-                    colorScheme="teal"
+                    colorPalette="teal"
                     size="sm"
                     type="button"
                     variant="warning"

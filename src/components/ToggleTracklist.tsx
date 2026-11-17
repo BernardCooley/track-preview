@@ -24,7 +24,7 @@ const ToggleTracklist = ({ toggleTracklist, isShowingTracklist }: Props) => {
             onClick={toggleTracklist}
             variant="ghost"
             fontSize="md"
-            colorScheme="teal"
+            colorPalette="teal"
             _hover={{
                 bg: "brand.backgroundTertiaryOpaque",
             }}

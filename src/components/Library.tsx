@@ -28,7 +28,6 @@ const Library = () => {
         onClose,
         buyModalIsOpen,
         onBuyModalOpen,
-        cancelRef,
         trackToDelete,
         setTrackToDelete,
         trackToBuy,
@@ -90,7 +89,7 @@ const Library = () => {
                         top="200px"
                         position="absolute"
                         variant="outline"
-                        colorScheme="teal"
+                        colorPalette="teal"
                         fontSize={["24px", "36px"]}
                         px={4}
                     >
@@ -112,7 +111,6 @@ const Library = () => {
                 reviewTracks={reviewTracks}
                 trackToDelete={trackToDelete}
                 deleteTrack={deleteTrack}
-                ref={cancelRef}
             />
 
             {currentReleaseTrack && (

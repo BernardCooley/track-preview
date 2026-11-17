@@ -6,7 +6,6 @@ import {
     Center,
     Flex,
     Grid,
-    Slide,
     Stack,
 } from "@chakra-ui/react";
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
@@ -107,28 +106,32 @@ function ExploreContent() {
         },
     ];
 
+    const showAudioPlayer =
+        currentStep === 4 &&
+        currentlyPlaying !== undefined &&
+        currentlyPlaying.length > 0;
+
     return (
         <Box h="full" m={0} overflowY="hidden" ref={pageRef}>
             <Header />
             <Center h="full">
                 <Flex direction="column" w="full" h="full">
                     <Stack
-                        spacing={0}
+                        gap={0}
                         w="full"
                         position="relative"
                         transition="ease-in-out"
-                        transitionDuration="200"
+                        transitionDuration="200ms"
                         h="full"
                     >
                         <Grid templateColumns="repeat(4, 1fr)" w="full">
                             {tabButtons.map((button, index) => (
                                 <Button
-                                    rightIcon={button.icon}
                                     key={button.name}
                                     variant={
                                         currentStep === index + 1
-                                            ? "tab selected"
-                                            : "tab deselected"
+                                            ? "tabSelected"
+                                            : "tabDeselected"
                                     }
                                     rounded="none"
                                     onClick={() =>
@@ -136,7 +139,9 @@ function ExploreContent() {
                                             `/explore?reviewStep=${index + 1}`
                                         )
                                     }
-                                ></Button>
+                                >
+                                    {button.icon}
+                                </Button>
                             ))}
                         </Grid>
 
@@ -148,19 +153,19 @@ function ExploreContent() {
                             )}
                         {reviewStep && Number(reviewStep) === 4 && <Library />}
                     </Stack>
-                    <Slide
-                        direction="bottom"
-                        in={
-                            currentStep === 4 &&
-                            currentlyPlaying !== undefined &&
-                            currentlyPlaying.length > 0
-                        }
-                        style={{ zIndex: 10 }}
+                    <Box
+                        position="fixed"
+                        bottom={0}
+                        left={0}
+                        right={0}
+                        zIndex={10}
+                        transform={showAudioPlayer ? "translateY(0)" : "translateY(100%)"}
+                        transition="transform 0.3s ease-in-out"
                     >
                         <Box p={4} mt="4" rounded="md" shadow="md">
                             <AudioPlayer ref={audioElement} />
                         </Box>
-                    </Slide>
+                    </Box>
                 </Flex>
             </Center>
         </Box>

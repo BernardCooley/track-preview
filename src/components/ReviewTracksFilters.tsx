@@ -1,12 +1,11 @@
 import React, { LegacyRef, forwardRef, useEffect, useRef } from "react";
 import {
     Box,
-    Collapse,
+    Collapsible,
+    Field,
     Flex,
-    FormControl,
-    FormLabel,
     IconButton,
-    Select,
+    NativeSelect,
     Switch,
 } from "@chakra-ui/react";
 import { arrayRange, getCurrentYear } from "../../utils";
@@ -70,179 +69,216 @@ const ReviewTracksFilters = forwardRef(
 
         return (
             <Box w="full">
-                <Collapse in={isOpen} animateOpacity>
-                    <Flex
-                        alignItems="center"
-                        zIndex={150}
-                        w="full"
-                        justifyContent="space-between"
-                    >
+                <Collapsible.Root open={isOpen}>
+                    <Collapsible.Content>
                         <Flex
-                            gap={6}
-                            zIndex="100"
-                            justifyContent="flex-start"
                             alignItems="center"
+                            zIndex={150}
                             w="full"
-                            flexWrap="wrap"
-                            mb={1}
+                            justifyContent="space-between"
                         >
                             <Flex
-                                alignItems="flex-start"
-                                gap={2}
-                                direction="column"
+                                gap={6}
+                                zIndex="100"
+                                justifyContent="flex-start"
+                                alignItems="center"
+                                w="full"
+                                flexWrap="wrap"
+                                mb={1}
                             >
-                                <FormLabel fontSize="md" mb={0}>
-                                    <Box>Genre</Box>
-                                </FormLabel>
-                                <Select
-                                    boxShadow="md"
-                                    _focusVisible={{
-                                        boxShadow: "none",
-                                    }}
-                                    ref={ref}
-                                    variant="outline"
-                                    placeholder="Select genre"
-                                    onChange={(e) =>
-                                        onGenreSelect(e.target.value)
-                                    }
-                                    defaultValue={selectedGenre || "All"}
-                                >
-                                    <option value="all">All</option>
-                                    {genres.sort().map((style) => (
-                                        <option key={style} value={style}>
-                                            {style}
-                                        </option>
-                                    ))}
-                                </Select>
-                            </Flex>
-                            {showDates && (
                                 <Flex
                                     alignItems="flex-start"
                                     gap={2}
                                     direction="column"
                                 >
-                                    <FormLabel fontSize="md" mb={0}>
-                                        <Box>Year from</Box>
-                                    </FormLabel>
-                                    <Select
-                                        ref={yearFromRef}
-                                        boxShadow="md"
-                                        _focusVisible={{
-                                            boxShadow: "none",
-                                        }}
-                                        variant="outline"
-                                        placeholder="Year from"
-                                        onChange={(e) => {
-                                            if (onYearFromSelect) {
-                                                onYearFromSelect(
-                                                    e.target.value
-                                                );
+                                    <Field.Label fontSize="md" mb={0}>
+                                        <Box>Genre</Box>
+                                    </Field.Label>
+                                    <NativeSelect.Root>
+                                        <NativeSelect.Field
+                                            boxShadow="md"
+                                            _focusVisible={{
+                                                boxShadow: "none",
+                                            }}
+                                            ref={ref}
+                                            onChange={(e) =>
+                                                onGenreSelect(e.target.value)
                                             }
-                                        }}
-                                        defaultValue={selectedYearFrom}
-                                    >
-                                        <option value={0}>All</option>
-                                        {arrayRange(1950, getCurrentYear(), 1)
-                                            .reverse()
-                                            .map((year) => (
-                                                <option
-                                                    key={year}
-                                                    value={year.toString()}
-                                                >
-                                                    {year}
+                                            defaultValue={selectedGenre || "All"}
+                                            height="50px"
+                                            border="1px solid"
+                                            borderColor="brand.backgroundPrimary"
+                                            shadow="md"
+                                            backgroundColor="brand.backgroundTertiaryOpaque"
+                                            color="white"
+                                            _focus={{
+                                                shadow: "xl",
+                                                borderColor: "brand.primary",
+                                            }}
+                                        >
+                                            <option value="all">All</option>
+                                            {genres.sort().map((style) => (
+                                                <option key={style} value={style}>
+                                                    {style}
                                                 </option>
                                             ))}
-                                    </Select>
+                                        </NativeSelect.Field>
+                                        <NativeSelect.Indicator />
+                                    </NativeSelect.Root>
                                 </Flex>
-                            )}
-                            {selectedYearFrom !== 0 && showDates && (
+                                {showDates && (
+                                    <Flex
+                                        alignItems="flex-start"
+                                        gap={2}
+                                        direction="column"
+                                    >
+                                        <Field.Label fontSize="md" mb={0}>
+                                            <Box>Year from</Box>
+                                        </Field.Label>
+                                        <NativeSelect.Root>
+                                            <NativeSelect.Field
+                                                ref={yearFromRef}
+                                                boxShadow="md"
+                                                _focusVisible={{
+                                                    boxShadow: "none",
+                                                }}
+                                                onChange={(e) => {
+                                                    if (onYearFromSelect) {
+                                                        onYearFromSelect(
+                                                            e.target.value
+                                                        );
+                                                    }
+                                                }}
+                                                defaultValue={selectedYearFrom}
+                                                height="50px"
+                                                border="1px solid"
+                                                borderColor="brand.backgroundPrimary"
+                                                shadow="md"
+                                                backgroundColor="brand.backgroundTertiaryOpaque"
+                                                color="white"
+                                                _focus={{
+                                                    shadow: "xl",
+                                                    borderColor: "brand.primary",
+                                                }}
+                                            >
+                                                <option value={0}>All</option>
+                                                {arrayRange(1950, getCurrentYear(), 1)
+                                                    .reverse()
+                                                    .map((year) => (
+                                                        <option
+                                                            key={year}
+                                                            value={year.toString()}
+                                                        >
+                                                            {year}
+                                                        </option>
+                                                    ))}
+                                            </NativeSelect.Field>
+                                            <NativeSelect.Indicator />
+                                        </NativeSelect.Root>
+                                    </Flex>
+                                )}
+                                {selectedYearFrom !== 0 && showDates && (
+                                    <Flex
+                                        alignItems="flex-start"
+                                        gap={2}
+                                        direction="column"
+                                    >
+                                        <Field.Label fontSize="md" mb={0}>
+                                            <Box>Year to</Box>
+                                        </Field.Label>
+                                        <NativeSelect.Root>
+                                            <NativeSelect.Field
+                                                ref={yearToRef}
+                                                boxShadow="md"
+                                                _focusVisible={{
+                                                    boxShadow: "none",
+                                                }}
+                                                onChange={(e) => {
+                                                    if (onYearToSelect) {
+                                                        onYearToSelect(e.target.value);
+                                                    }
+                                                }}
+                                                defaultValue={selectedYearTo || ""}
+                                                height="50px"
+                                                border="1px solid"
+                                                borderColor="brand.backgroundPrimary"
+                                                shadow="md"
+                                                backgroundColor="brand.backgroundTertiaryOpaque"
+                                                color="white"
+                                                _focus={{
+                                                    shadow: "xl",
+                                                    borderColor: "brand.primary",
+                                                }}
+                                            >
+                                                {arrayRange(
+                                                    Number(selectedYearFrom) + 1,
+                                                    getCurrentYear(),
+                                                    1
+                                                )
+                                                    .reverse()
+                                                    .map((year) => (
+                                                        <option
+                                                            key={year}
+                                                            value={year.toString()}
+                                                        >
+                                                            {year}
+                                                        </option>
+                                                    ))}
+                                            </NativeSelect.Field>
+                                            <NativeSelect.Indicator />
+                                        </NativeSelect.Root>
+                                    </Flex>
+                                )}
                                 <Flex
                                     alignItems="flex-start"
                                     gap={2}
                                     direction="column"
                                 >
-                                    <FormLabel fontSize="md" mb={0}>
-                                        <Box>Year to</Box>
-                                    </FormLabel>
-                                    <Select
-                                        ref={yearToRef}
+                                    <Field.Label fontSize="md" mb={0}>
+                                        <Box>AutoPlay</Box>
+                                    </Field.Label>
+                                    <Field.Root
+                                        display="flex"
+                                        alignItems="center"
+                                        w="auto"
                                         boxShadow="md"
-                                        _focusVisible={{
-                                            boxShadow: "none",
-                                        }}
-                                        variant="outline"
-                                        placeholder="Year to"
-                                        onChange={(e) => {
-                                            if (onYearToSelect) {
-                                                onYearToSelect(e.target.value);
-                                            }
-                                        }}
-                                        defaultValue={selectedYearTo || ""}
-                                    >
-                                        {arrayRange(
-                                            Number(selectedYearFrom) + 1,
-                                            getCurrentYear(),
-                                            1
-                                        )
-                                            .reverse()
-                                            .map((year) => (
-                                                <option
-                                                    key={year}
-                                                    value={year.toString()}
-                                                >
-                                                    {year}
-                                                </option>
-                                            ))}
-                                    </Select>
-                                </Flex>
-                            )}
-                            <Flex
-                                alignItems="flex-start"
-                                gap={2}
-                                direction="column"
-                            >
-                                <FormLabel fontSize="md" mb={0}>
-                                    <Box>AutoPlay</Box>
-                                </FormLabel>
-                                <FormControl
-                                    display="flex"
-                                    alignItems="center"
-                                    w="auto"
-                                    boxShadow="md"
-                                    rounded={6}
-                                    h="40px"
-                                    px={4}
-                                    _hover={{
-                                        cursor: "pointer",
-                                    }}
-                                >
-                                    <Switch
-                                        colorScheme="teal"
-                                        ref={autoPlayRef}
-                                        isChecked={autoPlay}
-                                        id="autoplay"
-                                        onChange={(e) => {
-                                            onAutoPlayChange(e.target.checked);
-                                        }}
-                                        size="md"
                                         rounded={6}
-                                    />
-                                </FormControl>
+                                        h="40px"
+                                        px={4}
+                                        _hover={{
+                                            cursor: "pointer",
+                                        }}
+                                    >
+                                        <Switch.Root
+                                            colorPalette="teal"
+                                            checked={autoPlay}
+                                            onCheckedChange={(details) => {
+                                                onAutoPlayChange(details.checked);
+                                            }}
+                                            size="md"
+                                        >
+                                            <Switch.Control rounded={6}>
+                                                <Switch.Thumb />
+                                            </Switch.Control>
+                                        </Switch.Root>
+                                    </Field.Root>
+                                </Flex>
                             </Flex>
+                            <Box position="absolute" top={3} right={[6, 2]}>
+                                <IconButton
+                                    rounded="full"
+                                    onClick={() => router.push("/settings")}
+                                    variant="ghost"
+                                    colorPalette="teal"
+                                    aria-label="settings page"
+                                    fontSize="3xl"
+                                >
+                                    <AccountCircleIcon fontSize="inherit" />
+                                </IconButton>
+                            </Box>
                         </Flex>
-                        <Box position="absolute" top={3} right={[6, 2]}>
-                            <IconButton
-                                rounded="full"
-                                onClick={() => router.push("/settings")}
-                                variant="ghost"
-                                colorScheme="teal"
-                                aria-label="settings page"
-                                fontSize="3xl"
-                                icon={<AccountCircleIcon fontSize="inherit" />}
-                            />
-                        </Box>
-                    </Flex>
-                </Collapse>
+                    </Collapsible.Content>
+                </Collapsible.Root>
             </Box>
         );
     }

@@ -1,5 +1,6 @@
 import { useCallback, useRef, useState } from "react";
-import { ToastProps, useDisclosure, useToast } from "@chakra-ui/react";
+import { useDisclosure } from "@chakra-ui/react";
+import { toaster } from "@/components/toaster";
 import { Track } from "../../types";
 import { useTrackContext } from "../../context/TrackContext";
 import { fetchRelease, fetchTracks, updateTrackReviewStep } from "@/bff/bff";
@@ -21,11 +22,10 @@ export const useTrackList = () => {
     } = useTrackContext();
     const [loading, setLoading] = useState<boolean>(false);
     const [noTracks, setNoTracks] = useState<boolean>(false);
-    const toast = useToast();
     const id = "step4-toast";
-    const { isOpen, onOpen, onClose } = useDisclosure();
+    const { open: isOpen, onOpen, onClose } = useDisclosure();
     const {
-        isOpen: buyModalIsOpen,
+        open: buyModalIsOpen,
         onOpen: onBuyModalOpen,
         onClose: onBuyModalClose,
     } = useDisclosure();
@@ -65,19 +65,16 @@ export const useTrackList = () => {
     };
 
     const showToast = useCallback(
-        ({ status, title, description }: ToastProps) => {
-            if (!toast.isActive(id)) {
-                toast({
-                    id,
-                    title: title || "An error has occured.",
-                    description: description || "Please try again later.",
-                    status: status,
-                    duration: 5000,
-                    isClosable: true,
-                });
-            }
+        ({ type, title, description }: { type?: string; title?: string; description?: string }) => {
+            toaster.create({
+                id,
+                title: title || "An error has occured.",
+                description: description || "Please try again later.",
+                type: (type as "success" | "error" | "warning" | "info") || "error",
+                duration: 5000,
+            });
         },
-        [toast]
+        []
     );
 
     const getTracks = useCallback(
@@ -105,7 +102,7 @@ export const useTrackList = () => {
                         setNoTracks(true);
                     }
                 } catch (error) {
-                    showToast({ status: "error" });
+                    showToast({ type: "error" });
                 }
             }
         },
@@ -143,7 +140,6 @@ export const useTrackList = () => {
         setLoading,
         noTracks,
         setNoTracks,
-        toast,
         id,
         isOpen,
         onOpen,

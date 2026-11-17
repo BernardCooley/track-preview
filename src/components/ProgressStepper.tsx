@@ -1,15 +1,8 @@
 import {
     Box,
     Button,
-    Step,
-    StepDescription,
-    StepIcon,
-    StepIndicator,
-    StepNumber,
-    StepSeparator,
-    StepStatus,
-    StepTitle,
-    Stepper,
+    Flex,
+    Steps,
 } from "@chakra-ui/react";
 import React from "react";
 
@@ -27,42 +20,36 @@ interface Props {
 
 const ProgressStepper = ({ onStepChange, currentStep }: Props) => {
     return (
-        <Stepper
-            variant="primary"
-            colorScheme="teal"
-            index={currentStep}
+        <Steps.Root
+            colorPalette="teal"
+            step={currentStep - 1}
             size={["sm", "md", "lg"]}
+            count={steps.length}
             px={[4, 0, 0]}
             pt={4}
         >
-            {steps.map((step, index) => (
-                <Step key={index}>
-                    <Button
-                        py={4}
-                        h="auto"
-                        variant="ghost"
-                        onClick={() => {
-                            onStepChange(index + 1);
-                        }}
-                        isActive={currentStep === index + 1}
-                    >
-                        <StepIndicator fontSize="sm">
-                            <StepStatus
-                                complete={<StepIcon />}
-                                incomplete={<StepNumber />}
-                                active={<StepNumber />}
-                            />
-                        </StepIndicator>
-                    </Button>
-                    <Box flexShrink="0" display={["none", "none", "block"]}>
-                        <StepTitle>{step.title}</StepTitle>
-                        <StepDescription>{step.description}</StepDescription>
-                    </Box>
-
-                    <StepSeparator />
-                </Step>
-            ))}
-        </Stepper>
+            <Steps.List>
+                {steps.map((step, index) => (
+                    <Steps.Item key={index} index={index}>
+                        <Button
+                            py={4}
+                            h="auto"
+                            variant="ghost"
+                            onClick={() => {
+                                onStepChange(index + 1);
+                            }}
+                        >
+                            <Steps.Indicator fontSize="sm" />
+                        </Button>
+                        <Box flexShrink="0" display={["none", "none", "block"]}>
+                            <Steps.Title>{step.title}</Steps.Title>
+                            <Steps.Description>{step.description}</Steps.Description>
+                        </Box>
+                        <Steps.Separator />
+                    </Steps.Item>
+                ))}
+            </Steps.List>
+        </Steps.Root>
     );
 };
 

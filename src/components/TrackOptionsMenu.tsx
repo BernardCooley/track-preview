@@ -1,4 +1,4 @@
-import { Menu, MenuButton, MenuItem, MenuList, Button } from "@chakra-ui/react";
+import { Menu, Button } from "@chakra-ui/react";
 import React from "react";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 
@@ -18,32 +18,61 @@ const TrackMenuOptions = ({
     onViewRelease,
 }: TrackOptionsProps) => {
     return (
-        <Menu variant="primary">
-            <MenuButton
-                onClick={(e) => e.stopPropagation()}
-                variant="menuButton"
-                onMouseEnter={onMouseEnter}
-                onMouseLeave={onMouseLeave}
-                as={Button}
-                rightIcon={<MoreHorizIcon />}
-            ></MenuButton>
-            <MenuList>
-                <MenuItem
+        <Menu.Root>
+            <Menu.Trigger asChild>
+                <Button
+                    onClick={(e) => e.stopPropagation()}
+                    variant="menuButton"
                     onMouseEnter={onMouseEnter}
                     onMouseLeave={onMouseLeave}
-                    onClick={() => onTrackDelete(index)}
                 >
-                    Delete track
-                </MenuItem>
-                <MenuItem
-                    onMouseEnter={onMouseEnter}
-                    onMouseLeave={onMouseLeave}
-                    onClick={() => onViewRelease(index)}
+                    <MoreHorizIcon />
+                </Button>
+            </Menu.Trigger>
+            <Menu.Positioner>
+                <Menu.Content
+                    bg="brand.backgroundPrimary"
+                    color="brand.textPrimary"
+                    padding="0"
+                    border="1px solid"
+                    borderColor="brand.primary"
+                    shadow="md"
                 >
-                    View release
-                </MenuItem>
-            </MenuList>
-        </Menu>
+                    <Menu.Item
+                        value="delete"
+                        p={3}
+                        fontSize="lg"
+                        rounded="md"
+                        bg="transparent"
+                        color="brand.textPrimary"
+                        _hover={{
+                            bg: "brand.backgroundTertiaryOpaque",
+                        }}
+                        onMouseEnter={onMouseEnter}
+                        onMouseLeave={onMouseLeave}
+                        onClick={() => onTrackDelete(index)}
+                    >
+                        Delete track
+                    </Menu.Item>
+                    <Menu.Item
+                        value="viewRelease"
+                        p={3}
+                        fontSize="lg"
+                        rounded="md"
+                        bg="transparent"
+                        color="brand.textPrimary"
+                        _hover={{
+                            bg: "brand.backgroundTertiaryOpaque",
+                        }}
+                        onMouseEnter={onMouseEnter}
+                        onMouseLeave={onMouseLeave}
+                        onClick={() => onViewRelease(index)}
+                    >
+                        View release
+                    </Menu.Item>
+                </Menu.Content>
+            </Menu.Positioner>
+        </Menu.Root>
     );
 };
 

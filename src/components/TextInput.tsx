@@ -1,14 +1,9 @@
 import {
     Box,
+    Field,
     Flex,
-    FormControl,
-    FormErrorMessage,
-    FormHelperText,
-    FormLabel,
     Input,
     InputGroup,
-    InputLeftElement,
-    InputRightElement,
 } from "@chakra-ui/react";
 import React, {
     CSSProperties,
@@ -21,7 +16,7 @@ import React, {
 interface Props {
     placeholder?: string;
     height?: string;
-    size: string;
+    size: "sm" | "md" | "lg" | "xl" | "2xl" | "2xs" | "xs";
     title?: string;
     error?: string;
     helperText?: string;
@@ -60,8 +55,8 @@ export const TextInput = forwardRef(
         ref: LegacyRef<HTMLInputElement>
     ) => {
         return (
-            <FormControl isInvalid={error ? true : false} style={styles}>
-                <FormLabel fontSize="lg" mb={0}>
+            <Field.Root invalid={error ? true : false} style={styles}>
+                <Field.Label fontSize="lg" mb={0}>
                     <Flex>
                         <Box>{title}</Box>
                         {required && (
@@ -70,24 +65,23 @@ export const TextInput = forwardRef(
                             </Box>
                         )}
                     </Flex>
-                </FormLabel>
+                </Field.Label>
                 {allowHelperText && (
-                    <FormHelperText
+                    <Field.HelperText
                         fontSize="sm"
                         py={2}
                         mt={0}
                         color="brand.lightTitle"
                     >
                         {helperText}
-                    </FormHelperText>
+                    </Field.HelperText>
                 )}
-                <InputGroup>
-                    {leftIcon && (
-                        <InputLeftElement>{leftIcon}</InputLeftElement>
-                    )}
+                <InputGroup
+                    startElement={leftIcon}
+                    endElement={rightIcon}
+                >
                     <Input
-                        isReadOnly={isReadOnly}
-                        variant={variant}
+                        readOnly={isReadOnly}
                         ref={ref}
                         type={type}
                         placeholder={placeholder}
@@ -96,17 +90,26 @@ export const TextInput = forwardRef(
                         boxSizing="border-box"
                         size={size}
                         aria-label={title}
+                        border="1px solid"
+                        borderColor="brand.backgroundPrimary"
+                        shadow="md"
+                        backgroundColor="brand.backgroundTertiaryOpaque"
+                        color="white"
+                        _focus={{
+                            shadow: "xl",
+                            borderColor: "brand.primary",
+                        }}
+                        _invalid={{
+                            borderColor: "brand.error",
+                        }}
                     />
-                    {rightIcon && (
-                        <InputRightElement>{rightIcon}</InputRightElement>
-                    )}
                 </InputGroup>
                 {allowErrors && (
                     <Box h="16px" mt="8px">
-                        <FormErrorMessage>{error}</FormErrorMessage>
+                        <Field.ErrorText>{error}</Field.ErrorText>
                     </Box>
                 )}
-            </FormControl>
+            </Field.Root>
         );
     }
 );

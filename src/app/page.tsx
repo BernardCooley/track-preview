@@ -4,7 +4,6 @@ import {
     Box,
     Button,
     Center,
-    ScaleFade,
     Flex,
     Text,
     VStack,
@@ -68,7 +67,15 @@ export default function Home() {
                             PHONIQUEST
                         </Text>
                     </Flex>
-                    <ScaleFade initialScale={0.9} in={!loading}>
+                    <Box
+                        animation="fadeIn 0.3s ease-in-out"
+                        css={{
+                            "@keyframes fadeIn": {
+                                from: { opacity: 0, transform: "scale(0.9)" },
+                                to: { opacity: 1, transform: "scale(1)" },
+                            },
+                        }}
+                    >
                         <Flex
                             direction="column"
                             alignItems="center"
@@ -125,7 +132,7 @@ export default function Home() {
                                 Get Started
                             </Button>
                         </Flex>
-                    </ScaleFade>
+                    </Box>
                 </Flex>
             ) : (
                 <Center

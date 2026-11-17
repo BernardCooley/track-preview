@@ -11,7 +11,8 @@ interface Props {
 const BuyLink = ({ track, buyLink }: Props) => {
     return (
         <Link
-            isExternal
+            target="_blank"
+            rel="noopener noreferrer"
             href={formatBuyUrl(track, buyLink.platform)}
             _hover={{
                 transform: "scale(1.2)",

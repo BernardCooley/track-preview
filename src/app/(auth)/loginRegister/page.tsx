@@ -3,15 +3,10 @@ import {
     Box,
     Center,
     Flex,
-    Tab,
-    TabList,
-    TabPanel,
-    TabPanels,
     Tabs,
     Text,
-    ToastProps,
-    useToast,
 } from "@chakra-ui/react";
+import { toaster } from "@/components/toaster";
 import React, { Suspense, useCallback, useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import SignIn from "@/components/SignIn";
@@ -28,7 +23,6 @@ const AuthPageContent = () => {
     const isLogin = searchParams.get("login");
     const isPasswordReset = searchParams.get("passwordReset");
     const isAccountDeleted = searchParams.get("accountDeleted");
-    const toast = useToast();
     const id = "loginRegisterToast";
     const hasPreviouslyLoggedIn = useReadLocalStorage(
         "has-previously-logged-in"
@@ -36,19 +30,16 @@ const AuthPageContent = () => {
     const [loading, setLoading] = useState(true);
 
     const showToast = useCallback(
-        ({ status, title, description }: ToastProps) => {
-            if (!toast.isActive(id)) {
-                toast({
-                    id,
-                    title: title || "An error has occurred.",
-                    description: description || "Please try again later.",
-                    status: status,
-                    duration: 5000,
-                    isClosable: true,
-                });
-            }
+        ({ type, title, description }: { type?: string; title?: string; description?: string }) => {
+            toaster.create({
+                id,
+                title: title || "An error has occurred.",
+                description: description || "Please try again later.",
+                type: (type as "success" | "error" | "warning" | "info") || "error",
+                duration: 5000,
+            });
         },
-        [toast]
+        []
     );
 
     const isUserLoggedIn = useCallback(async () => {
@@ -68,7 +59,7 @@ const AuthPageContent = () => {
     useEffect(() => {
         if (isPasswordReset) {
             showToast({
-                status: "success",
+                type: "success",
                 title: "Password reset",
                 description: "Please check your email to reset your password.",
             });
@@ -79,7 +70,7 @@ const AuthPageContent = () => {
     useEffect(() => {
         if (isAccountDeleted) {
             showToast({
-                status: "success",
+                type: "success",
                 title: "Account deleted",
                 description:
                     "Your account has been deleted. We are sorry to see you go.",
@@ -101,6 +92,8 @@ const AuthPageContent = () => {
             </Flex>
         );
     };
+
+    const defaultTab = isLogin === "true" || hasPreviouslyLoggedIn ? "signin" : "register";
 
     return (
         <>
@@ -126,39 +119,57 @@ const AuthPageContent = () => {
                     >
                         PHONIQUEST
                     </Text>
-                    <Tabs
-                        defaultIndex={
-                            isLogin === "true" || hasPreviouslyLoggedIn ? 0 : 1
-                        }
-                        onChange={(index) => {
+                    <Tabs.Root
+                        defaultValue={defaultTab}
+                        onValueChange={(details) => {
                             router.push(
                                 `/loginRegister?login=${
-                                    index === 0 ? "true" : "false"
+                                    details.value === "signin" ? "true" : "false"
                                 }`
                             );
                         }}
-                        isFitted
-                        variant="solid-rounded"
-                        colorScheme="primary"
+                        fitted
+                        variant="enclosed"
+                        colorPalette="primary"
                     >
-                        <TabList px={[10, 16, 60, 80]} gap={2}>
-                            <Tab>Sign in</Tab>
-                            <Tab>Register</Tab>
-                        </TabList>
+                        <Tabs.List px={[10, 16, 60, 80]} gap={2}>
+                            <Tabs.Trigger
+                                value="signin"
+                                color="brand.textPrimaryLighter"
+                                borderBottomRadius="0px"
+                                borderTopRadius="14px"
+                                _selected={{
+                                    bg: "brand.primary",
+                                    color: "brand.textPrimary",
+                                }}
+                            >
+                                Sign in
+                            </Tabs.Trigger>
+                            <Tabs.Trigger
+                                value="register"
+                                color="brand.textPrimaryLighter"
+                                borderBottomRadius="0px"
+                                borderTopRadius="14px"
+                                _selected={{
+                                    bg: "brand.primary",
+                                    color: "brand.textPrimary",
+                                }}
+                            >
+                                Register
+                            </Tabs.Trigger>
+                        </Tabs.List>
 
-                        <TabPanels>
-                            <TabPanel>
-                                <TabContainer>
-                                    <SignIn />
-                                </TabContainer>
-                            </TabPanel>
-                            <TabPanel>
-                                <TabContainer>
-                                    <SignUp />
-                                </TabContainer>
-                            </TabPanel>
-                        </TabPanels>
-                    </Tabs>
+                        <Tabs.Content value="signin">
+                            <TabContainer>
+                                <SignIn />
+                            </TabContainer>
+                        </Tabs.Content>
+                        <Tabs.Content value="register">
+                            <TabContainer>
+                                <SignUp />
+                            </TabContainer>
+                        </Tabs.Content>
+                    </Tabs.Root>
                 </Box>
             )}
         </>

@@ -6,7 +6,6 @@ import {
     Button,
     Center,
     Flex,
-    Icon,
     Text,
     useDisclosure,
 } from "@chakra-ui/react";
@@ -57,7 +56,7 @@ const TrackReview = memo(
         } = useTrackReview(reviewStep);
 
         const [animationImage, setAnimationImage] = useState<string>("");
-        const { isOpen: isShowingTracklist, onToggle: toggleTracklist } =
+        const { open: isShowingTracklist, onToggle: toggleTracklist } =
             useDisclosure();
         const [windowWidth, setWindowWidth] = useState(0);
         const animationDuration = 0.7;
@@ -137,7 +136,7 @@ const TrackReview = memo(
                             top="200px"
                             position="absolute"
                             variant="outline"
-                            colorScheme="teal"
+                            colorPalette="teal"
                             fontSize={["24px", "36px"]}
                             px={4}
                         >
@@ -227,9 +226,8 @@ const TrackReview = memo(
                         width="full"
                         justifyContent="center"
                     >
-                        <Icon
-                            fontSize={["100px", "200px"]}
-                            as={DeleteOutlineIcon}
+                        <DeleteOutlineIcon
+                            style={{ fontSize: "200px" }}
                         />
                     </Flex>
                 )}

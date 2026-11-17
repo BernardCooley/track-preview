@@ -30,43 +30,97 @@ const FilterTags = ({
     return (
         <Flex transition="opacity 0.3s" opacity={reviewStep === 1 ? 1 : 0}>
             <Flex gap={2} w="full" flexWrap="wrap">
-                <Tag
+                <Tag.Root
                     w={genres ? "auto" : "86px"}
-                    variant="filter"
+                    paddingY="6px"
+                    paddingX="10px"
+                    border="1px solid"
+                    borderColor="brand.primary"
+                    backgroundColor="brand.backgroundTertiary"
+                    _hover={{
+                        shadow: "xl",
+                        border: "1px solid",
+                        borderColor: "brand.primaryLight",
+                        bg: "brand.primaryOpaque",
+                        cursor: "pointer",
+                    }}
+                    _active={{
+                        shadow: "xl",
+                        border: "1px solid",
+                        borderColor: "brand.primaryLight",
+                        bg: "brand.primaryOpaque",
+                    }}
+                    color="white"
+                    fontSize="14px"
+                    fontWeight="normal"
+                    rounded="full"
+                    userSelect="none"
+                    textAlign="center"
+                    whiteSpace="nowrap"
+                    bg="brand.backgroundTertiaryOpaque"
                     pointerEvents={profileLoaded ? "auto" : "none"}
                     onClick={onGenreClick}
                 >
-                    {genres ? (
-                        <Text userSelect="none">
-                            {getGenreLabel(genres)}
-                        </Text>
-                    ) : (
-                        <Box w="full">
-                            <Spinner color="brand.primary" size="xs" />
-                        </Box>
-                    )}
-                </Tag>
+                    <Tag.Label w="full">
+                        {genres ? (
+                            <Text userSelect="none">
+                                {getGenreLabel(genres)}
+                            </Text>
+                        ) : (
+                            <Box w="full">
+                                <Spinner color="brand.primary" size="xs" />
+                            </Box>
+                        )}
+                    </Tag.Label>
+                </Tag.Root>
 
-                <Tag
+                <Tag.Root
                     w={yearRange && profileLoaded ? "auto" : "76px"}
-                    variant="filter"
+                    paddingY="6px"
+                    paddingX="10px"
+                    border="1px solid"
+                    borderColor="brand.primary"
+                    backgroundColor="brand.backgroundTertiary"
+                    _hover={{
+                        shadow: "xl",
+                        border: "1px solid",
+                        borderColor: "brand.primaryLight",
+                        bg: "brand.primaryOpaque",
+                        cursor: "pointer",
+                    }}
+                    _active={{
+                        shadow: "xl",
+                        border: "1px solid",
+                        borderColor: "brand.primaryLight",
+                        bg: "brand.primaryOpaque",
+                    }}
+                    color="white"
+                    fontSize="14px"
+                    fontWeight="normal"
+                    rounded="full"
+                    userSelect="none"
+                    textAlign="center"
+                    whiteSpace="nowrap"
+                    bg="brand.backgroundTertiaryOpaque"
                     onClick={onYearClick}
                     pointerEvents={profileLoaded ? "auto" : "none"}
                 >
-                    {yearRange && profileLoaded ? (
-                        <Text userSelect="none">
-                            {yearRange.from === 1960 &&
-                            yearRange.to === getCurrentYear()
-                                ? "All years"
-                                : `${yearRange.from} -
+                    <Tag.Label w="full">
+                        {yearRange && profileLoaded ? (
+                            <Text userSelect="none">
+                                {yearRange.from === 1960 &&
+                                yearRange.to === getCurrentYear()
+                                    ? "All years"
+                                    : `${yearRange.from} -
                          ${yearRange?.to}`}
-                        </Text>
-                    ) : (
-                        <Box w="full">
-                            <Spinner color="brand.primary" size="xs" />
-                        </Box>
-                    )}
-                </Tag>
+                            </Text>
+                        ) : (
+                            <Box w="full">
+                                <Spinner color="brand.primary" size="xs" />
+                            </Box>
+                        )}
+                    </Tag.Label>
+                </Tag.Root>
             </Flex>
         </Flex>
     );

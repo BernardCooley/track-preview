@@ -26,7 +26,6 @@ const ReleaseHeader = ({
         <Flex gap={4} w="full" alignItems="center" top={-1} p={2} wrap="wrap">
             <Button
                 variant="primary"
-                leftIcon={<ChevronLeftIcon />}
                 onClick={() => {
                     updateReviewTracks(4, previousTracks, 0);
                     updatePreviousTracks([]);
@@ -34,28 +33,29 @@ const ReleaseHeader = ({
                     updateCurrentReleaseTrack(null);
                 }}
             >
+                <ChevronLeftIcon />
                 Library
             </Button>
             <Flex direction="column">
                 <Flex gap={2}>
                     <Text
-                        noOfLines={1}
+                        lineClamp={1}
                         fontSize="md"
                         color="brand.textPrimaryLight"
                     >
                         Artist:
                     </Text>
-                    <Text noOfLines={2}>{currentReleaseTrack.artist}</Text>
+                    <Text lineClamp={2}>{currentReleaseTrack.artist}</Text>
                 </Flex>
                 <Flex gap={2}>
                     <Text
-                        noOfLines={1}
+                        lineClamp={1}
                         fontSize="md"
                         color="brand.textPrimaryLight"
                     >
                         Release title:
                     </Text>
-                    <Text noOfLines={2}>
+                    <Text lineClamp={2}>
                         {currentReleaseTrack.releaseTitle}
                     </Text>
                 </Flex>

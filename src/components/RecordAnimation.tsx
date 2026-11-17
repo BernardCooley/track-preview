@@ -38,7 +38,7 @@ const RecordAnimation = ({
             transform="translate(50%, 0)"
             position="absolute"
             px={4}
-            justify="center"
+            justifyContent="center"
             alignItems="center"
             w={animate ? ["65px", "100px"] : "300px"}
             h={animate ? ["65px", "100px"] : "300px"}
@@ -52,7 +52,7 @@ const RecordAnimation = ({
                 w="100%"
                 h="50%"
                 rounded="full"
-                bgPosition="center"
+                backgroundPosition="center"
             ></Box>
         </MotionCenter>
     );

@@ -9,14 +9,13 @@ import { TextInput } from "@/components/TextInput";
 import {
     Box,
     Button,
+    Field,
     Flex,
-    FormErrorMessage,
     IconButton,
     Link,
     Text,
-    ToastProps,
-    useToast,
 } from "@chakra-ui/react";
+import { toaster } from "@/components/toaster";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { LoginUser } from "../../firebase/utils";
@@ -45,23 +44,19 @@ const SignIn = () => {
     const [submitting, setSubmitting] = useState(false);
     const router = useRouter();
     const [authError, setAuthError] = useState<string | null>(null);
-    const toast = useToast();
     const id = "loginToast";
 
     const showToast = useCallback(
-        ({ status, title, description }: ToastProps) => {
-            if (!toast.isActive(id)) {
-                toast({
-                    id,
-                    title: title || "An error has occured.",
-                    description: description || "Please try again later.",
-                    status: status,
-                    duration: 5000,
-                    isClosable: true,
-                });
-            }
+        ({ type, title, description }: { type?: string; title?: string; description?: string }) => {
+            toaster.create({
+                id,
+                title: title || "An error has occured.",
+                description: description || "Please try again later.",
+                type: (type as "success" | "error" | "warning" | "info") || "error",
+                duration: 5000,
+            });
         },
-        [toast]
+        []
     );
 
     const {
@@ -89,7 +84,7 @@ const SignIn = () => {
                 }
             } else {
                 showToast({
-                    status: "error",
+                    type: "error",
                     title: "Email not verified",
                     description:
                         "Please check your email to verify your account.",
@@ -103,14 +98,13 @@ const SignIn = () => {
                 title: "Error signing in.",
                 description:
                     "Please check your email and password and try again.",
-                status: "error",
+                type: "error",
             });
 
             setTimeout(() => {
                 setSubmitting(false);
             }, 5000);
 
-            // TODO error not being thrown or caught - FIX
             setAuthError(
                 "Error signing in. Please check your email and password and try again."
             );
@@ -163,21 +157,20 @@ const SignIn = () => {
                                     }
                                     variant="ghost"
                                     h={1 / 2}
-                                    colorScheme="teal"
+                                    colorPalette="teal"
                                     aria-label="Show password"
                                     fontSize="3xl"
-                                    icon={
-                                        showPassword ? (
-                                            <VisibilityIcon fontSize="inherit" />
-                                        ) : (
-                                            <VisibilityOffIcon fontSize="inherit" />
-                                        )
-                                    }
-                                />
+                                >
+                                    {showPassword ? (
+                                        <VisibilityIcon fontSize="inherit" />
+                                    ) : (
+                                        <VisibilityOffIcon fontSize="inherit" />
+                                    )}
+                                </IconButton>
                             }
                         />
                         <Button
-                            isLoading={submitting}
+                            loading={submitting}
                             type="submit"
                             variant="primary"
                             onClick={handleSubmit(performLogin)}
@@ -187,8 +180,8 @@ const SignIn = () => {
                         <Flex gap={2}>
                             <Link
                                 href="/resetPassword"
-                                variant="link"
-                                colorScheme="primary"
+                                variant="underline"
+                                colorPalette="primary"
                             >
                                 <Text>Forgot password</Text>
                             </Link>
@@ -196,11 +189,11 @@ const SignIn = () => {
                     </Flex>
                 </Flex>
             </form>
-            {/* TODO - add forgot password link
-                TODO - Message not showing up */}
             {authError && (
                 <Box h="16px" mt="8px">
-                    <FormErrorMessage>{authError}</FormErrorMessage>
+                    <Field.Root invalid>
+                        <Field.ErrorText>{authError}</Field.ErrorText>
+                    </Field.Root>
                 </Box>
             )}
         </Flex>

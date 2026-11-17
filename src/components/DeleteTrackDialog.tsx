@@ -1,13 +1,8 @@
-import React, { LegacyRef, RefObject, forwardRef } from "react";
+import React from "react";
 import {
-    AlertDialog,
-    AlertDialogBody,
-    AlertDialogContent,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogOverlay,
     Box,
     Button,
+    Dialog,
     Flex,
     Text,
 } from "@chakra-ui/react";
@@ -22,91 +17,88 @@ interface Props {
     deleteTrack: () => void;
 }
 
-const DeleteTrackDialog = forwardRef(
-    (
-        {
-            isOpen,
-            onClose,
-            closeDialog,
-            reviewTracks,
-            trackToDelete,
-            deleteTrack,
-        }: Props,
-        ref: LegacyRef<HTMLButtonElement>
-    ) => {
-        return (
-            <AlertDialog
-                isOpen={isOpen}
-                leastDestructiveRef={ref as RefObject<HTMLButtonElement>}
-                onClose={() => {
+const DeleteTrackDialog = ({
+    isOpen,
+    onClose,
+    closeDialog,
+    reviewTracks,
+    trackToDelete,
+    deleteTrack,
+}: Props) => {
+    return (
+        <Dialog.Root
+            role="alertdialog"
+            open={isOpen}
+            onOpenChange={(details) => {
+                if (!details.open) {
                     onClose();
                     closeDialog();
-                }}
-            >
-                <AlertDialogOverlay>
-                    <AlertDialogContent
-                        m={6}
-                        bg="brand.backgroundPrimary"
-                        shadow="2xl"
-                        border="1px solid"
-                        borderColor="brand.primary"
-                    >
-                        <AlertDialogHeader fontSize="lg" fontWeight="bold">
-                            Delete Track
-                        </AlertDialogHeader>
+                }
+            }}
+        >
+            <Dialog.Backdrop />
+            <Dialog.Positioner>
+                <Dialog.Content
+                    m={6}
+                    bg="brand.backgroundPrimary"
+                    shadow="2xl"
+                    border="1px solid"
+                    borderColor="brand.primary"
+                >
+                    <Dialog.Header fontSize="lg" fontWeight="bold">
+                        Delete Track
+                    </Dialog.Header>
 
-                        <AlertDialogBody>
-                            <Flex direction="column" gap={2}>
-                                <Text>Are you sure you want to delete...</Text>
-                                <Flex
-                                    direction="column"
-                                    bg="brand.backgroundTertiaryOpaque"
-                                    p={2}
-                                    rounded="md"
-                                >
-                                    <Text fontSize="xl" fontWeight="bold">
-                                        {
-                                            reviewTracks[4].tracks[
-                                                trackToDelete!
-                                            ]?.artist
-                                        }
-                                    </Text>
-                                    <Text fontSize="md" fontWeight="bold">
-                                        {
-                                            reviewTracks[4].tracks[
-                                                trackToDelete!
-                                            ]?.title
-                                        }
-                                    </Text>
-                                </Flex>
-                                <Text>
-                                    You cannot undo this action afterwards.
+                    <Dialog.Body>
+                        <Flex direction="column" gap={2}>
+                            <Text>Are you sure you want to delete...</Text>
+                            <Flex
+                                direction="column"
+                                bg="brand.backgroundTertiaryOpaque"
+                                p={2}
+                                rounded="md"
+                            >
+                                <Text fontSize="xl" fontWeight="bold">
+                                    {
+                                        reviewTracks[4].tracks[
+                                            trackToDelete!
+                                        ]?.artist
+                                    }
+                                </Text>
+                                <Text fontSize="md" fontWeight="bold">
+                                    {
+                                        reviewTracks[4].tracks[
+                                            trackToDelete!
+                                        ]?.title
+                                    }
                                 </Text>
                             </Flex>
-                        </AlertDialogBody>
+                            <Text>
+                                You cannot undo this action afterwards.
+                            </Text>
+                        </Flex>
+                    </Dialog.Body>
 
-                        <AlertDialogFooter>
-                            <Button
-                                variant="primary"
-                                ref={ref}
-                                onClick={closeDialog}
-                            >
-                                Cancel
-                            </Button>
-                            <Button
-                                colorScheme="red"
-                                onClick={deleteTrack}
-                                ml={3}
-                            >
-                                Delete
-                            </Button>
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                </AlertDialogOverlay>
-            </AlertDialog>
-        );
-    }
-);
+                    <Dialog.Footer>
+                        <Button
+                            variant="primary"
+                            onClick={closeDialog}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            colorPalette="red"
+                            onClick={deleteTrack}
+                            ml={3}
+                        >
+                            Delete
+                        </Button>
+                    </Dialog.Footer>
+                </Dialog.Content>
+            </Dialog.Positioner>
+        </Dialog.Root>
+    );
+};
 
 DeleteTrackDialog.displayName = "DeleteTrackDialog";
 
