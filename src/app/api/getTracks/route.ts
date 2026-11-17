@@ -4,11 +4,16 @@ import { getCurrentYear } from "../../../../utils";
 import { Prisma, Track } from "@prisma/client";
 
 export async function POST(req: Request) {
-    const { genre, startYear, endYear, userId, limit, reviewStep } =
+    const { genres, startYear, endYear, userId, limit, reviewStep } =
         await req.json();
 
-    const genreCondition =
-        genre.toLowerCase() === "all" ? "" : `AND genre = '${genre}'`;
+    const isAllGenres =
+        !genres ||
+        genres.length === 0 ||
+        genres.some((g: string) => g.toLowerCase() === "all");
+    const genreCondition = isAllGenres
+        ? ""
+        : `AND genre IN (${genres.map((g: string) => `'${g.replace(/'/g, "''")}'`).join(", ")})`;
     const startYearCondition = startYear ? startYear : 1960;
     const endYearCondition = endYear ? endYear : getCurrentYear();
     const limitCondition = limit ? `LIMIT ${limit}` : "";

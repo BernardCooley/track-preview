@@ -67,13 +67,13 @@ export const useTrackReview = (reviewStep: number) => {
 
     const getTracks = useCallback(async () => {
         setCurrentTrack(null);
-        if (userProfile?.genre && user?.uid) {
+        if (userProfile?.genres && user?.uid) {
             setLoading(true);
             return await fetchTracks({
-                genre:
-                    userProfile?.genre && reviewStep === 1
-                        ? userProfile?.genre
-                        : "all",
+                genres:
+                    userProfile?.genres && reviewStep === 1
+                        ? userProfile?.genres
+                        : ["all"],
                 startYear: Number(userProfile?.yearFrom || 1960),
                 endYear: Number(userProfile?.yearTo || getCurrentYear()),
                 userId: user.uid,
@@ -84,7 +84,7 @@ export const useTrackReview = (reviewStep: number) => {
 
         return null;
     }, [
-        userProfile?.genre,
+        userProfile?.genres,
         user?.uid,
         userProfile?.yearFrom,
         userProfile?.yearTo,
@@ -140,7 +140,7 @@ export const useTrackReview = (reviewStep: number) => {
 
     useEffect(() => {
         if (
-            userProfile?.genre &&
+            userProfile?.genres &&
             userProfile?.yearFrom &&
             userProfile?.yearTo
         ) {
@@ -225,17 +225,25 @@ export const useTrackReview = (reviewStep: number) => {
         }
     };
 
-    const onGenreSelect = async (gen: string) => {
-        if (user?.uid && gen !== userProfile?.genre) {
-            const newProfile = await mutateUserProfile({
-                userId: user.uid,
-                genre: gen,
-            });
-            setRecentGenres((prev) => Array.from(new Set([...prev, gen])));
-            updateUserProfile(newProfile);
-            setCurrentTrack(null);
-            setListened(false);
-            setIsPlaying(false);
+    const onGenreApply = async (selectedGenres: string[]) => {
+        if (user?.uid) {
+            const sorted = [...selectedGenres].sort();
+            const prevSorted = [...(userProfile?.genres || ["all"])].sort();
+            const changed = JSON.stringify(sorted) !== JSON.stringify(prevSorted);
+
+            if (changed) {
+                const newProfile = await mutateUserProfile({
+                    userId: user.uid,
+                    genres: selectedGenres,
+                });
+                setRecentGenres((prev) =>
+                    Array.from(new Set([...prev, ...selectedGenres.filter((g) => g !== "all")]))
+                );
+                updateUserProfile(newProfile);
+                setCurrentTrack(null);
+                setListened(false);
+                setIsPlaying(false);
+            }
         }
         setShowGenreSelector(false);
     };
@@ -255,7 +263,7 @@ export const useTrackReview = (reviewStep: number) => {
 
     return {
         onYearConfirm,
-        onGenreSelect,
+        onGenreApply,
         onGetTracks,
         likeOrDislike,
         recentGenres,

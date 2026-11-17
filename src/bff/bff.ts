@@ -201,7 +201,7 @@ export const createUser = async ({ userId }: CreateUserProps): Promise<any> => {
 interface UpdateUserAutoplayProps {
     userId: string;
     autoplay?: boolean;
-    genre?: string;
+    genres?: string[];
     yearFrom?: number;
     yearTo?: number;
 }
@@ -209,7 +209,7 @@ interface UpdateUserAutoplayProps {
 export const mutateUserProfile = async ({
     userId,
     autoplay,
-    genre,
+    genres,
     yearFrom,
     yearTo,
 }: UpdateUserAutoplayProps): Promise<User> => {
@@ -220,7 +220,7 @@ export const mutateUserProfile = async ({
             {
                 userId,
                 autoplay,
-                genre,
+                genres,
                 yearFrom,
                 yearTo,
             }
@@ -361,7 +361,7 @@ export const resolvePreviewUrl = async (
 };
 
 interface GetTracksProps {
-    genre?: string;
+    genres?: string[];
     startYear?: number;
     endYear?: number;
     userId: string;
@@ -370,7 +370,7 @@ interface GetTracksProps {
 }
 
 export const fetchTracks = async ({
-    genre = "all",
+    genres = ["all"],
     startYear = 1960,
     endYear = getCurrentYear(),
     userId,
@@ -379,7 +379,7 @@ export const fetchTracks = async ({
 }: GetTracksProps): Promise<Track[] | null> => {
     try {
         const tracks = await fetchWithErrorHandling("/api/getTracks", "POST", {
-            genre,
+            genres,
             startYear,
             endYear,
             userId,

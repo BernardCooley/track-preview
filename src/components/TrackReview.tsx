@@ -51,7 +51,7 @@ const TrackReview = memo(
             setAutoplayLoading,
             onGetTracks,
             likeOrDislike,
-            onGenreSelect,
+            onGenreApply,
             onYearConfirm,
             resolvedPreviewUrl,
         } = useTrackReview(reviewStep);
@@ -164,12 +164,12 @@ const TrackReview = memo(
                 <GenreModal
                     onCancel={() => setShowGenreSelector(false)}
                     showGenreSelector={showGenreSelector}
-                    setShowGenreSelector={() => setShowGenreSelector(false)}
-                    genre={userProfile?.genre || "all"}
-                    onGenreSelect={onGenreSelect}
+                    setShowGenreSelector={setShowGenreSelector}
+                    selectedGenres={userProfile?.genres || ["all"]}
+                    onApply={onGenreApply}
                     availableGenres={genres}
                     onFavouriteClearClick={() => {
-                        setRecentGenres([userProfile?.genre || "all"]);
+                        setRecentGenres([]);
                     }}
                     recentGenres={recentGenres.filter((gen) => gen !== "all")}
                 />
@@ -204,7 +204,7 @@ const TrackReview = memo(
                                 setShowGenreSelector((prev) => !prev)
                             }
                             profileLoaded={userProfile ? true : false}
-                            genre={userProfile?.genre}
+                            genres={userProfile?.genres}
                             yearRange={
                                 {
                                     from: userProfile?.yearFrom || 1960,

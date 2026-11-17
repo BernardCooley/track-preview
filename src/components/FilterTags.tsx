@@ -4,7 +4,7 @@ import { getCurrentYear } from "../../utils";
 import { YearRange } from "../../types";
 
 interface Props {
-    genre?: string | null;
+    genres?: string[] | null;
     yearRange?: YearRange | null;
     profileLoaded: boolean;
     onGenreClick?: () => void;
@@ -12,8 +12,15 @@ interface Props {
     reviewStep: number;
 }
 
+function getGenreLabel(genres?: string[] | null): string {
+    if (!genres || genres.length === 0) return "All genres";
+    if (genres.some((g) => g.toLowerCase() === "all")) return "All genres";
+    if (genres.length === 1) return genres[0];
+    return `${genres.length} genres`;
+}
+
 const FilterTags = ({
-    genre,
+    genres,
     yearRange,
     profileLoaded,
     onGenreClick,
@@ -24,17 +31,14 @@ const FilterTags = ({
         <Flex transition="opacity 0.3s" opacity={reviewStep === 1 ? 1 : 0}>
             <Flex gap={2} w="full" flexWrap="wrap">
                 <Tag
-                    w={genre ? "auto" : "86px"}
-                    key={`${genre}`}
+                    w={genres ? "auto" : "86px"}
                     variant="filter"
                     pointerEvents={profileLoaded ? "auto" : "none"}
                     onClick={onGenreClick}
                 >
-                    {genre ? (
+                    {genres ? (
                         <Text userSelect="none">
-                            {genre.toLowerCase() === "all"
-                                ? "All genres"
-                                : genre}
+                            {getGenreLabel(genres)}
                         </Text>
                     ) : (
                         <Box w="full">
