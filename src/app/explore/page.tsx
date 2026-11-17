@@ -100,17 +100,21 @@ function ExploreContent() {
     return (
         <Flex direction="column" h="100dvh" ref={pageRef} bg="brand.bg">
             <MenuDrawer isOpen={isMenuOpen} onClose={onMenuClose} />
-            <Flex
+            <Box
                 w="full"
-                alignItems="center"
-                px={[3, 4]}
-                py={1}
                 borderBottom="1px solid"
                 borderBottomColor="brand.divider"
                 bg="brand.bg"
                 position="sticky"
                 top={0}
                 zIndex={100}
+            >
+            <Flex
+                maxW={["none", "none", "none", "1000px"]}
+                mx="auto"
+                alignItems="center"
+                px={[3, 4]}
+                py={1}
                 gap={1}
             >
                 <Link href="">
@@ -162,14 +166,17 @@ function ExploreContent() {
                     <MenuOpenIcon fontSize="small" />
                 </IconButton>
             </Flex>
+            </Box>
 
             <Box flex={1} overflow="hidden" position="relative">
+            <Box maxW={["none", "none", "none", "1000px"]} mx="auto" h="full">
                 {reviewStep &&
                     Number(reviewStep) >= 1 &&
                     Number(reviewStep) <= 3 && (
                         <TrackReview reviewStep={Number(reviewStep)} />
                     )}
                 {reviewStep && Number(reviewStep) === 4 && <Library />}
+            </Box>
             </Box>
 
             <Box
@@ -184,7 +191,7 @@ function ExploreContent() {
                 borderTop="1px solid"
                 borderTopColor="brand.border"
             >
-                <Box p={3}>
+                <Box p={3} maxW={["none", "none", "none", "1000px"]} mx="auto">
                     <AudioPlayer ref={audioElement} />
                 </Box>
             </Box>

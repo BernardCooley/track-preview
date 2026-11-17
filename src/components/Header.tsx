@@ -1,4 +1,5 @@
 import {
+    Box,
     Flex,
     IconButton,
     Text,
@@ -17,18 +18,22 @@ const Header = () => {
     return (
         <>
             <MenuDrawer isOpen={isOpen} onClose={onClose} />
-            <Flex
+            <Box
                 w="full"
-                justifyContent="space-between"
-                alignItems="center"
-                px={[4, 6]}
-                py={3}
                 borderBottom="1px solid"
                 borderBottomColor="brand.divider"
                 bg="brand.bg"
                 position="sticky"
                 top={0}
                 zIndex={100}
+            >
+            <Flex
+                maxW={["none", "none", "none", "1000px"]}
+                mx="auto"
+                justifyContent="space-between"
+                alignItems="center"
+                px={[4, 6]}
+                py={3}
             >
                 <Link href={pathname !== "/explore" ? "/explore" : ""}>
                     <Text
@@ -54,6 +59,7 @@ const Header = () => {
                     <MenuOpenIcon fontSize="small" />
                 </IconButton>
             </Flex>
+            </Box>
         </>
     );
 };
