@@ -114,14 +114,37 @@ const YearModal = ({
                             direction="column"
                             gap={4}
                         >
-                            <Text
-                                fontSize="lg"
-                                fontWeight="semibold"
-                                color="brand.textPrimary"
-                                letterSpacing="-0.01em"
-                            >
-                                Year Range
-                            </Text>
+                            <Flex justifyContent="space-between" alignItems="center">
+                                <Text
+                                    fontSize="lg"
+                                    fontWeight="semibold"
+                                    color="brand.textPrimary"
+                                    letterSpacing="-0.01em"
+                                >
+                                    Year Range
+                                </Text>
+                                {(() => {
+                                    const hasFilter = sliderValue[0] !== 1960 || sliderValue[1] !== getCurrentYear();
+                                    return (
+                                        <Button
+                                            onClick={() => {
+                                                setSliderValue([1960, getCurrentYear()]);
+                                                setDecadeIndex(null);
+                                            }}
+                                            variant="ghost"
+                                            color={hasFilter ? "brand.primary" : "brand.textMuted"}
+                                            fontWeight={hasFilter ? "medium" : "normal"}
+                                            height="auto"
+                                            px={1}
+                                            fontSize="xs"
+                                            shadow="none"
+                                            _hover={{ color: hasFilter ? "brand.primaryHover" : "brand.primary" }}
+                                        >
+                                            Clear
+                                        </Button>
+                                    );
+                                })()}
+                            </Flex>
 
                             <Flex
                                 justifyContent="center"
@@ -194,7 +217,6 @@ const YearModal = ({
                             gap={3}
                             px={[4, 5]}
                             py={4}
-                            justifyContent="flex-end"
                             css={{
                                 backdropFilter: "blur(16px)",
                                 WebkitBackdropFilter: "blur(16px)",
@@ -203,18 +225,14 @@ const YearModal = ({
                             }}
                         >
                             <Button
-                                disabled={
-                                    sliderValue[0] === 1960 &&
-                                    sliderValue[1] === getCurrentYear()
-                                }
-                                onClick={() => {
-                                    setSliderValue([1960, getCurrentYear()]);
-                                }}
-                                variant="outline"
+                                flex="0 0 auto"
+                                onClick={() => onCancel()}
+                                variant="cancel"
                             >
-                                All years
+                                Cancel
                             </Button>
                             <Button
+                                flex={1}
                                 disabled={
                                     sliderValue[0] === yearRange.from &&
                                     sliderValue[1] === yearRange.to
@@ -232,13 +250,7 @@ const YearModal = ({
                                 }}
                                 variant="primary"
                             >
-                                Confirm
-                            </Button>
-                            <Button
-                                onClick={() => onCancel()}
-                                variant="cancel"
-                            >
-                                Cancel
+                                Apply
                             </Button>
                         </Flex>
                     </Flex>

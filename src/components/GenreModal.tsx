@@ -265,23 +265,27 @@ const GenreModal = ({
                                         >
                                             Recent
                                         </Text>
-                                        {recentGenres.length > 1 && (
-                                            <Button
-                                                onClick={() => {
-                                                    setLocalSelection(["all"]);
-                                                    onFavouriteClearClick?.();
-                                                }}
-                                                variant="ghost"
-                                                color="brand.textMuted"
-                                                height="auto"
-                                                px={1}
-                                                fontSize="xs"
-                                                shadow="none"
-                                                _hover={{ color: "brand.primary" }}
-                                            >
-                                                Clear
-                                            </Button>
-                                        )}
+                                        {recentGenres.length > 1 && (() => {
+                                            const hasRecentSelected = recentGenres.some((g) => isSelected(g));
+                                            return (
+                                                <Button
+                                                    onClick={() => {
+                                                        setLocalSelection(["all"]);
+                                                        onFavouriteClearClick?.();
+                                                    }}
+                                                    variant="ghost"
+                                                    color={hasRecentSelected ? "brand.primary" : "brand.textMuted"}
+                                                    fontWeight={hasRecentSelected ? "medium" : "normal"}
+                                                    height="auto"
+                                                    px={1}
+                                                    fontSize="xs"
+                                                    shadow="none"
+                                                    _hover={{ color: hasRecentSelected ? "brand.primaryHover" : "brand.primary" }}
+                                                >
+                                                    Clear
+                                                </Button>
+                                            );
+                                        })()}
                                     </Flex>
                                     <Flex flexWrap="wrap" gap={1.5}>
                                         {recentGenres.map((gen) => (

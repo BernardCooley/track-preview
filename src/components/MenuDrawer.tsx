@@ -1,5 +1,6 @@
 import React from "react";
 import {
+    Box,
     Drawer,
     Flex,
     Separator,
@@ -34,19 +35,34 @@ const MenuDrawer = ({ isOpen, onClose }: Props) => {
                     borderLeft="1px solid"
                     borderLeftColor="brand.border"
                 >
-                    <Drawer.CloseTrigger
-                        top={4}
-                        color="brand.textMuted"
-                        _hover={{ color: "brand.textPrimary" }}
-                    />
-                    <Drawer.Header
-                        color="brand.textPrimary"
-                        fontWeight="semibold"
-                        borderBottom="1px solid"
-                        borderBottomColor="brand.divider"
+                    <Flex
+                        px={5}
+                        pt={5}
+                        pb={3}
+                        alignItems="center"
+                        justifyContent="space-between"
                     >
-                        Menu
-                    </Drawer.Header>
+                        <Text
+                            fontSize="xl"
+                            fontWeight="semibold"
+                            color="brand.textPrimary"
+                            letterSpacing="-0.01em"
+                        >
+                            Menu
+                        </Text>
+                        <Drawer.CloseTrigger
+                            position="relative"
+                            top="auto"
+                            right="auto"
+                            color="brand.textMuted"
+                            _hover={{ color: "brand.textPrimary" }}
+                        />
+                    </Flex>
+                    <Box
+                        h="1px"
+                        bg="brand.divider"
+                        mx={5}
+                    />
                     <Drawer.Body pt={6}>
                         <Flex direction="column" gap={2}>
                             <MenuDrawerItem

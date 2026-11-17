@@ -103,6 +103,7 @@ export const TextInput = forwardRef(
                         rounded="input"
                         color="brand.textPrimary"
                         fontSize="md"
+                        pl={4}
                         transition="all 0.2s ease"
                         _placeholder={{
                             color: "brand.textMuted",
