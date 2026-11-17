@@ -67,9 +67,9 @@ const TrackReviewCard = ({
     );
 
     return (
-        <Collapsible.Root open={isOpen}>
-            <Collapsible.Content>
-                <Flex justify="center" w="full" position="relative">
+        <Collapsible.Root open={isOpen} style={{ display: "flex", flexDirection: "column", flex: 1 }}>
+            <Collapsible.Content style={{ display: "flex", flexDirection: "column", flex: 1 }}>
+                <Flex justify="center" w="full" position="relative" flex={1}>
                     {loadingMessage && loadingMessage.length > 0 && (
                         <Flex
                             position="absolute"
@@ -96,6 +96,7 @@ const TrackReviewCard = ({
 
                     <Card.Root
                         w="full"
+                        flex={1}
                         bg="transparent"
                         shadow="none"
                         border="none"
@@ -103,10 +104,12 @@ const TrackReviewCard = ({
                             loadingMessage && loadingMessage.length > 0 ? 0.2 : 1
                         }
                         transition="opacity 0.3s ease"
+                        display="flex"
+                        flexDirection="column"
                     >
                         <Card.Body
                             w="full"
-                            minH={["400px", "456px"]}
+                            flex={1}
                             p={0}
                             display="flex"
                             flexDirection="column"
@@ -137,7 +140,7 @@ const TrackReviewCard = ({
 
                             <Flex
                                 direction="column"
-                                h="full"
+                                flex={1}
                                 w="full"
                                 justifyContent="center"
                                 pt={[8, 10]}

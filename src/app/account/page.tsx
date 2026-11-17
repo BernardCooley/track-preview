@@ -234,7 +234,7 @@ const Settings = () => {
     };
 
     return (
-        <Flex direction="column" minH="100vh" bg="brand.bg">
+        <Flex direction="column" minH="100dvh" bg="brand.bg">
             <Dialog.Root
                 role="alertdialog"
                 open={isOpen}

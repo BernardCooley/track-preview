@@ -200,7 +200,7 @@ const config = defineConfig({
             bg: "brand.bg",
             fontFamily: "body",
             lineHeight: "1.6",
-            minHeight: "100vh",
+            minHeight: "100dvh",
         },
     },
     theme: {

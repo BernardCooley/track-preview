@@ -12,7 +12,7 @@ function AppShell({ children }: { children: React.ReactNode }) {
     const { appearance } = useThemeContext();
 
     return (
-        <Theme appearance={appearance} style={{ minHeight: "100vh" }}>
+        <Theme appearance={appearance} style={{ minHeight: "100dvh", background: "var(--chakra-colors-brand-bg)" }}>
             <AllContexts>
                 <TrackContextProvider>
                     {children}

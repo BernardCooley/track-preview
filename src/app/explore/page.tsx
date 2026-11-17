@@ -94,7 +94,7 @@ function ExploreContent() {
         currentlyPlaying.length > 0;
 
     return (
-        <Flex direction="column" h="100vh" ref={pageRef} bg="brand.bg">
+        <Flex direction="column" h="100dvh" ref={pageRef} bg="brand.bg">
             <Header />
             <Grid
                 templateColumns="repeat(4, 1fr)"

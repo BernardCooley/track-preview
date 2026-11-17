@@ -57,7 +57,7 @@ export default function Home() {
 
     if (loading) {
         return (
-            <Center h="100vh" flexDirection="column" gap={8}>
+            <Center h="100dvh" flexDirection="column" gap={8}>
                 <Text
                     fontSize={["3xl", "4xl", "5xl"]}
                     fontFamily="brand"
@@ -73,14 +73,21 @@ export default function Home() {
 
     return (
         <Flex
-            minH="100vh"
+            h="100dvh"
             direction="column"
             alignItems="center"
-            justifyContent="center"
             px={[6, 8]}
-            py={[8, 12]}
+            pb={8}
         >
-            <VStack gap={[8, 10, 12]} maxW="520px" w="full">
+            <Flex
+                flex={1}
+                direction="column"
+                alignItems="center"
+                justifyContent="center"
+                w="full"
+                maxW="520px"
+                gap={[6, 8]}
+            >
                 <VStack gap={3}>
                     <Text
                         fontSize={["3xl", "4xl", "5xl"]}
@@ -145,7 +152,9 @@ export default function Home() {
                         ))}
                     </VStack>
                 </Box>
+            </Flex>
 
+            <Box w="full" maxW="520px">
                 <Button
                     w="full"
                     variant="primary"
@@ -160,7 +169,7 @@ export default function Home() {
                 >
                     Get Started
                 </Button>
-            </VStack>
+            </Box>
         </Flex>
     );
 }

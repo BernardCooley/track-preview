@@ -52,13 +52,12 @@ const PasswordReset = ({}: Props) => {
 
     return (
         <Flex
-            minH="100vh"
+            h="100dvh"
             direction="column"
             alignItems="center"
             px={[4, 6]}
-            py={[8, 12]}
         >
-            <Flex w="full" maxW="480px" mb={4}>
+            <Flex w="full" maxW="480px" pt={[6, 8]}>
                 <IconButton
                     variant="tertiary"
                     onClick={() => router.push("/loginRegister?login=true")}
@@ -69,23 +68,30 @@ const PasswordReset = ({}: Props) => {
                 </IconButton>
             </Flex>
 
-            <Text
-                fontSize={["3xl", "4xl", "5xl"]}
-                fontFamily="brand"
-                color="brand.textPrimary"
-                letterSpacing="wider"
-                mb={[6, 8]}
+            <Flex
+                pt={[4, 6]}
+                pb={[4, 6]}
+                justifyContent="center"
             >
-                PHONIQUEST
-            </Text>
+                <Text
+                    fontSize={["3xl", "4xl", "5xl"]}
+                    fontFamily="brand"
+                    color="brand.textPrimary"
+                    letterSpacing="wider"
+                >
+                    PHONIQUEST
+                </Text>
+            </Flex>
 
             <Box
                 w="full"
                 maxW="480px"
+                flex={1}
                 bg="brand.cardBg"
                 border="1px solid"
                 borderColor="brand.border"
-                rounded="card"
+                roundedTop="card"
+                roundedBottom="none"
                 p={[5, 6]}
             >
                 <Text

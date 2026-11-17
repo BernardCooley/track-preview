@@ -83,7 +83,7 @@ const AuthPageContent = () => {
 
     if (loading) {
         return (
-            <Center h="100vh" flexDirection="column" gap={8}>
+            <Center h="100dvh" flexDirection="column" gap={8}>
                 <Text
                     fontSize={["3xl", "4xl", "5xl"]}
                     fontFamily="brand"
@@ -99,29 +99,37 @@ const AuthPageContent = () => {
 
     return (
         <Flex
-            minH="100vh"
+            h="100dvh"
             direction="column"
             alignItems="center"
             px={[4, 6]}
-            py={[8, 12]}
         >
-            <Text
-                fontSize={["3xl", "4xl", "5xl"]}
-                fontFamily="brand"
-                color="brand.textPrimary"
-                letterSpacing="wider"
-                mb={[6, 8]}
+            <Flex
+                pt={[10, 12]}
+                pb={[4, 6]}
+                justifyContent="center"
             >
-                PHONIQUEST
-            </Text>
+                <Text
+                    fontSize={["3xl", "4xl", "5xl"]}
+                    fontFamily="brand"
+                    color="brand.textPrimary"
+                    letterSpacing="wider"
+                >
+                    PHONIQUEST
+                </Text>
+            </Flex>
 
             <Box
                 w="full"
                 maxW="480px"
+                flex={1}
+                display="flex"
+                flexDirection="column"
                 bg="brand.cardBg"
                 border="1px solid"
                 borderColor="brand.border"
-                rounded="card"
+                roundedTop="card"
+                roundedBottom="none"
                 overflow="hidden"
             >
                 <Tabs.Root
@@ -134,6 +142,7 @@ const AuthPageContent = () => {
                         );
                     }}
                     fitted
+                    style={{ display: "flex", flexDirection: "column", flex: 1 }}
                 >
                     <Tabs.List
                         bg="brand.surface"
@@ -171,10 +180,10 @@ const AuthPageContent = () => {
                         </Tabs.Trigger>
                     </Tabs.List>
 
-                    <Tabs.Content value="signin" pt={2}>
+                    <Tabs.Content value="signin" pt={2} flex={1}>
                         <SignIn />
                     </Tabs.Content>
-                    <Tabs.Content value="register" pt={2}>
+                    <Tabs.Content value="register" pt={2} flex={1}>
                         <SignUp />
                     </Tabs.Content>
                 </Tabs.Root>

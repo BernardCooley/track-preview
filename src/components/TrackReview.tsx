@@ -92,7 +92,7 @@ const TrackReview = memo(
         }, [animate]);
 
         return (
-            <Box position="relative" h="full" overflow="auto">
+            <Flex direction="column" position="relative" h="full" overflow="auto">
                 {loading && !animate && (
                     <Center position="absolute" inset={0} zIndex={150} pt={24}>
                         <Loading />
@@ -210,6 +210,7 @@ const TrackReview = memo(
                     transition="opacity 0.4s ease"
                     opacity={animate ? 0 : 1}
                     direction="column"
+                    flex={1}
                 >
                     {currentTrack && !animate && (
                         <TrackReviewCard
@@ -265,7 +266,7 @@ const TrackReview = memo(
                         />
                     )}
                 </Flex>
-            </Box>
+            </Flex>
         );
     },
     (prevProps, nextProps) => {
