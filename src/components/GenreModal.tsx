@@ -37,20 +37,15 @@ const GenreModal = ({
     const [searchValue, setSearchValue] = useState<string>("");
     const [filteredGenres, setFilteredGenres] = useState<string[]>([]);
     const [genres, setGenres] = useState<string[]>([]);
-    const [isSearching, setIsSearching] = useState<boolean>(false);
     const [localSelection, setLocalSelection] = useState<string[]>(selectedGenres);
+
+    const isSearchActive = searchValue.length > 0;
 
     useEffect(() => {
         if (showGenreSelector) {
             setLocalSelection(selectedGenres);
         }
     }, [showGenreSelector]);
-
-    useEffect(() => {
-        if (isSearching) {
-            searchRef.current?.focus();
-        }
-    }, [isSearching]);
 
     useEffect(() => {
         if (searchValue.length > 0 && filteredGenres.length > 0) {
@@ -94,7 +89,6 @@ const GenreModal = ({
     const handleClose = () => {
         setShowGenreSelector(false);
         setSearchValue("");
-        setIsSearching(false);
         setFilteredGenres([]);
     };
 
@@ -110,16 +104,38 @@ const GenreModal = ({
             .sort((a, b) => a.letter.localeCompare(b.letter));
     };
 
-    const GenreTag = ({ gen, isActive }: { gen: string; isActive: boolean }) => (
-        <Button
-            variant={isActive ? "subtle" : "surface"}
-            onClick={() => toggleGenre(gen)}
-            height="32px"
-            fontSize="xs"
+    const GenreTag = ({ gen, isActive, onClick }: { gen: string; isActive: boolean; onClick?: () => void }) => (
+        <Box
+            as="button"
+            onClick={onClick ?? (() => toggleGenre(gen))}
             px={3}
+            py={1.5}
+            fontSize="xs"
+            fontWeight={isActive ? "medium" : "normal"}
+            rounded="md"
+            cursor="pointer"
+            position="relative"
+            transition="all 0.15s ease"
+            color={isActive ? "brand.primary" : "brand.textPrimary"}
+            borderLeft={isActive ? "2px solid" : "2px solid transparent"}
+            borderLeftColor={isActive ? "brand.primary" : "transparent"}
+            css={{
+                backdropFilter: "blur(8px)",
+                WebkitBackdropFilter: "blur(8px)",
+                background: isActive
+                    ? "color-mix(in srgb, var(--chakra-colors-brand-primary) 10%, transparent)"
+                    : "var(--chakra-colors-brand-surface)",
+                boxShadow: "0 1px 3px rgba(0, 0, 0, 0.06)",
+                "&:hover": {
+                    background: isActive
+                        ? "color-mix(in srgb, var(--chakra-colors-brand-primary) 15%, transparent)"
+                        : "var(--chakra-colors-brand-surface-hover)",
+                    boxShadow: "0 2px 6px rgba(0, 0, 0, 0.08)",
+                },
+            }}
         >
             {gen}
-        </Button>
+        </Box>
     );
 
     return (
@@ -137,152 +153,164 @@ const GenreModal = ({
                     shadow="2xl"
                     border="1px solid"
                     borderColor="brand.border"
+                    overflow="hidden"
                 >
                     <Flex
                         h="full"
                         w="full"
-                        rounded="modal"
-                        p={showGenreSelector ? [3, 4] : 0}
                         direction="column"
-                        gap={3}
                     >
-                        <Text
-                            fontSize="lg"
-                            fontWeight="semibold"
-                            textAlign="center"
-                            color="brand.textPrimary"
+                        <Flex
+                            px={[4, 5]}
+                            pt={[4, 5]}
+                            pb={3}
+                            direction="column"
+                            gap={3}
+                            flexShrink={0}
                         >
-                            Select genres
-                        </Text>
-
-                        {isSearching ? (
-                            <TextInput
-                                ref={searchRef}
-                                allowHelperText={false}
-                                allowErrors={false}
-                                title=""
-                                size="md"
-                                height="40px"
-                                placeholder="Search genres"
-                                fieldProps={{
-                                    defaultValue: "",
-                                    value: searchValue,
-                                    onChange: (e) => setSearchValue(e.target.value),
-                                }}
-                                rightIcon={
-                                    <IconButton
-                                        position="absolute"
-                                        right={2}
-                                        top="50%"
-                                        transform="translateY(-50%)"
-                                        variant="tertiary"
-                                        onClick={() => {
-                                            setSearchValue("");
-                                            setIsSearching(false);
-                                            setFilteredGenres([]);
-                                        }}
-                                        aria-label="Clear search"
-                                        color="brand.textMuted"
-                                        size="sm"
-                                    >
-                                        <CloseTwoToneIcon fontSize="small" />
-                                    </IconButton>
-                                }
-                            />
-                        ) : (
-                            <Flex justifyContent="flex-start">
-                                <IconButton
-                                    variant="tertiary"
-                                    onClick={() => setIsSearching(true)}
-                                    aria-label="Search genres"
-                                    color="brand.textSecondary"
-                                    size="sm"
-                                >
-                                    <SearchTwoToneIcon fontSize="small" />
-                                </IconButton>
-                            </Flex>
-                        )}
-
-                        {!isSearching && recentGenres && recentGenres.length > 0 && (
-                            <Box
-                                border="1px solid"
-                                borderColor="brand.border"
-                                rounded="lg"
-                                p={3}
+                            <Text
+                                fontSize="lg"
+                                fontWeight="semibold"
+                                color="brand.textPrimary"
+                                letterSpacing="-0.01em"
                             >
-                                <Flex justifyContent="space-between" mb={2}>
-                                    <Text fontSize="sm" color="brand.textMuted">
-                                        Recent
-                                    </Text>
-                                    {recentGenres.length > 1 && (
-                                        <Button
-                                            onClick={() => {
-                                                setLocalSelection(["all"]);
-                                                onFavouriteClearClick?.();
-                                            }}
-                                            variant="ghost"
-                                            color="brand.primary"
-                                            height="auto"
-                                            px={1}
-                                            fontSize="xs"
-                                            shadow="none"
-                                        >
-                                            clear
-                                        </Button>
-                                    )}
-                                </Flex>
-                                <Flex flexWrap="wrap" gap={1.5}>
-                                    {recentGenres.map((gen) => (
-                                        <GenreTag
-                                            key={gen}
-                                            gen={gen}
-                                            isActive={isSelected(gen)}
-                                        />
-                                    ))}
-                                </Flex>
+                                Genres
+                            </Text>
+
+                            <Box position="relative">
+                                <TextInput
+                                    ref={searchRef}
+                                    allowHelperText={false}
+                                    allowErrors={false}
+                                    title=""
+                                    size="md"
+                                    height="38px"
+                                    placeholder="Search genres..."
+                                    fieldProps={{
+                                        defaultValue: "",
+                                        value: searchValue,
+                                        onChange: (e) => setSearchValue(e.target.value),
+                                    }}
+                                    rightIcon={
+                                        searchValue ? (
+                                            <IconButton
+                                                position="absolute"
+                                                right={2}
+                                                top="50%"
+                                                transform="translateY(-50%)"
+                                                variant="tertiary"
+                                                onClick={() => {
+                                                    setSearchValue("");
+                                                    setFilteredGenres([]);
+                                                }}
+                                                aria-label="Clear search"
+                                                color="brand.textMuted"
+                                                size="sm"
+                                            >
+                                                <CloseTwoToneIcon fontSize="small" />
+                                            </IconButton>
+                                        ) : (
+                                            <Box
+                                                position="absolute"
+                                                right={3}
+                                                top="50%"
+                                                transform="translateY(-50%)"
+                                                color="brand.textMuted"
+                                                display="flex"
+                                                pointerEvents="none"
+                                            >
+                                                <SearchTwoToneIcon fontSize="small" />
+                                            </Box>
+                                        )
+                                    }
+                                />
                             </Box>
-                        )}
+                        </Flex>
+
+                        <Box
+                            h="1px"
+                            bg="brand.divider"
+                            mx={[4, 5]}
+                            flexShrink={0}
+                        />
 
                         <Box
                             flex={1}
                             overflow="auto"
-                            border="1px solid"
-                            borderColor="brand.border"
-                            rounded="lg"
-                            p={3}
-                            mb="60px"
+                            px={[4, 5]}
+                            pt={3}
+                            pb="80px"
                             css={{
                                 "&::-webkit-scrollbar": {
-                                    width: "4px",
+                                    width: "3px",
+                                },
+                                "&::-webkit-scrollbar-track": {
+                                    background: "transparent",
                                 },
                                 "&::-webkit-scrollbar-thumb": {
                                     background: "var(--chakra-colors-brand-scrollbar-thumb)",
-                                    borderRadius: "4px",
+                                    borderRadius: "3px",
                                 },
                             }}
                         >
-                            {!isSearching && (
-                                <Box mb={3}>
-                                    <Button
-                                        variant={isAllSelected ? "subtle" : "surface"}
-                                        onClick={selectAll}
-                                        height="32px"
-                                        fontSize="xs"
-                                        px={3}
-                                    >
-                                        All genres
-                                    </Button>
-                                </Box>
-                            )}
-                            <Flex gap={4} direction="column">
-                                {getFormattedGenres(genres).map((genreSection) => (
-                                    <Box key={genreSection.letter}>
+                            {!isSearchActive && recentGenres && recentGenres.length > 0 && (
+                                <Box mb={4}>
+                                    <Flex justifyContent="space-between" alignItems="center" mb={2}>
                                         <Text
                                             fontSize="xs"
                                             fontWeight="semibold"
                                             color="brand.textMuted"
+                                            textTransform="uppercase"
+                                            letterSpacing="0.05em"
+                                        >
+                                            Recent
+                                        </Text>
+                                        {recentGenres.length > 1 && (
+                                            <Button
+                                                onClick={() => {
+                                                    setLocalSelection(["all"]);
+                                                    onFavouriteClearClick?.();
+                                                }}
+                                                variant="ghost"
+                                                color="brand.textMuted"
+                                                height="auto"
+                                                px={1}
+                                                fontSize="xs"
+                                                shadow="none"
+                                                _hover={{ color: "brand.primary" }}
+                                            >
+                                                Clear
+                                            </Button>
+                                        )}
+                                    </Flex>
+                                    <Flex flexWrap="wrap" gap={1.5}>
+                                        {recentGenres.map((gen) => (
+                                            <GenreTag
+                                                key={gen}
+                                                gen={gen}
+                                                isActive={isSelected(gen)}
+                                            />
+                                        ))}
+                                    </Flex>
+                                </Box>
+                            )}
+
+                            {!isSearchActive && (
+                                <Box mb={4}>
+                                    <GenreTag gen="All genres" isActive={isAllSelected} onClick={selectAll} />
+                                </Box>
+                            )}
+
+                            <Flex gap={4} direction="column">
+                                {getFormattedGenres(genres).map((genreSection) => (
+                                    <Box key={genreSection.letter}>
+                                        <Text
+                                            fontSize="11px"
+                                            fontWeight="semibold"
+                                            color="brand.textMuted"
                                             mb={2}
                                             textTransform="uppercase"
+                                            letterSpacing="0.08em"
                                         >
                                             {genreSection.letter}
                                         </Text>
@@ -302,10 +330,18 @@ const GenreModal = ({
 
                         <Flex
                             position="absolute"
-                            bottom={[3, 4]}
-                            left={[3, 4]}
-                            right={[3, 4]}
+                            bottom={0}
+                            left={0}
+                            right={0}
                             gap={3}
+                            px={[4, 5]}
+                            py={4}
+                            css={{
+                                backdropFilter: "blur(16px)",
+                                WebkitBackdropFilter: "blur(16px)",
+                                background: "color-mix(in srgb, var(--chakra-colors-brand-bg) 80%, transparent)",
+                                borderTop: "1px solid var(--chakra-colors-brand-divider)",
+                            }}
                         >
                             <Button
                                 flex="0 0 auto"
@@ -321,7 +357,6 @@ const GenreModal = ({
                                 onClick={() => {
                                     onApply(localSelection);
                                     setSearchValue("");
-                                    setIsSearching(false);
                                     setFilteredGenres([]);
                                 }}
                                 variant="primary"
