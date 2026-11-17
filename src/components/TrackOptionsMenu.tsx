@@ -22,31 +22,36 @@ const TrackMenuOptions = ({
             <Menu.Trigger asChild>
                 <Button
                     onClick={(e) => e.stopPropagation()}
-                    variant="menuButton"
+                    variant="tertiary"
                     onMouseEnter={onMouseEnter}
                     onMouseLeave={onMouseLeave}
+                    size="sm"
+                    color="brand.textMuted"
                 >
-                    <MoreHorizIcon />
+                    <MoreHorizIcon fontSize="small" />
                 </Button>
             </Menu.Trigger>
             <Menu.Positioner>
                 <Menu.Content
-                    bg="brand.backgroundPrimary"
+                    bg="brand.bg"
                     color="brand.textPrimary"
-                    padding="0"
+                    padding={1}
                     border="1px solid"
-                    borderColor="brand.primary"
-                    shadow="md"
+                    borderColor="brand.border"
+                    shadow="lg"
+                    rounded="lg"
+                    minW="140px"
                 >
                     <Menu.Item
                         value="delete"
-                        p={3}
-                        fontSize="lg"
+                        p={2.5}
+                        fontSize="sm"
                         rounded="md"
                         bg="transparent"
-                        color="brand.textPrimary"
+                        color="brand.textSecondary"
                         _hover={{
-                            bg: "brand.backgroundTertiaryOpaque",
+                            bg: "brand.surfaceHover",
+                            color: "brand.textPrimary",
                         }}
                         onMouseEnter={onMouseEnter}
                         onMouseLeave={onMouseLeave}
@@ -56,13 +61,14 @@ const TrackMenuOptions = ({
                     </Menu.Item>
                     <Menu.Item
                         value="viewRelease"
-                        p={3}
-                        fontSize="lg"
+                        p={2.5}
+                        fontSize="sm"
                         rounded="md"
                         bg="transparent"
-                        color="brand.textPrimary"
+                        color="brand.textSecondary"
                         _hover={{
-                            bg: "brand.backgroundTertiaryOpaque",
+                            bg: "brand.surfaceHover",
+                            color: "brand.textPrimary",
                         }}
                         onMouseEnter={onMouseEnter}
                         onMouseLeave={onMouseLeave}

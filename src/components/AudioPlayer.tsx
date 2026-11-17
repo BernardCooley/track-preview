@@ -11,6 +11,7 @@ const AudioPlayer = forwardRef<HTMLAudioElement>((props, ref) => {
                 ref={ref}
                 style={{
                     width: "100%",
+                    borderRadius: "8px",
                 }}
                 src={currentlyPlaying || undefined}
                 controls

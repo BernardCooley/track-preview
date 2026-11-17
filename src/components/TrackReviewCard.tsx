@@ -6,7 +6,6 @@ import {
     Flex,
     Separator,
     Spinner,
-    Tag,
     Text,
 } from "@chakra-ui/react";
 import { Track } from "../../types";
@@ -70,76 +69,83 @@ const TrackReviewCard = ({
     return (
         <Collapsible.Root open={isOpen}>
             <Collapsible.Content>
-                <Flex h="auto" justify="center" w="full">
+                <Flex justify="center" w="full" position="relative">
                     {loadingMessage && loadingMessage.length > 0 && (
-                        <Box
+                        <Flex
                             position="absolute"
                             top="50%"
-                            transform="translate(50%, 0)"
-                            right="50%"
+                            left="50%"
+                            transform="translate(-50%, -50%)"
                             zIndex={300}
+                            bg="brand.surfaceRaised"
+                            border="1px solid"
+                            borderColor="brand.border"
+                            rounded="lg"
+                            px={5}
+                            py={3}
+                            shadow="lg"
+                            alignItems="center"
+                            gap={3}
                         >
-                            <Tag.Root size="lg" colorPalette="white"
-                                padding="18px"
-                                height="62px"
-                                backgroundColor="brand.backgroundTertiary"
-                                color="white"
-                                fontSize="16px"
-                                fontWeight="normal"
-                                rounded="10px"
-                                userSelect="none"
-                                textAlign="center"
-                                whiteSpace="nowrap"
-                                bg="brand.backgroundTertiaryOpaque"
-                                shadow="lg"
-                            >
-                                <Tag.Label>
-                                    <Flex alignItems="center" gap={4}>
-                                        <Text fontSize="xl">{loadingMessage}</Text>
-                                        <BouncingDotsLoader />
-                                    </Flex>
-                                </Tag.Label>
-                            </Tag.Root>
-                        </Box>
+                            <Text fontSize="md" color="brand.textPrimary">
+                                {loadingMessage}
+                            </Text>
+                            <BouncingDotsLoader />
+                        </Flex>
                     )}
+
                     <Card.Root
                         w="full"
-                        size="md"
-                        backgroundColor="transparent"
+                        bg="transparent"
+                        shadow="none"
+                        border="none"
                         opacity={
                             loadingMessage && loadingMessage.length > 0 ? 0.2 : 1
                         }
+                        transition="opacity 0.3s ease"
                     >
                         <Card.Body
                             w="full"
-                            minH="456px"
-                            h={["full", "unset"]}
+                            minH={["400px", "456px"]}
                             p={0}
                             display="flex"
                             flexDirection="column"
-                            alignItems="flex-end"
                             justifyContent="space-between"
                             bgImage={`url(${currentTrack.thumbnail})`}
                             bgSize="cover"
+                            backgroundPosition="center"
+                            position="relative"
+                            overflow="hidden"
+                            _before={{
+                                content: '""',
+                                position: "absolute",
+                                inset: 0,
+                                bg: "linear-gradient(to bottom, rgba(26, 36, 34, 0.3) 0%, rgba(26, 36, 34, 0.85) 60%, rgba(26, 36, 34, 0.95) 100%)",
+                            }}
                         >
                             {!noTracks &&
                                 !loading &&
                                 reviewStep > 1 &&
                                 reviewStep < 4 && (
-                                    <ToggleTracklist
-                                        toggleTracklist={toggleTracklist}
-                                        isShowingTracklist={isShowingTracklist}
-                                    />
+                                    <Box position="relative" zIndex={1} alignSelf="flex-end">
+                                        <ToggleTracklist
+                                            toggleTracklist={toggleTracklist}
+                                            isShowingTracklist={isShowingTracklist}
+                                        />
+                                    </Box>
                                 )}
+
                             <Flex
                                 direction="column"
                                 h="full"
                                 w="full"
                                 justifyContent="center"
-                                pt={10}
-                                height="256px"
+                                pt={[8, 10]}
+                                pb={4}
+                                position="relative"
+                                zIndex={1}
                             >
-                                <Flex w="full" justifyContent="space-around">
+                                <Flex w="full" justifyContent="center" gap={[8, 12]}>
                                     <TrackCardIcon
                                         ariaLabel="dislike button"
                                         onClick={async () => onLikeOrDislike(false)}
@@ -154,11 +160,12 @@ const TrackReviewCard = ({
                                     />
                                 </Flex>
                             </Flex>
+
                             <Flex
                                 direction="column"
                                 w="full"
-                                bg="brand.backgroundTertiaryOpaque3"
-                                color="brand.textPrimary"
+                                position="relative"
+                                zIndex={1}
                             >
                                 <AudioPlayer
                                     ref={playerRef}
@@ -168,40 +175,38 @@ const TrackReviewCard = ({
                                         <Flex
                                             alignItems="center"
                                             direction="column"
-                                            position="relative"
-                                            gap={[1, 2]}
+                                            gap={1}
+                                            pb={2}
                                         >
                                             <Text
                                                 textAlign="center"
                                                 w="full"
-                                                fontSize={["2xl", "3xl"]}
+                                                fontSize={["xl", "2xl"]}
+                                                fontWeight="semibold"
                                                 lineClamp={2}
-                                                pb="2px"
+                                                color="brand.textPrimary"
                                             >
                                                 {currentTrack.title}
                                             </Text>
                                             <Text
                                                 textAlign="center"
                                                 lineClamp={2}
-                                                fontSize={["lg", "xl"]}
-                                                pb="2px"
+                                                fontSize={["md", "lg"]}
+                                                color="brand.textSecondary"
                                             >
                                                 {currentTrack.artist}
                                             </Text>
                                             <Flex
                                                 py={1}
-                                                fontSize={["md", "lg"]}
+                                                fontSize="sm"
                                                 justifyContent="space-between"
                                                 w="full"
+                                                color="brand.textMuted"
                                             >
                                                 <Text lineClamp={1}>
                                                     {currentTrack.genre}
                                                 </Text>
-                                                <Text
-                                                    css={{
-                                                        textWrap: "nowrap",
-                                                    }}
-                                                >
+                                                <Text whiteSpace="nowrap">
                                                     {currentTrack.releaseYear}
                                                 </Text>
                                             </Flex>
@@ -230,7 +235,7 @@ const TrackReviewCard = ({
                                         previous:
                                             indexOfCurrentTrack > 0 ? (
                                                 <SkipPreviousIcon
-                                                    style={{ fontSize: "34px" }}
+                                                    style={{ fontSize: "28px" }}
                                                 />
                                             ) : (
                                                 <Box></Box>
@@ -239,7 +244,7 @@ const TrackReviewCard = ({
                                             indexOfCurrentTrack <
                                             trackList.length - 1 ? (
                                                 <SkipNextIcon
-                                                    style={{ fontSize: "34px" }}
+                                                    style={{ fontSize: "28px" }}
                                                 />
                                             ) : (
                                                 <Box></Box>
@@ -260,24 +265,34 @@ const TrackReviewCard = ({
                                         <Box
                                             key="AutoplayButton"
                                             rounded="full"
-                                            w="84px"
                                             py={1}
-                                            px={2}
+                                            px={3}
                                             onClick={onAutoPlayToggle}
                                             border="1px solid"
-                                            borderColor="brand.textPrimary"
+                                            borderColor={
+                                                preferredAutoPlay
+                                                    ? "brand.primary"
+                                                    : "brand.border"
+                                            }
                                             bg={
                                                 preferredAutoPlay
-                                                    ? "brand.textPrimary"
+                                                    ? "brand.primarySubtle"
                                                     : "transparent"
                                             }
+                                            cursor="pointer"
+                                            transition="all 0.2s ease"
+                                            _hover={{
+                                                borderColor: "brand.primary",
+                                            }}
                                         >
                                             {profileLoaded && !autoplayLoading ? (
                                                 <Text
+                                                    fontSize="xs"
+                                                    fontWeight="medium"
                                                     color={
                                                         preferredAutoPlay
-                                                            ? "black"
-                                                            : "brand.textPrimary"
+                                                            ? "brand.primary"
+                                                            : "brand.textSecondary"
                                                     }
                                                     userSelect="none"
                                                 >
@@ -297,7 +312,7 @@ const TrackReviewCard = ({
                                         </Box>,
                                     ]}
                                 />
-                                <Separator />
+                                <Separator borderColor="brand.divider" />
                                 <FullTrackLinks
                                     onLinkClicked={() => {
                                         if (playerRef.current) {

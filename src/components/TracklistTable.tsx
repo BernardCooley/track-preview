@@ -58,20 +58,20 @@ const TracklistTable = ({
         isCurrentTrack: boolean
     ) => {
         return {
-            fontSize: "md",
-            outlineOffset: -2,
+            fontSize: "sm",
+            transition: "all 0.15s ease",
             outline: isCurrentTrack ? "1px solid" : "none",
             outlineColor: isCurrentTrack ? "brand.primary" : "transparent",
-            color: "brand.textPrimaryLight",
+            outlineOffset: -1,
+            rounded: "lg",
+            color: "brand.textSecondary",
             _hover: {
                 cursor: "pointer",
-                backgroundColor: isCurrentTrack
-                    ? "brand.backgroundTertiaryOpaque"
-                    : "brand.backgroundTertiaryOpaque2",
+                bg: isCurrentTrack
+                    ? "brand.primarySubtle"
+                    : "brand.surfaceHover",
             },
-            bg: isCurrentTrack
-                ? "brand.backgroundTertiaryOpaque"
-                : "transparent",
+            bg: isCurrentTrack ? "brand.primarySubtle" : "transparent",
             onClick: () => {
                 if (!isCurrentTrack) {
                     updateCurrentlyPlaying(track);
@@ -92,17 +92,19 @@ const TracklistTable = ({
                     )}
 
                     <Box
-                        transition="padding 0.2s ease-in-out"
                         maxH="68vh"
-                        overflowY="scroll"
+                        overflowY="auto"
                         overflowX="auto"
+                        w="full"
                         css={{
                             "&::-webkit-scrollbar": {
-                                display: "none",
+                                width: "4px",
+                            },
+                            "&::-webkit-scrollbar-thumb": {
+                                background: "rgba(255,255,255,0.1)",
+                                borderRadius: "4px",
                             },
                         }}
-                        shadow="2xl"
-                        w="full"
                     >
                         <Table.Root>
                             <Table.Body>
@@ -128,72 +130,69 @@ const TracklistTable = ({
                                                 isCurrentTrack
                                             )}
                                             borderBottom="1px solid"
-                                            borderBottomColor="brand.backgroundTertiary"
+                                            borderBottomColor="brand.divider"
                                         >
-                                            <Table.Cell color="brand.textPrimaryLight" padding="10px" paddingLeft="0" paddingRight="0" pr={2}>
+                                            <Table.Cell py={2.5} px={2}>
                                                 <Flex
                                                     alignItems="center"
                                                     gap={3}
-                                                    justifyContent="flex-start"
                                                     pl={2}
                                                     mb={2}
                                                 >
                                                     <Image
-                                                        rounded="full"
-                                                        w={16}
-                                                        h={16}
+                                                        rounded="lg"
+                                                        w={14}
+                                                        h={14}
                                                         src={thumbnail}
                                                         alt=""
-                                                    ></Image>
+                                                        objectFit="cover"
+                                                    />
                                                     <Flex
                                                         w="full"
                                                         direction="column"
-                                                        gap={2}
+                                                        gap={0.5}
                                                     >
                                                         <Text
-                                                            lineClamp={3}
-                                                            fontSize={"md"}
-                                                            color={
-                                                                "brand.textPrimary"
-                                                            }
-                                                            css={{
-                                                                textWrap: "wrap",
-                                                            }}
+                                                            lineClamp={2}
+                                                            fontSize="sm"
+                                                            color="brand.textPrimary"
+                                                            css={{ textWrap: "wrap" }}
                                                             fontWeight={
-                                                                !isCurrentTrack
-                                                                    ? "normal"
-                                                                    : "bold"
+                                                                isCurrentTrack
+                                                                    ? "semibold"
+                                                                    : "normal"
                                                             }
                                                         >
                                                             {title}
                                                         </Text>
                                                         <Text
-                                                            fontSize="sm"
+                                                            fontSize="xs"
+                                                            color="brand.textMuted"
                                                             maxW={32}
-                                                            css={{
-                                                                textWrap: "wrap",
-                                                            }}
-                                                            fontWeight={
-                                                                !isCurrentTrack
-                                                                    ? "normal"
-                                                                    : "bold"
-                                                            }
+                                                            css={{ textWrap: "wrap" }}
                                                         >
                                                             {artist}
                                                         </Text>
                                                     </Flex>
                                                 </Flex>
-                                                <Flex justifyContent="space-between">
+                                                <Flex
+                                                    justifyContent="space-between"
+                                                    px={2}
+                                                >
                                                     <Text
-                                                        px={2}
-                                                        lineClamp={2}
-                                                        css={{
-                                                            textWrap: "wrap",
-                                                        }}
+                                                        fontSize="xs"
+                                                        lineClamp={1}
+                                                        color="brand.textMuted"
+                                                        css={{ textWrap: "wrap" }}
                                                     >
                                                         {genre}
                                                     </Text>
-                                                    <Text>{releaseYear}</Text>
+                                                    <Text
+                                                        fontSize="xs"
+                                                        color="brand.textMuted"
+                                                    >
+                                                        {releaseYear}
+                                                    </Text>
                                                 </Flex>
                                             </Table.Cell>
                                         </Table.Row>

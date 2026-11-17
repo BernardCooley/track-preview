@@ -7,13 +7,13 @@
     display: block;
     position: relative;
     width: 100%;
-    height: 8px;
-    background-color: rgba(16, 152, 157, 0.47);
-    border-radius: 4px;
+    height: 6px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
 }
 .range-slider[data-vertical] {
     height: 100%;
-    width: 8px;
+    width: 6px;
 }
 .range-slider[data-disabled] {
     opacity: 0.5;
@@ -23,15 +23,20 @@
     position: absolute;
     z-index: 3;
     top: 50%;
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
     transform: translate(-50%, -50%);
     border-radius: 50%;
-    background: #d6dbdc;
+    background: #11999e;
+    border: 2px solid #f0f4f3;
+    transition: box-shadow 0.2s ease;
+}
+.range-slider .range-slider__thumb:hover {
+    box-shadow: 0 0 0 4px rgba(17, 153, 158, 0.2);
 }
 .range-slider .range-slider__thumb:focus-visible {
     outline: 0;
-    box-shadow: 0 0 0 6px rgba(33, 150, 243, 0.5);
+    box-shadow: 0 0 0 4px rgba(17, 153, 158, 0.3);
 }
 .range-slider[data-vertical] .range-slider__thumb {
     left: 50%;
@@ -47,6 +52,7 @@
     width: 100%;
     height: 100%;
     background-color: #11999e;
+    border-radius: 3px;
 }
 .range-slider[data-vertical] .range-slider__range {
     left: 50%;

@@ -1,7 +1,8 @@
-import { Box, Flex, Spinner, Tag, Text } from "@chakra-ui/react";
+import { Flex, Spinner, Text } from "@chakra-ui/react";
 import React from "react";
 import { getCurrentYear } from "../../utils";
 import { YearRange } from "../../types";
+import { Button } from "@chakra-ui/react";
 
 interface Props {
     genres?: string[] | null;
@@ -28,100 +29,44 @@ const FilterTags = ({
     reviewStep,
 }: Props) => {
     return (
-        <Flex transition="opacity 0.3s" opacity={reviewStep === 1 ? 1 : 0}>
-            <Flex gap={2} w="full" flexWrap="wrap">
-                <Tag.Root
-                    w={genres ? "auto" : "86px"}
-                    paddingY="6px"
-                    paddingX="10px"
-                    border="1px solid"
-                    borderColor="brand.primary"
-                    backgroundColor="brand.backgroundTertiary"
-                    _hover={{
-                        shadow: "xl",
-                        border: "1px solid",
-                        borderColor: "brand.primaryLight",
-                        bg: "brand.primaryOpaque",
-                        cursor: "pointer",
-                    }}
-                    _active={{
-                        shadow: "xl",
-                        border: "1px solid",
-                        borderColor: "brand.primaryLight",
-                        bg: "brand.primaryOpaque",
-                    }}
-                    color="white"
-                    fontSize="14px"
-                    fontWeight="normal"
-                    rounded="full"
-                    userSelect="none"
-                    textAlign="center"
-                    whiteSpace="nowrap"
-                    bg="brand.backgroundTertiaryOpaque"
-                    pointerEvents={profileLoaded ? "auto" : "none"}
-                    onClick={onGenreClick}
-                >
-                    <Tag.Label w="full">
-                        {genres ? (
-                            <Text userSelect="none">
-                                {getGenreLabel(genres)}
-                            </Text>
-                        ) : (
-                            <Box w="full">
-                                <Spinner color="brand.primary" size="xs" />
-                            </Box>
-                        )}
-                    </Tag.Label>
-                </Tag.Root>
+        <Flex
+            transition="opacity 0.3s"
+            opacity={reviewStep === 1 ? 1 : 0}
+            gap={2}
+            flexWrap="wrap"
+        >
+            <Button
+                variant={genres ? "surface" : "surface"}
+                onClick={onGenreClick}
+                pointerEvents={profileLoaded ? "auto" : "none"}
+                minW="80px"
+            >
+                {genres ? (
+                    <Text userSelect="none" fontSize="sm">
+                        {getGenreLabel(genres)}
+                    </Text>
+                ) : (
+                    <Spinner color="brand.primary" size="xs" />
+                )}
+            </Button>
 
-                <Tag.Root
-                    w={yearRange && profileLoaded ? "auto" : "76px"}
-                    paddingY="6px"
-                    paddingX="10px"
-                    border="1px solid"
-                    borderColor="brand.primary"
-                    backgroundColor="brand.backgroundTertiary"
-                    _hover={{
-                        shadow: "xl",
-                        border: "1px solid",
-                        borderColor: "brand.primaryLight",
-                        bg: "brand.primaryOpaque",
-                        cursor: "pointer",
-                    }}
-                    _active={{
-                        shadow: "xl",
-                        border: "1px solid",
-                        borderColor: "brand.primaryLight",
-                        bg: "brand.primaryOpaque",
-                    }}
-                    color="white"
-                    fontSize="14px"
-                    fontWeight="normal"
-                    rounded="full"
-                    userSelect="none"
-                    textAlign="center"
-                    whiteSpace="nowrap"
-                    bg="brand.backgroundTertiaryOpaque"
-                    onClick={onYearClick}
-                    pointerEvents={profileLoaded ? "auto" : "none"}
-                >
-                    <Tag.Label w="full">
-                        {yearRange && profileLoaded ? (
-                            <Text userSelect="none">
-                                {yearRange.from === 1960 &&
-                                yearRange.to === getCurrentYear()
-                                    ? "All years"
-                                    : `${yearRange.from} -
-                         ${yearRange?.to}`}
-                            </Text>
-                        ) : (
-                            <Box w="full">
-                                <Spinner color="brand.primary" size="xs" />
-                            </Box>
-                        )}
-                    </Tag.Label>
-                </Tag.Root>
-            </Flex>
+            <Button
+                variant="surface"
+                onClick={onYearClick}
+                pointerEvents={profileLoaded ? "auto" : "none"}
+                minW="70px"
+            >
+                {yearRange && profileLoaded ? (
+                    <Text userSelect="none" fontSize="sm">
+                        {yearRange.from === 1960 &&
+                        yearRange.to === getCurrentYear()
+                            ? "All years"
+                            : `${yearRange.from} - ${yearRange?.to}`}
+                    </Text>
+                ) : (
+                    <Spinner color="brand.primary" size="xs" />
+                )}
+            </Button>
         </Flex>
     );
 };

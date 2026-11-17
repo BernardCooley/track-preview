@@ -14,7 +14,7 @@ import SignUp from "@/components/SignUp";
 import { useReadLocalStorage } from "usehooks-ts";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../../../firebase/firebaseInit";
-import Loading from "@/components/Loading";
+import BouncingDotsLoader from "@/components/BouncingLoaderDots";
 
 const AuthPageContent = () => {
     const router = useRouter();
@@ -79,100 +79,107 @@ const AuthPageContent = () => {
         }
     }, [isAccountDeleted]);
 
-    const TabContainer = ({ children }: { children: React.ReactNode }) => {
-        return (
-            <Flex
-                direction="column"
-                h="100vh"
-                justifyContent="space-between"
-                alignItems="center"
-                w="full"
-            >
-                {children}
-            </Flex>
-        );
-    };
-
     const defaultTab = isLogin === "true" || hasPreviouslyLoggedIn ? "signin" : "register";
 
-    return (
-        <>
-            {loading && (
-                <Center
-                    zIndex={150}
-                    top="200px"
-                    right="50%"
-                    transform={`translate(50%, 0)`}
-                    position="absolute"
-                    px={4}
+    if (loading) {
+        return (
+            <Center h="100vh" flexDirection="column" gap={8}>
+                <Text
+                    fontSize={["3xl", "4xl", "5xl"]}
+                    fontFamily="brand"
+                    color="brand.textPrimary"
+                    letterSpacing="wider"
                 >
-                    <Loading />
-                </Center>
-            )}
-            {!loading && (
-                <Box>
-                    <Text
-                        py={10}
-                        textAlign="center"
-                        fontSize={["3xl", "4xl", "5xl", "6xl"]}
-                        fontFamily="brand"
-                    >
-                        PHONIQUEST
-                    </Text>
-                    <Tabs.Root
-                        defaultValue={defaultTab}
-                        onValueChange={(details) => {
-                            router.push(
-                                `/loginRegister?login=${
-                                    details.value === "signin" ? "true" : "false"
-                                }`
-                            );
-                        }}
-                        fitted
-                        variant="enclosed"
-                        colorPalette="primary"
-                    >
-                        <Tabs.List px={[10, 16, 60, 80]} gap={2}>
-                            <Tabs.Trigger
-                                value="signin"
-                                color="brand.textPrimaryLighter"
-                                borderBottomRadius="0px"
-                                borderTopRadius="14px"
-                                _selected={{
-                                    bg: "brand.primary",
-                                    color: "brand.textPrimary",
-                                }}
-                            >
-                                Sign in
-                            </Tabs.Trigger>
-                            <Tabs.Trigger
-                                value="register"
-                                color="brand.textPrimaryLighter"
-                                borderBottomRadius="0px"
-                                borderTopRadius="14px"
-                                _selected={{
-                                    bg: "brand.primary",
-                                    color: "brand.textPrimary",
-                                }}
-                            >
-                                Register
-                            </Tabs.Trigger>
-                        </Tabs.List>
+                    PHONIQUEST
+                </Text>
+                <BouncingDotsLoader />
+            </Center>
+        );
+    }
 
-                        <Tabs.Content value="signin">
-                            <TabContainer>
-                                <SignIn />
-                            </TabContainer>
-                        </Tabs.Content>
-                        <Tabs.Content value="register">
-                            <TabContainer>
-                                <SignUp />
-                            </TabContainer>
-                        </Tabs.Content>
-                    </Tabs.Root>
-                </Box>
-            )}
-        </>
+    return (
+        <Flex
+            minH="100vh"
+            direction="column"
+            alignItems="center"
+            px={[4, 6]}
+            py={[8, 12]}
+        >
+            <Text
+                fontSize={["3xl", "4xl", "5xl"]}
+                fontFamily="brand"
+                color="brand.textPrimary"
+                letterSpacing="wider"
+                mb={[6, 8]}
+            >
+                PHONIQUEST
+            </Text>
+
+            <Box
+                w="full"
+                maxW="480px"
+                bg="brand.cardBg"
+                border="1px solid"
+                borderColor="brand.border"
+                rounded="card"
+                overflow="hidden"
+            >
+                <Tabs.Root
+                    defaultValue={defaultTab}
+                    onValueChange={(details) => {
+                        router.push(
+                            `/loginRegister?login=${
+                                details.value === "signin" ? "true" : "false"
+                            }`
+                        );
+                    }}
+                    fitted
+                >
+                    <Tabs.List
+                        bg="brand.surface"
+                        borderBottom="1px solid"
+                        borderBottomColor="brand.border"
+                        gap={0}
+                    >
+                        <Tabs.Trigger
+                            value="signin"
+                            color="brand.textMuted"
+                            py={4}
+                            fontWeight="medium"
+                            transition="all 0.2s ease"
+                            _selected={{
+                                color: "brand.primary",
+                                borderBottom: "2px solid",
+                                borderBottomColor: "brand.primary",
+                            }}
+                        >
+                            Sign in
+                        </Tabs.Trigger>
+                        <Tabs.Trigger
+                            value="register"
+                            color="brand.textMuted"
+                            py={4}
+                            fontWeight="medium"
+                            transition="all 0.2s ease"
+                            _selected={{
+                                color: "brand.primary",
+                                borderBottom: "2px solid",
+                                borderBottomColor: "brand.primary",
+                            }}
+                        >
+                            Register
+                        </Tabs.Trigger>
+                    </Tabs.List>
+
+                    <Tabs.Content value="signin" pt={2}>
+                        <SignIn />
+                    </Tabs.Content>
+                    <Tabs.Content value="register" pt={2}>
+                        <SignUp />
+                    </Tabs.Content>
+                </Tabs.Root>
+            </Box>
+        </Flex>
     );
 };
 

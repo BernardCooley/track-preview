@@ -33,22 +33,33 @@ const BuyModal = ({
             <Dialog.Backdrop />
             <Dialog.Positioner>
                 <Dialog.Content
-                    minH="352px"
-                    m={6}
-                    bg="brand.backgroundPrimary"
+                    minH="300px"
+                    m={[3, 6]}
+                    bg="brand.bg"
                     shadow="2xl"
                     border="1px solid"
-                    borderColor="brand.primary"
+                    borderColor="brand.border"
+                    rounded="modal"
                 >
-                    <Dialog.Header>Buy</Dialog.Header>
-                    <Dialog.CloseTrigger />
-                    <Dialog.Body>
-                        <Grid templateColumns="repeat(3, 1fr)" gap={6}>
+                    <Dialog.Header
+                        color="brand.textPrimary"
+                        fontWeight="semibold"
+                        borderBottom="1px solid"
+                        borderBottomColor="brand.divider"
+                    >
+                        Buy
+                    </Dialog.Header>
+                    <Dialog.CloseTrigger
+                        color="brand.textMuted"
+                        _hover={{ color: "brand.textPrimary" }}
+                    />
+                    <Dialog.Body py={6}>
+                        <Grid templateColumns="repeat(3, 1fr)" gap={4}>
                             {buyLinks.map((buyLink) => (
                                 <GridItem
-                                    transition={"all .1s ease-in-out"}
+                                    transition="transform 0.15s ease"
                                     _hover={{
-                                        transform: "scale(1.2)",
+                                        transform: "scale(1.05)",
                                     }}
                                     key={buyLink.platform}
                                     w="100%"
@@ -62,8 +73,8 @@ const BuyModal = ({
                         </Grid>
                     </Dialog.Body>
 
-                    <Dialog.Footer>
-                        <Button variant="primary" mr={3} onClick={closeBuyModal}>
+                    <Dialog.Footer borderTop="1px solid" borderTopColor="brand.divider">
+                        <Button variant="outline" onClick={closeBuyModal}>
                             Close
                         </Button>
                     </Dialog.Footer>

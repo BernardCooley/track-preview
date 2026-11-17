@@ -14,19 +14,24 @@ const BuyLink = ({ track, buyLink }: Props) => {
             target="_blank"
             rel="noopener noreferrer"
             href={formatBuyUrl(track, buyLink.platform)}
+            transition="transform 0.15s ease"
             _hover={{
-                transform: "scale(1.2)",
+                transform: "scale(1.05)",
             }}
         >
-            <Flex direction="column" alignItems="center">
+            <Flex direction="column" alignItems="center" gap={2}>
                 <Image
                     alt={buyLink.platform}
-                    rounded="full"
-                    maxW={16}
-                    maxH={16}
+                    rounded="lg"
+                    maxW={14}
+                    maxH={14}
                     src={buyLink.logo}
-                ></Image>
-                <Text textAlign="center">
+                />
+                <Text
+                    textAlign="center"
+                    fontSize="xs"
+                    color="brand.textSecondary"
+                >
                     {capitaliseWords(buyLink.platform)}
                 </Text>
             </Flex>

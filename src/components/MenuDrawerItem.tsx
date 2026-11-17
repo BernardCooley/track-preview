@@ -1,6 +1,6 @@
 "use client";
 
-import { Flex, IconButton, Link, Text } from "@chakra-ui/react";
+import { Flex, Link, Text } from "@chakra-ui/react";
 import React from "react";
 
 interface Props {
@@ -11,39 +11,37 @@ interface Props {
 }
 
 const MenuDrawerItem = ({ pathname, linkText, href, icon }: Props) => {
+    const isActive = pathname === href;
+
     return (
         <Link
-            transform={pathname === href ? "scale(1.2)" : ""}
-            textDecoration={pathname === href ? "underline" : ""}
+            href={!isActive ? href : undefined}
+            display="flex"
+            alignItems="center"
+            gap={2}
+            px={3}
+            py={2}
+            rounded="lg"
+            bg={isActive ? "brand.primarySubtle" : "transparent"}
+            color={isActive ? "brand.primary" : "brand.textSecondary"}
+            fontWeight={isActive ? "semibold" : "medium"}
+            fontSize="md"
+            transition="all 0.2s ease"
             _hover={
-                pathname !== href
+                !isActive
                     ? {
-                          bg: "transparent",
-                          color: "brand.primary",
-                          transform: "scale(1.2)",
+                          bg: "brand.surfaceHover",
+                          color: "brand.textPrimary",
                       }
-                    : { bg: "transparent" }
+                    : {}
             }
-            color={pathname === href ? "brand.primary" : "white"}
-            variant="primary"
-            href={pathname !== href ? href : undefined}
         >
-            <Flex alignItems="center">
-                <Text textDecoration={pathname === href ? "underline" : ""}>
-                    {linkText}
-                </Text>
-                {icon && (
-                    <IconButton
-                        color="inherit"
-                        height="30px"
-                        variant="ghost"
-                        aria-label={linkText}
-                        fontSize="2xl"
-                    >
-                        {icon}
-                    </IconButton>
-                )}
-            </Flex>
+            <Text>{linkText}</Text>
+            {icon && (
+                <Flex color="inherit" fontSize="sm">
+                    {icon}
+                </Flex>
+            )}
         </Link>
     );
 };

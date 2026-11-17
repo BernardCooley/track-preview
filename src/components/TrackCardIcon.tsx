@@ -21,7 +21,7 @@ const TrackCardIcon = ({
     return (
         <IconButton
             disabled={isDisabled}
-            p={[4, 6]}
+            p={[4, 5]}
             shadow="none"
             onClick={onClick}
             variant="ghost"
@@ -29,20 +29,25 @@ const TrackCardIcon = ({
             h="auto"
             colorPalette={colorPalette}
             aria-label={ariaLabel}
-            fontSize={["50px", "60px", "70px"]}
-            backgroundColor="brand.backgroundTertiaryOpaque"
+            fontSize={["44px", "56px", "64px"]}
+            bg="brand.surface"
+            border="1px solid"
+            borderColor="brand.border"
             rounded="full"
-            _selected={
-                canHover
-                    ? {
-                          transform: "scale(1.2)",
-                      }
-                    : {}
-            }
+            transition="all 0.2s ease"
             _hover={
                 canHover
                     ? {
-                          transform: "scale(1.2)",
+                          transform: "scale(1.1)",
+                          shadow: "lg",
+                          borderColor: "brand.borderHover",
+                      }
+                    : {}
+            }
+            _active={
+                canHover
+                    ? {
+                          transform: "scale(0.95)",
                       }
                     : {}
             }

@@ -1,7 +1,6 @@
 import "./styles/globals.css";
 import type { Metadata } from "next";
 import { Providers } from "./providers";
-import Image from "next/image";
 
 export const metadata: Metadata = {
     title: "Phoniquest",
@@ -16,13 +15,6 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body>
-                <Image
-                    className="page-background"
-                    src="/logo_background_4x_gradient.png"
-                    alt=""
-                    fill
-                    priority
-                />
                 <Providers>{children}</Providers>
             </body>
         </html>

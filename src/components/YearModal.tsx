@@ -60,125 +60,137 @@ const YearModal = ({
             <Dialog.Backdrop />
             <Dialog.Positioner>
                 <Dialog.Content
-                    rounded={20}
-                    m={6}
-                    bg="brand.backgroundPrimary"
+                    rounded="modal"
+                    m={[3, 6]}
+                    bg="brand.bg"
                     shadow="2xl"
                     border="1px solid"
-                    borderColor="brand.primary"
+                    borderColor="brand.border"
                 >
                     <Flex
-                        h="full"
                         w="full"
-                        bg="brand.backgroundPrimary"
-                        rounded={20}
-                        p={showYearSelector ? 4 : 0}
+                        rounded="modal"
+                        p={showYearSelector ? [4, 5] : 0}
+                        direction="column"
+                        gap={5}
                     >
-                        <Flex w="full" direction="column" gap={4}>
-                            <Text fontSize="xl" textAlign="center">
-                                Select Year Range
-                            </Text>
-                            <Flex
-                                justifyContent="space-between"
-                                gap={1}
-                                flexWrap="wrap"
+                        <Text
+                            fontSize="lg"
+                            fontWeight="semibold"
+                            textAlign="center"
+                            color="brand.textPrimary"
+                        >
+                            Select Year Range
+                        </Text>
+
+                        <Flex
+                            justifyContent="center"
+                            gap={1.5}
+                            flexWrap="wrap"
+                        >
+                            {decades.map((decade, index) => (
+                                <Button
+                                    key={decade.title}
+                                    variant={
+                                        decadeIndex === index
+                                            ? "subtle"
+                                            : "surface"
+                                    }
+                                    onClick={() => setDecadeIndex(index)}
+                                    height="34px"
+                                    fontSize="sm"
+                                    px={3}
+                                >
+                                    {decade.title}
+                                </Button>
+                            ))}
+                        </Flex>
+
+                        <Flex w="full" mt={2} px={[4, 6]} direction="column" gap={5}>
+                            <Text
+                                fontSize="xl"
+                                fontWeight="semibold"
+                                textAlign="center"
+                                color="brand.primary"
                             >
-                                {decades.map((decade, index) => (
-                                    <Button
-                                        _focusVisible={{
-                                            boxShadow: "none",
-                                        }}
-                                        fontSize={
-                                            decadeIndex === index ? "lg" : "md"
-                                        }
-                                        color={
-                                            decadeIndex === index
-                                                ? "brand.textPrimary"
-                                                : "brand.textPrimaryLight"
-                                        }
-                                        outline="1px solid"
-                                        outlineColor={
-                                            decadeIndex === index
-                                                ? "brand.primary"
-                                                : decadeIndex === null
-                                                ? "transparent"
-                                                : "brand.backgroundSecondary"
-                                        }
-                                        key={decade.title}
-                                        onClick={() => {
-                                            setDecadeIndex(index);
-                                        }}
-                                        variant="tertiary"
+                                {sliderValue[0]} - {sliderValue[1]}
+                            </Text>
+                            <RangeSlider
+                                min={1960}
+                                max={2023}
+                                defaultValue={[yearRange?.from, yearRange?.to]}
+                                value={sliderValue}
+                                onInput={(val: any) => {
+                                    setSliderValue(val as number[]);
+                                    setDecadeIndex(null);
+                                }}
+                            />
+                            <Flex justifyContent="space-between" h={6}>
+                                {sliderMarks.map((year) => (
+                                    <Flex
+                                        key={year}
+                                        direction="column"
+                                        alignItems="center"
+                                        gap={1}
                                     >
-                                        {decade.title}
-                                    </Button>
+                                        <Separator
+                                            orientation="vertical"
+                                            borderColor="brand.border"
+                                        />
+                                        <Text
+                                            fontSize="xs"
+                                            color="brand.textMuted"
+                                            userSelect="none"
+                                        >
+                                            {year}
+                                        </Text>
+                                    </Flex>
                                 ))}
                             </Flex>
-                            <Flex w="full" mt={6} px={8} direction="column" gap={6}>
-                                <Text
-                                    fontSize="xl"
-                                    textAlign="center"
-                                >{`${sliderValue[0]} - ${sliderValue[1]}`}</Text>
-                                <RangeSlider
-                                    min={1960}
-                                    max={2023}
-                                    defaultValue={[yearRange?.from, yearRange?.to]}
-                                    value={sliderValue}
-                                    onInput={(val: any) => {
-                                        setSliderValue(val as number[]);
-                                        setDecadeIndex(null);
-                                    }}
-                                />
-                                <Flex justifyContent="space-between" h={8}>
-                                    {sliderMarks.map((year) => (
-                                        <Flex
-                                            key={year}
-                                            direction="column"
-                                            alignItems="center"
-                                        >
-                                            <Separator orientation="vertical" />
-                                            <Text userSelect="none">{year}</Text>
-                                        </Flex>
-                                    ))}
-                                </Flex>
-                            </Flex>
-                            <Flex gap={4} mt={6} justifyContent="flex-end">
-                                <Button
-                                    disabled={
-                                        sliderValue[0] === 1960 &&
-                                        sliderValue[1] === getCurrentYear()
-                                    }
-                                    onClick={() => {
-                                        setSliderValue([1960, getCurrentYear()]);
-                                    }}
-                                    variant="primary"
-                                >
-                                    All years
-                                </Button>
-                                <Button
-                                    disabled={
-                                        sliderValue[0] === yearRange.from &&
-                                        sliderValue[1] === yearRange.to
-                                    }
-                                    loading={setButtonLoading}
-                                    onClick={() => {
-                                        setSetButtonLoading(true);
-                                        onConfirm({
-                                            from: sliderValue[0] as number,
-                                            to: sliderValue[1] as number,
-                                        });
-                                        setTimeout(() => {
-                                            setSetButtonLoading(false);
-                                        }, 1000);
-                                    }}
-                                    variant="primary"
-                                >
-                                    Confirm
-                                </Button>
-                                <Button onClick={() => onCancel()} variant="cancel">
-                                    Cancel
-                                </Button>
-                            </Flex>
+                        </Flex>
+
+                        <Flex gap={3} mt={2} justifyContent="flex-end">
+                            <Button
+                                disabled={
+                                    sliderValue[0] === 1960 &&
+                                    sliderValue[1] === getCurrentYear()
+                                }
+                                onClick={() => {
+                                    setSliderValue([1960, getCurrentYear()]);
+                                }}
+                                variant="outline"
+                                height="42px"
+                            >
+                                All years
+                            </Button>
+                            <Button
+                                disabled={
+                                    sliderValue[0] === yearRange.from &&
+                                    sliderValue[1] === yearRange.to
+                                }
+                                loading={setButtonLoading}
+                                onClick={() => {
+                                    setSetButtonLoading(true);
+                                    onConfirm({
+                                        from: sliderValue[0] as number,
+                                        to: sliderValue[1] as number,
+                                    });
+                                    setTimeout(() => {
+                                        setSetButtonLoading(false);
+                                    }, 1000);
+                                }}
+                                variant="primary"
+                                height="42px"
+                            >
+                                Confirm
+                            </Button>
+                            <Button
+                                onClick={() => onCancel()}
+                                variant="cancel"
+                                height="42px"
+                            >
+                                Cancel
+                            </Button>
                         </Flex>
                     </Flex>
                 </Dialog.Content>

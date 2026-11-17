@@ -112,87 +112,75 @@ const SignIn = () => {
     };
 
     return (
-        <Flex direction="column" w={["100%", "100%", "70%", "60%"]}>
+        <Flex direction="column" w="full" maxW="420px" mx="auto">
             <form
                 onSubmit={handleSubmit(performLogin)}
                 style={{ height: "100%" }}
             >
                 <Flex
                     direction="column"
-                    gap="18px"
-                    p={[6, 12, 20]}
-                    pt={10}
-                    justifyContent="space-between"
-                    height="full"
+                    gap={5}
+                    p={[5, 6]}
                 >
-                    <Flex direction="column" gap={8}>
-                        <TextInput
-                            required={true}
-                            title="Email"
-                            size="md"
-                            fieldProps={register("email")}
-                            error={errors.email?.message}
-                        />
-                        <TextInput
-                            type={showPassword ? "text" : "password"}
-                            required={true}
-                            title="Password"
-                            size="md"
-                            fieldProps={register("password")}
-                            error={errors.password?.message}
-                            rightIcon={
-                                <IconButton
-                                    _hover={{
-                                        bg: "transparent",
-                                        color: "brand.primary",
-                                        transform: "scale(1.2)",
-                                    }}
-                                    shadow="lg"
-                                    height="30px"
-                                    position="absolute"
-                                    right={2}
-                                    top={8}
-                                    onClick={() =>
-                                        setShowPassword((prev) => !prev)
-                                    }
-                                    variant="ghost"
-                                    h={1 / 2}
-                                    colorPalette="teal"
-                                    aria-label="Show password"
-                                    fontSize="3xl"
-                                >
-                                    {showPassword ? (
-                                        <VisibilityIcon fontSize="inherit" />
-                                    ) : (
-                                        <VisibilityOffIcon fontSize="inherit" />
-                                    )}
-                                </IconButton>
-                            }
-                        />
-                        <Button
-                            loading={submitting}
-                            type="submit"
-                            variant="primary"
-                            onClick={handleSubmit(performLogin)}
-                        >
-                            Sign In
-                        </Button>
-                        <Flex gap={2}>
-                            <Link
-                                href="/resetPassword"
-                                variant="underline"
-                                colorPalette="primary"
+                    <TextInput
+                        required={true}
+                        title="Email"
+                        size="md"
+                        fieldProps={register("email")}
+                        error={errors.email?.message}
+                    />
+                    <TextInput
+                        type={showPassword ? "text" : "password"}
+                        required={true}
+                        title="Password"
+                        size="md"
+                        fieldProps={register("password")}
+                        error={errors.password?.message}
+                        rightIcon={
+                            <IconButton
+                                position="absolute"
+                                right={2}
+                                top="50%"
+                                transform="translateY(-50%)"
+                                variant="tertiary"
+                                onClick={() =>
+                                    setShowPassword((prev) => !prev)
+                                }
+                                aria-label="Toggle password visibility"
+                                color="brand.textMuted"
                             >
-                                <Text>Forgot password</Text>
-                            </Link>
-                        </Flex>
-                    </Flex>
+                                {showPassword ? (
+                                    <VisibilityIcon fontSize="small" />
+                                ) : (
+                                    <VisibilityOffIcon fontSize="small" />
+                                )}
+                            </IconButton>
+                        }
+                    />
+                    <Button
+                        loading={submitting}
+                        type="submit"
+                        variant="primary"
+                        w="full"
+                        onClick={handleSubmit(performLogin)}
+                    >
+                        Sign In
+                    </Button>
+                    <Link
+                        href="/resetPassword"
+                        variant="primary"
+                        fontSize="sm"
+                    >
+                        Forgot password?
+                    </Link>
                 </Flex>
             </form>
             {authError && (
-                <Box h="16px" mt="8px">
+                <Box px={[5, 6]}>
                     <Field.Root invalid>
-                        <Field.ErrorText>{authError}</Field.ErrorText>
+                        <Field.ErrorText fontSize="sm">
+                            {authError}
+                        </Field.ErrorText>
                     </Field.Root>
                 </Box>
             )}

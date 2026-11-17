@@ -3,10 +3,9 @@
 import {
     Box,
     Button,
-    Center,
     Flex,
     Grid,
-    Stack,
+    Text,
 } from "@chakra-ui/react";
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import AudioPlayer from "@/components/AudioPlayer";
@@ -69,7 +68,6 @@ function ExploreContent() {
 
     useEffect(() => {
         const reviewStep = searchParams?.get("reviewStep");
-
         if (reviewStep) {
             setCurrentStep(parseInt(reviewStep));
         }
@@ -84,26 +82,10 @@ function ExploreContent() {
     }, [currentlyPlaying]);
 
     const tabButtons = [
-        {
-            name: "Step 1",
-            icon: <LooksOneIcon />,
-            onClick: () => router.push("/explore?reviewStep=1"),
-        },
-        {
-            name: "Step 2",
-            icon: <LooksTwoIcon />,
-            onClick: () => router.push("/explore?reviewStep=2"),
-        },
-        {
-            name: "Step 3",
-            icon: <Looks3Icon />,
-            onClick: () => router.push("/explore?reviewStep=3"),
-        },
-        {
-            name: "Step 4",
-            icon: <LibraryMusicIcon />,
-            onClick: () => router.push("/explore?reviewStep=4"),
-        },
+        { name: "Step 1", label: "Discover", icon: <LooksOneIcon style={{ fontSize: "20px" }} /> },
+        { name: "Step 2", label: "Review", icon: <LooksTwoIcon style={{ fontSize: "20px" }} /> },
+        { name: "Step 3", label: "Final", icon: <Looks3Icon style={{ fontSize: "20px" }} /> },
+        { name: "Step 4", label: "Library", icon: <LibraryMusicIcon style={{ fontSize: "20px" }} /> },
     ];
 
     const showAudioPlayer =
@@ -112,63 +94,61 @@ function ExploreContent() {
         currentlyPlaying.length > 0;
 
     return (
-        <Box h="full" m={0} overflowY="hidden" ref={pageRef}>
+        <Flex direction="column" h="100vh" ref={pageRef} bg="brand.bg">
             <Header />
-            <Center h="full">
-                <Flex direction="column" w="full" h="full">
-                    <Stack
-                        gap={0}
-                        w="full"
-                        position="relative"
-                        transition="ease-in-out"
-                        transitionDuration="200ms"
-                        h="full"
+            <Grid
+                templateColumns="repeat(4, 1fr)"
+                w="full"
+                borderBottom="1px solid"
+                borderBottomColor="brand.divider"
+                bg="brand.bg"
+            >
+                {tabButtons.map((button, index) => (
+                    <Button
+                        key={button.name}
+                        variant={currentStep === index + 1 ? "tabSelected" : "tabDeselected"}
+                        onClick={() =>
+                            router.push(`/explore?reviewStep=${index + 1}`)
+                        }
+                        gap={2}
                     >
-                        <Grid templateColumns="repeat(4, 1fr)" w="full">
-                            {tabButtons.map((button, index) => (
-                                <Button
-                                    key={button.name}
-                                    variant={
-                                        currentStep === index + 1
-                                            ? "tabSelected"
-                                            : "tabDeselected"
-                                    }
-                                    rounded="none"
-                                    onClick={() =>
-                                        router.push(
-                                            `/explore?reviewStep=${index + 1}`
-                                        )
-                                    }
-                                >
-                                    {button.icon}
-                                </Button>
-                            ))}
-                        </Grid>
+                        {button.icon}
+                        <Text
+                            display={["none", "inline"]}
+                            fontSize="sm"
+                        >
+                            {button.label}
+                        </Text>
+                    </Button>
+                ))}
+            </Grid>
 
-                        {reviewStep &&
-                            Number(reviewStep) >= 1 &&
-                            reviewStep &&
-                            Number(reviewStep) <= 3 && (
-                                <TrackReview reviewStep={Number(reviewStep)} />
-                            )}
-                        {reviewStep && Number(reviewStep) === 4 && <Library />}
-                    </Stack>
-                    <Box
-                        position="fixed"
-                        bottom={0}
-                        left={0}
-                        right={0}
-                        zIndex={10}
-                        transform={showAudioPlayer ? "translateY(0)" : "translateY(100%)"}
-                        transition="transform 0.3s ease-in-out"
-                    >
-                        <Box p={4} mt="4" rounded="md" shadow="md">
-                            <AudioPlayer ref={audioElement} />
-                        </Box>
-                    </Box>
-                </Flex>
-            </Center>
-        </Box>
+            <Box flex={1} overflow="hidden" position="relative">
+                {reviewStep &&
+                    Number(reviewStep) >= 1 &&
+                    Number(reviewStep) <= 3 && (
+                        <TrackReview reviewStep={Number(reviewStep)} />
+                    )}
+                {reviewStep && Number(reviewStep) === 4 && <Library />}
+            </Box>
+
+            <Box
+                position="fixed"
+                bottom={0}
+                left={0}
+                right={0}
+                zIndex={10}
+                transform={showAudioPlayer ? "translateY(0)" : "translateY(100%)"}
+                transition="transform 0.3s ease-in-out"
+                bg="brand.bgSubtle"
+                borderTop="1px solid"
+                borderTopColor="brand.border"
+            >
+                <Box p={3}>
+                    <AudioPlayer ref={audioElement} />
+                </Box>
+            </Box>
+        </Flex>
     );
 }
 

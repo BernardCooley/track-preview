@@ -1,5 +1,4 @@
 import {
-    Separator,
     Flex,
     IconButton,
     Text,
@@ -14,54 +13,47 @@ import { usePathname } from "next/navigation";
 const Header = () => {
     const pathname = usePathname();
     const { open: isOpen, onOpen, onClose } = useDisclosure();
+
     return (
         <>
-            <MenuDrawer
-                isOpen={isOpen}
-                onClose={onClose}
-            />
-            <IconButton
-                _hover={{
-                    bg: "transparent",
-                    color: "brand.primary",
-                    transform: "scale(1.2)",
-                }}
-                shadow="lg"
-                height="30px"
-                position="absolute"
-                right={6}
-                top={12}
-                onClick={onOpen}
-                variant="ghost"
-                h={1 / 2}
-                colorPalette="teal"
-                aria-label="Show password"
-                fontSize="3xl"
+            <MenuDrawer isOpen={isOpen} onClose={onClose} />
+            <Flex
+                w="full"
+                justifyContent="space-between"
+                alignItems="center"
+                px={[4, 6]}
+                py={3}
+                borderBottom="1px solid"
+                borderBottomColor="brand.divider"
+                bg="brand.bg"
+                position="sticky"
+                top={0}
+                zIndex={100}
             >
-                <MenuOpenIcon fontSize="inherit" />
-            </IconButton>
-            <Flex w="full" justifyContent="center" mt={6}>
-                <Flex
-                    alignItems="center"
-                    height="50px"
-                    fontSize={["3xl", "5xl"]}
-                    fontFamily="brand"
-                    backgroundImage={"url(/logo_1x.png)"}
-                    backgroundSize="100% 100%"
-                    backgroundRepeat="no-repeat"
+                <Link href={pathname !== "/explore" ? "/explore" : ""}>
+                    <Text
+                        userSelect="none"
+                        fontSize={["lg", "xl"]}
+                        fontFamily="brand"
+                        color="brand.textPrimary"
+                        letterSpacing="wide"
+                        _hover={{
+                            color: "brand.primary",
+                        }}
+                        transition="color 0.2s ease"
+                    >
+                        PHONIQUEST
+                    </Text>
+                </Link>
+                <IconButton
+                    variant="tertiary"
+                    onClick={onOpen}
+                    aria-label="Open menu"
+                    color="brand.textSecondary"
                 >
-                    <Link href={pathname !== "/explore" ? "/explore" : ""}>
-                        <Text
-                            userSelect="none"
-                            fontSize="2xl"
-                            color="brand.backgroundLightPrimary"
-                        >
-                            PHONIQUEST
-                        </Text>
-                    </Link>
-                </Flex>
+                    <MenuOpenIcon fontSize="small" />
+                </IconButton>
             </Flex>
-            <Separator mt={4} />
         </>
     );
 };

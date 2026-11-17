@@ -39,58 +39,61 @@ const DeleteTrackDialog = ({
             <Dialog.Backdrop />
             <Dialog.Positioner>
                 <Dialog.Content
-                    m={6}
-                    bg="brand.backgroundPrimary"
+                    m={[3, 6]}
+                    bg="brand.bg"
                     shadow="2xl"
                     border="1px solid"
-                    borderColor="brand.primary"
+                    borderColor="brand.border"
+                    rounded="modal"
                 >
-                    <Dialog.Header fontSize="lg" fontWeight="bold">
+                    <Dialog.Header
+                        fontSize="lg"
+                        fontWeight="semibold"
+                        color="brand.textPrimary"
+                        borderBottom="1px solid"
+                        borderBottomColor="brand.divider"
+                    >
                         Delete Track
                     </Dialog.Header>
 
-                    <Dialog.Body>
-                        <Flex direction="column" gap={2}>
-                            <Text>Are you sure you want to delete...</Text>
-                            <Flex
-                                direction="column"
-                                bg="brand.backgroundTertiaryOpaque"
-                                p={2}
-                                rounded="md"
+                    <Dialog.Body py={5}>
+                        <Flex direction="column" gap={3}>
+                            <Text color="brand.textSecondary">
+                                Are you sure you want to delete...
+                            </Text>
+                            <Box
+                                bg="brand.surface"
+                                border="1px solid"
+                                borderColor="brand.border"
+                                p={3}
+                                rounded="lg"
                             >
-                                <Text fontSize="xl" fontWeight="bold">
-                                    {
-                                        reviewTracks[4].tracks[
-                                            trackToDelete!
-                                        ]?.artist
-                                    }
+                                <Text
+                                    fontSize="md"
+                                    fontWeight="semibold"
+                                    color="brand.textPrimary"
+                                >
+                                    {reviewTracks[4].tracks[trackToDelete!]?.artist}
                                 </Text>
-                                <Text fontSize="md" fontWeight="bold">
-                                    {
-                                        reviewTracks[4].tracks[
-                                            trackToDelete!
-                                        ]?.title
-                                    }
+                                <Text fontSize="sm" color="brand.textSecondary">
+                                    {reviewTracks[4].tracks[trackToDelete!]?.title}
                                 </Text>
-                            </Flex>
-                            <Text>
+                            </Box>
+                            <Text fontSize="sm" color="brand.textMuted">
                                 You cannot undo this action afterwards.
                             </Text>
                         </Flex>
                     </Dialog.Body>
 
-                    <Dialog.Footer>
-                        <Button
-                            variant="primary"
-                            onClick={closeDialog}
-                        >
+                    <Dialog.Footer
+                        borderTop="1px solid"
+                        borderTopColor="brand.divider"
+                        gap={3}
+                    >
+                        <Button variant="outline" onClick={closeDialog}>
                             Cancel
                         </Button>
-                        <Button
-                            colorPalette="red"
-                            onClick={deleteTrack}
-                            ml={3}
-                        >
+                        <Button variant="warning" onClick={deleteTrack}>
                             Delete
                         </Button>
                     </Dialog.Footer>

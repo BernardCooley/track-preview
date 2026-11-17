@@ -32,7 +32,7 @@ const ProgressStepper = ({ onStepChange, currentStep }: Props) => {
                 {steps.map((step, index) => (
                     <Steps.Item key={index} index={index}>
                         <Button
-                            py={4}
+                            py={3}
                             h="auto"
                             variant="ghost"
                             onClick={() => {

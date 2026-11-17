@@ -36,7 +36,7 @@ export const TextInput = forwardRef(
     (
         {
             placeholder = "",
-            height = "70px",
+            height = "48px",
             size,
             title = "",
             error,
@@ -56,22 +56,29 @@ export const TextInput = forwardRef(
     ) => {
         return (
             <Field.Root invalid={error ? true : false} style={styles}>
-                <Field.Label fontSize="lg" mb={0}>
-                    <Flex>
-                        <Box>{title}</Box>
-                        {required && (
-                            <Box color="gpRed.500" pl={1}>
-                                *
-                            </Box>
-                        )}
-                    </Flex>
-                </Field.Label>
-                {allowHelperText && (
-                    <Field.HelperText
+                {title && (
+                    <Field.Label
                         fontSize="sm"
-                        py={2}
+                        fontWeight="medium"
+                        color="brand.textSecondary"
+                        mb={1}
+                    >
+                        <Flex>
+                            <Box>{title}</Box>
+                            {required && (
+                                <Box color="brand.error" pl={1}>
+                                    *
+                                </Box>
+                            )}
+                        </Flex>
+                    </Field.Label>
+                )}
+                {allowHelperText && helperText && (
+                    <Field.HelperText
+                        fontSize="xs"
+                        py={1}
                         mt={0}
-                        color="brand.lightTitle"
+                        color="brand.textMuted"
                     >
                         {helperText}
                     </Field.HelperText>
@@ -90,23 +97,31 @@ export const TextInput = forwardRef(
                         boxSizing="border-box"
                         size={size}
                         aria-label={title}
+                        bg="brand.inputBg"
                         border="1px solid"
-                        borderColor="brand.backgroundPrimary"
-                        shadow="md"
-                        backgroundColor="brand.backgroundTertiaryOpaque"
-                        color="white"
+                        borderColor="brand.inputBorder"
+                        rounded="input"
+                        color="brand.textPrimary"
+                        fontSize="md"
+                        transition="all 0.2s ease"
+                        _placeholder={{
+                            color: "brand.textMuted",
+                        }}
                         _focus={{
-                            shadow: "xl",
-                            borderColor: "brand.primary",
+                            borderColor: "brand.borderFocus",
+                            shadow: "0 0 0 1px var(--chakra-colors-brand-border-focus)",
                         }}
                         _invalid={{
                             borderColor: "brand.error",
+                            shadow: "0 0 0 1px var(--chakra-colors-brand-error)",
                         }}
                     />
                 </InputGroup>
                 {allowErrors && (
-                    <Box h="16px" mt="8px">
-                        <Field.ErrorText>{error}</Field.ErrorText>
+                    <Box h="16px" mt="6px">
+                        <Field.ErrorText fontSize="xs">
+                            {error}
+                        </Field.ErrorText>
                     </Box>
                 )}
             </Field.Root>

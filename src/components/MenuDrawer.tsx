@@ -25,18 +25,25 @@ const MenuDrawer = ({ isOpen, onClose }: Props) => {
             <Drawer.Backdrop />
             <Drawer.Positioner>
                 <Drawer.Content
-                    background="linear-gradient(to bottom, var(--chakra-colors-brand-background-primary), var(--chakra-colors-brand-background-secondary))"
+                    bg="brand.bg"
+                    borderLeft="1px solid"
+                    borderLeftColor="brand.border"
                 >
-                    <Drawer.CloseTrigger top={4} fontSize="md" />
-                    <Drawer.Header>Menu</Drawer.Header>
-                    <Separator />
-                    <Drawer.Body>
-                        <Flex
-                            direction="column"
-                            gap={6}
-                            pt={4}
-                            alignItems="center"
-                        >
+                    <Drawer.CloseTrigger
+                        top={4}
+                        color="brand.textMuted"
+                        _hover={{ color: "brand.textPrimary" }}
+                    />
+                    <Drawer.Header
+                        color="brand.textPrimary"
+                        fontWeight="semibold"
+                        borderBottom="1px solid"
+                        borderBottomColor="brand.divider"
+                    >
+                        Menu
+                    </Drawer.Header>
+                    <Drawer.Body pt={6}>
+                        <Flex direction="column" gap={2}>
                             <MenuDrawerItem
                                 pathname={pathname}
                                 linkText="Home"
@@ -50,14 +57,14 @@ const MenuDrawer = ({ isOpen, onClose }: Props) => {
                         </Flex>
                     </Drawer.Body>
 
-                    <Separator />
+                    <Separator borderColor="brand.divider" />
 
-                    <Drawer.Footer>
+                    <Drawer.Footer justifyContent="flex-start">
                         <MenuDrawerItem
                             pathname={pathname}
                             linkText="Contact"
                             href="mailto:info@phoniquest.com"
-                            icon={<OpenInNewIcon />}
+                            icon={<OpenInNewIcon style={{ fontSize: "16px" }} />}
                         />
                     </Drawer.Footer>
                 </Drawer.Content>

@@ -26,29 +26,37 @@ const FullTrackLinks = ({ currentTrack, onLinkClicked }: Props) => {
     ];
 
     return (
-        <Flex gap={2} w="full" py={2} direction="column" alignItems="center">
-            <Text fontSize={[16, 20]}>Listen to the full track</Text>
-            <Flex w="70%" justifyContent="space-around" flexWrap="wrap">
+        <Flex
+            gap={2}
+            w="full"
+            py={3}
+            direction="column"
+            alignItems="center"
+        >
+            <Text fontSize="sm" color="brand.textMuted">
+                Listen to the full track
+            </Text>
+            <Flex gap={4} justifyContent="center" flexWrap="wrap">
                 {links.map((link) => (
                     <Link
                         onClick={onLinkClicked}
-                        rounded="12px"
-                        pt={0}
-                        pb={1}
-                        px={2}
+                        rounded="lg"
+                        py={1}
+                        px={3}
                         key={link.title}
                         target="_blank"
                         rel="noopener noreferrer"
                         href={link.url}
+                        transition="all 0.2s ease"
                         _hover={{
-                            background: "brand.backgroundTertiaryOpaque3",
+                            bg: "brand.surfaceHover",
                         }}
                     >
-                        <Flex gap={2} direction="row" alignItems="center">
+                        <Flex gap={2} alignItems="center">
                             <link.icon
-                                style={{ fontSize: "28px", color: link.color }}
+                                style={{ fontSize: "22px", color: link.color }}
                             />
-                            <Text fontSize={["14px", "18px"]}>
+                            <Text fontSize="sm" color="brand.textSecondary">
                                 {link.title}
                             </Text>
                         </Flex>

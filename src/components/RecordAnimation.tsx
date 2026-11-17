@@ -40,8 +40,8 @@ const RecordAnimation = ({
             px={4}
             justifyContent="center"
             alignItems="center"
-            w={animate ? ["65px", "100px"] : "300px"}
-            h={animate ? ["65px", "100px"] : "300px"}
+            w={animate ? ["60px", "90px"] : "300px"}
+            h={animate ? ["60px", "90px"] : "300px"}
             rounded="full"
             bgImage="./vinyl.png"
             bgSize="cover"
@@ -53,7 +53,7 @@ const RecordAnimation = ({
                 h="50%"
                 rounded="full"
                 backgroundPosition="center"
-            ></Box>
+            />
         </MotionCenter>
     );
 };
