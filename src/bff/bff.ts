@@ -132,14 +132,6 @@ export const fetchITunesTrack = async ({
     }
 };
 
-export const scrapeJuno = async (): Promise<any[] | null> => {
-    const scrapedData: any[] | null = await fetchWithErrorHandling(
-        "/api/scrapeJuno",
-        "GET"
-    );
-    return scrapedData;
-};
-
 export const getSpotifyAccessToken = async (): Promise<AccessToken | null> => {
     const token: AccessToken | null = await fetchWithErrorHandling(
         "/api/getSpotifyAccessToken",
