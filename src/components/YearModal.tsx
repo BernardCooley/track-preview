@@ -211,7 +211,6 @@ const YearModal = ({
                                     setSliderValue([1960, getCurrentYear()]);
                                 }}
                                 variant="outline"
-                                height="42px"
                             >
                                 All years
                             </Button>
@@ -232,14 +231,12 @@ const YearModal = ({
                                     }, 1000);
                                 }}
                                 variant="primary"
-                                height="42px"
                             >
                                 Confirm
                             </Button>
                             <Button
                                 onClick={() => onCancel()}
                                 variant="cancel"
-                                height="42px"
                             >
                                 Cancel
                             </Button>

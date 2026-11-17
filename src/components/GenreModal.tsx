@@ -347,8 +347,6 @@ const GenreModal = ({
                                 flex="0 0 auto"
                                 onClick={onCancel}
                                 variant="cancel"
-                                height="44px"
-                                px={5}
                             >
                                 Cancel
                             </Button>
@@ -360,7 +358,6 @@ const GenreModal = ({
                                     setFilteredGenres([]);
                                 }}
                                 variant="primary"
-                                height="44px"
                             >
                                 Apply
                             </Button>
