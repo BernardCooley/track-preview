@@ -5,19 +5,18 @@ import {
     Text,
     useDisclosure,
 } from "@chakra-ui/react";
-import React, { forwardRef } from "react";
+import React from "react";
 import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import MenuDrawer from "./MenuDrawer";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const Header = forwardRef<HTMLButtonElement | undefined>((menuButtonRef) => {
+const Header = () => {
     const pathname = usePathname();
     const { isOpen, onOpen, onClose } = useDisclosure();
     return (
         <>
             <MenuDrawer
-                ref={menuButtonRef as any}
                 isOpen={isOpen}
                 onClose={onClose}
             />
@@ -64,8 +63,6 @@ const Header = forwardRef<HTMLButtonElement | undefined>((menuButtonRef) => {
             <Divider mt={4} />
         </>
     );
-});
-
-Header.displayName = "Header";
+};
 
 export default Header;
