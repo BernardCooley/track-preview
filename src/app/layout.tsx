@@ -20,15 +20,9 @@ export default function RootLayout({
                     className="page-background"
                     src="/logo_background_4x_gradient.png"
                     alt=""
-                    width={
-                        typeof window !== "undefined" ? window.innerWidth : 1920
-                    }
-                    height={
-                        typeof window !== "undefined"
-                            ? window.innerHeight
-                            : 1080
-                    }
-                ></Image>
+                    fill
+                    priority
+                />
                 <Providers>{children}</Providers>
             </body>
         </html>
