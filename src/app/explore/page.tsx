@@ -78,7 +78,7 @@ function ExploreContent() {
 
     useEffect(() => {
         if (currentlyPlaying !== undefined) {
-            audioElement.current?.play();
+            audioElement.current?.play().catch(() => {});
         } else {
             audioElement.current?.pause();
         }
@@ -123,7 +123,7 @@ function ExploreContent() {
                         <Grid templateColumns="repeat(4, 1fr)" w="full">
                             {tabButtons.map((button, index) => (
                                 <Button
-                                    rightIcon={<>{button.icon}</>}
+                                    rightIcon={button.icon}
                                     key={button.name}
                                     variant={
                                         currentStep === index + 1
