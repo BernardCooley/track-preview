@@ -176,6 +176,7 @@ const TrackReviewCard = ({
                                     autoPlayAfterSrcChange={autoplay}
                                     header={
                                         <Flex
+                                            data-track-info
                                             alignItems="center"
                                             direction="column"
                                             gap={1}

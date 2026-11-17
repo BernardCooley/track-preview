@@ -136,6 +136,7 @@ function ExploreContent() {
                     {tabButtons.map((button, index) => (
                         <Button
                             key={button.name}
+                            data-tab-step={index + 1}
                             variant={currentStep === index + 1 ? "tabSelected" : "tabDeselected"}
                             onClick={() =>
                                 router.push(`/explore?reviewStep=${index + 1}`)

@@ -18,7 +18,6 @@ import { mutateUserProfile } from "@/bff/bff";
 import { genres } from "../../data/genres";
 import { useTrackReview } from "@/hooks/useTrackReview";
 import RecordAnimation from "./RecordAnimation";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import TracklistTable from "./TracklistTable";
 
 interface Props {
@@ -58,16 +57,8 @@ const TrackReview = memo(
         const [animationImage, setAnimationImage] = useState<string>("");
         const { open: isShowingTracklist, onToggle: toggleTracklist } =
             useDisclosure();
-        const [windowWidth, setWindowWidth] = useState(0);
-        const animationDuration = 0.7;
+        const animationDuration = 1.4;
         const [animate, setAnimate] = useState<"like" | "dislike" | null>(null);
-
-        useEffect(() => {
-            setWindowWidth(window.innerWidth);
-            const handleResize = () => setWindowWidth(window.innerWidth);
-            window.addEventListener("resize", handleResize);
-            return () => window.removeEventListener("resize", handleResize);
-        }, []);
 
         useEffect(() => {
             if (currentTrack) {
@@ -186,24 +177,10 @@ const TrackReview = memo(
                 {animate && (
                     <RecordAnimation
                         animate={animate}
-                        leftPosition={(windowWidth / 4) * reviewStep}
+                        reviewStep={reviewStep}
                         animationDuration={animationDuration}
                         image={animationImage}
                     />
-                )}
-
-                {animate === "dislike" && (
-                    <Flex
-                        position="absolute"
-                        top={300}
-                        width="full"
-                        justifyContent="center"
-                        zIndex={100}
-                    >
-                        <Box color="brand.dislike" opacity={0.6}>
-                            <DeleteOutlineIcon style={{ fontSize: "160px" }} />
-                        </Box>
-                    </Flex>
                 )}
 
                 <Flex
