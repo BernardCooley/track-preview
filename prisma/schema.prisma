@@ -47,7 +47,7 @@ model Review {
 model Track {
   id            String    @id @default(cuid())
   platform      String
-  platformId    String
+  platformId    String    @unique
   purchaseUrl   String
   artist        String
   releaseTitle  String
