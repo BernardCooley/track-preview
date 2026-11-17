@@ -176,12 +176,10 @@ const TrackReview = memo(
                 <YearModal
                     showYearSelector={showYearSelector}
                     setShowYearSelector={setShowYearSelector}
-                    yearRange={
-                        {
-                            from: userProfile?.yearFrom || 1960,
-                            to: userProfile?.yearTo || getCurrentYear(),
-                        } || { from: 1960, to: getCurrentYear() }
-                    }
+                    yearRange={{
+                        from: userProfile?.yearFrom || 1960,
+                        to: userProfile?.yearTo || getCurrentYear(),
+                    }}
                     onConfirm={(val) => onYearConfirm(val)}
                     onCancel={() => setShowYearSelector(false)}
                 />
@@ -205,12 +203,10 @@ const TrackReview = memo(
                             }
                             profileLoaded={userProfile ? true : false}
                             genres={userProfile?.genres}
-                            yearRange={
-                                {
-                                    from: userProfile?.yearFrom || 1960,
-                                    to: userProfile?.yearTo || getCurrentYear(),
-                                } || { from: 1960, to: getCurrentYear() }
-                            }
+                            yearRange={{
+                                from: userProfile?.yearFrom || 1960,
+                                to: userProfile?.yearTo || getCurrentYear(),
+                            }}
                         />
                     )}
                 </Box>

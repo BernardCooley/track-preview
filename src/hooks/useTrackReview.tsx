@@ -55,14 +55,32 @@ export const useTrackReview = (reviewStep: number) => {
     }, [userProfile]);
 
     useEffect(() => {
+        let revoked = false;
+        let objectUrl = "";
+
         if (currentTrack) {
             setListened(false);
             setIsPlaying(false);
             setResolvedPreviewUrl("");
-            resolvePreviewUrl(currentTrack.id).then((url) => {
-                if (url) setResolvedPreviewUrl(url);
+            resolvePreviewUrl(currentTrack.id).then(async (proxyUrl) => {
+                if (!proxyUrl || revoked) return;
+                try {
+                    const res = await fetch(proxyUrl);
+                    if (!res.ok || revoked) return;
+                    const blob = await res.blob();
+                    if (revoked) return;
+                    objectUrl = URL.createObjectURL(blob);
+                    setResolvedPreviewUrl(objectUrl);
+                } catch {
+                    // fall through — no preview available
+                }
             });
         }
+
+        return () => {
+            revoked = true;
+            if (objectUrl) URL.revokeObjectURL(objectUrl);
+        };
     }, [currentTrack]);
 
     const getTracks = useCallback(async () => {

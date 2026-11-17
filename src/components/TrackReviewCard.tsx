@@ -194,7 +194,7 @@ const TrackReviewCard = ({
                                     </Flex>
                                 }
                                 autoPlay={autoplay}
-                                src={previewUrl || ""}
+                                src={previewUrl || undefined}
                                 showJumpControls={false}
                                 showSkipControls={true}
                                 onClickNext={() => {

@@ -1,6 +1,5 @@
-import { Menu, MenuButton, MenuItem, MenuList } from "@chakra-ui/menu";
+import { Menu, MenuButton, MenuItem, MenuList, Button } from "@chakra-ui/react";
 import React from "react";
-import { Button } from "@chakra-ui/button";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 
 interface TrackOptionsProps {
