@@ -13,7 +13,7 @@ model User {
   id         String   @id @default(cuid())
   firebaseId String
   autoplay   Boolean  @default(false)
-  genre      String   @default("all")
+  genres     String[] @default(["all"])
   yearFrom   Int      @default(1960)
   yearTo     Int      @default(dbgenerated("extract(year from now())::int"))
   Review     Review[]

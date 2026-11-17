@@ -18,8 +18,8 @@ import SearchTwoToneIcon from "@mui/icons-material/SearchTwoTone";
 interface Props {
     showGenreSelector: boolean;
     setShowGenreSelector: React.Dispatch<React.SetStateAction<boolean>>;
-    genre: string;
-    onGenreSelect: (genre: string) => void;
+    selectedGenres: string[];
+    onApply: (genres: string[]) => void;
     availableGenres: string[];
     onFavouriteClearClick?: () => void;
     recentGenres?: string[];
@@ -29,8 +29,8 @@ interface Props {
 const GenreModal = ({
     showGenreSelector,
     setShowGenreSelector,
-    genre,
-    onGenreSelect,
+    selectedGenres,
+    onApply,
     availableGenres,
     onFavouriteClearClick,
     recentGenres,
@@ -41,6 +41,13 @@ const GenreModal = ({
     const [filteredGenres, setFilteredGenres] = useState<string[]>([]);
     const [genres, setGenres] = useState<string[]>([]);
     const [isSearching, setIsSearching] = useState<boolean>(false);
+    const [localSelection, setLocalSelection] = useState<string[]>(selectedGenres);
+
+    useEffect(() => {
+        if (showGenreSelector) {
+            setLocalSelection(selectedGenres);
+        }
+    }, [showGenreSelector]);
 
     useEffect(() => {
         if (isSearching) {
@@ -67,6 +74,33 @@ const GenreModal = ({
         }
     }, [searchValue]);
 
+    const isSelected = (gen: string) => localSelection.includes(gen);
+    const isAllSelected =
+        localSelection.length === 0 ||
+        localSelection.some((g) => g.toLowerCase() === "all");
+
+    const toggleGenre = (gen: string) => {
+        setLocalSelection((prev) => {
+            const withoutAll = prev.filter((g) => g.toLowerCase() !== "all");
+            if (prev.includes(gen)) {
+                const next = withoutAll.filter((g) => g !== gen);
+                return next.length === 0 ? ["all"] : next;
+            }
+            return [...withoutAll, gen];
+        });
+    };
+
+    const selectAll = () => {
+        setLocalSelection(["all"]);
+    };
+
+    const handleClose = () => {
+        setShowGenreSelector(false);
+        setSearchValue("");
+        setIsSearching(false);
+        setFilteredGenres([]);
+    };
+
     const getFormattedGenres = (genres: string[]) => {
         const firstCharacters = Array.from(
             new Set(genres.map((gen) => gen.charAt(0)))
@@ -85,12 +119,7 @@ const GenreModal = ({
     return (
         <Modal
             isOpen={showGenreSelector}
-            onClose={() => {
-                setShowGenreSelector(false);
-                setSearchValue("");
-                setIsSearching(false);
-                setFilteredGenres([]);
-            }}
+            onClose={handleClose}
         >
             <ModalOverlay />
             <ModalContent
@@ -120,7 +149,7 @@ const GenreModal = ({
                         alignItems="flex-end"
                     >
                         <Text fontSize="xl" textAlign="center" w="full">
-                            Select genre
+                            Select genres
                         </Text>
                         {isSearching ? (
                             <TextInput
@@ -210,7 +239,10 @@ const GenreModal = ({
                                         <Text>Recent</Text>
                                         {recentGenres.length > 1 && (
                                             <Button
-                                                onClick={onFavouriteClearClick}
+                                                onClick={() => {
+                                                    setLocalSelection(["all"]);
+                                                    onFavouriteClearClick?.();
+                                                }}
                                                 variant="unstyled"
                                                 shadow="none"
                                                 color="brand.primary"
@@ -232,16 +264,14 @@ const GenreModal = ({
                                                 width="auto"
                                                 userSelect="none"
                                                 padding={2}
-                                                onClick={() =>
-                                                    onGenreSelect(gen)
-                                                }
+                                                onClick={() => toggleGenre(gen)}
                                                 bg={
-                                                    genre === gen
+                                                    isSelected(gen)
                                                         ? "brand.primaryOpaque"
                                                         : "transparent"
                                                 }
                                                 borderColor={
-                                                    genre === gen
+                                                    isSelected(gen)
                                                         ? "brand.primaryLight"
                                                         : "brand.primaryOpaque"
                                                 }
@@ -250,18 +280,16 @@ const GenreModal = ({
                                                         ? {}
                                                         : {
                                                               cursor: "pointer",
-                                                              bg:
-                                                                  genre === gen
-                                                                      ? "transparent"
-                                                                      : "brand.primaryOpaque",
-                                                              borderColor:
-                                                                  genre === gen
-                                                                      ? "brand.primaryOpaque"
-                                                                      : "brand.primaryLight",
+                                                              bg: isSelected(gen)
+                                                                  ? "transparent"
+                                                                  : "brand.primaryOpaque",
+                                                              borderColor: isSelected(gen)
+                                                                  ? "brand.primaryOpaque"
+                                                                  : "brand.primaryLight",
                                                           }
                                                 }
                                                 variant="filter"
-                                                key={genre}
+                                                key={gen}
                                                 size="xs"
                                                 fontSize="12px"
                                             >
@@ -286,19 +314,14 @@ const GenreModal = ({
                             {!isSearching && (
                                 <Tag
                                     width="auto"
-                                    onClick={() => {
-                                        onGenreSelect("all");
-                                        setSearchValue("");
-                                        setIsSearching(false);
-                                        setFilteredGenres([]);
-                                    }}
+                                    onClick={selectAll}
                                     bg={
-                                        genre === "all"
+                                        isAllSelected
                                             ? "brand.primaryOpaque"
                                             : "transparent"
                                     }
                                     borderColor={
-                                        genre === "all"
+                                        isAllSelected
                                             ? "brand.primaryLight"
                                             : "brand.primaryOpaque"
                                     }
@@ -307,18 +330,15 @@ const GenreModal = ({
                                             ? {}
                                             : {
                                                   cursor: "pointer",
-                                                  bg:
-                                                      genre === "all"
-                                                          ? "transparent"
-                                                          : "brand.primaryOpaque",
-                                                  borderColor:
-                                                      genre === "all"
-                                                          ? "brand.primaryOpaque"
-                                                          : "brand.primaryLight",
+                                                  bg: isAllSelected
+                                                      ? "transparent"
+                                                      : "brand.primaryOpaque",
+                                                  borderColor: isAllSelected
+                                                      ? "brand.primaryOpaque"
+                                                      : "brand.primaryLight",
                                               }
                                     }
                                     variant="filter"
-                                    key={genre}
                                     size="xs"
                                     fontSize="14px"
                                     m={1}
@@ -336,27 +356,14 @@ const GenreModal = ({
                                                     (gen) => (
                                                         <Tag
                                                             width="auto"
-                                                            onClick={() => {
-                                                                onGenreSelect(
-                                                                    gen
-                                                                );
-                                                                setSearchValue(
-                                                                    ""
-                                                                );
-                                                                setIsSearching(
-                                                                    false
-                                                                );
-                                                                setFilteredGenres(
-                                                                    []
-                                                                );
-                                                            }}
+                                                            onClick={() => toggleGenre(gen)}
                                                             bg={
-                                                                genre === gen
+                                                                isSelected(gen)
                                                                     ? "brand.primaryOpaque"
                                                                     : "transparent"
                                                             }
                                                             borderColor={
-                                                                genre === gen
+                                                                isSelected(gen)
                                                                     ? "brand.primaryLight"
                                                                     : "brand.primaryOpaque"
                                                             }
@@ -365,20 +372,16 @@ const GenreModal = ({
                                                                     ? {}
                                                                     : {
                                                                           cursor: "pointer",
-                                                                          bg:
-                                                                              genre ===
-                                                                              gen
-                                                                                  ? "transparent"
-                                                                                  : "brand.primaryOpaque",
-                                                                          borderColor:
-                                                                              genre ===
-                                                                              gen
-                                                                                  ? "brand.primaryOpaque"
-                                                                                  : "brand.primaryLight",
+                                                                          bg: isSelected(gen)
+                                                                              ? "transparent"
+                                                                              : "brand.primaryOpaque",
+                                                                          borderColor: isSelected(gen)
+                                                                              ? "brand.primaryOpaque"
+                                                                              : "brand.primaryLight",
                                                                       }
                                                             }
                                                             variant="filter"
-                                                            key={genre}
+                                                            key={gen}
                                                             size="xs"
                                                             fontSize="14px"
                                                             m={1}
@@ -393,16 +396,39 @@ const GenreModal = ({
                                 )}
                             </Flex>
                         </Flex>
-                        <Button
+                        <Flex
                             position="absolute"
                             bottom="16px"
-                            p={4}
-                            w="100px"
-                            onClick={onCancel}
-                            variant="cancel"
+                            gap={3}
+                            w="calc(100% - 32px)"
                         >
-                            Cancel
-                        </Button>
+                            <Button
+                                p={4}
+                                w="100px"
+                                onClick={onCancel}
+                                variant="cancel"
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                p={4}
+                                flex={1}
+                                onClick={() => {
+                                    onApply(localSelection);
+                                    setSearchValue("");
+                                    setIsSearching(false);
+                                    setFilteredGenres([]);
+                                }}
+                                variant="solid"
+                                bg="brand.primary"
+                                color="brand.backgroundPrimary"
+                                _hover={{
+                                    bg: "brand.primaryLight",
+                                }}
+                            >
+                                Apply
+                            </Button>
+                        </Flex>
                     </Flex>
                 </Flex>
             </ModalContent>

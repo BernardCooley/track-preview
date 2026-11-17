@@ -2,11 +2,11 @@ import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
-    const { userId, autoplay, genre, yearFrom, yearTo } = await req.json();
+    const { userId, autoplay, genres, yearFrom, yearTo } = await req.json();
 
     const data = {
         ...(autoplay !== undefined && { autoplay }),
-        ...(genre && { genre }),
+        ...(genres && { genres }),
         ...(yearFrom && { yearFrom }),
         ...(yearTo && { yearTo }),
     };
