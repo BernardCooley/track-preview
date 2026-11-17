@@ -20,6 +20,17 @@ function getGenreLabel(genres?: string[] | null): string {
     return `${genres.length} genres`;
 }
 
+function hasGenreFilter(genres?: string[] | null): boolean {
+    if (!genres || genres.length === 0) return false;
+    if (genres.some((g) => g.toLowerCase() === "all")) return false;
+    return true;
+}
+
+function hasYearFilter(yearRange?: YearRange | null): boolean {
+    if (!yearRange) return false;
+    return yearRange.from !== 1960 || yearRange.to !== getCurrentYear();
+}
+
 const FilterTags = ({
     genres,
     yearRange,
@@ -28,6 +39,9 @@ const FilterTags = ({
     onYearClick,
     reviewStep,
 }: Props) => {
+    const genreActive = hasGenreFilter(genres);
+    const yearActive = hasYearFilter(yearRange);
+
     return (
         <Flex
             transition="opacity 0.3s"
@@ -36,7 +50,7 @@ const FilterTags = ({
             flexWrap="wrap"
         >
             <Button
-                variant={genres ? "surface" : "surface"}
+                variant={genreActive ? "subtle" : "surface"}
                 onClick={onGenreClick}
                 pointerEvents={profileLoaded ? "auto" : "none"}
                 minW="80px"
@@ -51,7 +65,7 @@ const FilterTags = ({
             </Button>
 
             <Button
-                variant="surface"
+                variant={yearActive ? "subtle" : "surface"}
                 onClick={onYearClick}
                 pointerEvents={profileLoaded ? "auto" : "none"}
                 minW="70px"
