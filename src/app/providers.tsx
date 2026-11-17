@@ -1,15 +1,18 @@
 "use client";
 
-import { ChakraProvider, Toaster, Toast } from "@chakra-ui/react";
+import { ChakraProvider, Theme, Toaster, Toast } from "@chakra-ui/react";
 import { TrackContextProvider } from "../../context/TrackContext";
+import { ThemeContextProvider, useThemeContext } from "../../context/ThemeContext";
 import AllContexts from "../../Contexts/AllContexts";
 import { system } from "../../ChakraTheme";
 import "@fontsource/allerta-stencil";
 import { toaster } from "@/components/toaster";
 
-export function Providers({ children }: { children: React.ReactNode }) {
+function AppShell({ children }: { children: React.ReactNode }) {
+    const { appearance } = useThemeContext();
+
     return (
-        <ChakraProvider value={system}>
+        <Theme appearance={appearance} style={{ minHeight: "100vh" }}>
             <AllContexts>
                 <TrackContextProvider>
                     {children}
@@ -35,6 +38,16 @@ export function Providers({ children }: { children: React.ReactNode }) {
                     </Toaster>
                 </TrackContextProvider>
             </AllContexts>
+        </Theme>
+    );
+}
+
+export function Providers({ children }: { children: React.ReactNode }) {
+    return (
+        <ChakraProvider value={system}>
+            <ThemeContextProvider>
+                <AppShell>{children}</AppShell>
+            </ThemeContextProvider>
         </ChakraProvider>
     );
 }

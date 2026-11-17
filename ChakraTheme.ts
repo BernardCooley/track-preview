@@ -26,7 +26,6 @@ const buttonRecipe = defineRecipe({
                 height: "48px",
                 px: "6",
             },
-            // "secondary" - mapped to "outline"
             outline: {
                 bg: "brand.surface",
                 color: "brand.textPrimary",
@@ -52,7 +51,6 @@ const buttonRecipe = defineRecipe({
                 height: "40px",
                 px: "3",
             },
-            // "danger" - mapped to "warning"
             warning: {
                 bg: "brand.error",
                 color: "white",
@@ -68,7 +66,6 @@ const buttonRecipe = defineRecipe({
                 height: "48px",
                 px: "6",
             },
-            // "dangerOutline" - mapped to "cancel"
             cancel: {
                 bg: "transparent",
                 color: "brand.error",
@@ -82,7 +79,6 @@ const buttonRecipe = defineRecipe({
                 height: "48px",
                 px: "6",
             },
-            // "tabActive" - mapped to "tabSelected"
             tabSelected: {
                 bg: "transparent",
                 color: "brand.primary",
@@ -94,7 +90,6 @@ const buttonRecipe = defineRecipe({
                 px: "4",
                 fontWeight: "semibold",
             },
-            // "tab" - mapped to "tabDeselected"
             tabDeselected: {
                 bg: "transparent",
                 color: "brand.textMuted",
@@ -109,7 +104,6 @@ const buttonRecipe = defineRecipe({
                     bg: "brand.surfaceHover",
                 },
             },
-            // "icon" - mapped to "tertiary"
             tertiary: {
                 bg: "transparent",
                 color: "brand.textSecondary",
@@ -134,7 +128,6 @@ const buttonRecipe = defineRecipe({
                     color: "brand.primaryHover",
                 },
             },
-            // "filterTag" - mapped to "surface"
             surface: {
                 bg: "brand.surface",
                 color: "brand.textPrimary",
@@ -153,7 +146,6 @@ const buttonRecipe = defineRecipe({
                     cursor: "pointer",
                 },
             },
-            // "filterTagActive" - mapped to "subtle"
             subtle: {
                 bg: "brand.primarySubtle",
                 color: "brand.primary",
@@ -209,50 +201,9 @@ const config = defineConfig({
         tokens: {
             colors: {
                 brand: {
-                    // Core palette - change these to retheme the whole app
                     primary: { value: "#11999e" },
                     primaryHover: { value: "#0e8286" },
-                    primarySubtle: { value: "rgba(17, 153, 158, 0.12)" },
-                    primaryMuted: { value: "rgba(17, 153, 158, 0.4)" },
                     textOnPrimary: { value: "#ffffff" },
-
-                    // Backgrounds
-                    bg: { value: "#1a2422" },
-                    bgSubtle: { value: "#1e2b28" },
-                    surface: { value: "rgba(255, 255, 255, 0.06)" },
-                    surfaceHover: { value: "rgba(255, 255, 255, 0.1)" },
-                    surfaceRaised: { value: "rgba(255, 255, 255, 0.08)" },
-                    overlay: { value: "rgba(0, 0, 0, 0.6)" },
-
-                    // Text
-                    textPrimary: { value: "#f0f4f3" },
-                    textSecondary: { value: "#a8b5b2" },
-                    textMuted: { value: "#6b7d79" },
-                    textOnSurface: { value: "#d0d8d6" },
-
-                    // Borders
-                    border: { value: "rgba(255, 255, 255, 0.1)" },
-                    borderHover: { value: "rgba(255, 255, 255, 0.2)" },
-                    borderFocus: { value: "#11999e" },
-
-                    // Status colors
-                    error: { value: "#ef4444" },
-                    errorHover: { value: "#dc2626" },
-                    errorSubtle: { value: "rgba(239, 68, 68, 0.12)" },
-                    success: { value: "#22c55e" },
-                    successSubtle: { value: "rgba(34, 197, 94, 0.12)" },
-
-                    // Specific UI elements
-                    cardBg: { value: "rgba(255, 255, 255, 0.04)" },
-                    inputBg: { value: "rgba(255, 255, 255, 0.06)" },
-                    inputBorder: { value: "rgba(255, 255, 255, 0.12)" },
-                    divider: { value: "rgba(255, 255, 255, 0.08)" },
-
-                    // Action colors for like/dislike
-                    like: { value: "#22c55e" },
-                    likeSubtle: { value: "rgba(34, 197, 94, 0.15)" },
-                    dislike: { value: "#ef4444" },
-                    dislikeSubtle: { value: "rgba(239, 68, 68, 0.15)" },
                 },
                 primary: {
                     50: { value: "#f0fafa" },
@@ -283,6 +234,192 @@ const config = defineConfig({
                 page: { value: "24px" },
                 section: { value: "32px" },
                 card: { value: "20px" },
+            },
+        },
+        semanticTokens: {
+            colors: {
+                brand: {
+                    primarySubtle: {
+                        value: {
+                            _light: "rgba(17, 153, 158, 0.08)",
+                            _dark: "rgba(17, 153, 158, 0.12)",
+                        },
+                    },
+                    primaryMuted: {
+                        value: {
+                            _light: "rgba(17, 153, 158, 0.25)",
+                            _dark: "rgba(17, 153, 158, 0.4)",
+                        },
+                    },
+                    bg: {
+                        value: {
+                            _light: "#f7f9f8",
+                            _dark: "#1a2422",
+                        },
+                    },
+                    bgSubtle: {
+                        value: {
+                            _light: "#eef2f0",
+                            _dark: "#1e2b28",
+                        },
+                    },
+                    surface: {
+                        value: {
+                            _light: "rgba(0, 0, 0, 0.03)",
+                            _dark: "rgba(255, 255, 255, 0.06)",
+                        },
+                    },
+                    surfaceHover: {
+                        value: {
+                            _light: "rgba(0, 0, 0, 0.06)",
+                            _dark: "rgba(255, 255, 255, 0.1)",
+                        },
+                    },
+                    surfaceRaised: {
+                        value: {
+                            _light: "#ffffff",
+                            _dark: "rgba(255, 255, 255, 0.08)",
+                        },
+                    },
+                    overlay: {
+                        value: {
+                            _light: "rgba(0, 0, 0, 0.3)",
+                            _dark: "rgba(0, 0, 0, 0.6)",
+                        },
+                    },
+                    textPrimary: {
+                        value: {
+                            _light: "#1a2422",
+                            _dark: "#f0f4f3",
+                        },
+                    },
+                    textSecondary: {
+                        value: {
+                            _light: "#4a5e5a",
+                            _dark: "#a8b5b2",
+                        },
+                    },
+                    textMuted: {
+                        value: {
+                            _light: "#7a8e8a",
+                            _dark: "#6b7d79",
+                        },
+                    },
+                    textOnSurface: {
+                        value: {
+                            _light: "#2d3e3a",
+                            _dark: "#d0d8d6",
+                        },
+                    },
+                    border: {
+                        value: {
+                            _light: "rgba(0, 0, 0, 0.1)",
+                            _dark: "rgba(255, 255, 255, 0.1)",
+                        },
+                    },
+                    borderHover: {
+                        value: {
+                            _light: "rgba(0, 0, 0, 0.2)",
+                            _dark: "rgba(255, 255, 255, 0.2)",
+                        },
+                    },
+                    borderFocus: {
+                        value: {
+                            _light: "#11999e",
+                            _dark: "#11999e",
+                        },
+                    },
+                    error: {
+                        value: {
+                            _light: "#dc2626",
+                            _dark: "#ef4444",
+                        },
+                    },
+                    errorHover: {
+                        value: {
+                            _light: "#b91c1c",
+                            _dark: "#dc2626",
+                        },
+                    },
+                    errorSubtle: {
+                        value: {
+                            _light: "rgba(220, 38, 38, 0.08)",
+                            _dark: "rgba(239, 68, 68, 0.12)",
+                        },
+                    },
+                    success: {
+                        value: {
+                            _light: "#16a34a",
+                            _dark: "#22c55e",
+                        },
+                    },
+                    successSubtle: {
+                        value: {
+                            _light: "rgba(22, 163, 74, 0.08)",
+                            _dark: "rgba(34, 197, 94, 0.12)",
+                        },
+                    },
+                    cardBg: {
+                        value: {
+                            _light: "#ffffff",
+                            _dark: "rgba(255, 255, 255, 0.04)",
+                        },
+                    },
+                    inputBg: {
+                        value: {
+                            _light: "#ffffff",
+                            _dark: "rgba(255, 255, 255, 0.06)",
+                        },
+                    },
+                    inputBorder: {
+                        value: {
+                            _light: "rgba(0, 0, 0, 0.15)",
+                            _dark: "rgba(255, 255, 255, 0.12)",
+                        },
+                    },
+                    divider: {
+                        value: {
+                            _light: "rgba(0, 0, 0, 0.08)",
+                            _dark: "rgba(255, 255, 255, 0.08)",
+                        },
+                    },
+                    like: {
+                        value: {
+                            _light: "#16a34a",
+                            _dark: "#22c55e",
+                        },
+                    },
+                    likeSubtle: {
+                        value: {
+                            _light: "rgba(22, 163, 74, 0.1)",
+                            _dark: "rgba(34, 197, 94, 0.15)",
+                        },
+                    },
+                    dislike: {
+                        value: {
+                            _light: "#dc2626",
+                            _dark: "#ef4444",
+                        },
+                    },
+                    dislikeSubtle: {
+                        value: {
+                            _light: "rgba(220, 38, 38, 0.1)",
+                            _dark: "rgba(239, 68, 68, 0.15)",
+                        },
+                    },
+                    scrollbarThumb: {
+                        value: {
+                            _light: "rgba(0, 0, 0, 0.15)",
+                            _dark: "rgba(255, 255, 255, 0.1)",
+                        },
+                    },
+                    progressTrail: {
+                        value: {
+                            _light: "rgba(0, 0, 0, 0.08)",
+                            _dark: "rgba(255, 255, 255, 0.08)",
+                        },
+                    },
+                },
             },
         },
     },

@@ -214,7 +214,7 @@ const LibraryTable = ({
                     background: "transparent",
                 },
                 "&::-webkit-scrollbar-thumb": {
-                    background: "rgba(255,255,255,0.1)",
+                    background: "var(--chakra-colors-brand-scrollbar-thumb)",
                     borderRadius: "4px",
                 },
             }}

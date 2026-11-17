@@ -49,7 +49,7 @@ const Loading = ({ progress, loadingText, showLoadingBar = false }: Props) => {
                         percent={progress}
                         strokeWidth={4}
                         strokeColor="#11999e"
-                        trailColor="rgba(255,255,255,0.08)"
+                        trailColor="var(--chakra-colors-brand-progress-trail)"
                     />
                 </Flex>
             )}

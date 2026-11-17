@@ -19,6 +19,24 @@ a {
     text-decoration: none;
 }
 
+/* Theme-aware CSS variables */
+:root,
+.light {
+    --audio-controls-color: #4a5e5a;
+    --audio-progress-bar-bg: rgba(0, 0, 0, 0.1);
+    --audio-download-bg: rgba(0, 0, 0, 0.06);
+    --slider-track-bg: rgba(0, 0, 0, 0.1);
+    --slider-thumb-border: #1a2422;
+}
+
+.dark {
+    --audio-controls-color: #a8b5b2;
+    --audio-progress-bar-bg: rgba(255, 255, 255, 0.1);
+    --audio-download-bg: rgba(255, 255, 255, 0.06);
+    --slider-track-bg: rgba(255, 255, 255, 0.1);
+    --slider-thumb-border: #f0f4f3;
+}
+
 /* Bouncing loader */
 .bouncing-loader {
     display: flex;
@@ -59,7 +77,7 @@ a {
 
 .rhap_time,
 .rhap_container svg {
-    color: #a8b5b2 !important;
+    color: var(--audio-controls-color) !important;
 }
 
 .rhap_progress-indicator,
@@ -75,11 +93,11 @@ a {
 }
 
 .rhap_progress-bar {
-    background-color: rgba(255, 255, 255, 0.1) !important;
+    background-color: var(--audio-progress-bar-bg) !important;
 }
 
 .rhap_download-progress {
-    background-color: rgba(255, 255, 255, 0.06) !important;
+    background-color: var(--audio-download-bg) !important;
 }
 
 .rhap_additional-controls {
@@ -90,7 +108,7 @@ a {
 .rhap_main-controls-button,
 .rhap_repeat-button,
 .rhap_volume-button {
-    color: #a8b5b2 !important;
+    color: var(--audio-controls-color) !important;
 }
 
 .rhap_main-controls-button:hover,

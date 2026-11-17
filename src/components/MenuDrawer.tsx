@@ -3,10 +3,14 @@ import {
     Drawer,
     Flex,
     Separator,
+    Text,
 } from "@chakra-ui/react";
 import { usePathname } from "next/navigation";
 import MenuDrawerItem from "./MenuDrawerItem";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+import LightModeIcon from "@mui/icons-material/LightMode";
+import DarkModeIcon from "@mui/icons-material/DarkMode";
+import { useThemeContext } from "../../context/ThemeContext";
 
 interface Props {
     isOpen: boolean;
@@ -15,6 +19,7 @@ interface Props {
 
 const MenuDrawer = ({ isOpen, onClose }: Props) => {
     const pathname = usePathname();
+    const { appearance, toggleAppearance } = useThemeContext();
 
     return (
         <Drawer.Root
@@ -54,6 +59,40 @@ const MenuDrawer = ({ isOpen, onClose }: Props) => {
                                 linkText="Account"
                                 href="/account"
                             />
+                        </Flex>
+
+                        <Separator borderColor="brand.divider" my={4} />
+
+                        <Flex
+                            alignItems="center"
+                            gap={3}
+                            px={3}
+                            py={2}
+                            rounded="lg"
+                            cursor="pointer"
+                            transition="all 0.2s ease"
+                            _hover={{
+                                bg: "brand.surfaceHover",
+                            }}
+                            onClick={toggleAppearance}
+                        >
+                            <Flex
+                                color="brand.primary"
+                                fontSize="sm"
+                            >
+                                {appearance === "light" ? (
+                                    <DarkModeIcon style={{ fontSize: "20px" }} />
+                                ) : (
+                                    <LightModeIcon style={{ fontSize: "20px" }} />
+                                )}
+                            </Flex>
+                            <Text
+                                fontSize="md"
+                                fontWeight="medium"
+                                color="brand.textSecondary"
+                            >
+                                {appearance === "light" ? "Dark mode" : "Light mode"}
+                            </Text>
                         </Flex>
                     </Drawer.Body>
 

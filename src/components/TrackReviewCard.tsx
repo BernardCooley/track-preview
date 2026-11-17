@@ -120,7 +120,7 @@ const TrackReviewCard = ({
                                 content: '""',
                                 position: "absolute",
                                 inset: 0,
-                                bg: "linear-gradient(to bottom, rgba(26, 36, 34, 0.3) 0%, rgba(26, 36, 34, 0.85) 60%, rgba(26, 36, 34, 0.95) 100%)",
+                                bg: "linear-gradient(to bottom, color-mix(in srgb, var(--chakra-colors-brand-bg) 30%, transparent) 0%, color-mix(in srgb, var(--chakra-colors-brand-bg) 85%, transparent) 60%, color-mix(in srgb, var(--chakra-colors-brand-bg) 95%, transparent) 100%)",
                             }}
                         >
                             {!noTracks &&
