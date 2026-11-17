@@ -12,7 +12,7 @@ import {
     ToastProps,
     useToast,
 } from "@chakra-ui/react";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { Suspense, useCallback, useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import SignIn from "@/components/SignIn";
 import SignUp from "@/components/SignUp";
@@ -21,7 +21,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../../../firebase/firebaseInit";
 import Loading from "@/components/Loading";
 
-const AuthPage = () => {
+const AuthPageContent = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
     const pathname = usePathname();
@@ -164,5 +164,11 @@ const AuthPage = () => {
         </>
     );
 };
+
+const AuthPage = () => (
+    <Suspense>
+        <AuthPageContent />
+    </Suspense>
+);
 
 export default AuthPage;

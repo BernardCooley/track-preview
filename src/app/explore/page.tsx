@@ -9,7 +9,7 @@ import {
     Slide,
     Stack,
 } from "@chakra-ui/react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import AudioPlayer from "@/components/AudioPlayer";
 import { useRouter, useSearchParams } from "next/navigation";
 import { onAuthStateChanged } from "firebase/auth";
@@ -26,7 +26,7 @@ import LooksTwoIcon from "@mui/icons-material/LooksTwo";
 import Looks3Icon from "@mui/icons-material/Looks3";
 import LibraryMusicIcon from "@mui/icons-material/LibraryMusic";
 
-export default function Explore() {
+function ExploreContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const { currentlyPlaying, updateCurrentlyPlaying } = useTrackContext();
@@ -164,5 +164,13 @@ export default function Explore() {
                 </Flex>
             </Center>
         </Box>
+    );
+}
+
+export default function Explore() {
+    return (
+        <Suspense>
+            <ExploreContent />
+        </Suspense>
     );
 }
