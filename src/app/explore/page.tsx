@@ -4,15 +4,16 @@ import {
     Box,
     Button,
     Flex,
-    Grid,
+    IconButton,
     Text,
+    useDisclosure,
 } from "@chakra-ui/react";
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import AudioPlayer from "@/components/AudioPlayer";
 import { useRouter, useSearchParams } from "next/navigation";
 import { onAuthStateChanged } from "firebase/auth";
 import Library from "@/components/Library";
-import Header from "@/components/Header";
+import MenuDrawer from "@/components/MenuDrawer";
 import { getUserProfile } from "@/bff/bff";
 import { useTrackContext } from "../../../context/TrackContext";
 import { useAuthContext } from "../../../Contexts/AuthContext";
@@ -23,6 +24,8 @@ import LooksOneIcon from "@mui/icons-material/LooksOne";
 import LooksTwoIcon from "@mui/icons-material/LooksTwo";
 import Looks3Icon from "@mui/icons-material/Looks3";
 import LibraryMusicIcon from "@mui/icons-material/LibraryMusic";
+import MenuOpenIcon from "@mui/icons-material/MenuOpen";
+import Link from "next/link";
 
 function ExploreContent() {
     const router = useRouter();
@@ -33,6 +36,7 @@ function ExploreContent() {
     const { updateUser, user, updateUserProfile } = useAuthContext();
     const reviewStep = searchParams?.get("reviewStep");
     const pageRef = useRef<HTMLDivElement>(null);
+    const { open: isMenuOpen, onOpen: onMenuOpen, onClose: onMenuClose } = useDisclosure();
 
     useEffect(() => {
         if (user?.uid) {
@@ -95,33 +99,69 @@ function ExploreContent() {
 
     return (
         <Flex direction="column" h="100dvh" ref={pageRef} bg="brand.bg">
-            <Header />
-            <Grid
-                templateColumns="repeat(4, 1fr)"
+            <MenuDrawer isOpen={isMenuOpen} onClose={onMenuClose} />
+            <Flex
                 w="full"
+                alignItems="center"
+                px={[3, 4]}
+                py={1}
                 borderBottom="1px solid"
                 borderBottomColor="brand.divider"
                 bg="brand.bg"
+                position="sticky"
+                top={0}
+                zIndex={100}
+                gap={1}
             >
-                {tabButtons.map((button, index) => (
-                    <Button
-                        key={button.name}
-                        variant={currentStep === index + 1 ? "tabSelected" : "tabDeselected"}
-                        onClick={() =>
-                            router.push(`/explore?reviewStep=${index + 1}`)
-                        }
-                        gap={2}
+                <Link href="">
+                    <Text
+                        userSelect="none"
+                        fontSize="md"
+                        fontFamily="brand"
+                        color="brand.textPrimary"
+                        letterSpacing="wide"
+                        _hover={{ color: "brand.primary" }}
+                        transition="color 0.2s ease"
+                        mr={1}
                     >
-                        {button.icon}
-                        <Text
-                            display={["none", "inline"]}
-                            fontSize="sm"
+                        PHONIQUEST
+                    </Text>
+                </Link>
+
+                <Flex flex={1} justifyContent="center" gap={0}>
+                    {tabButtons.map((button, index) => (
+                        <Button
+                            key={button.name}
+                            variant={currentStep === index + 1 ? "tabSelected" : "tabDeselected"}
+                            onClick={() =>
+                                router.push(`/explore?reviewStep=${index + 1}`)
+                            }
+                            gap={1}
+                            px={[3, 4]}
+                            h="44px"
+                            minW={0}
                         >
-                            {button.label}
-                        </Text>
-                    </Button>
-                ))}
-            </Grid>
+                            {button.icon}
+                            <Text
+                                display={["none", "inline"]}
+                                fontSize="sm"
+                            >
+                                {button.label}
+                            </Text>
+                        </Button>
+                    ))}
+                </Flex>
+
+                <IconButton
+                    variant="tertiary"
+                    onClick={onMenuOpen}
+                    aria-label="Open menu"
+                    color="brand.textSecondary"
+                    size="sm"
+                >
+                    <MenuOpenIcon fontSize="small" />
+                </IconButton>
+            </Flex>
 
             <Box flex={1} overflow="hidden" position="relative">
                 {reviewStep &&
