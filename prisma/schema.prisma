@@ -45,19 +45,20 @@ model Review {
 }
 
 model Track {
-  id           String   @id @default(cuid())
-  platform     String
-  platformId   String
-  purchaseUrl  String
-  artist       String
-  releaseTitle String
-  genre        String
-  title        String
-  previewUrl   String
-  url          String
-  thumbnail    String
-  releaseYear  Int
-  releaseDate  String
-  slug         String   @unique
-  review       Review[]
+  id            String    @id @default(cuid())
+  platform      String
+  platformId    String
+  purchaseUrl   String
+  artist        String
+  releaseTitle  String
+  genre         String
+  title         String
+  previewUrl    String
+  url           String
+  thumbnail     String
+  releaseYear   Int
+  releaseDate   String
+  slug          String    @unique
+  deezerTrackId String?
+  review        Review[]
 }

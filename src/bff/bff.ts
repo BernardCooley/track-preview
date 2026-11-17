@@ -344,6 +344,22 @@ export const updateCommentReplied = async ({
     }
 };
 
+export const resolvePreviewUrl = async (
+    trackId: string
+): Promise<string> => {
+    try {
+        const result = await fetchWithErrorHandling<{ previewUrl: string }>(
+            "/api/resolvePreviewUrl",
+            "POST",
+            { trackId }
+        );
+        return result?.previewUrl || "";
+    } catch (error) {
+        console.error("Failed to resolve preview URL:", error);
+        return "";
+    }
+};
+
 interface GetTracksProps {
     genre?: string;
     startYear?: number;

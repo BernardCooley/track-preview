@@ -26,6 +26,7 @@ import ToggleTracklist from "./ToggleTracklist";
 interface Props {
     loadingMessage?: string;
     currentTrack: Track;
+    previewUrl?: string;
     onLikeOrDislike: (liked: boolean) => Promise<void>;
     onAudioPlay: () => void;
     autoplay?: boolean;
@@ -46,6 +47,7 @@ interface Props {
 const TrackReviewCard = ({
     loadingMessage,
     currentTrack,
+    previewUrl,
     onLikeOrDislike,
     onAudioPlay,
     autoplay,
@@ -192,7 +194,7 @@ const TrackReviewCard = ({
                                     </Flex>
                                 }
                                 autoPlay={autoplay}
-                                src={currentTrack.previewUrl}
+                                src={previewUrl || ""}
                                 showJumpControls={false}
                                 showSkipControls={true}
                                 onClickNext={() => {

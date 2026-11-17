@@ -53,16 +53,19 @@ const TrackReview = memo(
             likeOrDislike,
             onGenreSelect,
             onYearConfirm,
+            resolvedPreviewUrl,
         } = useTrackReview(reviewStep);
 
         const [animationImage, setAnimationImage] = useState<string>("");
         const { isOpen: isShowingTracklist, onToggle: toggleTracklist } =
             useDisclosure();
-        const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+        const [windowWidth, setWindowWidth] = useState(0);
         const animationDuration = 0.7;
         const [animate, setAnimate] = useState<"like" | "dislike" | null>(null);
 
         useEffect(() => {
+            setWindowWidth(window.innerWidth);
+
             const handleResize = () => {
                 setWindowWidth(window.innerWidth);
             };
@@ -266,6 +269,7 @@ const TrackReview = memo(
                             isOpen={reviewStep === 1 || !isShowingTracklist}
                             autoplay={userProfile?.autoplay || false}
                             currentTrack={currentTrack}
+                            previewUrl={resolvedPreviewUrl}
                             onLikeOrDislike={async (val) => {
                                 await likeOrDislike(val);
                                 setAnimate(val ? "like" : "dislike");

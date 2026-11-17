@@ -5,6 +5,7 @@ import { useTrackContext } from "../../context/TrackContext";
 import {
     fetchTracks,
     mutateUserProfile,
+    resolvePreviewUrl,
     updateTrackReviewStep,
 } from "@/bff/bff";
 import { useLocalStorage } from "usehooks-ts";
@@ -36,6 +37,7 @@ export const useTrackReview = (reviewStep: number) => {
     const [fetchAttempted, setFetchAttempted] = useState<boolean>(false);
     const [autoplayLoading, setAutoplayLoading] = useState<boolean>(false);
     const [indexOfTrack, setIndexOfTrack] = useState(0);
+    const [resolvedPreviewUrl, setResolvedPreviewUrl] = useState<string>("");
 
     const comparisonUserProfile = (profile: UserProfile | null) => {
         if (profile === null) return;
@@ -56,6 +58,10 @@ export const useTrackReview = (reviewStep: number) => {
         if (currentTrack) {
             setListened(false);
             setIsPlaying(false);
+            setResolvedPreviewUrl("");
+            resolvePreviewUrl(currentTrack.id).then((url) => {
+                if (url) setResolvedPreviewUrl(url);
+            });
         }
     }, [currentTrack]);
 
@@ -284,5 +290,6 @@ export const useTrackReview = (reviewStep: number) => {
         setAutoplayLoading,
         reviewTracks,
         updateReviewTracks,
+        resolvedPreviewUrl,
     };
 };
