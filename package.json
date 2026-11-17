@@ -8,7 +8,7 @@
         "start": "next start",
         "lint": "next lint",
         "tsc": "tsc --noEmit",
-        "postinstall": "npx prisma generate && npx chakra-ui typegen ./ChakraTheme.ts",
+        "postinstall": "prisma generate && chakra typegen ./ChakraTheme.ts",
         "migrateprod": "dotenv -e npx prisma db push npx prisma migrate deploy",
         "migratedev": "dotenv -e npx prisma db push npx prisma migrate dev",
         "scrapejuno": "node scraping_tracks/scrapejuno.js",
