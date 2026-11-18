@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useState } from "react";
+import React, { memo, useCallback, useEffect, useState } from "react";
 import { getCurrentYear } from "../../utils";
 import {
     Badge,
@@ -7,6 +7,7 @@ import {
     Center,
     Flex,
     Text,
+    VStack,
     useDisclosure,
 } from "@chakra-ui/react";
 import Loading from "./Loading";
@@ -55,6 +56,26 @@ const TrackReview = memo(
             resolvedPreviewUrl,
             previewLoading,
         } = useTrackReview(reviewStep);
+
+        const userGenres = userProfile?.genres;
+        const hasGenreFilter = userGenres && userGenres.length > 0 && !userGenres.some((g: string) => g.toLowerCase() === "all");
+        const hasYearFilter = (userProfile?.yearFrom && userProfile.yearFrom !== 1960) || (userProfile?.yearTo && userProfile.yearTo !== getCurrentYear());
+        const hasActiveFilters = hasGenreFilter || hasYearFilter;
+        const genreLabel = hasGenreFilter
+            ? userGenres!.length === 1 ? userGenres![0] : `${userGenres!.length} genre`
+            : "all";
+
+        const resetFilters = useCallback(async () => {
+            if (user?.uid) {
+                const newProfile = await mutateUserProfile({
+                    userId: user.uid,
+                    genres: ["all"],
+                    yearFrom: 1960,
+                    yearTo: getCurrentYear(),
+                });
+                updateUserProfile(newProfile);
+            }
+        }, [user?.uid, updateUserProfile]);
 
         const [animationImage, setAnimationImage] = useState<string>("");
         const { open: isShowingTracklist, onToggle: toggleTracklist } =
@@ -119,15 +140,58 @@ const TrackReview = memo(
                 )}
 
                 {noTracks && !loading && reviewStep === 1 && (
-                    <Center pt={24} px={6}>
-                        <Text
-                            textAlign="center"
-                            color="brand.textSecondary"
-                            fontSize="md"
-                        >
-                            No tracks found. Please try again with different
-                            filters.
-                        </Text>
+                    <Center flex={1} px={6}>
+                        <VStack gap={5} maxW="360px">
+                            <VStack gap={2}>
+                                <Text
+                                    textAlign="center"
+                                    color="brand.textPrimary"
+                                    fontSize="md"
+                                    fontWeight="semibold"
+                                >
+                                    No tracks found
+                                </Text>
+                                <Text
+                                    textAlign="center"
+                                    color="brand.textSecondary"
+                                    fontSize="sm"
+                                >
+                                    {hasActiveFilters
+                                        ? <>We don&apos;t currently have any <Text as="span" fontWeight="bold" color="brand.textPrimary">{genreLabel}</Text> tracks between <Text as="span" fontWeight="bold" color="brand.textPrimary">{userProfile?.yearFrom || 1960}</Text> and <Text as="span" fontWeight="bold" color="brand.textPrimary">{userProfile?.yearTo || getCurrentYear()}</Text>.<br />Try adjusting your filters or try again later.</>
+                                        : <>We don&apos;t currently have any tracks matching your filters.<br />Try adjusting them or try again later.</>}
+                                </Text>
+                            </VStack>
+                            <VStack gap={2} w="full">
+                                <Flex gap={2} w="full">
+                                    <Button
+                                        variant="subtle"
+                                        size="sm"
+                                        flex={1}
+                                        onClick={() => setShowYearSelector(true)}
+                                    >
+                                        Change years
+                                    </Button>
+                                    <Button
+                                        variant="subtle"
+                                        size="sm"
+                                        flex={1}
+                                        onClick={() => setShowGenreSelector(true)}
+                                    >
+                                        Change genre
+                                    </Button>
+                                </Flex>
+                                {hasActiveFilters && (
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        w="full"
+                                        onClick={resetFilters}
+                                    >
+                                        Reset all filters
+                                    </Button>
+                                )}
+                            </VStack>
+                        </VStack>
                     </Center>
                 )}
 
@@ -154,7 +218,7 @@ const TrackReview = memo(
                     onCancel={() => setShowYearSelector(false)}
                 />
 
-                {reviewStep === 1 && (
+                {reviewStep === 1 && !(noTracks && !loading) && (
                     <Box px={[4, 6]} py={3}>
                         {user?.uid && (
                             <FilterTags
