@@ -98,19 +98,11 @@ export const ResetPassword = async (email: string) => {
 };
 
 export const DeleteUser = async () => {
-    try {
-        const user = auth.currentUser;
-        await user?.delete();
+    const user = auth.currentUser;
+    if (!user) throw new Error("No current user");
 
-        if (user) {
-            await deleteUserProfile({
-                userId: user?.uid,
-            });
-        }
-    } catch (error) {
-        console.error(error);
-        throw error;
-    }
+    await deleteUserProfile({ userId: user.uid });
+    await user.delete();
 };
 
 export const SendVerificationEmail = async (user: User) => {

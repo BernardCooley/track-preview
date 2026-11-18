@@ -87,8 +87,23 @@ const Settings = () => {
         try {
             await DeleteUser();
             router.push("/loginRegister?login=false?accountDeleted=true");
-        } catch (error) {
-            console.log(error);
+        } catch (error: any) {
+            if (error.code === "auth/requires-recent-login") {
+                showToast({
+                    title: "Please log in again to delete your account.",
+                    description: "Redirecting you to the login page...",
+                    type: "info",
+                });
+                setTimeout(() => {
+                    router.push("/loginRegister?login=true&isAttemptingAccountEdit=true");
+                }, 5000);
+            } else {
+                showToast({
+                    title: "Error deleting account.",
+                    description: "Please try again later.",
+                    type: "error",
+                });
+            }
         }
     };
 
