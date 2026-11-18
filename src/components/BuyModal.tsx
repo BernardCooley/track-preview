@@ -100,7 +100,7 @@ const BuyModal = ({
                                 textAlign="center"
                                 mt={5}
                             >
-                                These are affiliate links. We may earn a small commission at no extra cost to you.
+                                Results may vary by store. Some links may be affiliate links — we may earn a small commission at no extra cost to you.
                             </Text>
                         </Box>
 
