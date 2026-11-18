@@ -71,7 +71,7 @@ export default function Home() {
 
     return (
         <Flex
-            h="100dvh"
+            minH="100dvh"
             direction="column"
             alignItems="center"
             px={[6, 8]}
@@ -84,7 +84,7 @@ export default function Home() {
                 justifyContent="center"
                 w="full"
                 maxW="520px"
-                gap={[20, 24]}
+                gap={[10, 24]}
             >
                 <VStack gap={4} mt="-46px">
                     <Text
