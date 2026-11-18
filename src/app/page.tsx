@@ -75,7 +75,7 @@ export default function Home() {
             direction="column"
             alignItems="center"
             px={[6, 8]}
-            pb={8}
+            pb={16}
         >
             <Flex
                 flex={1}
@@ -86,7 +86,7 @@ export default function Home() {
                 maxW="520px"
                 gap={[20, 24]}
             >
-                <VStack gap={4}>
+                <VStack gap={4} mt="-46px">
                     <Text
                         fontSize={["3xl", "4xl", "5xl"]}
                         fontFamily="brand"
@@ -152,13 +152,13 @@ export default function Home() {
                 </Box>
             </Flex>
 
-            <Box w="full" maxW="520px">
+            <Flex direction="column" gap={3} w="full" maxW="320px">
                 <Button
                     w="full"
                     variant="primary"
                     size="lg"
                     loading={startingTrial}
-    onClick={async () => {
+                    onClick={async () => {
                         if (user) {
                             router.push("/explore");
                             return;
@@ -186,15 +186,25 @@ export default function Home() {
                 >
                     Get Started
                 </Button>
-                <Button
-                    w="full"
-                    variant="outline"
-                    size="lg"
-                    onClick={() => router.push("/loginRegister?login=true")}
-                >
-                    Sign in
-                </Button>
-            </Box>
+                <Flex gap={3}>
+                    <Button
+                        flex={1}
+                        variant="outline"
+                        size="lg"
+                        onClick={() => router.push("/loginRegister?login=true")}
+                    >
+                        Sign in
+                    </Button>
+                    <Button
+                        flex={1}
+                        variant="outline"
+                        size="lg"
+                        onClick={() => router.push("/loginRegister?login=false")}
+                    >
+                        Register
+                    </Button>
+                </Flex>
+            </Flex>
         </Flex>
     );
 }
