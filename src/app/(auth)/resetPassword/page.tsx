@@ -41,12 +41,13 @@ const PasswordReset = ({}: Props) => {
         try {
             await ResetPassword(formData.email);
             setAuthError(null);
-            setSubmitting(false);
-            router.push("/loginRegister?login=true?passwordReset=true");
+            router.push("/loginRegister?login=true&passwordReset=true");
         } catch (error) {
             setAuthError(
                 "Error sending password reset email. Please check your email and password and try again."
             );
+        } finally {
+            setSubmitting(false);
         }
     };
 

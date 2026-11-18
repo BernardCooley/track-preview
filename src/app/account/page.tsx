@@ -86,7 +86,7 @@ const Settings = () => {
     const deleteAccount = async () => {
         try {
             await DeleteUser();
-            router.push("/loginRegister?login=false?accountDeleted=true");
+            router.push("/loginRegister?login=false&accountDeleted=true");
         } catch (error: any) {
             if (error.code === "auth/requires-recent-login") {
                 showToast({

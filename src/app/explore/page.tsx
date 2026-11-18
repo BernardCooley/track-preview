@@ -60,7 +60,7 @@ function ExploreContent() {
             setIsAnonymous(user.isAnonymous);
         }
         onAuthStateChanged(auth, async (user) => {
-            if (user && user.uid) {
+            if (user && user.uid && (user.isAnonymous || user.emailVerified)) {
                 updateUser({ email: user.email || "", uid: user.uid });
                 setIsAnonymous(user.isAnonymous);
                 return router.push(`/explore/?reviewStep=${reviewStep || 1}`);
