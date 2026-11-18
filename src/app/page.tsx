@@ -205,6 +205,17 @@ export default function Home() {
                     </Button>
                 </Flex>
             </Flex>
+
+            <Text
+                fontSize="xs"
+                color="brand.textMuted"
+                pb={4}
+                cursor="pointer"
+                _hover={{ color: "brand.textSecondary" }}
+                onClick={() => router.push("/legal")}
+            >
+                Privacy Policy & Terms of Service
+            </Text>
         </Flex>
     );
 }

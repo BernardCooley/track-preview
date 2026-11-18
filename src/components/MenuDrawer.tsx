@@ -86,6 +86,11 @@ const MenuDrawer = ({ isOpen, onClose }: Props) => {
                                 linkText="How it works"
                                 href="/how-it-works"
                             />
+                            <MenuDrawerItem
+                                pathname={pathname}
+                                linkText="Legal"
+                                href="/legal"
+                            />
                         </Flex>
 
                         <Separator borderColor="brand.divider" my={4} />
