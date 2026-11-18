@@ -20,7 +20,6 @@ import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { UserCredential } from "firebase/auth";
 import {
-    DeleteUser,
     LinkAnonymousAccount,
     RegisterUser,
     SendVerificationEmail,
@@ -86,6 +85,7 @@ const SignUp = () => {
     const performRegister = async (formData: FormData) => {
         setEmail(formData.email);
         setSubmitting(true);
+        setAuthError(null);
         const isCurrentlyAnonymous = auth.currentUser?.isAnonymous === true;
         let newUser: UserCredential | null = null;
 
@@ -95,62 +95,60 @@ const SignUp = () => {
             } else {
                 newUser = await RegisterUser(formData.email, formData.password);
             }
+        } catch (error: any) {
+            if (error.code === "auth/email-already-in-use" || error.code === "auth/credential-already-in-use") {
+                setAuthError("This email is already registered. Please sign in instead.");
+            } else {
+                setAuthError("Error registering. Please check your email and password and try again.");
+            }
+            setSubmitting(false);
+            return;
+        }
+
+        if (!newUser) {
+            setAuthError("Error registering. Please try again.");
+            setSubmitting(false);
+            return;
+        }
+
+        if (isCurrentlyAnonymous) {
+            try {
+                await mutateUserProfile({
+                    userId: newUser.user.uid,
+                    isAnonymous: false,
+                });
+            } catch (error) {
+                setAuthError("Account was linked but profile update failed. Please sign in with your new email.");
+                setSubmitting(false);
+                return;
+            }
+        } else {
+            try {
+                await createUser({
+                    userId: newUser.user.uid,
+                });
+            } catch (error) {
+                try {
+                    await newUser.user.delete();
+                } catch {}
+                setAuthError("Error creating your account. Please try again.");
+                setSubmitting(false);
+                return;
+            }
+        }
+
+        try {
+            await SendVerificationEmail(newUser.user);
         } catch (error) {
             showToast({
-                title: "Error registering.",
-                description:
-                    "Please check your email and password and try again.",
-                type: "error",
+                title: "Verification email failed to send.",
+                description: "Your account was created. Please try signing in — you can request a new verification email.",
+                type: "warning",
             });
-            setAuthError(
-                "Error registering. Please check your email and password and try again."
-            );
         }
 
-        if (newUser) {
-            if (isCurrentlyAnonymous) {
-                try {
-                    await mutateUserProfile({
-                        userId: newUser.user.uid,
-                        isAnonymous: false,
-                    });
-                } catch (error) {
-                    showToast({
-                        title: "Error upgrading account.",
-                        description: "Please try again later.",
-                        type: "error",
-                    });
-                }
-            } else {
-                try {
-                    await createUser({
-                        userId: newUser.user.uid,
-                    });
-                } catch (error) {
-                    await DeleteUser();
-                    showToast({
-                        title: "Error registering.",
-                        description:
-                            "Please check your email and password and try again.",
-                        type: "error",
-                    });
-                }
-            }
-
-            try {
-                await SendVerificationEmail(newUser.user);
-
-                setAuthError(null);
-                setSubmitted(true);
-            } catch (error) {
-                showToast({
-                    title: "Error sending verification email.",
-                    description:
-                        "Please check your email and password and try again.",
-                    type: "error",
-                });
-            }
-        }
+        setAuthError(null);
+        setSubmitted(true);
         setSubmitting(false);
     };
 
