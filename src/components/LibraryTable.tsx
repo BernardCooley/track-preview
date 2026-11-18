@@ -202,8 +202,8 @@ const LibraryTable = ({
     return (
         <Box
             transition="padding 0.2s ease-in-out"
-            pb={currentlyPlaying ? 20 : 4}
-            maxH={currentReleaseTrack || currentlyPlaying ? "70vh" : "78vh"}
+            pb={currentlyPlaying ? 24 : 4}
+            flex={1}
             overflowY="auto"
             overflowX="auto"
             css={{
@@ -323,9 +323,6 @@ const LibraryTable = ({
                         <Table.ColumnHeader color="brand.textMuted" py={2} px={2}>
                             <TableHeading title="title" />
                         </Table.ColumnHeader>
-                        <Table.ColumnHeader color="brand.textMuted" py={2} px={2}>
-                            <TableHeading title="genre" />
-                        </Table.ColumnHeader>
                         {!currentReleaseTrack && (
                             <Table.ColumnHeader py={2} px={2} w="70px" />
                         )}
@@ -344,31 +341,26 @@ const LibraryTable = ({
                             borderBottom="1px solid"
                             borderBottomColor="brand.divider"
                         >
-                            <Table.Cell py={2.5} px={2}>
+                            <Table.Cell py={2.5} px={2} maxW={0}>
                                 <Flex alignItems="center" gap={3} pl={2}>
                                     <Image
                                         rounded="lg"
                                         w={11}
                                         h={11}
+                                        minW={11}
                                         src={track.thumbnail}
                                         alt=""
                                         objectFit="cover"
                                     />
                                     <Flex
                                         direction="column"
-                                        maxW={[28, 36]}
                                         gap={0.5}
+                                        overflow="hidden"
                                     >
                                         <Text
-                                            truncate={playingTrackId !== track.id}
+                                            truncate
                                             color="brand.textPrimary"
                                             fontSize="sm"
-                                            css={{
-                                                textWrap:
-                                                    playingTrackId !== track.id
-                                                        ? "nowrap"
-                                                        : "wrap",
-                                            }}
                                             fontWeight={
                                                 playingTrackId === track.id
                                                     ? "semibold"
@@ -378,35 +370,21 @@ const LibraryTable = ({
                                             {track.title}
                                         </Text>
                                         <Text
-                                            truncate={playingTrackId !== track.id}
+                                            truncate
                                             fontSize="xs"
                                             color="brand.textMuted"
-                                            maxW={24}
-                                            css={{
-                                                textWrap:
-                                                    playingTrackId !== track.id
-                                                        ? "nowrap"
-                                                        : "wrap",
-                                            }}
                                         >
                                             {track.artist}
                                         </Text>
+                                        <Text
+                                            truncate
+                                            fontSize="xs"
+                                            color="brand.textMuted"
+                                        >
+                                            {track.genre}
+                                        </Text>
                                     </Flex>
                                 </Flex>
-                            </Table.Cell>
-                            <Table.Cell py={2.5} px={2}>
-                                <Text
-                                    truncate={playingTrackId !== track.id}
-                                    fontSize="xs"
-                                    css={{
-                                        textWrap:
-                                            playingTrackId !== track.id
-                                                ? "nowrap"
-                                                : "wrap",
-                                    }}
-                                >
-                                    {track.genre}
-                                </Text>
                             </Table.Cell>
                             {!currentReleaseTrack && (
                                 <Table.Cell py={2.5} px={2}>

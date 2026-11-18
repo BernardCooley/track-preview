@@ -1,5 +1,5 @@
 import { Menu, Button } from "@chakra-ui/react";
-import React from "react";
+import React, { useRef } from "react";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 
 interface TrackOptionsProps {
@@ -17,14 +17,24 @@ const TrackMenuOptions = ({
     onTrackDelete,
     onViewRelease,
 }: TrackOptionsProps) => {
+    const openRef = useRef(false);
+
     return (
-        <Menu.Root>
+        <Menu.Root
+            onOpenChange={({ open }) => {
+                openRef.current = open;
+                if (open) {
+                    onMouseEnter();
+                } else {
+                    onMouseLeave();
+                }
+            }}
+        >
             <Menu.Trigger asChild>
                 <Button
                     onClick={(e) => e.stopPropagation()}
                     variant="tertiary"
                     onMouseEnter={onMouseEnter}
-                    onMouseLeave={onMouseLeave}
                     size="sm"
                     color="brand.textMuted"
                 >
@@ -49,12 +59,11 @@ const TrackMenuOptions = ({
                         rounded="md"
                         bg="transparent"
                         color="brand.textSecondary"
+                        cursor="pointer"
                         _hover={{
                             bg: "brand.surfaceHover",
                             color: "brand.textPrimary",
                         }}
-                        onMouseEnter={onMouseEnter}
-                        onMouseLeave={onMouseLeave}
                         onClick={() => onTrackDelete(index)}
                     >
                         Delete track
@@ -66,12 +75,11 @@ const TrackMenuOptions = ({
                         rounded="md"
                         bg="transparent"
                         color="brand.textSecondary"
+                        cursor="pointer"
                         _hover={{
                             bg: "brand.surfaceHover",
                             color: "brand.textPrimary",
                         }}
-                        onMouseEnter={onMouseEnter}
-                        onMouseLeave={onMouseLeave}
                         onClick={() => onViewRelease(index)}
                     >
                         View release

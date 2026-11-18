@@ -65,13 +65,13 @@ const Header = () => {
                 mx="auto"
                 justifyContent="space-between"
                 alignItems="center"
-                px={[4, 6]}
-                py={3}
+                px={[3, 4]}
+                py={1}
             >
                 <Link href={pathname !== "/explore" ? "/explore" : ""}>
                     <Text
                         userSelect="none"
-                        fontSize={["lg", "xl"]}
+                        fontSize="md"
                         fontFamily="brand"
                         color="brand.textPrimary"
                         letterSpacing="wide"

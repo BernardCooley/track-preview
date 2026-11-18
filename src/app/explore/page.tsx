@@ -67,8 +67,15 @@ function ExploreContent() {
     }, [isUserLoggedIn]);
 
     useEffect(() => {
+        audioElement.current?.pause();
         updateCurrentlyPlaying(undefined);
     }, [currentStep]);
+
+    useEffect(() => {
+        return () => {
+            audioElement.current?.pause();
+        };
+    }, []);
 
     useEffect(() => {
         const reviewStep = searchParams?.get("reviewStep");
@@ -189,22 +196,22 @@ function ExploreContent() {
             </Box>
             </Box>
 
-            <Box
-                position="fixed"
-                bottom={0}
-                left={0}
-                right={0}
-                zIndex={10}
-                transform={showAudioPlayer ? "translateY(0)" : "translateY(100%)"}
-                transition="transform 0.3s ease-in-out"
-                bg="brand.bgSubtle"
-                borderTop="1px solid"
-                borderTopColor="brand.border"
-            >
-                <Box p={3} maxW={["none", "none", "none", "1000px"]} mx="auto">
-                    <AudioPlayer ref={audioElement} />
+            {showAudioPlayer && (
+                <Box
+                    position="fixed"
+                    bottom={0}
+                    left={0}
+                    right={0}
+                    zIndex={10}
+                    bg="brand.bgSubtle"
+                    borderTop="1px solid"
+                    borderTopColor="brand.border"
+                >
+                    <Box p={3} maxW={["none", "none", "none", "1000px"]} mx="auto">
+                        <AudioPlayer ref={audioElement} />
+                    </Box>
                 </Box>
-            </Box>
+            )}
         </Flex>
     );
 }
