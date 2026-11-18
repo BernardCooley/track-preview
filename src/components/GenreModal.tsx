@@ -258,6 +258,47 @@ const GenreModal = ({
                             }}
                         >
                             {!isSearchActive && recentGenres && recentGenres.length > 0 && (
+                                <>
+                                    <Box mb={4}>
+                                        <Flex justifyContent="space-between" alignItems="center" mb={2}>
+                                            <Text
+                                                fontSize="xs"
+                                                fontWeight="semibold"
+                                                color="brand.textMuted"
+                                                textTransform="uppercase"
+                                                letterSpacing="0.05em"
+                                            >
+                                                Recent
+                                            </Text>
+                                            <Button
+                                                onClick={() => onFavouriteClearClick?.()}
+                                                variant="ghost"
+                                                color="brand.primary"
+                                                fontWeight="medium"
+                                                height="auto"
+                                                px={1}
+                                                fontSize="xs"
+                                                shadow="none"
+                                                _hover={{ color: "brand.primaryHover" }}
+                                            >
+                                                Clear
+                                            </Button>
+                                        </Flex>
+                                        <Flex flexWrap="wrap" gap={1.5}>
+                                            {recentGenres.map((gen) => (
+                                                <GenreTag
+                                                    key={gen}
+                                                    gen={gen}
+                                                    isActive={isSelected(gen)}
+                                                />
+                                            ))}
+                                        </Flex>
+                                    </Box>
+                                    <Box h="1px" bg="brand.divider" mb={4} />
+                                </>
+                            )}
+
+                            {!isSearchActive && !isAllSelected && (
                                 <Box mb={4}>
                                     <Flex justifyContent="space-between" alignItems="center" mb={2}>
                                         <Text
@@ -267,39 +308,34 @@ const GenreModal = ({
                                             textTransform="uppercase"
                                             letterSpacing="0.05em"
                                         >
-                                            Recent
+                                            Selected
                                         </Text>
-                                        {recentGenres.length > 1 && (() => {
-                                            const hasRecentSelected = recentGenres.some((g) => isSelected(g));
-                                            return (
-                                                <Button
-                                                    onClick={() => {
-                                                        setLocalSelection(["all"]);
-                                                        onFavouriteClearClick?.();
-                                                    }}
-                                                    variant="ghost"
-                                                    color={hasRecentSelected ? "brand.primary" : "brand.textMuted"}
-                                                    fontWeight={hasRecentSelected ? "medium" : "normal"}
-                                                    height="auto"
-                                                    px={1}
-                                                    fontSize="xs"
-                                                    shadow="none"
-                                                    _hover={{ color: hasRecentSelected ? "brand.primaryHover" : "brand.primary" }}
-                                                >
-                                                    Clear
-                                                </Button>
-                                            );
-                                        })()}
+                                        <Button
+                                            onClick={() => setLocalSelection(["all"])}
+                                            variant="ghost"
+                                            color="brand.primary"
+                                            fontWeight="medium"
+                                            height="auto"
+                                            px={1}
+                                            fontSize="xs"
+                                            shadow="none"
+                                            _hover={{ color: "brand.primaryHover" }}
+                                        >
+                                            Clear
+                                        </Button>
                                     </Flex>
                                     <Flex flexWrap="wrap" gap={1.5}>
-                                        {recentGenres.map((gen) => (
-                                            <GenreTag
-                                                key={gen}
-                                                gen={gen}
-                                                isActive={isSelected(gen)}
-                                            />
-                                        ))}
+                                        {localSelection
+                                            .filter((g) => g.toLowerCase() !== "all")
+                                            .map((gen) => (
+                                                <GenreTag
+                                                    key={gen}
+                                                    gen={gen}
+                                                    isActive={true}
+                                                />
+                                            ))}
                                     </Flex>
+                                    <Box h="1px" bg="brand.divider" mt={4} />
                                 </Box>
                             )}
 
