@@ -146,7 +146,11 @@ describe("Account Settings", () => {
 
         await waitFor(() => {
             expect(mockDeleteUser).toHaveBeenCalled();
-            expect(mockRouter.push).toHaveBeenCalledWith("/loginRegister?login=false&accountDeleted=true");
+            expect(screen.getByText("Deleting your account...")).toBeInTheDocument();
+        });
+
+        await waitFor(() => {
+            expect(mockRouter.push).toHaveBeenCalledWith("/");
         });
     });
 

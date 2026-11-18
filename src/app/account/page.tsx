@@ -11,6 +11,8 @@ import {
 } from "@chakra-ui/react";
 import { toaster } from "@/components/toaster";
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Center } from "@chakra-ui/react";
+import BouncingDotsLoader from "@/components/BouncingLoaderDots";
 import {
     DeleteUser,
     LogOut,
@@ -52,6 +54,7 @@ const Settings = () => {
     const id = "accountToast";
     const [userAccount, setUserAccount] = useState<UserAccount | null>(null);
     const [showPassword, setShowPassword] = useState<boolean>(false);
+    const [deleting, setDeleting] = useState<boolean>(false);
 
     const showToast = useCallback(
         ({ type, title, description, duration }: { type?: string; title?: string; description?: string; duration?: number }) => {
@@ -84,10 +87,12 @@ const Settings = () => {
     };
 
     const deleteAccount = async () => {
+        setDeleting(true);
         try {
             await DeleteUser();
-            router.push("/loginRegister?login=false&accountDeleted=true");
+            router.push("/");
         } catch (error: any) {
+            setDeleting(false);
             if (error.code === "auth/requires-recent-login") {
                 showToast({
                     title: "Please log in again to delete your account.",
@@ -249,6 +254,25 @@ const Settings = () => {
             </Flex>
         );
     };
+
+    if (deleting) {
+        return (
+            <Center h="100dvh" flexDirection="column" gap={6} bg="brand.bg">
+                <Text
+                    fontSize={["3xl", "4xl", "5xl"]}
+                    fontFamily="brand"
+                    color="brand.textPrimary"
+                    letterSpacing="wider"
+                >
+                    PHONIQUEST
+                </Text>
+                <Text color="brand.textSecondary" fontSize="md">
+                    Deleting your account...
+                </Text>
+                <BouncingDotsLoader />
+            </Center>
+        );
+    }
 
     return (
         <Flex direction="column" minH="100dvh" bg="brand.bg">

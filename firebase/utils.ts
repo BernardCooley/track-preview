@@ -103,6 +103,7 @@ export const DeleteUser = async () => {
 
     await deleteUserProfile({ userId: user.uid });
     await user.delete();
+    await signOut(auth);
 };
 
 export const SendVerificationEmail = async (user: User) => {
