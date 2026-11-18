@@ -13,7 +13,7 @@ interface Props {
     thumbnailRect?: DOMRect | null;
 }
 
-const MORPH_DURATION = 0.4;
+const MORPH_DURATION = 0.25;
 
 const RecordAnimation = ({
     animate,

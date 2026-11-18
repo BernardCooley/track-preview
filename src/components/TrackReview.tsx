@@ -82,7 +82,7 @@ const TrackReview = memo(
         const [thumbnailRect, setThumbnailRect] = useState<DOMRect | null>(null);
         const { open: isShowingTracklist, onToggle: toggleTracklist } =
             useDisclosure();
-        const animationDuration = 1.4;
+        const animationDuration = 0.9;
         const [animate, setAnimate] = useState<"like" | "dislike" | null>(null);
 
         useEffect(() => {
@@ -103,7 +103,7 @@ const TrackReview = memo(
             if (animate) {
                 setTimeout(() => {
                     setAnimate(null);
-                }, 400 + animationDuration * 1000 + (animationDuration * 1000) / 2);
+                }, 250 + animationDuration * 1000 + (animationDuration * 1000) / 2);
             }
         }, [animate]);
 
@@ -304,7 +304,7 @@ const TrackReview = memo(
                                 setAnimationImage(
                                     currentTrack?.thumbnail || ""
                                 );
-                                const morphMs = 400;
+                                const morphMs = 250;
                                 const animationMs = morphMs + animationDuration * 1000 + (animationDuration * 1000) / 2;
                                 await new Promise((r) => setTimeout(r, animationMs));
                                 await likeOrDislike(val);
