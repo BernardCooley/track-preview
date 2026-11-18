@@ -15,8 +15,9 @@ model User {
   autoplay   Boolean  @default(false)
   genres     String[] @default(["all"])
   yearFrom   Int      @default(1960)
-  yearTo     Int      @default(dbgenerated("extract(year from now())::int"))
-  Review     Review[]
+  yearTo      Int      @default(dbgenerated("extract(year from now())::int"))
+  curatedMode Boolean  @default(false)
+  Review      Review[]
 }
 
 model Comment {
@@ -53,12 +54,9 @@ model Track {
   releaseTitle  String
   genre         String
   title         String
-  previewUrl    String
-  url           String
   thumbnail     String
   releaseYear   Int
   releaseDate   String
-  slug          String    @unique
   deezerTrackId String?
   review        Review[]
 }

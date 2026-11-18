@@ -2,10 +2,11 @@ import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
-    const { userId, autoplay, genres, yearFrom, yearTo } = await req.json();
+    const { userId, autoplay, genres, yearFrom, yearTo, curatedMode } = await req.json();
 
     const data = {
         ...(autoplay !== undefined && { autoplay }),
+        ...(curatedMode !== undefined && { curatedMode }),
         ...(genres && { genres }),
         ...(yearFrom && { yearFrom }),
         ...(yearTo && { yearTo }),
@@ -18,6 +19,19 @@ export async function POST(req: Request) {
             },
             data,
         });
+
+        if (curatedMode === false) {
+            await prisma?.review.updateMany({
+                where: {
+                    userId: userId,
+                    currentReviewStep: { in: [2, 3] },
+                },
+                data: {
+                    currentReviewStep: 4,
+                    furthestReviewStep: 4,
+                },
+            });
+        }
 
         const response = NextResponse.json(updateUser, {
             status: 200,

@@ -108,6 +108,7 @@ const TrackReviewCard = ({
                         flexDirection="column"
                     >
                         <Card.Body
+                            data-track-thumbnail
                             w="full"
                             flex={1}
                             p={0}

@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useState } from "react";
+import React, { memo, useCallback, useEffect, useState } from "react";
 import { getCurrentYear } from "../../utils";
 import {
     Badge,
@@ -7,6 +7,7 @@ import {
     Center,
     Flex,
     Text,
+    VStack,
     useDisclosure,
 } from "@chakra-ui/react";
 import Loading from "./Loading";
@@ -19,6 +20,7 @@ import { genres } from "../../data/genres";
 import { useTrackReview } from "@/hooks/useTrackReview";
 import RecordAnimation from "./RecordAnimation";
 import TracklistTable from "./TracklistTable";
+import TrackTransition from "./TrackTransition";
 
 interface Props {
     reviewStep: number;
@@ -52,12 +54,35 @@ const TrackReview = memo(
             onGenreApply,
             onYearConfirm,
             resolvedPreviewUrl,
+            previewLoading,
         } = useTrackReview(reviewStep);
 
+        const userGenres = userProfile?.genres;
+        const hasGenreFilter = userGenres && userGenres.length > 0 && !userGenres.some((g: string) => g.toLowerCase() === "all");
+        const hasYearFilter = (userProfile?.yearFrom && userProfile.yearFrom !== 1960) || (userProfile?.yearTo && userProfile.yearTo !== getCurrentYear());
+        const hasActiveFilters = hasGenreFilter || hasYearFilter;
+        const genreLabel = hasGenreFilter
+            ? userGenres!.length === 1 ? userGenres![0] : `${userGenres!.length} genre`
+            : "all";
+
+        const resetFilters = useCallback(async () => {
+            if (user?.uid) {
+                const newProfile = await mutateUserProfile({
+                    userId: user.uid,
+                    genres: ["all"],
+                    yearFrom: 1960,
+                    yearTo: getCurrentYear(),
+                });
+                updateUserProfile(newProfile);
+            }
+        }, [user?.uid, updateUserProfile]);
+
         const [animationImage, setAnimationImage] = useState<string>("");
+        const [animationStart, setAnimationStart] = useState<{ x: number; y: number } | null>(null);
+        const [thumbnailRect, setThumbnailRect] = useState<DOMRect | null>(null);
         const { open: isShowingTracklist, onToggle: toggleTracklist } =
             useDisclosure();
-        const animationDuration = 1.4;
+        const animationDuration = 0.9;
         const [animate, setAnimate] = useState<"like" | "dislike" | null>(null);
 
         useEffect(() => {
@@ -78,15 +103,27 @@ const TrackReview = memo(
             if (animate) {
                 setTimeout(() => {
                     setAnimate(null);
-                }, animationDuration * 1000 + (animationDuration * 1000) / 2);
+                }, 250 + animationDuration * 1000 + (animationDuration * 1000) / 2);
             }
         }, [animate]);
 
         return (
+            <>
+            {animate && (
+                <RecordAnimation
+                    animate={animate}
+                    reviewStep={reviewStep}
+                    animationDuration={animationDuration}
+                    image={animationImage}
+                    curatedMode={userProfile?.curatedMode ?? false}
+                    startPosition={animationStart}
+                    thumbnailRect={thumbnailRect}
+                />
+            )}
             <Flex direction="column" position="relative" h="full" overflow="auto">
-                {loading && !animate && (
-                    <Center position="absolute" inset={0} zIndex={150} pt={24}>
-                        <Loading />
+                {loading && !animate && !currentTrack && (
+                    <Center position="absolute" inset={0} zIndex={150}>
+                        <TrackTransition />
                     </Center>
                 )}
 
@@ -117,15 +154,58 @@ const TrackReview = memo(
                 )}
 
                 {noTracks && !loading && reviewStep === 1 && (
-                    <Center pt={24} px={6}>
-                        <Text
-                            textAlign="center"
-                            color="brand.textSecondary"
-                            fontSize="md"
-                        >
-                            No tracks found. Please try again with different
-                            filters.
-                        </Text>
+                    <Center flex={1} px={6}>
+                        <VStack gap={5} maxW="360px">
+                            <VStack gap={2}>
+                                <Text
+                                    textAlign="center"
+                                    color="brand.textPrimary"
+                                    fontSize="md"
+                                    fontWeight="semibold"
+                                >
+                                    No tracks found
+                                </Text>
+                                <Text
+                                    textAlign="center"
+                                    color="brand.textSecondary"
+                                    fontSize="sm"
+                                >
+                                    {hasActiveFilters
+                                        ? <>We don&apos;t currently have any <Text as="span" fontWeight="bold" color="brand.textPrimary">{genreLabel}</Text> tracks between <Text as="span" fontWeight="bold" color="brand.textPrimary">{userProfile?.yearFrom || 1960}</Text> and <Text as="span" fontWeight="bold" color="brand.textPrimary">{userProfile?.yearTo || getCurrentYear()}</Text>.<br />Try adjusting your filters or try again later.</>
+                                        : <>We don&apos;t currently have any tracks matching your filters.<br />Try adjusting them or try again later.</>}
+                                </Text>
+                            </VStack>
+                            <VStack gap={2} w="full">
+                                <Flex gap={2} w="full">
+                                    <Button
+                                        variant="subtle"
+                                        size="sm"
+                                        flex={1}
+                                        onClick={() => setShowYearSelector(true)}
+                                    >
+                                        Change years
+                                    </Button>
+                                    <Button
+                                        variant="subtle"
+                                        size="sm"
+                                        flex={1}
+                                        onClick={() => setShowGenreSelector(true)}
+                                    >
+                                        Change genre
+                                    </Button>
+                                </Flex>
+                                {hasActiveFilters && (
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        w="full"
+                                        onClick={resetFilters}
+                                    >
+                                        Reset all filters
+                                    </Button>
+                                )}
+                            </VStack>
+                        </VStack>
                     </Center>
                 )}
 
@@ -152,7 +232,7 @@ const TrackReview = memo(
                     onCancel={() => setShowYearSelector(false)}
                 />
 
-                {reviewStep === 1 && (
+                {reviewStep === 1 && !(noTracks && !loading) && (
                     <Box px={[4, 6]} py={3}>
                         {user?.uid && (
                             <FilterTags
@@ -174,22 +254,18 @@ const TrackReview = memo(
                     </Box>
                 )}
 
-                {animate && (
-                    <RecordAnimation
-                        animate={animate}
-                        reviewStep={reviewStep}
-                        animationDuration={animationDuration}
-                        image={animationImage}
-                    />
+                {(previewLoading || loading) && !animate && currentTrack && (
+                    <Flex flex={1}>
+                        <TrackTransition />
+                    </Flex>
                 )}
 
                 <Flex
-                    transition="opacity 0.4s ease"
-                    opacity={animate ? 0 : 1}
                     direction="column"
                     flex={1}
+                    display={(!previewLoading && !loading) && !animate ? "flex" : "none"}
                 >
-                    {currentTrack && !animate && (
+                    {currentTrack && !previewLoading && !loading && (
                         <TrackReviewCard
                             noTracks={noTracks}
                             loading={loading}
@@ -215,11 +291,23 @@ const TrackReview = memo(
                             currentTrack={currentTrack}
                             previewUrl={resolvedPreviewUrl}
                             onLikeOrDislike={async (val) => {
-                                await likeOrDislike(val);
+                                const trackInfo = document.querySelector("[data-track-info]");
+                                if (trackInfo) {
+                                    const rect = trackInfo.getBoundingClientRect();
+                                    setAnimationStart({ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 });
+                                }
+                                const thumb = document.querySelector("[data-track-thumbnail]");
+                                if (thumb) {
+                                    setThumbnailRect(thumb.getBoundingClientRect());
+                                }
                                 setAnimate(val ? "like" : "dislike");
                                 setAnimationImage(
                                     currentTrack?.thumbnail || ""
                                 );
+                                const morphMs = 250;
+                                const animationMs = morphMs + animationDuration * 1000 + (animationDuration * 1000) / 2;
+                                await new Promise((r) => setTimeout(r, animationMs));
+                                await likeOrDislike(val);
                             }}
                             onAudioPlay={() => {
                                 setIsPlaying(true);
@@ -244,6 +332,7 @@ const TrackReview = memo(
                     )}
                 </Flex>
             </Flex>
+            </>
         );
     },
     (prevProps, nextProps) => {

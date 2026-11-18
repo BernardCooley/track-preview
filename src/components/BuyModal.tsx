@@ -7,9 +7,10 @@ import {
     Dialog,
     Text,
 } from "@chakra-ui/react";
-import React from "react";
+import React, { useMemo } from "react";
 import BuyLink from "./BuyLink";
 import { IBuyLink, ReviewTracks } from "../../types";
+import { getRelevantBuyLinks } from "../../utils";
 
 interface Props {
     buyModalIsOpen: boolean;
@@ -26,6 +27,12 @@ const BuyModal = ({
     reviewTracks,
     trackToBuy,
 }: Props) => {
+    const track = trackToBuy !== null ? reviewTracks[4].tracks[trackToBuy] : null;
+    const filteredLinks = useMemo(
+        () => (track ? getRelevantBuyLinks(buyLinks, track.genre) : buyLinks),
+        [buyLinks, track]
+    );
+
     return (
         <Dialog.Root
             placement="center"
@@ -78,7 +85,7 @@ const BuyModal = ({
 
                         <Box px={[4, 5]} py={5}>
                             <Grid templateColumns="repeat(3, 1fr)" gap={4}>
-                                {buyLinks.map((buyLink) => (
+                                {filteredLinks.map((buyLink) => (
                                     <GridItem
                                         key={buyLink.platform}
                                         display="flex"
@@ -88,12 +95,20 @@ const BuyModal = ({
                                         _hover={{ transform: "scale(1.05)" }}
                                     >
                                         <BuyLink
-                                            track={reviewTracks[4].tracks[trackToBuy!]}
+                                            track={track!}
                                             buyLink={buyLink}
                                         />
                                     </GridItem>
                                 ))}
                             </Grid>
+                            <Text
+                                fontSize="xs"
+                                color="brand.textMuted"
+                                textAlign="center"
+                                mt={5}
+                            >
+                                Results may vary by store. Some links may be affiliate links — we may earn a small commission at no extra cost to you.
+                            </Text>
                         </Box>
 
                         <Flex

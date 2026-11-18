@@ -61,7 +61,23 @@ npx prisma db push
 Seeds ~500 tracks per genre from the scraped data in `scraping_tracks/`:
 
 ```bash
-node prisma/seed.js
+npx prisma db seed
+```
+
+### Reset the database (migrate + seed in one step)
+
+To wipe the local database, re-run all migrations, and re-seed:
+
+```bash
+npx prisma migrate reset
+```
+
+### Create a new migration
+
+After changing `prisma/schema.prisma`, generate and apply a migration:
+
+```bash
+npx prisma migrate dev --name describe-the-change
 ```
 
 The seed reads from three data sources:

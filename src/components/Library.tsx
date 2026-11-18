@@ -48,7 +48,7 @@ const Library = () => {
         if (changesMade[4] || reviewTracks[4].tracks.length === 0) {
             getTracks(null);
         }
-    }, [user]);
+    }, [user, changesMade[4]]);
 
     useEffect(() => {
         if (trackToDelete || trackToDelete === 0) {

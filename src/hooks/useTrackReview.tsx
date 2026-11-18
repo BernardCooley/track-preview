@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useAuthContext } from "../../Contexts/AuthContext";
 import { getCurrentYear } from "../../utils";
 import { useTrackContext } from "../../context/TrackContext";
@@ -37,11 +37,16 @@ export const useTrackReview = (reviewStep: number) => {
     const [autoplayLoading, setAutoplayLoading] = useState<boolean>(false);
     const [indexOfTrack, setIndexOfTrack] = useState(0);
     const [resolvedPreviewUrl, setResolvedPreviewUrl] = useState<string>("");
+    const [previewLoading, setPreviewLoading] = useState<boolean>(true);
+
+    const previewCache = useRef<Map<string, string>>(new Map());
+    const unplayableTracks = useRef<Set<string>>(new Set());
+    const prefetchingTracks = useRef<Set<string>>(new Set());
 
     const comparisonUserProfile = (profile: UserProfile | null) => {
         if (profile === null) return;
 
-        const { autoplay, ...rest } = profile;
+        const { autoplay, curatedMode, ...rest } = profile;
         return JSON.stringify(rest);
     };
 
@@ -53,37 +58,107 @@ export const useTrackReview = (reviewStep: number) => {
         setPrevUserProfile(userProfile);
     }, [userProfile]);
 
-    useEffect(() => {
-        let revoked = false;
-        let objectUrl = "";
+    const fetchPreview = useCallback(async (trackId: string): Promise<string | null> => {
+        if (previewCache.current.has(trackId)) return previewCache.current.get(trackId)!;
+        if (unplayableTracks.current.has(trackId)) return null;
 
-        if (currentTrack) {
-            setListened(false);
-            setIsPlaying(false);
-            setResolvedPreviewUrl("");
-            resolvePreviewUrl(currentTrack.id).then(async (proxyUrl) => {
-                if (!proxyUrl || revoked) return;
-                try {
-                    const res = await fetch(proxyUrl);
-                    if (!res.ok || revoked) return;
-                    const blob = await res.blob();
-                    if (revoked) return;
-                    objectUrl = URL.createObjectURL(blob);
-                    setResolvedPreviewUrl(objectUrl);
-                } catch {
-                    // fall through — no preview available
-                }
+        try {
+            const proxyUrl = await resolvePreviewUrl(trackId);
+            if (!proxyUrl) {
+                unplayableTracks.current.add(trackId);
+                return null;
+            }
+            const res = await fetch(proxyUrl);
+            if (!res.ok) {
+                unplayableTracks.current.add(trackId);
+                return null;
+            }
+            const blob = await res.blob();
+            const objectUrl = URL.createObjectURL(blob);
+            previewCache.current.set(trackId, objectUrl);
+            return objectUrl;
+        } catch {
+            unplayableTracks.current.add(trackId);
+            return null;
+        }
+    }, []);
+
+    const prefetchUpcoming = useCallback((tracks: Track[], fromIndex: number) => {
+        const PREFETCH_COUNT = 3;
+        let queued = 0;
+        for (let i = fromIndex + 1; i < tracks.length && queued < PREFETCH_COUNT; i++) {
+            const track = tracks[i];
+            if (
+                unplayableTracks.current.has(track.id) ||
+                previewCache.current.has(track.id) ||
+                prefetchingTracks.current.has(track.id)
+            ) continue;
+            prefetchingTracks.current.add(track.id);
+            queued++;
+            fetchPreview(track.id).finally(() => {
+                prefetchingTracks.current.delete(track.id);
             });
         }
+    }, [fetchPreview]);
+
+    useEffect(() => {
+        let revoked = false;
+
+        if (!currentTrack) return;
+
+        setListened(false);
+        setIsPlaying(false);
+        setResolvedPreviewUrl("");
+        setPreviewLoading(true);
+
+        const tracks = reviewTracks[reviewStep].tracks;
+        const currentIndex = tracks.findIndex((t) => t.id === currentTrack.id);
+
+        const tryTrackAtIndex = async (idx: number) => {
+            if (revoked) return;
+            if (idx >= tracks.length) {
+                setPreviewLoading(false);
+                setLoading(false);
+                return;
+            }
+
+            const track = tracks[idx];
+
+            if (idx !== currentIndex) {
+                setCurrentTrack(track as Track);
+                return;
+            }
+
+            const blobUrl = await fetchPreview(track.id);
+            if (revoked) return;
+
+            if (!blobUrl) {
+                tryTrackAtIndex(idx + 1);
+                return;
+            }
+
+            setResolvedPreviewUrl(blobUrl);
+            setPreviewLoading(false);
+            prefetchUpcoming(tracks, idx);
+        };
+
+        tryTrackAtIndex(currentIndex);
 
         return () => {
             revoked = true;
-            if (objectUrl) URL.revokeObjectURL(objectUrl);
         };
     }, [currentTrack]);
 
+    const clearPreviewCache = useCallback(() => {
+        previewCache.current.forEach((url) => URL.revokeObjectURL(url));
+        previewCache.current.clear();
+        unplayableTracks.current.clear();
+        prefetchingTracks.current.clear();
+    }, []);
+
     const getTracks = useCallback(async () => {
         setCurrentTrack(null);
+        clearPreviewCache();
         if (userProfile?.genres && user?.uid) {
             setLoading(true);
             return await fetchTracks({
@@ -199,7 +274,13 @@ export const useTrackReview = (reviewStep: number) => {
                 );
 
                 setLoading(true);
+                setPreviewLoading(true);
                 const track = { ...currentTrack };
+                const cachedUrl = previewCache.current.get(track.id);
+                if (cachedUrl) {
+                    URL.revokeObjectURL(cachedUrl);
+                    previewCache.current.delete(track.id);
+                }
 
                 if (reviewTracks[reviewStep].tracks.length > 0) {
                     if (reviewTracks[reviewStep].tracks.length === 1) {
@@ -211,6 +292,7 @@ export const useTrackReview = (reviewStep: number) => {
                             reviewStep,
                             like,
                             userId: user.uid,
+                            curatedMode: userProfile?.curatedMode ?? false,
                         });
                     } else {
                         updateTrackReviewStep({
@@ -218,18 +300,25 @@ export const useTrackReview = (reviewStep: number) => {
                             reviewStep,
                             like,
                             userId: user.uid,
+                            curatedMode: userProfile?.curatedMode ?? false,
                         });
                     }
 
+                    const currentIndex = reviewTracks[reviewStep].tracks.findIndex(
+                        (t) => t.id === track.id
+                    );
+                    const remaining = reviewTracks[reviewStep].tracks.filter(
+                        (t) => t.id !== track.id
+                    );
+                    const nextIndex = Math.min(currentIndex, remaining.length - 1);
                     updateReviewTracks(
                         reviewStep,
-                        reviewTracks[reviewStep].tracks.filter(
-                            (t) => t.id !== track.id
-                        ),
-                        0
+                        remaining,
+                        Math.max(nextIndex, 0)
                     );
                 }
-                updateChangesMade(reviewStep + 1, true);
+                const nextStep = (!userProfile?.curatedMode && reviewStep === 1) ? 4 : reviewStep + 1;
+                updateChangesMade(nextStep, true);
             }
         } catch (error) {
             showToast({
@@ -312,5 +401,6 @@ export const useTrackReview = (reviewStep: number) => {
         reviewTracks,
         updateReviewTracks,
         resolvedPreviewUrl,
+        previewLoading,
     };
 };

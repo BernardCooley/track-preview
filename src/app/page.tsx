@@ -9,7 +9,6 @@ import { auth } from "../../firebase/firebaseInit";
 import BouncingDotsLoader from "@/components/BouncingLoaderDots";
 import HeadphonesIcon from "@mui/icons-material/Headphones";
 import ThumbUpAltIcon from "@mui/icons-material/ThumbUpAlt";
-import SkipNextIcon from "@mui/icons-material/SkipNext";
 import LibraryMusicIcon from "@mui/icons-material/LibraryMusic";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 
@@ -21,23 +20,19 @@ export default function Home() {
     const features = [
         {
             icon: <HeadphonesIcon style={{ fontSize: "20px" }} />,
-            text: "Listen to a random song",
+            text: "Tracks are picked completely at random — no algorithms deciding what you hear",
         },
         {
             icon: <ThumbUpAltIcon style={{ fontSize: "20px" }} />,
-            text: "Like or dislike each song",
-        },
-        {
-            icon: <SkipNextIcon style={{ fontSize: "20px" }} />,
-            text: "Dislikes are gone forever. Likes move to the next step",
+            text: "Like or skip each track. Your taste is the only filter",
         },
         {
             icon: <LibraryMusicIcon style={{ fontSize: "20px" }} />,
-            text: "A new track loads after each like or dislike",
+            text: "Build a library of tracks you genuinely discovered yourself",
         },
         {
             icon: <ShoppingCartIcon style={{ fontSize: "20px" }} />,
-            text: "Manage or buy your liked tracks from the library",
+            text: "Find purchase links to support the artists you discover",
         },
     ];
 
@@ -86,9 +81,9 @@ export default function Home() {
                 justifyContent="center"
                 w="full"
                 maxW="520px"
-                gap={[6, 8]}
+                gap={[20, 24]}
             >
-                <VStack gap={3}>
+                <VStack gap={4}>
                     <Text
                         fontSize={["3xl", "4xl", "5xl"]}
                         fontFamily="brand"
@@ -103,7 +98,7 @@ export default function Home() {
                         color="brand.textSecondary"
                         textAlign="center"
                     >
-                        Discover music you love
+                        No algorithms. No rankings. Just random music discovery.
                     </Text>
                 </VStack>
 

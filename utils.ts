@@ -1,4 +1,4 @@
-import { BuyPlatforms, Track } from "./types";
+import { BuyPlatforms, IBuyLink, Track } from "./types";
 
 export const removeDuplicates = (arr: string[]) => {
     return arr.filter((item, index) => arr.indexOf(item) === index);
@@ -65,6 +65,8 @@ export const formatBuyUrl = (track: Track, platform: BuyPlatforms) => {
         return `https://bandcamp.com/search?q=${track.artist} ${track.title}`;
     } else if (platform === "apple music") {
         return `https://music.apple.com/search?term=${track.artist} ${track.title}`;
+    } else if (platform === "bleep") {
+        return `https://bleep.com/search/query?q=${track.artist}+-+${track.title}`;
     }
 };
 
@@ -76,6 +78,118 @@ export const generateSlug = (artist: string, title: string, platformId: string, 
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/(^-|-$)/g, "");
+};
+
+const specialistStoreGenres: Partial<Record<BuyPlatforms, string[]>> = {
+    beatport: [
+        "Deep House",
+        "Techno",
+        "Experimental/Electronic",
+        "Coldwave/Synth",
+        "Electro",
+        "Disco/Nu-Disco",
+        "Minimal/Tech House",
+        "Electro House",
+        "Balearic/Downtempo",
+        "Uplifting Trance",
+        "Drum & Bass / Jungle",
+        "Funky/Club House",
+        "Hardstyle",
+        "Breakbeat",
+        "Dirty Dubstep/Trap/Grime",
+        "UK Garage",
+        "Bass",
+        "Gabba",
+        "Hard Techno",
+        "Footwork/Juke",
+        "Deep Dubstep",
+        "Hard House",
+        "Progressive House",
+        "DJ Tools",
+        "Hard Trance",
+        "Psy/Goa Trance",
+        "UK Hardcore",
+        "Bassline",
+        "Pop Trance",
+        "Dance",
+        "Dubstep",
+        "Electronica",
+        "House",
+        "Trance",
+        "Broken Beat/Nu Jazz",
+        "Dancehall/Ragga",
+        "Dub",
+        "Industrial/Noise",
+    ],
+    bleep: [
+        "Experimental/Electronic",
+        "Techno",
+        "Ambient/Drone",
+        "Coldwave/Synth",
+        "Electro",
+        "Industrial/Noise",
+        "Post Rock/Experimental",
+        "Modern Classical",
+        "Minimal/Tech House",
+        "Electronica",
+        "Deep House",
+        "Balearic/Downtempo",
+        "Broken Beat/Nu Jazz",
+        "Dub",
+    ],
+    juno: [
+        "Deep House",
+        "Techno",
+        "Electro",
+        "Disco/Nu-Disco",
+        "Minimal/Tech House",
+        "Electro House",
+        "Funky/Club House",
+        "Drum & Bass / Jungle",
+        "Breakbeat",
+        "UK Garage",
+        "Bass",
+        "Hard Techno",
+        "Footwork/Juke",
+        "Deep Dubstep",
+        "Hard House",
+        "Progressive House",
+        "DJ Tools",
+        "Hardstyle",
+        "Gabba",
+        "Hard Trance",
+        "Psy/Goa Trance",
+        "UK Hardcore",
+        "Bassline",
+        "Pop Trance",
+        "Uplifting Trance",
+        "Dance",
+        "Dubstep",
+        "Electronica",
+        "House",
+        "Trance",
+        "Balearic/Downtempo",
+        "Dirty Dubstep/Trap/Grime",
+        "Dancehall/Ragga",
+        "Dub",
+        "Hip Hop/R&B",
+        "Funk",
+        "Soul",
+        "Experimental/Electronic",
+        "Coldwave/Synth",
+        "Reggae Classics/Ska",
+        "Roots/Lovers Rock",
+    ],
+};
+
+export const getRelevantBuyLinks = (buyLinks: IBuyLink[], genre: string): IBuyLink[] => {
+    return buyLinks.filter((link) => {
+        const allowedGenres = specialistStoreGenres[link.platform];
+        if (!allowedGenres) return true;
+        return allowedGenres.some(
+            (g) => g.toLowerCase() === genre.toLowerCase()
+        );
+    });
 };
 
 export const capitaliseWords = (str: string) => {

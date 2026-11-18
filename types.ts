@@ -13,12 +13,9 @@ export interface Track {
     purchaseUrl: string;
     artist: string;
     title: string;
-    previewUrl: string;
     id: string;
     thumbnail: string;
-    url: string;
     releaseYear: number;
-    slug: string;
     releaseTitle: string;
     platform: string;
     platformId: string;
@@ -60,7 +57,8 @@ export type BuyPlatforms =
     | "juno download"
     | "discogs"
     | "bandcamp"
-    | "apple music";
+    | "apple music"
+    | "bleep";
 
 export interface IBuyLink {
     platform: BuyPlatforms;
