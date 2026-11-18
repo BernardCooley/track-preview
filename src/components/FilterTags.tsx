@@ -54,6 +54,7 @@ const FilterTags = ({
                 onClick={onGenreClick}
                 pointerEvents={profileLoaded ? "auto" : "none"}
                 minW="80px"
+                justifyContent="center"
             >
                 {genres ? (
                     <Text userSelect="none" fontSize="sm">
@@ -69,6 +70,7 @@ const FilterTags = ({
                 onClick={onYearClick}
                 pointerEvents={profileLoaded ? "auto" : "none"}
                 minW="70px"
+                justifyContent="center"
             >
                 {yearRange && profileLoaded ? (
                     <Text userSelect="none" fontSize="sm">
