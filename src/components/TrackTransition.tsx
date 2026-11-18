@@ -1,6 +1,7 @@
 "use client";
 
 import { Box, Flex } from "@chakra-ui/react";
+import BouncingDotsLoader from "./BouncingLoaderDots";
 
 const TrackTransition = () => {
     return (
@@ -11,23 +12,16 @@ const TrackTransition = () => {
             justifyContent="center"
             gap={8}
             pb={16}
-            animation="fadeIn 0.3s ease-out"
-            css={{
-                "@keyframes fadeIn": {
-                    from: { opacity: 0 },
-                    to: { opacity: 1 },
-                },
-                "@keyframes spin": {
-                    from: { transform: "rotate(0deg)" },
-                    to: { transform: "rotate(360deg)" },
-                },
-                "@keyframes pulse": {
-                    "0%, 100%": { opacity: 0.3 },
-                    "50%": { opacity: 0.6 },
-                },
-            }}
         >
-            <Box position="relative">
+            <Box
+                position="relative"
+                css={{
+                    "@keyframes spin": {
+                        from: { transform: "rotate(0deg)" },
+                        to: { transform: "rotate(360deg)" },
+                    },
+                }}
+            >
                 <Box
                     w={["140px", "170px"]}
                     h={["140px", "170px"]}
@@ -78,29 +72,7 @@ const TrackTransition = () => {
                 </Box>
             </Box>
 
-            <Flex direction="column" alignItems="center" gap={3} w="60%">
-                <Box
-                    h="20px"
-                    w="70%"
-                    borderRadius="md"
-                    bg="brand.surface"
-                    animation="pulse 1.5s ease-in-out infinite"
-                />
-                <Box
-                    h="16px"
-                    w="50%"
-                    borderRadius="md"
-                    bg="brand.surface"
-                    animation="pulse 1.5s ease-in-out infinite 0.2s"
-                />
-                <Box
-                    h="12px"
-                    w="35%"
-                    borderRadius="md"
-                    bg="brand.surface"
-                    animation="pulse 1.5s ease-in-out infinite 0.4s"
-                />
-            </Flex>
+            <BouncingDotsLoader />
         </Flex>
     );
 };
