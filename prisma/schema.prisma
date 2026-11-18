@@ -16,8 +16,10 @@ model User {
   genres     String[] @default(["all"])
   yearFrom   Int      @default(1960)
   yearTo      Int      @default(dbgenerated("extract(year from now())::int"))
-  curatedMode Boolean  @default(false)
-  Review      Review[]
+  curatedMode  Boolean  @default(false)
+  isAnonymous  Boolean  @default(false)
+  lastActiveAt DateTime @default(now())
+  Review       Review[]
 }
 
 model Comment {

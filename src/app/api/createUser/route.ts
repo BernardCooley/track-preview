@@ -2,13 +2,14 @@ import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
-    const { userId } = await req.json();
+    const { userId, isAnonymous } = await req.json();
 
     try {
         const user = await prisma?.user.create({
             data: {
                 id: userId,
                 firebaseId: userId,
+                ...(isAnonymous !== undefined && { isAnonymous }),
             },
         });
 

@@ -21,10 +21,12 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import { UserCredential } from "firebase/auth";
 import {
     DeleteUser,
+    LinkAnonymousAccount,
     RegisterUser,
     SendVerificationEmail,
 } from "../../firebase/utils";
-import { createUser } from "@/bff/bff";
+import { createUser, mutateUserProfile } from "@/bff/bff";
+import { auth } from "../../firebase/firebaseInit";
 
 interface FormData {
     email: string;
@@ -84,10 +86,15 @@ const SignUp = () => {
     const performRegister = async (formData: FormData) => {
         setEmail(formData.email);
         setSubmitting(true);
+        const isCurrentlyAnonymous = auth.currentUser?.isAnonymous === true;
         let newUser: UserCredential | null = null;
 
         try {
-            newUser = await RegisterUser(formData.email, formData.password);
+            if (isCurrentlyAnonymous) {
+                newUser = await LinkAnonymousAccount(formData.email, formData.password);
+            } else {
+                newUser = await RegisterUser(formData.email, formData.password);
+            }
         } catch (error) {
             showToast({
                 title: "Error registering.",
@@ -101,18 +108,33 @@ const SignUp = () => {
         }
 
         if (newUser) {
-            try {
-                await createUser({
-                    userId: newUser.user.uid,
-                });
-            } catch (error) {
-                await DeleteUser();
-                showToast({
-                    title: "Error registering.",
-                    description:
-                        "Please check your email and password and try again.",
-                    type: "error",
-                });
+            if (isCurrentlyAnonymous) {
+                try {
+                    await mutateUserProfile({
+                        userId: newUser.user.uid,
+                        isAnonymous: false,
+                    });
+                } catch (error) {
+                    showToast({
+                        title: "Error upgrading account.",
+                        description: "Please try again later.",
+                        type: "error",
+                    });
+                }
+            } else {
+                try {
+                    await createUser({
+                        userId: newUser.user.uid,
+                    });
+                } catch (error) {
+                    await DeleteUser();
+                    showToast({
+                        title: "Error registering.",
+                        description:
+                            "Please check your email and password and try again.",
+                        type: "error",
+                    });
+                }
             }
 
             try {

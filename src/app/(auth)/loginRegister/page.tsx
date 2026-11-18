@@ -44,7 +44,7 @@ const AuthPageContent = () => {
 
     const isUserLoggedIn = useCallback(async () => {
         onAuthStateChanged(auth, (user) => {
-            if (user && user.email && user.uid) {
+            if (user && user.email && user.uid && !user.isAnonymous) {
                 router.push("/explore");
             } else {
                 setLoading(false);

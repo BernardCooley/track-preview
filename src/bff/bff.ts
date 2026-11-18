@@ -183,11 +183,13 @@ export const updateTrackReviewStep = async ({
 
 interface CreateUserProps {
     userId: string;
+    isAnonymous?: boolean;
 }
 
-export const createUser = async ({ userId }: CreateUserProps): Promise<any> => {
+export const createUser = async ({ userId, isAnonymous }: CreateUserProps): Promise<any> => {
     const user: any = await fetchWithErrorHandling("/api/createUser", "POST", {
         userId,
+        isAnonymous,
     });
 
     return user;
@@ -197,6 +199,7 @@ interface UpdateUserAutoplayProps {
     userId: string;
     autoplay?: boolean;
     curatedMode?: boolean;
+    isAnonymous?: boolean;
     genres?: string[];
     yearFrom?: number;
     yearTo?: number;
@@ -206,6 +209,7 @@ export const mutateUserProfile = async ({
     userId,
     autoplay,
     curatedMode,
+    isAnonymous,
     genres,
     yearFrom,
     yearTo,
@@ -218,6 +222,7 @@ export const mutateUserProfile = async ({
                 userId,
                 autoplay,
                 curatedMode,
+                isAnonymous,
                 genres,
                 yearFrom,
                 yearTo,
@@ -355,6 +360,24 @@ export const resolvePreviewUrl = async (
     } catch (error) {
         console.error("Failed to resolve preview URL:", error);
         return "";
+    }
+};
+
+export const getTrialLikeCount = async ({
+    userId,
+}: {
+    userId: string;
+}): Promise<number> => {
+    try {
+        const result = await fetchWithErrorHandling<{ count: number }>(
+            "/api/getTrialLikeCount",
+            "POST",
+            { userId }
+        );
+        return result?.count ?? 0;
+    } catch (error) {
+        console.error(error);
+        return 0;
     }
 };
 

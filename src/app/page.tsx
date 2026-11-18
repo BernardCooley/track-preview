@@ -6,6 +6,8 @@ import { useAuthContext } from "../../Contexts/AuthContext";
 import { useCallback, useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../firebase/firebaseInit";
+import { SignInAnonymously } from "../../firebase/utils";
+import { createUser } from "@/bff/bff";
 import BouncingDotsLoader from "@/components/BouncingLoaderDots";
 import HeadphonesIcon from "@mui/icons-material/Headphones";
 import ThumbUpAltIcon from "@mui/icons-material/ThumbUpAlt";
@@ -14,6 +16,7 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 
 export default function Home() {
     const [loading, setLoading] = useState(true);
+    const [startingTrial, setStartingTrial] = useState(false);
     const { user } = useAuthContext();
     const router = useRouter();
 
@@ -38,7 +41,7 @@ export default function Home() {
 
     const isUserLoggedIn = useCallback(async () => {
         onAuthStateChanged(auth, (user) => {
-            if (user && user.email && user.uid) {
+            if (user && user.uid) {
                 router.push("/explore");
             } else {
                 setLoading(false);
@@ -154,15 +157,42 @@ export default function Home() {
                     w="full"
                     variant="primary"
                     size="lg"
-                    onClick={() => {
-                        router.push(
-                            user
-                                ? "/explore"
-                                : "/loginRegister?login=true"
-                        );
+                    loading={startingTrial}
+    onClick={async () => {
+                        if (user) {
+                            router.push("/explore");
+                            return;
+                        }
+                        setStartingTrial(true);
+                        try {
+                            const result = await SignInAnonymously();
+                            if (result?.user) {
+                                try {
+                                    await createUser({
+                                        userId: result.user.uid,
+                                        isAnonymous: true,
+                                    });
+                                } catch {
+                                    // User already exists in DB — that's fine
+                                }
+                                router.push("/explore");
+                            }
+                        } catch {
+                            router.push("/loginRegister?login=true");
+                        } finally {
+                            setStartingTrial(false);
+                        }
                     }}
                 >
                     Get Started
+                </Button>
+                <Button
+                    w="full"
+                    variant="outline"
+                    size="lg"
+                    onClick={() => router.push("/loginRegister?login=true")}
+                >
+                    Sign in
                 </Button>
             </Box>
         </Flex>

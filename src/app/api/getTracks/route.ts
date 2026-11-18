@@ -43,6 +43,13 @@ export async function POST(req: Request) {
             (await prisma?.$queryRaw(Prisma.raw(reviewStep === 1 ? q1 : q2))) ||
             [];
 
+        if (reviewStep === 1) {
+            await prisma?.user.update({
+                where: { id: userId },
+                data: { lastActiveAt: new Date() },
+            });
+        }
+
         const response = NextResponse.json(tracks, {
             status: 200,
         });

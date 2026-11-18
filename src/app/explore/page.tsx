@@ -17,7 +17,8 @@ import MenuDrawer from "@/components/MenuDrawer";
 import { getUserProfile } from "@/bff/bff";
 import { useTrackContext } from "../../../context/TrackContext";
 import { useAuthContext } from "../../../Contexts/AuthContext";
-import { GetCurrentUser } from "../../../firebase/utils";
+import { GetCurrentUser, SignInAnonymously } from "../../../firebase/utils";
+import { createUser } from "@/bff/bff";
 import { auth } from "../../../firebase/firebaseInit";
 import TrackReview from "@/components/TrackReview";
 import LooksOneIcon from "@mui/icons-material/LooksOne";
@@ -25,6 +26,7 @@ import LooksTwoIcon from "@mui/icons-material/LooksTwo";
 import Looks3Icon from "@mui/icons-material/Looks3";
 import LibraryMusicIcon from "@mui/icons-material/LibraryMusic";
 import MenuOpenIcon from "@mui/icons-material/MenuOpen";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import Link from "next/link";
 
 function ExploreContent() {
@@ -33,7 +35,7 @@ function ExploreContent() {
     const { currentlyPlaying, updateCurrentlyPlaying } = useTrackContext();
     const audioElement = useRef<HTMLAudioElement>(null);
     const [currentStep, setCurrentStep] = useState<number>(0);
-    const { updateUser, user, updateUserProfile, userProfile } = useAuthContext();
+    const { updateUser, user, updateUserProfile, userProfile, isAnonymous, setIsAnonymous } = useAuthContext();
     const reviewStep = searchParams?.get("reviewStep");
     const pageRef = useRef<HTMLDivElement>(null);
     const { open: isMenuOpen, onOpen: onMenuOpen, onClose: onMenuClose } = useDisclosure();
@@ -41,7 +43,11 @@ function ExploreContent() {
     useEffect(() => {
         if (user?.uid) {
             (async () => {
-                const userProf = await getUserProfile({ userId: user?.uid });
+                let userProf = await getUserProfile({ userId: user.uid });
+                if (!userProf && isAnonymous) {
+                    await createUser({ userId: user.uid, isAnonymous: true });
+                    userProf = await getUserProfile({ userId: user.uid });
+                }
                 updateUserProfile(userProf);
             })();
         }
@@ -49,15 +55,30 @@ function ExploreContent() {
 
     const isUserLoggedIn = useCallback(async () => {
         const user = await GetCurrentUser();
-        if (user?.email && user?.uid) {
-            updateUser({ email: user.email, uid: user.uid });
+        if (user?.uid) {
+            updateUser({ email: user.email || "", uid: user.uid });
+            setIsAnonymous(user.isAnonymous);
         }
-        onAuthStateChanged(auth, (user) => {
-            if (user && user.email && user.uid) {
-                updateUser({ email: user.email, uid: user.uid });
+        onAuthStateChanged(auth, async (user) => {
+            if (user && user.uid) {
+                updateUser({ email: user.email || "", uid: user.uid });
+                setIsAnonymous(user.isAnonymous);
                 return router.push(`/explore/?reviewStep=${reviewStep || 1}`);
             } else {
-                return router.push("/loginRegister?login=true");
+                try {
+                    const result = await SignInAnonymously();
+                    if (result?.user) {
+                        await createUser({
+                            userId: result.user.uid,
+                            isAnonymous: true,
+                        });
+                        updateUser({ email: "", uid: result.user.uid });
+                        setIsAnonymous(true);
+                        return router.push(`/explore/?reviewStep=${reviewStep || 1}`);
+                    }
+                } catch {
+                    return router.push("/loginRegister?login=true");
+                }
             }
         });
     }, [router]);
@@ -173,6 +194,20 @@ function ExploreContent() {
                     ))}
                 </Flex>
 
+                {isAnonymous && (
+                    <Button
+                        variant="outline"
+                        size="xs"
+                        onClick={() => router.push("/loginRegister")}
+                        gap={1}
+                        fontSize="xs"
+                        color="brand.primary"
+                        borderColor="brand.primary"
+                    >
+                        <PersonAddIcon style={{ fontSize: "14px" }} />
+                        <Text display={["none", "inline"]}>Sign up</Text>
+                    </Button>
+                )}
                 <IconButton
                     variant="tertiary"
                     onClick={onMenuOpen}
