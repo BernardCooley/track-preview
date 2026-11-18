@@ -54,6 +54,20 @@ export const useTrackReview = (reviewStep: number) => {
         setPrevUserProfile(userProfile);
     }, [userProfile]);
 
+    const skipToNextTrack = useCallback(() => {
+        const tracks = reviewTracks[reviewStep].tracks;
+        const currentIndex = currentTrack
+            ? tracks.findIndex((t) => t.id === currentTrack.id)
+            : -1;
+        const nextIndex = currentIndex + 1;
+        if (nextIndex < tracks.length) {
+            setCurrentTrack(tracks[nextIndex] as Track);
+        } else {
+            setPreviewLoading(false);
+            setLoading(false);
+        }
+    }, [reviewTracks, reviewStep, currentTrack]);
+
     useEffect(() => {
         let revoked = false;
         let objectUrl = "";
@@ -64,24 +78,26 @@ export const useTrackReview = (reviewStep: number) => {
             setResolvedPreviewUrl("");
             setPreviewLoading(true);
             resolvePreviewUrl(currentTrack.id).then(async (proxyUrl) => {
-                if (!proxyUrl || revoked) {
-                    if (!revoked) setPreviewLoading(false);
+                if (revoked) return;
+                if (!proxyUrl) {
+                    skipToNextTrack();
                     return;
                 }
                 try {
                     const res = await fetch(proxyUrl);
-                    if (!res.ok || revoked) {
-                        if (!revoked) setPreviewLoading(false);
+                    if (revoked) return;
+                    if (!res.ok) {
+                        skipToNextTrack();
                         return;
                     }
                     const blob = await res.blob();
                     if (revoked) return;
                     objectUrl = URL.createObjectURL(blob);
                     setResolvedPreviewUrl(objectUrl);
+                    setPreviewLoading(false);
                 } catch {
-                    // fall through — no preview available
+                    if (!revoked) skipToNextTrack();
                 }
-                if (!revoked) setPreviewLoading(false);
             });
         }
 
