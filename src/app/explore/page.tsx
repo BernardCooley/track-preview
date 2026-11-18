@@ -14,7 +14,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { onAuthStateChanged } from "firebase/auth";
 import Library from "@/components/Library";
 import MenuDrawer from "@/components/MenuDrawer";
-import { getUserProfile } from "@/bff/bff";
+import { getUserProfile, createUser } from "@/bff/bff";
 import { useTrackContext } from "../../../context/TrackContext";
 import { useAuthContext } from "../../../Contexts/AuthContext";
 import { GetCurrentUser } from "../../../firebase/utils";

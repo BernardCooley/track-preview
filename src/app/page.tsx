@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, Button, Center, Dialog, Flex, Text, VStack } from "@chakra-ui/react";
+import { Box, Button, Center, Dialog, Flex, Link, Text, VStack } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
 import { useAuthContext } from "../../Contexts/AuthContext";
 import { useCallback, useEffect, useState } from "react";
@@ -229,16 +229,14 @@ export default function Home() {
                     Legal
                 </Text>
                 <Text fontSize="xs" color="brand.textMuted">·</Text>
-                <Text
-                    as="a"
+                <Link
                     href="mailto:info@phoniquest.com"
                     fontSize="xs"
                     color="brand.textMuted"
-                    cursor="pointer"
-                    _hover={{ color: "brand.textSecondary" }}
+                    _hover={{ color: "brand.textSecondary", textDecoration: "none" }}
                 >
                     Contact
-                </Text>
+                </Link>
             </Flex>
 
             <Dialog.Root
