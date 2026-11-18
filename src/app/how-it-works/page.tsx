@@ -1,12 +1,7 @@
 "use client";
 
-import { Box, Flex, IconButton, Text } from "@chakra-ui/react";
-import Header from "@/components/Header";
-import { useEffect, useState } from "react";
-import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "../../../firebase/firebaseInit";
-import { useRouter } from "next/navigation";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import { Box, Flex, Text } from "@chakra-ui/react";
+import BackHeader from "@/components/BackHeader";
 import LooksOneIcon from "@mui/icons-material/LooksOne";
 import LooksTwoIcon from "@mui/icons-material/LooksTwo";
 import Looks3Icon from "@mui/icons-material/Looks3";
@@ -43,56 +38,9 @@ const steps = [
 ];
 
 const HowItWorks = () => {
-    const router = useRouter();
-    const [authenticated, setAuthenticated] = useState<boolean | null>(null);
-
-    useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            setAuthenticated(!!user);
-        });
-        return unsubscribe;
-    }, []);
-
     return (
         <Flex direction="column" minH="100dvh" bg="brand.bg">
-            {authenticated === false ? (
-                <Box
-                    w="full"
-                    borderBottom="1px solid"
-                    borderBottomColor="brand.divider"
-                    bg="brand.bg"
-                    position="sticky"
-                    top={0}
-                    zIndex={100}
-                >
-                    <Flex
-                        maxW={["none", "none", "none", "1000px"]}
-                        mx="auto"
-                        alignItems="center"
-                        px={[3, 4]}
-                        py={1}
-                    >
-                        <IconButton
-                            variant="tertiary"
-                            onClick={() => router.back()}
-                            aria-label="Go back"
-                            color="brand.textSecondary"
-                        >
-                            <ChevronLeftIcon fontSize="small" />
-                        </IconButton>
-                        <Text
-                            fontSize="md"
-                            fontFamily="brand"
-                            color="brand.textPrimary"
-                            letterSpacing="wide"
-                        >
-                            How it works
-                        </Text>
-                    </Flex>
-                </Box>
-            ) : authenticated === true ? (
-                <Header />
-            ) : null}
+            <BackHeader title="How it works" />
 
                 <Flex
                     flex={1}

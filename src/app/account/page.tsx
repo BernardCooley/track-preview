@@ -21,7 +21,7 @@ import {
     UpdateUserPassword,
 } from "../../../firebase/utils";
 import { useRouter } from "next/navigation";
-import Header from "@/components/Header";
+import BackHeader from "@/components/BackHeader";
 import EditIcon from "@mui/icons-material/Edit";
 import {
     getAuth,
@@ -217,7 +217,7 @@ const Settings = () => {
     if (emailUpdated) {
         return (
             <Flex direction="column" minH="100dvh" bg="brand.bg">
-                <Header />
+                <BackHeader title="Account" />
                 <Center flex={1} flexDirection="column" gap={6} px={[4, 6]}>
                     <Box
                         w="64px"
@@ -338,7 +338,7 @@ const Settings = () => {
                 </Dialog.Positioner>
             </Dialog.Root>
 
-            <Header />
+            <BackHeader title="Account" />
 
             <Flex
                 flex={1}
