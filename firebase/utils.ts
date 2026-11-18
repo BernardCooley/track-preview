@@ -14,6 +14,7 @@ import {
     getAuth,
     updateEmail,
     updatePassword,
+    reauthenticateWithCredential,
 } from "firebase/auth";
 import { auth } from "./firebaseInit";
 import { createUser, deleteUserProfile } from "@/bff/bff";
@@ -138,11 +139,12 @@ export const UpdateUserEmail = async (email: string, user: User) => {
     }
 };
 
-export const UpdateUserPassword = async (password: string, user: User) => {
-    try {
-        await updatePassword(user, password);
-    } catch (error: any) {
-        console.error(error);
-        throw error;
-    }
+export const ReauthenticateUser = async (user: User, currentPassword: string) => {
+    const credential = EmailAuthProvider.credential(user.email!, currentPassword);
+    await reauthenticateWithCredential(user, credential);
+};
+
+export const UpdateUserPassword = async (currentPassword: string, newPassword: string, user: User) => {
+    await ReauthenticateUser(user, currentPassword);
+    await updatePassword(user, newPassword);
 };

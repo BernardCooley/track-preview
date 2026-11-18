@@ -225,41 +225,40 @@ describe("Account Settings", () => {
         render(<Settings />);
 
         await waitFor(() => {
-            const editButtons = screen.getAllByLabelText(/edit/i);
+            const editButtons = screen.getAllByLabelText(/^edit$/i);
             expect(editButtons.length).toBe(2);
         });
     });
 
     describe("change email flow", () => {
+        const clickEmailEdit = async (user: ReturnType<typeof userEvent.setup>) => {
+            await waitFor(() => {
+                expect(screen.getByText("user@example.com")).toBeInTheDocument();
+            });
+            const editButtons = screen.getAllByLabelText(/^edit$/i);
+            await user.click(editButtons[0]);
+        };
+
         it("shows email input when edit is clicked", async () => {
             const user = userEvent.setup();
             render(<Settings />);
 
-            await waitFor(() => {
-                expect(screen.getByText("user@example.com")).toBeInTheDocument();
-            });
-
-            const editButtons = screen.getAllByLabelText(/edit/i);
-            await user.click(editButtons[0]);
+            await clickEmailEdit(user);
 
             await waitFor(() => {
                 expect(screen.getByText("Enter your new email address")).toBeInTheDocument();
             });
         });
 
-        it("shows cancel button when editing email", async () => {
+        it("shows cancel and save buttons when editing email", async () => {
             const user = userEvent.setup();
             render(<Settings />);
 
-            await waitFor(() => {
-                expect(screen.getByText("user@example.com")).toBeInTheDocument();
-            });
-
-            const editButtons = screen.getAllByLabelText(/edit/i);
-            await user.click(editButtons[0]);
+            await clickEmailEdit(user);
 
             await waitFor(() => {
-                expect(screen.getByLabelText(/cancel/i)).toBeInTheDocument();
+                expect(screen.getByRole("button", { name: /cancel/i })).toBeInTheDocument();
+                expect(screen.getByRole("button", { name: /save/i })).toBeInTheDocument();
             });
         });
 
@@ -267,21 +266,13 @@ describe("Account Settings", () => {
             const user = userEvent.setup();
             render(<Settings />);
 
-            await waitFor(() => {
-                expect(screen.getByText("user@example.com")).toBeInTheDocument();
-            });
+            await clickEmailEdit(user);
 
-            const editButtons = screen.getAllByLabelText(/edit/i);
-            await user.click(editButtons[0]);
-
-            await waitFor(() => {
-                expect(screen.getByLabelText(/cancel/i)).toBeInTheDocument();
-            });
-
-            await user.click(screen.getByLabelText(/cancel/i));
+            await user.click(screen.getByRole("button", { name: /cancel/i }));
 
             await waitFor(() => {
                 expect(screen.getByText("user@example.com")).toBeInTheDocument();
+                expect(screen.queryByText("Enter your new email address")).not.toBeInTheDocument();
             });
         });
 
@@ -289,12 +280,7 @@ describe("Account Settings", () => {
             const user = userEvent.setup();
             render(<Settings />);
 
-            await waitFor(() => {
-                expect(screen.getByText("user@example.com")).toBeInTheDocument();
-            });
-
-            const editButtons = screen.getAllByLabelText(/edit/i);
-            await user.click(editButtons[0]);
+            await clickEmailEdit(user);
 
             const input = screen.getByDisplayValue("user@example.com");
             await user.clear(input);
@@ -305,87 +291,109 @@ describe("Account Settings", () => {
             });
         });
 
-        it("does not show save button for invalid email", async () => {
+        it("save button is disabled for invalid email", async () => {
             const user = userEvent.setup();
             render(<Settings />);
 
-            await waitFor(() => {
-                expect(screen.getByText("user@example.com")).toBeInTheDocument();
-            });
-
-            const editButtons = screen.getAllByLabelText(/edit/i);
-            await user.click(editButtons[0]);
+            await clickEmailEdit(user);
 
             const input = screen.getByDisplayValue("user@example.com");
             await user.clear(input);
             await user.type(input, "invalid-email");
 
             await waitFor(() => {
-                expect(screen.queryByLabelText("Save")).not.toBeInTheDocument();
+                expect(screen.getByRole("button", { name: /save/i })).toBeDisabled();
             });
         });
 
-        it("shows save button for valid new email", async () => {
+        it("save button is enabled for valid new email", async () => {
             const user = userEvent.setup();
             render(<Settings />);
 
-            await waitFor(() => {
-                expect(screen.getByText("user@example.com")).toBeInTheDocument();
-            });
-
-            const editButtons = screen.getAllByLabelText(/edit/i);
-            await user.click(editButtons[0]);
+            await clickEmailEdit(user);
 
             const input = screen.getByDisplayValue("user@example.com");
             await user.clear(input);
             await user.type(input, "new@example.com");
 
             await waitFor(() => {
-                expect(screen.getByLabelText("Save")).toBeInTheDocument();
+                expect(screen.getByRole("button", { name: /save/i })).not.toBeDisabled();
             });
         });
 
-        it("does not show save button when email is unchanged", async () => {
+        it("save button is disabled when email is unchanged", async () => {
             const user = userEvent.setup();
             render(<Settings />);
 
+            await clickEmailEdit(user);
+
             await waitFor(() => {
-                expect(screen.getByText("user@example.com")).toBeInTheDocument();
+                expect(screen.getByRole("button", { name: /save/i })).toBeDisabled();
             });
-
-            const editButtons = screen.getAllByLabelText(/edit/i);
-            await user.click(editButtons[0]);
-
-            expect(screen.queryByLabelText("Save")).not.toBeInTheDocument();
         });
 
-        it("calls UpdateUserEmail and SendVerificationEmail on save", async () => {
+        it("calls UpdateUserEmail and SendVerificationEmail on save and shows confirmation", async () => {
             mockUpdateUserEmail.mockResolvedValue(undefined);
             mockSendVerificationEmail.mockResolvedValue(undefined);
             const user = userEvent.setup();
             render(<Settings />);
 
-            await waitFor(() => {
-                expect(screen.getByText("user@example.com")).toBeInTheDocument();
-            });
-
-            const editButtons = screen.getAllByLabelText(/edit/i);
-            await user.click(editButtons[0]);
+            await clickEmailEdit(user);
 
             const input = screen.getByDisplayValue("user@example.com");
             await user.clear(input);
             await user.type(input, "new@example.com");
 
             await waitFor(() => {
-                expect(screen.getByLabelText("Save")).toBeInTheDocument();
+                expect(screen.getByRole("button", { name: /save/i })).not.toBeDisabled();
             });
 
-            await user.click(screen.getByLabelText("Save"));
+            await user.click(screen.getByRole("button", { name: /save/i }));
 
             await waitFor(() => {
                 expect(mockUpdateUserEmail).toHaveBeenCalledWith("new@example.com", expect.objectContaining({ uid: "test-123" }));
                 expect(mockSendVerificationEmail).toHaveBeenCalled();
             });
+
+            await waitFor(() => {
+                expect(screen.getByText("Email updated")).toBeInTheDocument();
+                expect(screen.getByText(/new@example.com/)).toBeInTheDocument();
+                expect(screen.getByText(/Please verify your new email address/)).toBeInTheDocument();
+                expect(screen.getByText("Redirecting to sign in...")).toBeInTheDocument();
+            });
+        });
+
+        it("redirects to login page after email update", async () => {
+            vi.useFakeTimers({ shouldAdvanceTime: true });
+            mockUpdateUserEmail.mockResolvedValue(undefined);
+            mockSendVerificationEmail.mockResolvedValue(undefined);
+            mockLogOut.mockResolvedValue(undefined);
+            const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+            render(<Settings />);
+
+            await clickEmailEdit(user);
+
+            const input = screen.getByDisplayValue("user@example.com");
+            await user.clear(input);
+            await user.type(input, "new@example.com");
+
+            await waitFor(() => {
+                expect(screen.getByRole("button", { name: /save/i })).not.toBeDisabled();
+            });
+
+            await user.click(screen.getByRole("button", { name: /save/i }));
+
+            await waitFor(() => {
+                expect(screen.getByText("Email updated")).toBeInTheDocument();
+            });
+
+            vi.advanceTimersByTime(8000);
+
+            await waitFor(() => {
+                expect(mockLogOut).toHaveBeenCalledWith(mockRouter, "/loginRegister?login=true&verifyEmail=true");
+            });
+
+            vi.useRealTimers();
         });
 
         it("handles requires-recent-login error on email update", async () => {
@@ -395,155 +403,176 @@ describe("Account Settings", () => {
             const user = userEvent.setup();
             render(<Settings />);
 
-            await waitFor(() => {
-                expect(screen.getByText("user@example.com")).toBeInTheDocument();
-            });
-
-            const editButtons = screen.getAllByLabelText(/edit/i);
-            await user.click(editButtons[0]);
+            await clickEmailEdit(user);
 
             const input = screen.getByDisplayValue("user@example.com");
             await user.clear(input);
             await user.type(input, "new@example.com");
 
             await waitFor(() => {
-                expect(screen.getByLabelText("Save")).toBeInTheDocument();
+                expect(screen.getByRole("button", { name: /save/i })).not.toBeDisabled();
             });
 
-            await user.click(screen.getByLabelText("Save"));
+            await user.click(screen.getByRole("button", { name: /save/i }));
 
             await waitFor(() => {
                 expect(mockUpdateUserEmail).toHaveBeenCalled();
             });
         });
-    });
 
-    describe("change password flow", () => {
-        it("shows password input when edit is clicked", async () => {
+        it("disables log out and delete account buttons while editing email", async () => {
             const user = userEvent.setup();
             render(<Settings />);
 
+            await clickEmailEdit(user);
+
+            await waitFor(() => {
+                expect(screen.getByRole("button", { name: /log out/i })).toBeDisabled();
+                expect(screen.getByRole("button", { name: /delete account/i })).toBeDisabled();
+            });
+        });
+
+        it("re-enables log out and delete account buttons after cancelling email edit", async () => {
+            const user = userEvent.setup();
+            render(<Settings />);
+
+            await clickEmailEdit(user);
+
+            await waitFor(() => {
+                expect(screen.getByRole("button", { name: /log out/i })).toBeDisabled();
+            });
+
+            await user.click(screen.getByRole("button", { name: /cancel/i }));
+
+            await waitFor(() => {
+                expect(screen.getByRole("button", { name: /log out/i })).not.toBeDisabled();
+                expect(screen.getByRole("button", { name: /delete account/i })).not.toBeDisabled();
+            });
+        });
+    });
+
+    describe("change password flow", () => {
+        const clickPasswordEdit = async (user: ReturnType<typeof userEvent.setup>) => {
             await waitFor(() => {
                 expect(screen.getByText("**********")).toBeInTheDocument();
             });
-
-            const editButtons = screen.getAllByLabelText(/edit/i);
+            const editButtons = screen.getAllByLabelText(/^edit$/i);
             await user.click(editButtons[1]);
+        };
+
+        it("shows both password inputs when edit is clicked", async () => {
+            const user = userEvent.setup();
+            render(<Settings />);
+
+            await clickPasswordEdit(user);
 
             await waitFor(() => {
+                expect(screen.getByText("Enter your current password")).toBeInTheDocument();
                 expect(screen.getByText("Enter your new password")).toBeInTheDocument();
             });
         });
 
-        it("shows validation error for password shorter than 6 characters", async () => {
+        it("shows validation error for new password shorter than 6 characters", async () => {
             const user = userEvent.setup();
             render(<Settings />);
 
-            await waitFor(() => {
-                expect(screen.getByText("**********")).toBeInTheDocument();
-            });
+            await clickPasswordEdit(user);
 
-            const editButtons = screen.getAllByLabelText(/edit/i);
-            await user.click(editButtons[1]);
-
-            const input = screen.getByDisplayValue("");
-            await user.type(input, "short");
+            const inputs = screen.getAllByDisplayValue("");
+            await user.type(inputs[1], "short");
 
             await waitFor(() => {
                 expect(screen.getByText("Password must be at least 6 characters long.")).toBeInTheDocument();
             });
         });
 
-        it("accepts a password of exactly 6 characters", async () => {
+        it("save button is disabled when only new password is filled", async () => {
             const user = userEvent.setup();
             render(<Settings />);
 
-            await waitFor(() => {
-                expect(screen.getByText("**********")).toBeInTheDocument();
-            });
+            await clickPasswordEdit(user);
 
-            const editButtons = screen.getAllByLabelText(/edit/i);
-            await user.click(editButtons[1]);
-
-            const input = screen.getByDisplayValue("");
-            await user.type(input, "abcdef");
+            const inputs = screen.getAllByDisplayValue("");
+            await user.type(inputs[1], "abcdef");
 
             await waitFor(() => {
-                expect(screen.queryByText("Password must be at least 6 characters long.")).not.toBeInTheDocument();
-                expect(screen.getByLabelText("Save")).toBeInTheDocument();
+                expect(screen.getByRole("button", { name: /save/i })).toBeDisabled();
             });
         });
 
-        it("does not show save button for short password", async () => {
+        it("save button is enabled when both current and valid new password are filled", async () => {
             const user = userEvent.setup();
             render(<Settings />);
 
-            await waitFor(() => {
-                expect(screen.getByText("**********")).toBeInTheDocument();
-            });
+            await clickPasswordEdit(user);
 
-            const editButtons = screen.getAllByLabelText(/edit/i);
-            await user.click(editButtons[1]);
-
-            const input = screen.getByDisplayValue("");
-            await user.type(input, "abc");
+            const inputs = screen.getAllByDisplayValue("");
+            await user.type(inputs[0], "oldpass123");
+            await user.type(inputs[1], "newpass123");
 
             await waitFor(() => {
-                expect(screen.queryByLabelText("Save")).not.toBeInTheDocument();
+                expect(screen.getByRole("button", { name: /save/i })).not.toBeDisabled();
             });
         });
 
-        it("calls UpdateUserPassword on save", async () => {
+        it("save button is disabled for short new password", async () => {
+            const user = userEvent.setup();
+            render(<Settings />);
+
+            await clickPasswordEdit(user);
+
+            const inputs = screen.getAllByDisplayValue("");
+            await user.type(inputs[0], "oldpass123");
+            await user.type(inputs[1], "abc");
+
+            await waitFor(() => {
+                expect(screen.getByRole("button", { name: /save/i })).toBeDisabled();
+            });
+        });
+
+        it("calls UpdateUserPassword with both passwords on save", async () => {
             mockUpdateUserPassword.mockResolvedValue(undefined);
             const user = userEvent.setup();
             render(<Settings />);
 
+            await clickPasswordEdit(user);
+
+            const inputs = screen.getAllByDisplayValue("");
+            await user.type(inputs[0], "oldpass123");
+            await user.type(inputs[1], "newpassword123");
+
             await waitFor(() => {
-                expect(screen.getByText("**********")).toBeInTheDocument();
+                expect(screen.getByRole("button", { name: /save/i })).not.toBeDisabled();
             });
 
-            const editButtons = screen.getAllByLabelText(/edit/i);
-            await user.click(editButtons[1]);
-
-            const input = screen.getByDisplayValue("");
-            await user.type(input, "newpassword123");
+            await user.click(screen.getByRole("button", { name: /save/i }));
 
             await waitFor(() => {
-                expect(screen.getByLabelText("Save")).toBeInTheDocument();
-            });
-
-            await user.click(screen.getByLabelText("Save"));
-
-            await waitFor(() => {
-                expect(mockUpdateUserPassword).toHaveBeenCalledWith("newpassword123", expect.objectContaining({ uid: "test-123" }));
+                expect(mockUpdateUserPassword).toHaveBeenCalledWith("oldpass123", "newpassword123", expect.objectContaining({ uid: "test-123" }));
             });
         });
 
-        it("handles requires-recent-login error on password update", async () => {
-            const error = new Error("Requires recent login") as Error & { code: string };
-            error.code = "auth/requires-recent-login";
+        it("shows error when current password is wrong", async () => {
+            const error = new Error("Wrong password") as Error & { code: string };
+            error.code = "auth/wrong-password";
             mockUpdateUserPassword.mockRejectedValue(error);
             const user = userEvent.setup();
             render(<Settings />);
 
+            await clickPasswordEdit(user);
+
+            const inputs = screen.getAllByDisplayValue("");
+            await user.type(inputs[0], "wrongpass");
+            await user.type(inputs[1], "newpassword123");
+
             await waitFor(() => {
-                expect(screen.getByText("**********")).toBeInTheDocument();
+                expect(screen.getByRole("button", { name: /save/i })).not.toBeDisabled();
             });
 
-            const editButtons = screen.getAllByLabelText(/edit/i);
-            await user.click(editButtons[1]);
-
-            const input = screen.getByDisplayValue("");
-            await user.type(input, "newpassword123");
+            await user.click(screen.getByRole("button", { name: /save/i }));
 
             await waitFor(() => {
-                expect(screen.getByLabelText("Save")).toBeInTheDocument();
-            });
-
-            await user.click(screen.getByLabelText("Save"));
-
-            await waitFor(() => {
-                expect(mockUpdateUserPassword).toHaveBeenCalled();
+                expect(screen.getByText("Current password is incorrect.")).toBeInTheDocument();
             });
         });
 
@@ -551,46 +580,69 @@ describe("Account Settings", () => {
             const user = userEvent.setup();
             render(<Settings />);
 
-            await waitFor(() => {
-                expect(screen.getByText("**********")).toBeInTheDocument();
-            });
-
-            const editButtons = screen.getAllByLabelText(/edit/i);
-            await user.click(editButtons[1]);
+            await clickPasswordEdit(user);
 
             await waitFor(() => {
                 expect(screen.getByText("Enter your new password")).toBeInTheDocument();
             });
 
-            await user.click(screen.getByLabelText(/cancel/i));
+            await user.click(screen.getByRole("button", { name: /cancel/i }));
 
             await waitFor(() => {
                 expect(screen.getByText("**********")).toBeInTheDocument();
             });
         });
 
-        it("toggles password visibility", async () => {
+        it("toggles password visibility for both fields", async () => {
             const user = userEvent.setup();
             render(<Settings />);
 
-            await waitFor(() => {
-                expect(screen.getByText("**********")).toBeInTheDocument();
-            });
+            await clickPasswordEdit(user);
 
-            const editButtons = screen.getAllByLabelText(/edit/i);
-            await user.click(editButtons[1]);
-
-            const input = screen.getByDisplayValue("");
-            await user.type(input, "secret");
+            const inputs = screen.getAllByDisplayValue("");
+            await user.type(inputs[0], "secret");
 
             const toggleButton = screen.getByLabelText("Toggle password visibility");
-            expect(input).toHaveAttribute("type", "password");
+            expect(inputs[0]).toHaveAttribute("type", "password");
+            expect(inputs[1]).toHaveAttribute("type", "password");
 
             await user.click(toggleButton);
-            expect(input).toHaveAttribute("type", "text");
+            expect(inputs[0]).toHaveAttribute("type", "text");
+            expect(inputs[1]).toHaveAttribute("type", "text");
 
             await user.click(toggleButton);
-            expect(input).toHaveAttribute("type", "password");
+            expect(inputs[0]).toHaveAttribute("type", "password");
+            expect(inputs[1]).toHaveAttribute("type", "password");
+        });
+
+        it("disables log out and delete account buttons while editing password", async () => {
+            const user = userEvent.setup();
+            render(<Settings />);
+
+            await clickPasswordEdit(user);
+
+            await waitFor(() => {
+                expect(screen.getByRole("button", { name: /log out/i })).toBeDisabled();
+                expect(screen.getByRole("button", { name: /delete account/i })).toBeDisabled();
+            });
+        });
+
+        it("re-enables log out and delete account buttons after cancelling password edit", async () => {
+            const user = userEvent.setup();
+            render(<Settings />);
+
+            await clickPasswordEdit(user);
+
+            await waitFor(() => {
+                expect(screen.getByRole("button", { name: /log out/i })).toBeDisabled();
+            });
+
+            await user.click(screen.getByRole("button", { name: /cancel/i }));
+
+            await waitFor(() => {
+                expect(screen.getByRole("button", { name: /log out/i })).not.toBeDisabled();
+                expect(screen.getByRole("button", { name: /delete account/i })).not.toBeDisabled();
+            });
         });
     });
 });
