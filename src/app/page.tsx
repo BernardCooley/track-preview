@@ -81,9 +81,9 @@ export default function Home() {
                 justifyContent="center"
                 w="full"
                 maxW="520px"
-                gap={[6, 8]}
+                gap={[20, 24]}
             >
-                <VStack gap={3}>
+                <VStack gap={4}>
                     <Text
                         fontSize={["3xl", "4xl", "5xl"]}
                         fontFamily="brand"
