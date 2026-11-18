@@ -260,48 +260,83 @@ const Settings = () => {
                 <Dialog.Backdrop />
                 <Dialog.Positioner>
                     <Dialog.Content
+                        m={[3, 6]}
                         bg="brand.bg"
+                        shadow="2xl"
                         border="1px solid"
                         borderColor="brand.border"
                         rounded="modal"
-                        mx={[3, 6]}
+                        overflow="hidden"
                     >
-                        <Dialog.Header
-                            fontSize="lg"
-                            fontWeight="semibold"
-                            color="brand.textPrimary"
-                            borderBottom="1px solid"
-                            borderBottomColor="brand.divider"
-                        >
-                            Delete Account
-                        </Dialog.Header>
-                        <Dialog.Body py={5}>
-                            <Text color="brand.textSecondary">
-                                {`Are you sure? You can't undo this action afterwards.`}
-                            </Text>
-                        </Dialog.Body>
-                        <Dialog.Footer
-                            borderTop="1px solid"
-                            borderTopColor="brand.divider"
-                            gap={3}
-                        >
-                            <Button
-                                ref={cancelRef}
-                                onClick={onClose}
-                                variant="outline"
+                        <Flex direction="column">
+                            <Flex
+                                px={[4, 5]}
+                                pt={[4, 5]}
+                                pb={3}
+                                alignItems="center"
+                                justifyContent="space-between"
                             >
-                                Cancel
-                            </Button>
-                            <Button
-                                variant="warning"
-                                onClick={async () => {
-                                    deleteAccount();
-                                    onClose();
+                                <Text
+                                    fontSize="lg"
+                                    fontWeight="semibold"
+                                    color="brand.textPrimary"
+                                    letterSpacing="-0.01em"
+                                >
+                                    Delete Account
+                                </Text>
+                                <Dialog.CloseTrigger
+                                    position="relative"
+                                    top="auto"
+                                    right="auto"
+                                    color="brand.textMuted"
+                                    _hover={{ color: "brand.textPrimary" }}
+                                />
+                            </Flex>
+
+                            <Box
+                                h="1px"
+                                bg="brand.divider"
+                                mx={[4, 5]}
+                            />
+
+                            <Box px={[4, 5]} py={5}>
+                                <Flex direction="column" gap={3}>
+                                    <Text color="brand.textSecondary" fontSize="sm">
+                                        {`Are you sure? You can't undo this action afterwards.`}
+                                    </Text>
+                                </Flex>
+                            </Box>
+
+                            <Flex
+                                gap={3}
+                                px={[4, 5]}
+                                py={4}
+                                justifyContent="flex-end"
+                                css={{
+                                    backdropFilter: "blur(16px)",
+                                    WebkitBackdropFilter: "blur(16px)",
+                                    background: "color-mix(in srgb, var(--chakra-colors-brand-bg) 80%, transparent)",
+                                    borderTop: "1px solid var(--chakra-colors-brand-divider)",
                                 }}
                             >
-                                Delete account
-                            </Button>
-                        </Dialog.Footer>
+                                <Button
+                                    ref={cancelRef}
+                                    variant="outline"
+                                    onClick={onClose}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    variant="warning"
+                                    onClick={async () => {
+                                        deleteAccount();
+                                        onClose();
+                                    }}
+                                >
+                                    Delete account
+                                </Button>
+                            </Flex>
+                        </Flex>
                     </Dialog.Content>
                 </Dialog.Positioner>
             </Dialog.Root>
