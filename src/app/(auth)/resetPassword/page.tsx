@@ -1,7 +1,7 @@
 "use client";
 
 import { TextInput } from "@/components/TextInput";
-import { Box, Button, Flex, IconButton, Text } from "@chakra-ui/react";
+import { Box, Button, Field, Flex, IconButton, Text } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
@@ -128,6 +128,15 @@ const PasswordReset = ({}: Props) => {
                         </Button>
                     </Flex>
                 </form>
+                {authError && (
+                    <Box mt={4}>
+                        <Field.Root invalid>
+                            <Field.ErrorText fontSize="sm">
+                                {authError}
+                            </Field.ErrorText>
+                        </Field.Root>
+                    </Box>
+                )}
             </Box>
         </Flex>
     );

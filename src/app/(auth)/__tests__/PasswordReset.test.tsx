@@ -75,7 +75,7 @@ describe("PasswordReset", () => {
         });
     });
 
-    it("does not redirect on failure", async () => {
+    it("shows error message and does not redirect on failure", async () => {
         mockResetPassword.mockRejectedValue(new Error("Failed"));
         const user = userEvent.setup();
         render(<PasswordReset />);
@@ -86,6 +86,7 @@ describe("PasswordReset", () => {
 
         await waitFor(() => {
             expect(mockResetPassword).toHaveBeenCalled();
+            expect(screen.getByText(/error sending password reset email/i)).toBeInTheDocument();
             expect(mockRouter.push).not.toHaveBeenCalled();
         });
     });
