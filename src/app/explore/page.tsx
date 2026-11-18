@@ -33,7 +33,7 @@ function ExploreContent() {
     const { currentlyPlaying, updateCurrentlyPlaying } = useTrackContext();
     const audioElement = useRef<HTMLAudioElement>(null);
     const [currentStep, setCurrentStep] = useState<number>(0);
-    const { updateUser, user, updateUserProfile } = useAuthContext();
+    const { updateUser, user, updateUserProfile, userProfile } = useAuthContext();
     const reviewStep = searchParams?.get("reviewStep");
     const pageRef = useRef<HTMLDivElement>(null);
     const { open: isMenuOpen, onOpen: onMenuOpen, onClose: onMenuClose } = useDisclosure();
@@ -73,9 +73,14 @@ function ExploreContent() {
     useEffect(() => {
         const reviewStep = searchParams?.get("reviewStep");
         if (reviewStep) {
-            setCurrentStep(parseInt(reviewStep));
+            const step = parseInt(reviewStep);
+            if (!userProfile?.curatedMode && (step === 2 || step === 3)) {
+                router.replace(`/explore?reviewStep=1`);
+                return;
+            }
+            setCurrentStep(step);
         }
-    }, [searchParams]);
+    }, [searchParams, userProfile?.curatedMode]);
 
     useEffect(() => {
         if (currentlyPlaying !== undefined) {
@@ -85,12 +90,16 @@ function ExploreContent() {
         }
     }, [currentlyPlaying]);
 
-    const tabButtons = [
-        { name: "Step 1", label: "Discover", icon: <LooksOneIcon style={{ fontSize: "20px" }} /> },
-        { name: "Step 2", label: "Review", icon: <LooksTwoIcon style={{ fontSize: "20px" }} /> },
-        { name: "Step 3", label: "Final", icon: <Looks3Icon style={{ fontSize: "20px" }} /> },
-        { name: "Step 4", label: "Library", icon: <LibraryMusicIcon style={{ fontSize: "20px" }} /> },
+    const allTabs = [
+        { name: "Step 1", label: "Discover", icon: <LooksOneIcon style={{ fontSize: "24px" }} />, step: 1 },
+        { name: "Step 2", label: "Review", icon: <LooksTwoIcon style={{ fontSize: "24px" }} />, step: 2 },
+        { name: "Step 3", label: "Final", icon: <Looks3Icon style={{ fontSize: "24px" }} />, step: 3 },
+        { name: "Step 4", label: "Library", icon: <LibraryMusicIcon style={{ fontSize: "24px" }} />, step: 4 },
     ];
+
+    const tabButtons = userProfile?.curatedMode
+        ? allTabs
+        : allTabs.filter(t => t.step === 1 || t.step === 4);
 
     const showAudioPlayer =
         currentStep === 4 &&
@@ -132,14 +141,14 @@ function ExploreContent() {
                     </Text>
                 </Link>
 
-                <Flex flex={1} justifyContent="center" gap={0}>
-                    {tabButtons.map((button, index) => (
+                <Flex flex={1} justifyContent="center" gap={1}>
+                    {tabButtons.map((button) => (
                         <Button
                             key={button.name}
-                            data-tab-step={index + 1}
-                            variant={currentStep === index + 1 ? "tabSelected" : "tabDeselected"}
+                            data-tab-step={button.step}
+                            variant={currentStep === button.step ? "tabSelected" : "tabDeselected"}
                             onClick={() =>
-                                router.push(`/explore?reviewStep=${index + 1}`)
+                                router.push(`/explore?reviewStep=${button.step}`)
                             }
                             gap={1}
                             px={[3, 4]}

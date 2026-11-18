@@ -4,6 +4,7 @@ import {
     Drawer,
     Flex,
     Separator,
+    Switch,
     Text,
 } from "@chakra-ui/react";
 import { usePathname } from "next/navigation";
@@ -12,6 +13,9 @@ import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import { useThemeContext } from "../../context/ThemeContext";
+import { useAuthContext } from "../../Contexts/AuthContext";
+import { useTrackContext } from "../../context/TrackContext";
+import { mutateUserProfile } from "@/bff/bff";
 
 interface Props {
     isOpen: boolean;
@@ -21,6 +25,8 @@ interface Props {
 const MenuDrawer = ({ isOpen, onClose }: Props) => {
     const pathname = usePathname();
     const { appearance, toggleAppearance } = useThemeContext();
+    const { user, userProfile, updateUserProfile } = useAuthContext();
+    const { updateChangesMade, updateReviewTracks } = useTrackContext();
 
     return (
         <Drawer.Root
@@ -75,6 +81,11 @@ const MenuDrawer = ({ isOpen, onClose }: Props) => {
                                 linkText="Account"
                                 href="/account"
                             />
+                            <MenuDrawerItem
+                                pathname={pathname}
+                                linkText="How it works"
+                                href="/how-it-works"
+                            />
                         </Flex>
 
                         <Separator borderColor="brand.divider" my={4} />
@@ -109,6 +120,52 @@ const MenuDrawer = ({ isOpen, onClose }: Props) => {
                             >
                                 {appearance === "light" ? "Dark mode" : "Light mode"}
                             </Text>
+                        </Flex>
+
+                        <Flex
+                            alignItems="center"
+                            justifyContent="space-between"
+                            px={3}
+                            py={2}
+                            rounded="lg"
+                        >
+                            <Flex direction="column">
+                                <Text
+                                    fontSize="md"
+                                    fontWeight="medium"
+                                    color="brand.textSecondary"
+                                >
+                                    Curated mode
+                                </Text>
+                                <Text
+                                    fontSize="xs"
+                                    color="brand.textMuted"
+                                >
+                                    Review liked tracks twice before they reach your library
+                                </Text>
+                            </Flex>
+                            <Switch.Root
+                                checked={userProfile?.curatedMode ?? false}
+                                onCheckedChange={async (details) => {
+                                    if (user?.uid) {
+                                        const newProfile = await mutateUserProfile({
+                                            userId: user.uid,
+                                            curatedMode: details.checked,
+                                        });
+                                        updateUserProfile(newProfile);
+                                        updateReviewTracks(2, [], 0);
+                                        updateReviewTracks(3, [], 0);
+                                        updateChangesMade(2, true);
+                                        updateChangesMade(3, true);
+                                        updateChangesMade(4, true);
+                                    }
+                                }}
+                            >
+                                <Switch.HiddenInput />
+                                <Switch.Control>
+                                    <Switch.Thumb />
+                                </Switch.Control>
+                            </Switch.Root>
                         </Flex>
                     </Drawer.Body>
 

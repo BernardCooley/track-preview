@@ -37,11 +37,12 @@ export const useTrackReview = (reviewStep: number) => {
     const [autoplayLoading, setAutoplayLoading] = useState<boolean>(false);
     const [indexOfTrack, setIndexOfTrack] = useState(0);
     const [resolvedPreviewUrl, setResolvedPreviewUrl] = useState<string>("");
+    const [previewLoading, setPreviewLoading] = useState<boolean>(true);
 
     const comparisonUserProfile = (profile: UserProfile | null) => {
         if (profile === null) return;
 
-        const { autoplay, ...rest } = profile;
+        const { autoplay, curatedMode, ...rest } = profile;
         return JSON.stringify(rest);
     };
 
@@ -61,11 +62,18 @@ export const useTrackReview = (reviewStep: number) => {
             setListened(false);
             setIsPlaying(false);
             setResolvedPreviewUrl("");
+            setPreviewLoading(true);
             resolvePreviewUrl(currentTrack.id).then(async (proxyUrl) => {
-                if (!proxyUrl || revoked) return;
+                if (!proxyUrl || revoked) {
+                    if (!revoked) setPreviewLoading(false);
+                    return;
+                }
                 try {
                     const res = await fetch(proxyUrl);
-                    if (!res.ok || revoked) return;
+                    if (!res.ok || revoked) {
+                        if (!revoked) setPreviewLoading(false);
+                        return;
+                    }
                     const blob = await res.blob();
                     if (revoked) return;
                     objectUrl = URL.createObjectURL(blob);
@@ -73,6 +81,7 @@ export const useTrackReview = (reviewStep: number) => {
                 } catch {
                     // fall through — no preview available
                 }
+                if (!revoked) setPreviewLoading(false);
             });
         }
 
@@ -199,6 +208,7 @@ export const useTrackReview = (reviewStep: number) => {
                 );
 
                 setLoading(true);
+                setPreviewLoading(true);
                 const track = { ...currentTrack };
 
                 if (reviewTracks[reviewStep].tracks.length > 0) {
@@ -211,6 +221,7 @@ export const useTrackReview = (reviewStep: number) => {
                             reviewStep,
                             like,
                             userId: user.uid,
+                            curatedMode: userProfile?.curatedMode ?? false,
                         });
                     } else {
                         updateTrackReviewStep({
@@ -218,6 +229,7 @@ export const useTrackReview = (reviewStep: number) => {
                             reviewStep,
                             like,
                             userId: user.uid,
+                            curatedMode: userProfile?.curatedMode ?? false,
                         });
                     }
 
@@ -229,7 +241,8 @@ export const useTrackReview = (reviewStep: number) => {
                         0
                     );
                 }
-                updateChangesMade(reviewStep + 1, true);
+                const nextStep = (!userProfile?.curatedMode && reviewStep === 1) ? 4 : reviewStep + 1;
+                updateChangesMade(nextStep, true);
             }
         } catch (error) {
             showToast({
@@ -312,5 +325,6 @@ export const useTrackReview = (reviewStep: number) => {
         reviewTracks,
         updateReviewTracks,
         resolvedPreviewUrl,
+        previewLoading,
     };
 };

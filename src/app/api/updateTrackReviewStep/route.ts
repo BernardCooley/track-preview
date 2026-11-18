@@ -3,7 +3,7 @@ import { Review } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
-    const { trackId, like, reviewStep, userId } = await req.json();
+    const { trackId, like, reviewStep, userId, curatedMode } = await req.json();
 
     try {
         const review = await prisma?.review.findFirst({
@@ -15,6 +15,8 @@ export async function POST(req: Request) {
 
         let tracks: Review[] | undefined;
 
+        const likeStep = reviewStep === 1 && !curatedMode ? 4 : reviewStep + 1;
+
         if (review) {
             tracks = await prisma?.$transaction([
                 prisma.review.update({
@@ -22,8 +24,8 @@ export async function POST(req: Request) {
                         id: review.id,
                     },
                     data: {
-                        currentReviewStep: like ? reviewStep + 1 : 0,
-                        furthestReviewStep: like ? reviewStep + 1 : reviewStep,
+                        currentReviewStep: like ? likeStep : 0,
+                        furthestReviewStep: like ? likeStep : reviewStep,
                     },
                 }),
             ]);
@@ -31,8 +33,8 @@ export async function POST(req: Request) {
             tracks = await prisma?.$transaction([
                 prisma.review.create({
                     data: {
-                        currentReviewStep: like ? 2 : 0,
-                        furthestReviewStep: like ? 2 : 1,
+                        currentReviewStep: like ? likeStep : 0,
+                        furthestReviewStep: like ? likeStep : 1,
                         Track: {
                             connect: {
                                 id: trackId,

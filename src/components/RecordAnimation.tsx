@@ -7,6 +7,7 @@ interface Props {
     reviewStep: number;
     animationDuration: number;
     image: Track["thumbnail"];
+    curatedMode?: boolean;
 }
 
 const RecordAnimation = ({
@@ -14,6 +15,7 @@ const RecordAnimation = ({
     reviewStep,
     animationDuration,
     image,
+    curatedMode,
 }: Props) => {
     const [target, setTarget] = useState<{ x: number; y: number } | null>(null);
     const [start, setStart] = useState<{ x: number; y: number } | null>(null);
@@ -29,8 +31,9 @@ const RecordAnimation = ({
         }
 
         if (animate === "like") {
+            const targetStep = !curatedMode && reviewStep === 1 ? 4 : reviewStep + 1;
             const nextTab = document.querySelector(
-                `[data-tab-step="${reviewStep + 1}"]`
+                `[data-tab-step="${targetStep}"]`
             ) as HTMLElement | null;
             if (nextTab) {
                 const rect = nextTab.getBoundingClientRect();

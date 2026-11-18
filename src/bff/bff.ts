@@ -157,6 +157,7 @@ interface UpdateTrackReviewStepProps {
     like: boolean;
     reviewStep: number;
     userId: string;
+    curatedMode?: boolean;
 }
 
 export const updateTrackReviewStep = async ({
@@ -164,6 +165,7 @@ export const updateTrackReviewStep = async ({
     like,
     reviewStep,
     userId,
+    curatedMode,
 }: UpdateTrackReviewStepProps): Promise<Review[] | null> => {
     const userTracks: any[] | null = await fetchWithErrorHandling(
         "/api/updateTrackReviewStep",
@@ -173,6 +175,7 @@ export const updateTrackReviewStep = async ({
             like,
             reviewStep,
             userId,
+            curatedMode,
         }
     );
     return userTracks;
@@ -193,6 +196,7 @@ export const createUser = async ({ userId }: CreateUserProps): Promise<any> => {
 interface UpdateUserAutoplayProps {
     userId: string;
     autoplay?: boolean;
+    curatedMode?: boolean;
     genres?: string[];
     yearFrom?: number;
     yearTo?: number;
@@ -201,6 +205,7 @@ interface UpdateUserAutoplayProps {
 export const mutateUserProfile = async ({
     userId,
     autoplay,
+    curatedMode,
     genres,
     yearFrom,
     yearTo,
@@ -212,6 +217,7 @@ export const mutateUserProfile = async ({
             {
                 userId,
                 autoplay,
+                curatedMode,
                 genres,
                 yearFrom,
                 yearTo,

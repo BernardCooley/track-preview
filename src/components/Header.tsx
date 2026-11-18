@@ -5,15 +5,48 @@ import {
     Text,
     useDisclosure,
 } from "@chakra-ui/react";
-import React from "react";
+import React, { useCallback, useEffect } from "react";
 import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import MenuDrawer from "./MenuDrawer";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../../firebase/firebaseInit";
+import { GetCurrentUser } from "../../firebase/utils";
+import { useAuthContext } from "../../Contexts/AuthContext";
+import { getUserProfile } from "@/bff/bff";
 
 const Header = () => {
     const pathname = usePathname();
     const { open: isOpen, onOpen, onClose } = useDisclosure();
+    const { user, updateUser, updateUserProfile } = useAuthContext();
+
+    useEffect(() => {
+        if (user?.uid) {
+            (async () => {
+                const userProf = await getUserProfile({ userId: user.uid });
+                updateUserProfile(userProf);
+            })();
+        }
+    }, [user]);
+
+    const initAuth = useCallback(async () => {
+        const currentUser = await GetCurrentUser();
+        if (currentUser?.email && currentUser?.uid) {
+            updateUser({ email: currentUser.email, uid: currentUser.uid });
+        }
+        onAuthStateChanged(auth, (firebaseUser) => {
+            if (firebaseUser?.email && firebaseUser?.uid) {
+                updateUser({ email: firebaseUser.email, uid: firebaseUser.uid });
+            }
+        });
+    }, []);
+
+    useEffect(() => {
+        if (!user) {
+            initAuth();
+        }
+    }, [user, initAuth]);
 
     return (
         <>

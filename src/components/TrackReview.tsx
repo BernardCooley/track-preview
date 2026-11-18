@@ -19,6 +19,7 @@ import { genres } from "../../data/genres";
 import { useTrackReview } from "@/hooks/useTrackReview";
 import RecordAnimation from "./RecordAnimation";
 import TracklistTable from "./TracklistTable";
+import TrackTransition from "./TrackTransition";
 
 interface Props {
     reviewStep: number;
@@ -52,6 +53,7 @@ const TrackReview = memo(
             onGenreApply,
             onYearConfirm,
             resolvedPreviewUrl,
+            previewLoading,
         } = useTrackReview(reviewStep);
 
         const [animationImage, setAnimationImage] = useState<string>("");
@@ -84,9 +86,9 @@ const TrackReview = memo(
 
         return (
             <Flex direction="column" position="relative" h="full" overflow="auto">
-                {loading && !animate && (
-                    <Center position="absolute" inset={0} zIndex={150} pt={24}>
-                        <Loading />
+                {loading && !animate && !currentTrack && (
+                    <Center position="absolute" inset={0} zIndex={150}>
+                        <TrackTransition />
                     </Center>
                 )}
 
@@ -180,16 +182,22 @@ const TrackReview = memo(
                         reviewStep={reviewStep}
                         animationDuration={animationDuration}
                         image={animationImage}
+                        curatedMode={userProfile?.curatedMode ?? false}
                     />
                 )}
 
+                {(previewLoading || loading || !!animate) && currentTrack && (
+                    <Flex flex={1}>
+                        <TrackTransition />
+                    </Flex>
+                )}
+
                 <Flex
-                    transition="opacity 0.4s ease"
-                    opacity={animate ? 0 : 1}
                     direction="column"
                     flex={1}
+                    display={!animate && !previewLoading && !loading ? "flex" : "none"}
                 >
-                    {currentTrack && !animate && (
+                    {currentTrack && !previewLoading && !loading && (
                         <TrackReviewCard
                             noTracks={noTracks}
                             loading={loading}
