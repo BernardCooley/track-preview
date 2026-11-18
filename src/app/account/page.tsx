@@ -174,7 +174,7 @@ const Settings = () => {
                     }, 5000);
                 } else {
                     showToast({
-                        title: "Error updating email.",
+                        title: "Error updating password.",
                         description: "Please try again later.",
                         type: "error",
                     });
@@ -186,12 +186,14 @@ const Settings = () => {
     const resetEmailState = () => {
         setEmailTouched(false);
         setEditingEmail(false);
+        setNewEmail("");
         setErrors((prev) => ({ ...prev, email: "" }));
     };
 
     const resetPasswordState = () => {
         setPasswordTouched(false);
         setEditingPassword(false);
+        setNewPassword("");
         setErrors((prev) => ({ ...prev, password: "" }));
     };
 
