@@ -142,6 +142,8 @@ const GenreModal = ({
         <Dialog.Root
             open={showGenreSelector}
             onOpenChange={(details) => { if (!details.open) handleClose(); }}
+            initialFocusEl={() => null}
+            trapFocus={false}
         >
             <Dialog.Backdrop />
             <Dialog.Positioner>
@@ -190,6 +192,8 @@ const GenreModal = ({
                                         defaultValue: "",
                                         value: searchValue,
                                         onChange: (e) => setSearchValue(e.target.value),
+                                        autoFocus: false,
+                                        tabIndex: -1,
                                     }}
                                     rightIcon={
                                         searchValue ? (
