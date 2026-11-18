@@ -1,4 +1,4 @@
-import { Comment, User } from "@prisma/client";
+import { User } from "@prisma/client";
 import { AccessToken, Review, SearchedTrack, Track } from "../../types";
 import { getCurrentYear } from "../../utils";
 
@@ -279,73 +279,6 @@ export const deleteUserProfile = async ({
     }
 };
 
-interface AddCommentProps {
-    name: string;
-    userId: string;
-    comment: string;
-    email: string;
-}
-
-export const addComment = async ({
-    name,
-    userId,
-    comment,
-    email,
-}: AddCommentProps) => {
-    try {
-        await fetchWithErrorHandling("/api/addComment", "POST", {
-            name,
-            userId,
-            comment,
-            email,
-        });
-    } catch (error) {
-        throw error;
-    }
-};
-
-export const getComments = async (): Promise<Comment[] | null> => {
-    try {
-        const comments = await fetchWithErrorHandling(
-            "/api/getComments",
-            "POST"
-        );
-        return comments as Comment[];
-    } catch (error) {
-        throw error;
-    }
-};
-
-interface DeleteCommentProps {
-    id: string;
-}
-
-export const deleteComment = async ({ id }: DeleteCommentProps) => {
-    try {
-        await fetchWithErrorHandling("/api/deleteComment", "POST", { id });
-    } catch (error) {
-        throw error;
-    }
-};
-
-interface UpdateCommentProps {
-    id: string;
-    replied: boolean;
-}
-
-export const updateCommentReplied = async ({
-    id,
-    replied,
-}: UpdateCommentProps) => {
-    try {
-        await fetchWithErrorHandling("/api/updateCommentReplied", "POST", {
-            id,
-            replied,
-        });
-    } catch (error) {
-        throw error;
-    }
-};
 
 export const resolvePreviewUrl = async (
     trackId: string
