@@ -80,6 +80,14 @@
         "vite": "^8.3.8",
         "vitest": "^5.1.1"
     },
+    "overrides": {
+        "msw": {
+            "graphql": "15.8.0"
+        },
+        "vitest": {
+            "@types/node": "$@types/node"
+        }
+    },
     "prisma": {
         "seed": "node prisma/seed.js",
         "schema": "./prisma/schema.prisma"
