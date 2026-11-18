@@ -116,6 +116,7 @@ export const useTrackReview = (reviewStep: number) => {
 
         const tracks = reviewTracks[reviewStep].tracks;
         const currentIndex = tracks.findIndex((t) => t.id === currentTrack.id);
+        if (currentIndex === -1) return;
 
         const tryTrackAtIndex = async (idx: number) => {
             if (revoked) return;
