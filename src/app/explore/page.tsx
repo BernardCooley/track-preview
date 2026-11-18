@@ -64,6 +64,8 @@ function ExploreContent() {
                 updateUser({ email: user.email || "", uid: user.uid });
                 setIsAnonymous(user.isAnonymous);
                 return router.push(`/explore/?reviewStep=${reviewStep || 1}`);
+            } else if (user && user.uid && user.email && !user.emailVerified) {
+                return router.push("/loginRegister?login=true&verifyEmail=true");
             } else {
                 try {
                     const result = await SignInAnonymously();

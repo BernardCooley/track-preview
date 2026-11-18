@@ -1,6 +1,7 @@
 "use client";
 import {
     Box,
+    Button,
     Center,
     Flex,
     Tabs,
@@ -23,11 +24,13 @@ const AuthPageContent = () => {
     const isLogin = searchParams.get("login");
     const isPasswordReset = searchParams.get("passwordReset");
     const isAccountDeleted = searchParams.get("accountDeleted");
+    const isVerifyEmail = searchParams.get("verifyEmail");
     const id = "loginRegisterToast";
     const hasPreviouslyLoggedIn = useReadLocalStorage(
         "has-previously-logged-in"
     );
     const [loading, setLoading] = useState(true);
+    const [showVerifyBanner, setShowVerifyBanner] = useState(isVerifyEmail === "true");
 
     const showToast = useCallback(
         ({ type, title, description }: { type?: string; title?: string; description?: string }) => {
@@ -44,7 +47,7 @@ const AuthPageContent = () => {
 
     const isUserLoggedIn = useCallback(async () => {
         onAuthStateChanged(auth, (user) => {
-            if (user && user.email && user.uid && !user.isAnonymous) {
+            if (user && user.email && user.uid && !user.isAnonymous && user.emailVerified) {
                 router.push("/explore");
             } else {
                 setLoading(false);
@@ -58,28 +61,35 @@ const AuthPageContent = () => {
 
     useEffect(() => {
         if (isPasswordReset) {
-            showToast({
+            setTimeout(() => showToast({
                 type: "success",
                 title: "Password reset",
                 description: "Please check your email to reset your password.",
-            });
+            }), 0);
             router.push(pathname);
         }
     }, [isPasswordReset]);
 
     useEffect(() => {
         if (isAccountDeleted) {
-            showToast({
+            setTimeout(() => showToast({
                 type: "success",
                 title: "Account deleted",
                 description:
                     "Your account has been deleted. We are sorry to see you go.",
-            });
+            }), 0);
             router.push(pathname);
         }
     }, [isAccountDeleted]);
 
-    const defaultTab = isLogin === "true" || hasPreviouslyLoggedIn ? "signin" : "register";
+    useEffect(() => {
+        if (isVerifyEmail) {
+            setShowVerifyBanner(true);
+            router.push(pathname + "?login=true");
+        }
+    }, [isVerifyEmail]);
+
+    const activeTab = isLogin === "false" ? "register" : "signin";
 
     if (loading) {
         return (
@@ -119,6 +129,35 @@ const AuthPageContent = () => {
                 </Text>
             </Flex>
 
+            {showVerifyBanner && (
+                <Box
+                    w="full"
+                    maxW="480px"
+                    mb={4}
+                    bg="brand.primarySubtle"
+                    border="1px solid"
+                    borderColor="brand.primary"
+                    rounded="card"
+                    p={[4, 5]}
+                >
+                    <Flex direction="column" gap={3} alignItems="center" textAlign="center">
+                        <Text fontSize="sm" fontWeight="semibold" color="brand.textPrimary">
+                            Email not verified
+                        </Text>
+                        <Text fontSize="sm" color="brand.textSecondary">
+                            Please check your inbox for a verification link before signing in.
+                        </Text>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setShowVerifyBanner(false)}
+                        >
+                            Dismiss
+                        </Button>
+                    </Flex>
+                </Box>
+            )}
+
             <Box
                 w="full"
                 maxW="480px"
@@ -133,7 +172,7 @@ const AuthPageContent = () => {
                 overflow="hidden"
             >
                 <Tabs.Root
-                    defaultValue={defaultTab}
+                    value={activeTab}
                     onValueChange={(details) => {
                         router.push(
                             `/loginRegister?login=${

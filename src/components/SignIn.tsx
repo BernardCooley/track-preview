@@ -88,12 +88,9 @@ const SignIn = () => {
                 setHasPreviouslyLoggedIn(true);
             } else {
                 await signOut(auth);
-                showToast({
-                    type: "error",
-                    title: "Email not verified",
-                    description:
-                        "Please check your email to verify your account.",
-                });
+                setAuthError(
+                    "Your email address has not been verified. Please check your inbox for a verification link before signing in."
+                );
             }
             setSubmitting(false);
         } catch (error) {
