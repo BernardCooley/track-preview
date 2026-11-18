@@ -152,6 +152,7 @@ export default function Home() {
                             alignItems="center"
                             gap={4}
                             cursor="pointer"
+                            userSelect={["none", "auto"]}
                             onClick={() => router.push("/how-it-works")}
                             _hover={{ "& p": { color: "brand.textPrimary" } }}
                             transition="all 0.2s ease"
@@ -218,7 +219,7 @@ export default function Home() {
                 </Flex>
             </Flex>
 
-            <Flex gap={3} mt="auto" pb={4} pt={6}>
+            <Flex gap={3} mt="auto" pb={4} pt={6} userSelect={["none", "auto"]}>
                 <Text
                     fontSize="xs"
                     color="brand.textMuted"
