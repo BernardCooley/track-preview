@@ -21,6 +21,7 @@ import { useTrackReview } from "@/hooks/useTrackReview";
 import RecordAnimation from "./RecordAnimation";
 import TracklistTable from "./TracklistTable";
 import TrackTransition from "./TrackTransition";
+import { useRouter } from "next/navigation";
 
 interface Props {
     reviewStep: number;
@@ -55,7 +56,12 @@ const TrackReview = memo(
             onYearConfirm,
             resolvedPreviewUrl,
             previewLoading,
+            trialLimitReached,
+            trialLikeCount,
+            isAnonymous,
         } = useTrackReview(reviewStep);
+
+        const router = useRouter();
 
         const userGenres = userProfile?.genres;
         const hasGenreFilter = userGenres && userGenres.length > 0 && !userGenres.some((g: string) => g.toLowerCase() === "all");
@@ -153,7 +159,38 @@ const TrackReview = memo(
                     </Center>
                 )}
 
-                {noTracks && !loading && reviewStep === 1 && (
+                {trialLimitReached && reviewStep === 1 && (
+                    <Center flex={1} px={6}>
+                        <VStack gap={5} maxW="360px">
+                            <VStack gap={2}>
+                                <Text
+                                    textAlign="center"
+                                    color="brand.textPrimary"
+                                    fontSize="md"
+                                    fontWeight="semibold"
+                                >
+                                    You&apos;ve reached the free trial limit
+                                </Text>
+                                <Text
+                                    textAlign="center"
+                                    color="brand.textSecondary"
+                                    fontSize="sm"
+                                >
+                                    You&apos;ve liked {trialLikeCount} tracks. Create a free account to keep discovering music and save your library permanently.
+                                </Text>
+                            </VStack>
+                            <Button
+                                variant="primary"
+                                w="full"
+                                onClick={() => router.push("/loginRegister")}
+                            >
+                                Create account
+                            </Button>
+                        </VStack>
+                    </Center>
+                )}
+
+                {noTracks && !loading && reviewStep === 1 && !trialLimitReached && (
                     <Center flex={1} px={6}>
                         <VStack gap={5} maxW="360px">
                             <VStack gap={2}>
