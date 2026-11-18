@@ -1,7 +1,12 @@
 "use client";
 
-import { Box, Flex, Text } from "@chakra-ui/react";
+import { Box, Flex, IconButton, Text } from "@chakra-ui/react";
 import Header from "@/components/Header";
+import { useEffect, useState } from "react";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../../../firebase/firebaseInit";
+import { useRouter } from "next/navigation";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import LooksOneIcon from "@mui/icons-material/LooksOne";
 import LooksTwoIcon from "@mui/icons-material/LooksTwo";
 import Looks3Icon from "@mui/icons-material/Looks3";
@@ -38,115 +43,162 @@ const steps = [
 ];
 
 const HowItWorks = () => {
+    const router = useRouter();
+    const [authenticated, setAuthenticated] = useState<boolean | null>(null);
+
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            setAuthenticated(!!user);
+        });
+        return unsubscribe;
+    }, []);
+
     return (
         <Flex direction="column" minH="100dvh" bg="brand.bg">
-            <Header />
-
-            <Flex
-                flex={1}
-                direction="column"
-                alignItems="center"
-                px={[4, 6]}
-                py={[6, 8]}
-            >
-                <Box w="full" maxW="520px">
-                    <Text
-                        fontSize="lg"
-                        fontWeight="semibold"
-                        color="brand.textPrimary"
-                        mb={6}
-                    >
-                        How it works
-                    </Text>
-
-                    <Flex direction="column" gap={4}>
-                        {steps.map((step) => (
-                            <Flex
-                                key={step.title}
-                                gap={4}
-                                p={4}
-                                rounded="lg"
-                                bg="brand.cardBg"
-                                border="1px solid"
-                                borderColor="brand.border"
-                                alignItems="flex-start"
-                            >
-                                <Flex
-                                    color="brand.primary"
-                                    mt="2px"
-                                    flexShrink={0}
-                                >
-                                    {step.icon}
-                                </Flex>
-                                <Flex direction="column" gap={1}>
-                                    <Flex alignItems="center" gap={2}>
-                                        <Text
-                                            fontSize="md"
-                                            fontWeight="semibold"
-                                            color="brand.textPrimary"
-                                        >
-                                            {step.title}
-                                        </Text>
-                                        {step.curatedOnly && (
-                                            <Text
-                                                fontSize="xs"
-                                                color="brand.textMuted"
-                                                bg="brand.surfaceHover"
-                                                px={2}
-                                                py={0.5}
-                                                rounded="full"
-                                            >
-                                                Curated mode
-                                            </Text>
-                                        )}
-                                    </Flex>
-                                    <Text
-                                        fontSize="sm"
-                                        color="brand.textSecondary"
-                                    >
-                                        {step.description}
-                                    </Text>
-                                </Flex>
-                            </Flex>
-                        ))}
-                    </Flex>
-
+            {authenticated === false ? (
+                <Box
+                    w="full"
+                    borderBottom="1px solid"
+                    borderBottomColor="brand.divider"
+                    bg="brand.bg"
+                    position="sticky"
+                    top={0}
+                    zIndex={100}
+                >
                     <Flex
-                        mt={6}
-                        gap={4}
-                        p={4}
-                        rounded="lg"
-                        bg="brand.cardBg"
-                        border="1px solid"
-                        borderColor="brand.border"
-                        alignItems="flex-start"
+                        maxW={["none", "none", "none", "1000px"]}
+                        mx="auto"
+                        alignItems="center"
+                        px={[3, 4]}
+                        py={1}
                     >
-                        <Flex
-                            color="brand.primary"
-                            mt="2px"
-                            flexShrink={0}
+                        <IconButton
+                            variant="tertiary"
+                            onClick={() => router.back()}
+                            aria-label="Go back"
+                            color="brand.textSecondary"
                         >
-                            <TuneIcon style={{ fontSize: "24px" }} />
-                        </Flex>
-                        <Flex direction="column" gap={1}>
-                            <Text
-                                fontSize="md"
-                                fontWeight="semibold"
-                                color="brand.textPrimary"
-                            >
-                                Curated mode
-                            </Text>
-                            <Text
-                                fontSize="sm"
-                                color="brand.textSecondary"
-                            >
-                                Off by default. When enabled, liked tracks go through two extra review steps before reaching your library. Toggle it in the menu. Turning it off moves any in-progress tracks straight to your library.
-                            </Text>
-                        </Flex>
+                            <ChevronLeftIcon fontSize="small" />
+                        </IconButton>
+                        <Text
+                            fontSize="md"
+                            fontFamily="brand"
+                            color="brand.textPrimary"
+                            letterSpacing="wide"
+                        >
+                            How it works
+                        </Text>
                     </Flex>
                 </Box>
+            ) : authenticated === true ? (
+                <Header />
+            ) : null}
+
+                <Flex
+                    flex={1}
+                    direction="column"
+                    alignItems="center"
+                    px={[4, 6]}
+                    py={[6, 8]}
+                >
+                    <Box w="full" maxW="520px">
+                        <Text
+                            fontSize="lg"
+                            fontWeight="semibold"
+                            color="brand.textPrimary"
+                            mb={6}
+                        >
+                            How it works
+                        </Text>
+
+                        <Flex direction="column" gap={4}>
+                            {steps.map((step) => (
+                                <Flex
+                                    key={step.title}
+                                    gap={4}
+                                    p={4}
+                                    rounded="lg"
+                                    bg="brand.cardBg"
+                                    border="1px solid"
+                                    borderColor="brand.border"
+                                    alignItems="flex-start"
+                                >
+                                    <Flex
+                                        color="brand.primary"
+                                        mt="2px"
+                                        flexShrink={0}
+                                    >
+                                        {step.icon}
+                                    </Flex>
+                                    <Flex direction="column" gap={1}>
+                                        <Flex alignItems="center" gap={2}>
+                                            <Text
+                                                fontSize="md"
+                                                fontWeight="semibold"
+                                                color="brand.textPrimary"
+                                            >
+                                                {step.title}
+                                            </Text>
+                                            {step.curatedOnly && (
+                                                <Text
+                                                    fontSize="xs"
+                                                    color="brand.textMuted"
+                                                    bg="brand.surfaceHover"
+                                                    px={2}
+                                                    py={0.5}
+                                                    rounded="full"
+                                                >
+                                                    Curated mode
+                                                </Text>
+                                            )}
+                                        </Flex>
+                                        <Text
+                                            fontSize="sm"
+                                            color="brand.textSecondary"
+                                        >
+                                            {step.description}
+                                        </Text>
+                                    </Flex>
+                                </Flex>
+                            ))}
+                        </Flex>
+
+                        <Flex
+                            mt={6}
+                            gap={4}
+                            p={4}
+                            rounded="lg"
+                            bg="brand.cardBg"
+                            border="1px solid"
+                            borderColor="brand.border"
+                            alignItems="flex-start"
+                        >
+                            <Flex
+                                color="brand.primary"
+                                mt="2px"
+                                flexShrink={0}
+                            >
+                                <TuneIcon style={{ fontSize: "24px" }} />
+                            </Flex>
+                            <Flex direction="column" gap={1}>
+                                <Text
+                                    fontSize="md"
+                                    fontWeight="semibold"
+                                    color="brand.textPrimary"
+                                >
+                                    Curated mode
+                                </Text>
+                                <Text
+                                    fontSize="sm"
+                                    color="brand.textSecondary"
+                                >
+                                    Off by default. When enabled, liked tracks go through two extra review steps before reaching your library. Toggle it in the menu. Turning it off moves any in-progress tracks straight to your library.
+                                </Text>
+                            </Flex>
+                        </Flex>
+                    </Box>
+                </Flex>
             </Flex>
-        </Flex>
     );
 };
 

@@ -1,15 +1,16 @@
 "use client";
 import Header from "@/components/Header";
+import AuthGuard from "@/components/AuthGuard";
 import { Box } from "@chakra-ui/react";
 import React from "react";
 
-interface Props {}
-
-const Settings = ({}: Props) => {
+const Settings = () => {
     return (
-        <Box h="full" m={0} px={[4, 8]}>
-            <Header />
-        </Box>
+        <AuthGuard>
+            <Box h="full" m={0} px={[4, 8]}>
+                <Header />
+            </Box>
+        </AuthGuard>
     );
 };
 

@@ -17,8 +17,8 @@ import MenuDrawer from "@/components/MenuDrawer";
 import { getUserProfile } from "@/bff/bff";
 import { useTrackContext } from "../../../context/TrackContext";
 import { useAuthContext } from "../../../Contexts/AuthContext";
-import { GetCurrentUser, SignInAnonymously } from "../../../firebase/utils";
-import { createUser } from "@/bff/bff";
+import { GetCurrentUser } from "../../../firebase/utils";
+import AuthGuard from "@/components/AuthGuard";
 import { auth } from "../../../firebase/firebaseInit";
 import TrackReview from "@/components/TrackReview";
 import LooksOneIcon from "@mui/icons-material/LooksOne";
@@ -67,20 +67,7 @@ function ExploreContent() {
             } else if (user && user.uid && user.email && !user.emailVerified) {
                 return router.push("/loginRegister?login=true&verifyEmail=true");
             } else {
-                try {
-                    const result = await SignInAnonymously();
-                    if (result?.user) {
-                        await createUser({
-                            userId: result.user.uid,
-                            isAnonymous: true,
-                        });
-                        updateUser({ email: "", uid: result.user.uid });
-                        setIsAnonymous(true);
-                        return router.push(`/explore/?reviewStep=${reviewStep || 1}`);
-                    }
-                } catch {
-                    return router.push("/loginRegister?login=true");
-                }
+                return router.push("/");
             }
         });
     }, [router]);
@@ -255,8 +242,10 @@ function ExploreContent() {
 
 export default function Explore() {
     return (
-        <Suspense>
-            <ExploreContent />
-        </Suspense>
+        <AuthGuard>
+            <Suspense>
+                <ExploreContent />
+            </Suspense>
+        </AuthGuard>
     );
 }

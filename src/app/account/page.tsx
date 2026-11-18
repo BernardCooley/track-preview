@@ -33,6 +33,7 @@ import { User } from "../../../types";
 import { TextInput } from "@/components/TextInput";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import AuthGuard from "@/components/AuthGuard";
 
 const Settings = () => {
     const { open: isOpen, onOpen, onClose } = useDisclosure();
@@ -631,4 +632,10 @@ const Settings = () => {
     );
 };
 
-export default Settings;
+const AccountPage = () => (
+    <AuthGuard>
+        <Settings />
+    </AuthGuard>
+);
+
+export default AccountPage;
