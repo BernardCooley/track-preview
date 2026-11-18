@@ -154,7 +154,7 @@ describe("Account Settings", () => {
         });
     });
 
-    it("handles requires-recent-login error on delete", async () => {
+    it("handles requires-recent-login error on delete and returns to settings", async () => {
         const error = new Error("Requires recent login") as Error & { code: string };
         error.code = "auth/requires-recent-login";
         mockDeleteUser.mockRejectedValue(error);
@@ -179,6 +179,36 @@ describe("Account Settings", () => {
 
         await waitFor(() => {
             expect(mockDeleteUser).toHaveBeenCalled();
+            expect(screen.getByText("Account Settings")).toBeInTheDocument();
+            expect(screen.queryByText("Deleting your account...")).not.toBeInTheDocument();
+        });
+    });
+
+    it("handles generic error on delete and returns to settings", async () => {
+        mockDeleteUser.mockRejectedValue(new Error("Unknown error"));
+        const user = userEvent.setup();
+        render(<Settings />);
+
+        await waitFor(() => {
+            expect(screen.getByRole("button", { name: /delete account/i })).toBeInTheDocument();
+        });
+
+        await user.click(screen.getByRole("button", { name: /delete account/i }));
+
+        await waitFor(() => {
+            expect(screen.getByText(/are you sure/i)).toBeInTheDocument();
+        });
+
+        const confirmButtons = screen.getAllByRole("button", { name: /delete account/i });
+        const dialogConfirm = confirmButtons.find(btn =>
+            btn.closest('[role="alertdialog"]')
+        );
+        await user.click(dialogConfirm!);
+
+        await waitFor(() => {
+            expect(mockDeleteUser).toHaveBeenCalled();
+            expect(screen.getByText("Account Settings")).toBeInTheDocument();
+            expect(screen.queryByText("Deleting your account...")).not.toBeInTheDocument();
         });
     });
 

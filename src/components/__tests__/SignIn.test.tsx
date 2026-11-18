@@ -85,7 +85,7 @@ describe("SignIn", () => {
         });
     });
 
-    it("signs out and shows error for unverified email", async () => {
+    it("signs out and shows inline error for unverified email", async () => {
         mockLoginUser.mockResolvedValue(makeCredential({ emailVerified: false }));
         const user = userEvent.setup();
         render(<SignIn />);
@@ -100,7 +100,27 @@ describe("SignIn", () => {
         await waitFor(() => {
             expect(mockSignOut).toHaveBeenCalled();
             expect(mockRouter.push).not.toHaveBeenCalledWith("/explore");
+            expect(screen.getByText(/email address has not been verified/i)).toBeInTheDocument();
         });
+    });
+
+    it("does not redirect to explore when email is not verified", async () => {
+        mockLoginUser.mockResolvedValue(makeCredential({ emailVerified: false }));
+        const user = userEvent.setup();
+        render(<SignIn />);
+
+        const emailInput = screen.getByRole("textbox", { name: /email/i });
+        const passwordInput = document.querySelector('input[type="password"]')!;
+
+        await user.type(emailInput, "test@example.com");
+        await user.type(passwordInput, "password123");
+        await user.click(screen.getByRole("button", { name: /sign in/i }));
+
+        await waitFor(() => {
+            expect(mockSignOut).toHaveBeenCalled();
+        });
+
+        expect(mockRouter.push).not.toHaveBeenCalled();
     });
 
     it("shows error message on login failure", async () => {
