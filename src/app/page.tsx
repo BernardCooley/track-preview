@@ -218,18 +218,28 @@ export default function Home() {
                 </Flex>
             </Flex>
 
-            <Text
-                fontSize="xs"
-                color="brand.textMuted"
-                mt="auto"
-                pb={4}
-                pt={6}
-                cursor="pointer"
-                _hover={{ color: "brand.textSecondary" }}
-                onClick={() => router.push("/legal")}
-            >
-                Legal
-            </Text>
+            <Flex gap={3} mt="auto" pb={4} pt={6}>
+                <Text
+                    fontSize="xs"
+                    color="brand.textMuted"
+                    cursor="pointer"
+                    _hover={{ color: "brand.textSecondary" }}
+                    onClick={() => router.push("/legal")}
+                >
+                    Legal
+                </Text>
+                <Text fontSize="xs" color="brand.textMuted">·</Text>
+                <Text
+                    as="a"
+                    href="mailto:info@phoniquest.com"
+                    fontSize="xs"
+                    color="brand.textMuted"
+                    cursor="pointer"
+                    _hover={{ color: "brand.textSecondary" }}
+                >
+                    Contact
+                </Text>
+            </Flex>
 
             <Dialog.Root
                 open={showTrialDialog}
