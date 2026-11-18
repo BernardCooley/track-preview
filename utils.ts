@@ -65,6 +65,8 @@ export const formatBuyUrl = (track: Track, platform: BuyPlatforms) => {
         return `https://bandcamp.com/search?q=${track.artist} ${track.title}`;
     } else if (platform === "apple music") {
         return `https://music.apple.com/search?term=${track.artist} ${track.title}`;
+    } else if (platform === "bleep") {
+        return `https://bleep.com/search/query?q=${track.artist}+-+${track.title}`;
     }
 };
 

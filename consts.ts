@@ -60,4 +60,8 @@ export const buyLinks = [
         platform: "apple music",
         logo: "/logos/apple_music.jpeg",
     },
+    {
+        platform: "bleep",
+        logo: "/logos/bleep.png",
+    },
 ] satisfies IBuyLink[];

@@ -57,7 +57,8 @@ export type BuyPlatforms =
     | "juno download"
     | "discogs"
     | "bandcamp"
-    | "apple music";
+    | "apple music"
+    | "bleep";
 
 export interface IBuyLink {
     platform: BuyPlatforms;
