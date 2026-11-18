@@ -94,6 +94,14 @@ const BuyModal = ({
                                     </GridItem>
                                 ))}
                             </Grid>
+                            <Text
+                                fontSize="xs"
+                                color="brand.textMuted"
+                                textAlign="center"
+                                mt={5}
+                            >
+                                These are affiliate links. We may earn a small commission at no extra cost to you.
+                            </Text>
                         </Box>
 
                         <Flex
