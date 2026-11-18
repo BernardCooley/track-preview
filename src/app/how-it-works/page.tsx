@@ -50,15 +50,6 @@ const HowItWorks = () => {
                     py={[6, 8]}
                 >
                     <Box w="full" maxW="520px">
-                        <Text
-                            fontSize="lg"
-                            fontWeight="semibold"
-                            color="brand.textPrimary"
-                            mb={6}
-                        >
-                            How it works
-                        </Text>
-
                         <Flex direction="column" gap={4}>
                             {steps.map((step) => (
                                 <Flex
