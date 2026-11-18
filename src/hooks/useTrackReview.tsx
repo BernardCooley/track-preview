@@ -304,12 +304,17 @@ export const useTrackReview = (reviewStep: number) => {
                         });
                     }
 
+                    const currentIndex = reviewTracks[reviewStep].tracks.findIndex(
+                        (t) => t.id === track.id
+                    );
+                    const remaining = reviewTracks[reviewStep].tracks.filter(
+                        (t) => t.id !== track.id
+                    );
+                    const nextIndex = Math.min(currentIndex, remaining.length - 1);
                     updateReviewTracks(
                         reviewStep,
-                        reviewTracks[reviewStep].tracks.filter(
-                            (t) => t.id !== track.id
-                        ),
-                        0
+                        remaining,
+                        Math.max(nextIndex, 0)
                     );
                 }
                 const nextStep = (!userProfile?.curatedMode && reviewStep === 1) ? 4 : reviewStep + 1;

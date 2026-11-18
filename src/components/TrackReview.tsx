@@ -78,6 +78,8 @@ const TrackReview = memo(
         }, [user?.uid, updateUserProfile]);
 
         const [animationImage, setAnimationImage] = useState<string>("");
+        const [animationStart, setAnimationStart] = useState<{ x: number; y: number } | null>(null);
+        const [thumbnailRect, setThumbnailRect] = useState<DOMRect | null>(null);
         const { open: isShowingTracklist, onToggle: toggleTracklist } =
             useDisclosure();
         const animationDuration = 1.4;
@@ -101,11 +103,23 @@ const TrackReview = memo(
             if (animate) {
                 setTimeout(() => {
                     setAnimate(null);
-                }, animationDuration * 1000 + (animationDuration * 1000) / 2);
+                }, 400 + animationDuration * 1000 + (animationDuration * 1000) / 2);
             }
         }, [animate]);
 
         return (
+            <>
+            {animate && (
+                <RecordAnimation
+                    animate={animate}
+                    reviewStep={reviewStep}
+                    animationDuration={animationDuration}
+                    image={animationImage}
+                    curatedMode={userProfile?.curatedMode ?? false}
+                    startPosition={animationStart}
+                    thumbnailRect={thumbnailRect}
+                />
+            )}
             <Flex direction="column" position="relative" h="full" overflow="auto">
                 {loading && !animate && !currentTrack && (
                     <Center position="absolute" inset={0} zIndex={150}>
@@ -240,17 +254,7 @@ const TrackReview = memo(
                     </Box>
                 )}
 
-                {animate && (
-                    <RecordAnimation
-                        animate={animate}
-                        reviewStep={reviewStep}
-                        animationDuration={animationDuration}
-                        image={animationImage}
-                        curatedMode={userProfile?.curatedMode ?? false}
-                    />
-                )}
-
-                {(previewLoading || loading || !!animate) && currentTrack && (
+                {(previewLoading || loading) && !animate && currentTrack && (
                     <Flex flex={1}>
                         <TrackTransition />
                     </Flex>
@@ -259,7 +263,7 @@ const TrackReview = memo(
                 <Flex
                     direction="column"
                     flex={1}
-                    display={!animate && !previewLoading && !loading ? "flex" : "none"}
+                    display={(!previewLoading && !loading) && !animate ? "flex" : "none"}
                 >
                     {currentTrack && !previewLoading && !loading && (
                         <TrackReviewCard
@@ -287,11 +291,23 @@ const TrackReview = memo(
                             currentTrack={currentTrack}
                             previewUrl={resolvedPreviewUrl}
                             onLikeOrDislike={async (val) => {
-                                await likeOrDislike(val);
+                                const trackInfo = document.querySelector("[data-track-info]");
+                                if (trackInfo) {
+                                    const rect = trackInfo.getBoundingClientRect();
+                                    setAnimationStart({ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 });
+                                }
+                                const thumb = document.querySelector("[data-track-thumbnail]");
+                                if (thumb) {
+                                    setThumbnailRect(thumb.getBoundingClientRect());
+                                }
                                 setAnimate(val ? "like" : "dislike");
                                 setAnimationImage(
                                     currentTrack?.thumbnail || ""
                                 );
+                                const morphMs = 400;
+                                const animationMs = morphMs + animationDuration * 1000 + (animationDuration * 1000) / 2;
+                                await new Promise((r) => setTimeout(r, animationMs));
+                                await likeOrDislike(val);
                             }}
                             onAudioPlay={() => {
                                 setIsPlaying(true);
@@ -316,6 +332,7 @@ const TrackReview = memo(
                     )}
                 </Flex>
             </Flex>
+            </>
         );
     },
     (prevProps, nextProps) => {
