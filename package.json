@@ -17,7 +17,8 @@
         "addslugtotracks": "node scraping_tracks/addslugtotracks.js",
         "searchTracksSpotify": "node scraping_tracks/searchTracksSpotify.js",
         "searchTracksDeezer": "node scraping_tracks/searchTracksDeezer.js",
-        "test": "jest --watch",
+        "test": "vitest",
+        "test:run": "vitest run",
         "runlocaldb": "docker run --rm -p 5432:5432 -e POSTGRES_HOST_AUTH_METHOD=trust postgres"
     },
     "dependencies": {
@@ -61,14 +62,23 @@
         "@aws-amplify/backend": "0.15.1",
         "@aws-amplify/backend-cli": "0.16.0",
         "@chakra-ui/cli": "^3.38.0",
+        "@testing-library/dom": "^10.4.2",
+        "@testing-library/jest-dom": "^7.0.1",
+        "@testing-library/react": "^16.3.3",
+        "@testing-library/user-event": "^14.6.12",
         "@types/node": "20.19.43",
         "@types/uuid": "9.0.8",
+        "@vitejs/plugin-react": "^6.3.0",
         "encoding": "0.1.14",
+        "jsdom": "^31.0.1",
+        "msw": "^3.0.7",
         "prisma": "5.22.0",
         "puppeteer": "21.11.0",
         "puppeteer-extra": "3.3.6",
         "puppeteer-extra-plugin-stealth": "2.11.2",
-        "typescript": "5.9.3"
+        "typescript": "5.9.3",
+        "vite": "^8.3.8",
+        "vitest": "^5.1.1"
     },
     "prisma": {
         "seed": "node prisma/seed.js",
