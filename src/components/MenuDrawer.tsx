@@ -130,6 +130,7 @@ const MenuDrawer = ({ isOpen, onClose }: Props) => {
                         <Flex
                             alignItems="center"
                             justifyContent="space-between"
+                            gap={3}
                             px={3}
                             py={2}
                             rounded="lg"
