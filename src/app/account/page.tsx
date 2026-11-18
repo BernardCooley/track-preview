@@ -73,7 +73,7 @@ const Settings = () => {
                 setUser({ email: user.email, uid: user.uid });
             }
         });
-    }, [router]);
+    }, []);
 
     useEffect(() => {
         isUserLoggedIn();
@@ -446,7 +446,7 @@ const Settings = () => {
                                             size="md"
                                             fieldProps={{
                                                 onChange: (e) => {
-                                                    if (e.target.value.length > 6) {
+                                                    if (e.target.value.length >= 6) {
                                                         setErrors((prev) => ({
                                                             ...prev,
                                                             password: "",
@@ -457,7 +457,7 @@ const Settings = () => {
                                                         setErrors((prev) => ({
                                                             ...prev,
                                                             password:
-                                                                "Password must be more than 6 characters long.",
+                                                                "Password must be at least 6 characters long.",
                                                         }));
                                                         setPasswordTouched(false);
                                                     }
