@@ -38,6 +38,7 @@ next-env.d.ts
 .env.sample
 .env.development
 .env.production
+.env.scraping
 
 # prisma
 /src/prisma/migrations
