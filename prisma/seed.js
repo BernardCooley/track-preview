@@ -4,7 +4,7 @@ const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
 
-const TRACKS_PER_GENRE = 500;
+const TRACKS_PER_GENRE = Infinity;
 const BATCH_SIZE = 200;
 
 const FOUND_DIRS = [
@@ -12,13 +12,6 @@ const FOUND_DIRS = [
     path.resolve(__dirname, "../scraping_tracks/searchedTracks/deezer/found"),
     path.resolve(__dirname, "../scraping_tracks/searchedTracks/spotify/found"),
 ];
-
-function generateSlug(artist, title, platformId, genre) {
-    return `${artist}-${title}-${platformId}-${genre}`
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/(^-|-$)/g, "");
-}
 
 function shuffle(arr) {
     for (let i = arr.length - 1; i > 0; i--) {
@@ -69,9 +62,18 @@ async function main() {
 
     for (const genre of genres) {
         const allTracks = genreBuckets[genre];
-        const sampled = shuffle(allTracks).slice(0, TRACKS_PER_GENRE);
 
-        const records = sampled.map((t) => ({
+        const existing = await prisma.track.findMany({
+            where: { genre },
+            select: { platformId: true },
+        });
+        const existingIds = new Set(existing.map((t) => t.platformId));
+
+        const fresh = shuffle(
+            allTracks.filter((t) => !existingIds.has(String(t.platformId)))
+        ).slice(0, TRACKS_PER_GENRE);
+
+        const records = fresh.map((t) => ({
             id: t.id || crypto.randomUUID(),
             platform: t.platform || "deezer",
             platformId: String(t.platformId),
@@ -81,17 +83,9 @@ async function main() {
             releaseTitle: t.releaseTitle || "",
             genre: t.genre,
             title: t.title || "",
-            previewUrl: t.previewUrl || "",
-            url: t.url || "",
             thumbnail: t.thumbnail || "",
             releaseYear: t.releaseYear || new Date().getFullYear(),
             releaseDate: t.releaseDate || "",
-            slug: generateSlug(
-                t.artist || "unknown",
-                t.title || "",
-                String(t.platformId),
-                t.genre
-            ),
         }));
 
         let inserted = 0;
@@ -113,7 +107,7 @@ async function main() {
 
         totalInserted += inserted;
         console.log(
-            `  ${genre}: ${inserted}/${sampled.length} inserted (${allTracks.length} available)`
+            `  ${genre}: ${inserted} inserted, ${existingIds.size} already existed (${allTracks.length} available)`
         );
     }
 

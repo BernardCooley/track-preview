@@ -128,7 +128,7 @@ const LibraryTable = ({
                     } else {
                         setPlayingTrackId(track.id);
                         const url = await resolvePreviewUrl(track.id);
-                        updateCurrentlyPlaying(url || track.previewUrl);
+                        updateCurrentlyPlaying(url);
                     }
                 }
             },

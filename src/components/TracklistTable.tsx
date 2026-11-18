@@ -110,8 +110,8 @@ const TracklistTable = ({
                             <Table.Body>
                                 {tracklist[reviewStep].tracks.map((track) => {
                                     const isCurrentTrack =
-                                        currentlyPlaying?.previewUrl ===
-                                        track.previewUrl;
+                                        currentlyPlaying?.id ===
+                                        track.id;
                                     const {
                                         id,
                                         thumbnail,

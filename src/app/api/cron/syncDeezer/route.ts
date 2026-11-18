@@ -2,7 +2,6 @@ import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { genres } from "../../../../../data/genres";
 import { deezerGenreMap, appGenreToDeezerIds } from "../../../../../data/deezerGenreMap";
-import { generateSlug } from "../../../../../utils";
 
 const DeezerPublicApi = require("deezer-public-api");
 
@@ -109,12 +108,9 @@ function mapTrack(track: any, genre: string) {
         releaseTitle: track.album?.title || "",
         genre,
         title,
-        previewUrl: track.preview || "",
-        url: track.link || "",
         thumbnail: track.album?.cover_medium || "",
         releaseYear: extractYear(track),
         releaseDate: track.album?.release_date || "",
-        slug: generateSlug(artist, title, platformId, genre),
     };
 }
 
@@ -188,10 +184,6 @@ export async function GET(req: Request) {
             }
         }
 
-        const tracksWithPreview = allTracks.filter(
-            (t) => t.previewUrl && t.previewUrl.length > 0
-        );
-
         if (!prisma) {
             return NextResponse.json(
                 { error: "Database client not initialized" },
@@ -200,13 +192,13 @@ export async function GET(req: Request) {
         }
 
         const result = await prisma.track.createMany({
-            data: tracksWithPreview,
+            data: allTracks,
             skipDuplicates: true,
         });
 
         return NextResponse.json({
             inserted: result.count,
-            total: tracksWithPreview.length,
+            total: allTracks.length,
             genres: todaysGenres,
         });
     } catch (error: any) {

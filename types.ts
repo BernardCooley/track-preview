@@ -13,12 +13,9 @@ export interface Track {
     purchaseUrl: string;
     artist: string;
     title: string;
-    previewUrl: string;
     id: string;
     thumbnail: string;
-    url: string;
     releaseYear: number;
-    slug: string;
     releaseTitle: string;
     platform: string;
     platformId: string;

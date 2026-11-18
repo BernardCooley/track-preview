@@ -53,12 +53,9 @@ model Track {
   releaseTitle  String
   genre         String
   title         String
-  previewUrl    String
-  url           String
   thumbnail     String
   releaseYear   Int
   releaseDate   String
-  slug          String    @unique
   deezerTrackId String?
   review        Review[]
 }
