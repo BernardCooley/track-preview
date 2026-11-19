@@ -147,8 +147,6 @@ const Library = () => {
 
             {!loading && !noTracks && (
                 <LibraryTable
-                    sortBy={sortBy}
-                    sortDirection={sortDirection}
                     currentReleaseTrack={currentReleaseTrack}
                     reviewTracks={reviewTracks}
                     currentlyPlaying={currentlyPlaying}
@@ -159,8 +157,6 @@ const Library = () => {
                     updatePreviousTracks={updatePreviousTracks}
                     getTracks={getTracks}
                     updateReviewTracks={updateReviewTracks}
-                    setSortBy={setSortBy}
-                    setSortDirection={setSortDirection}
                     addTrackToLibrary={addTrackToLibrary}
                     addingTrackId={addingTrackId}
                     libraryTrackIds={libraryTrackIds}

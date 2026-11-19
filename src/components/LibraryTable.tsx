@@ -18,20 +18,14 @@ import ShopIcon from "@mui/icons-material/Shop";
 import LibraryAddIcon from "@mui/icons-material/LibraryAdd";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import TrackMenuOptions from "./TrackOptionsMenu";
-import { camelcaseToTitleCase, getFormattedDate } from "../../utils";
+import { getFormattedDate } from "../../utils";
 import { resolvePreviewUrl } from "@/bff/bff";
 import { useTrackContext } from "../../context/TrackContext";
 import GenreModal from "./GenreModal";
 
 type TrackKeys = keyof Track;
 
-interface TableHeadingProps {
-    title: TrackKeys;
-}
-
 interface Props {
-    sortBy: keyof Track | "";
-    sortDirection: SortDirection;
     currentReleaseTrack: Track | null;
     reviewTracks: ReviewTracks;
     currentlyPlaying: string | undefined;
@@ -46,8 +40,6 @@ interface Props {
         tracks: Track[],
         currentTrackIndex: number
     ) => void;
-    setSortBy: React.Dispatch<React.SetStateAction<keyof Track | "">>;
-    setSortDirection: React.Dispatch<React.SetStateAction<SortDirection>>;
     addTrackToLibrary: (track: Track) => Promise<void>;
     addingTrackId: string | null;
     libraryTrackIds: Set<string>;
@@ -56,8 +48,6 @@ interface Props {
 }
 
 const LibraryTable = ({
-    sortBy,
-    sortDirection,
     currentReleaseTrack,
     reviewTracks,
     currentlyPlaying,
@@ -68,8 +58,6 @@ const LibraryTable = ({
     updatePreviousTracks,
     getTracks,
     updateReviewTracks,
-    setSortBy,
-    setSortDirection,
     addTrackToLibrary,
     addingTrackId,
     libraryTrackIds,
@@ -147,22 +135,6 @@ const LibraryTable = ({
             return "";
         }
     }, []);
-    const sortTracks = (field: TrackKeys) => {
-        const order = sortBy === field ? sortDirection : "asc";
-
-        const sortedTracks = [...reviewTracks[4].tracks].sort((a, b) => {
-            const aVal = a[field] ?? "";
-            const bVal = b[field] ?? "";
-            if (aVal < bVal) return order === "asc" ? -1 : 1;
-            if (aVal > bVal) return order === "asc" ? 1 : -1;
-            return 0;
-        });
-
-        updateReviewTracks(4, sortedTracks, 0);
-        setSortBy(field);
-        setSortDirection(order === "asc" ? "desc" : "asc");
-    };
-
     const gotToRelease = (index: number) => {
         updateCurrentReleaseTrack(reviewTracks[4].tracks[index]);
         if (
@@ -295,40 +267,6 @@ const LibraryTable = ({
         };
     };
 
-    const TableHeading = ({ title }: TableHeadingProps) => {
-        const isActive = sortBy === title;
-        return (
-            <Button
-                variant="ghost"
-                onClick={() => sortTracks(title as TrackKeys)}
-                height="auto"
-                px={2}
-                py={1}
-                shadow="none"
-                color={isActive ? "brand.primary" : "brand.textMuted"}
-                fontWeight={isActive ? "semibold" : "medium"}
-                fontSize="xs"
-                textTransform="uppercase"
-                letterSpacing="wider"
-                _hover={{
-                    color: "brand.textSecondary",
-                    bg: "transparent",
-                }}
-            >
-                <Text>{camelcaseToTitleCase(title)}</Text>
-                {isActive && (
-                    <Box
-                        transform={sortDirection === "asc" ? "" : "rotate(180deg)"}
-                        transition="transform 0.2s ease"
-                        ml={1}
-                    >
-                        <KeyboardArrowUpIcon style={{ fontSize: "16px" }} />
-                    </Box>
-                )}
-            </Button>
-        );
-    };
-
     const getOriginalIndex = (track: Track) =>
         reviewTracks[4].tracks.findIndex((t) => t.id === track.id);
 
@@ -436,7 +374,11 @@ const LibraryTable = ({
             />
 
             {!currentReleaseTrack && (
-                <Flex px={[3, 4]} pt={2} pb={0} gap={1.5} alignItems="center">
+                <Flex px={[3, 4]} pt={3} pb={2} gap={2.5} direction="column" position="sticky" top={0} zIndex={10} bg="brand.bg">
+                    <Text fontSize="lg" fontWeight="bold" color="brand.textPrimary" letterSpacing="-0.01em">
+                        My Library
+                    </Text>
+                    <Flex gap={1.5} alignItems="center">
                     <Button
                         variant={hasGenreFilter ? "subtle" : "surface"}
                         onClick={() => setShowGenreSelector(true)}
@@ -535,30 +477,12 @@ const LibraryTable = ({
                             </Menu.Content>
                         </Menu.Positioner>
                     </Menu.Root>
+                    </Flex>
                 </Flex>
             )}
 
             {/* Desktop table */}
             <Table.Root display={["none", "none", "table"]}>
-                {!currentReleaseTrack && (
-                    <Table.Header>
-                        <Table.Row>
-                            <Table.ColumnHeader color="brand.textMuted" py={2} px={2}>
-                                <TableHeading title="title" />
-                            </Table.ColumnHeader>
-                            <Table.ColumnHeader color="brand.textMuted" py={2} px={2}>
-                                <TableHeading title="releaseTitle" />
-                            </Table.ColumnHeader>
-                            <Table.ColumnHeader color="brand.textMuted" py={2} px={2}>
-                                <TableHeading title="genre" />
-                            </Table.ColumnHeader>
-                            <Table.ColumnHeader color="brand.textMuted" py={2} px={2}>
-                                <TableHeading title="releaseDate" />
-                            </Table.ColumnHeader>
-                            <Table.ColumnHeader py={2} px={2} w="80px" />
-                        </Table.Row>
-                    </Table.Header>
-                )}
                 <Table.Body>
                     {filteredTracks.map((track) => (
                         <Table.Row
@@ -641,16 +565,6 @@ const LibraryTable = ({
 
             {/* Mobile table */}
             <Table.Root display={["table", "table", "none"]}>
-                {!currentReleaseTrack && (
-                    <Table.Header>
-                        <Table.Row>
-                            <Table.ColumnHeader color="brand.textMuted" py={2} px={2}>
-                                <TableHeading title="title" />
-                            </Table.ColumnHeader>
-                            <Table.ColumnHeader py={2} px={2} w="70px" />
-                        </Table.Row>
-                    </Table.Header>
-                )}
                 <Table.Body>
                     {filteredTracks.map((track) => (
                         <Table.Row
@@ -662,7 +576,7 @@ const LibraryTable = ({
                             borderBottom="1px solid"
                             borderBottomColor="brand.divider"
                         >
-                            <Table.Cell py={2.5} px={2} maxW={currentReleaseTrack ? "none" : 0}>
+                            <Table.Cell py={2.5} px={2} maxW={0} w="full">
                                 <Flex alignItems="center" gap={3} pl={2}>
                                     <Image
                                         rounded="lg"
