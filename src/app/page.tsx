@@ -83,7 +83,7 @@ export default function Home() {
                 maxW="520px"
                 gap={[10, 24]}
             >
-                <VStack gap={4} mt="-46px">
+                <VStack gap={4}>
                     <Text
                         fontSize={["3xl", "4xl", "5xl"]}
                         fontFamily="brand"
@@ -102,27 +102,58 @@ export default function Home() {
                     </Text>
                 </VStack>
 
-                <Box
-                    w="full"
-                    bg="brand.cardBg"
-                    border="1px solid"
-                    borderColor="brand.border"
-                    rounded="card"
-                    p={[5, 6]}
-                    animation="fadeIn 0.4s ease-out"
-                    css={{
-                        "@keyframes fadeIn": {
-                            from: { opacity: 0, transform: "translateY(8px)" },
-                            to: { opacity: 1, transform: "translateY(0)" },
-                        },
-                    }}
-                >
-                    <VStack gap={4} align="stretch">
-                        {features.map((feature, index) => (
+                <VStack gap={6} w="full" alignItems="center">
+                    <Box
+                        w="full"
+                        bg="brand.cardBg"
+                        border="1px solid"
+                        borderColor="brand.border"
+                        rounded="card"
+                        p={[5, 6]}
+                        animation="fadeIn 0.4s ease-out"
+                        css={{
+                            "@keyframes fadeIn": {
+                                from: { opacity: 0, transform: "translateY(8px)" },
+                                to: { opacity: 1, transform: "translateY(0)" },
+                            },
+                        }}
+                    >
+                        <VStack gap={4} align="stretch">
+                            {features.map((feature, index) => (
+                                <Flex
+                                    key={index}
+                                    alignItems="center"
+                                    gap={4}
+                                >
+                                    <Flex
+                                        w="40px"
+                                        h="40px"
+                                        minW="40px"
+                                        alignItems="center"
+                                        justifyContent="center"
+                                        rounded="lg"
+                                        bg="brand.primarySubtle"
+                                        color="brand.primary"
+                                    >
+                                        {feature.icon}
+                                    </Flex>
+                                    <Text
+                                        fontSize={["sm", "md"]}
+                                        color="brand.textSecondary"
+                                        lineHeight="short"
+                                    >
+                                        {feature.text}
+                                    </Text>
+                                </Flex>
+                            ))}
                             <Flex
-                                key={index}
                                 alignItems="center"
                                 gap={4}
+                                cursor="pointer"
+                                userSelect={["none", "auto"]}
+                                onClick={() => router.push("/how-it-works")}
+                                _hover={{ "& p": { color: "brand.textPrimary" } }}
+                                transition="all 0.2s ease"
                             >
                                 <Flex
                                     w="40px"
@@ -134,86 +165,63 @@ export default function Home() {
                                     bg="brand.primarySubtle"
                                     color="brand.primary"
                                 >
-                                    {feature.icon}
+                                    →
                                 </Flex>
                                 <Text
                                     fontSize={["sm", "md"]}
-                                    color="brand.textSecondary"
+                                    color="brand.primary"
+                                    fontWeight="medium"
                                     lineHeight="short"
+                                    transition="color 0.2s ease"
                                 >
-                                    {feature.text}
+                                    Learn more
                                 </Text>
                             </Flex>
-                        ))}
-                        <Flex
-                            alignItems="center"
-                            gap={4}
-                            cursor="pointer"
-                            userSelect={["none", "auto"]}
-                            onClick={() => router.push("/how-it-works")}
-                            _hover={{ "& p": { color: "brand.textPrimary" } }}
-                            transition="all 0.2s ease"
-                        >
-                            <Flex
-                                w="40px"
-                                h="40px"
-                                minW="40px"
-                                alignItems="center"
-                                justifyContent="center"
-                                rounded="lg"
-                                bg="brand.primarySubtle"
-                                color="brand.primary"
-                            >
-                                →
-                            </Flex>
-                            <Text
-                                fontSize={["sm", "md"]}
-                                color="brand.primary"
-                                fontWeight="medium"
-                                lineHeight="short"
-                                transition="color 0.2s ease"
-                            >
-                                Learn more
-                            </Text>
-                        </Flex>
-                    </VStack>
-                </Box>
-            </Flex>
+                        </VStack>
+                    </Box>
 
-            <Flex direction="column" gap={3} w="full" maxW="320px">
-                <Button
-                    w="full"
-                    variant="primary"
-                    size="lg"
-                    loading={startingTrial}
-                    onClick={() => {
-                        if (user) {
-                            router.push("/explore");
-                            return;
-                        }
-                        setShowTrialDialog(true);
-                    }}
-                >
-                    Get Started
-                </Button>
-                <Flex gap={3}>
-                    <Button
-                        flex={1}
-                        variant="outline"
-                        size="lg"
-                        onClick={() => router.push("/loginRegister?login=true")}
-                    >
-                        Sign in
-                    </Button>
-                    <Button
-                        flex={1}
-                        variant="outline"
-                        size="lg"
-                        onClick={() => router.push("/loginRegister?login=false")}
-                    >
-                        Register
-                    </Button>
+                    <Flex direction="column" gap={5} w="full" maxW="320px" alignItems="center">
+                    <Flex gap={3} w="full">
+                        <Button
+                            flex={1}
+                            variant="primary"
+                            size="lg"
+                            onClick={() => router.push("/loginRegister?login=true")}
+                        >
+                            Sign in
+                        </Button>
+                        <Button
+                            flex={1}
+                            variant="outline"
+                            size="lg"
+                            onClick={() => router.push("/loginRegister?login=false")}
+                        >
+                            Register
+                        </Button>
+                    </Flex>
+                    <Flex direction="column" alignItems="center" gap={1}>
+                        <Text fontSize="xs" color="brand.textMuted">
+                            Want to try without an account?
+                        </Text>
+                        <Text
+                            fontSize="xs"
+                            color="brand.primary"
+                            cursor="pointer"
+                            fontWeight="medium"
+                            _hover={{ textDecoration: "underline" }}
+                            onClick={() => {
+                                if (user) {
+                                    router.push("/explore");
+                                    return;
+                                }
+                                setShowTrialDialog(true);
+                            }}
+                        >
+                            Continue as guest
+                        </Text>
+                    </Flex>
                 </Flex>
+                </VStack>
             </Flex>
 
             <Flex gap={3} mt="auto" pb={4} pt={6} userSelect={["none", "auto"]}>
