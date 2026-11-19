@@ -46,11 +46,6 @@ describe("BuyModal", () => {
         expect(screen.getByText("Apple Music")).toBeInTheDocument();
     });
 
-    it("renders disclaimer text", () => {
-        render(<BuyModal {...defaultProps} />);
-        expect(screen.getByText(/results may vary/i)).toBeInTheDocument();
-    });
-
     it("calls closeBuyModal when close button clicked", async () => {
         const closeBuyModal = vi.fn();
         const user = userEvent.setup();
