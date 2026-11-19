@@ -42,8 +42,11 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      - name: Validate Prisma migrations
+      - name: Validate Prisma schema
         run: npx prisma validate
+        env:
+          POSTGRES_URL: postgres://dummy
+          POSTGRES_URL_NON_POOLING: postgres://dummy
 
       - name: Run tests
         run: npx vitest run
