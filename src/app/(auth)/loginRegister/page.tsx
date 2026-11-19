@@ -45,19 +45,16 @@ const AuthPageContent = () => {
         []
     );
 
-    const isUserLoggedIn = useCallback(async () => {
-        onAuthStateChanged(auth, (user) => {
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
             if (user && user.email && user.uid && !user.isAnonymous && user.emailVerified) {
                 router.push("/explore");
             } else {
                 setLoading(false);
             }
         });
+        return unsubscribe;
     }, [router]);
-
-    useEffect(() => {
-        isUserLoggedIn();
-    }, [isUserLoggedIn]);
 
     useEffect(() => {
         if (isPasswordReset) {
@@ -145,7 +142,7 @@ const AuthPageContent = () => {
                             Email not verified
                         </Text>
                         <Text fontSize="sm" color="brand.textSecondary">
-                            Please check your inbox for a verification link before signing in.
+                            Please check your inbox for a verification link and then you can log in.
                         </Text>
                         <Button
                             variant="outline"

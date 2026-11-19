@@ -89,7 +89,7 @@ const SignIn = () => {
             } else {
                 await signOut(auth);
                 setAuthError(
-                    "Your email address has not been verified. Please check your inbox for a verification link before signing in."
+                    "Your email address has not been verified. Please check your inbox for a verification link and then you can log in."
                 );
             }
             setSubmitting(false);

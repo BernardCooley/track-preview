@@ -39,7 +39,35 @@ function ExploreContent() {
     const { updateUser, user, updateUserProfile, userProfile, isAnonymous, setIsAnonymous, profileError, setProfileError } = useAuthContext();
     const reviewStep = searchParams?.get("reviewStep");
     const pageRef = useRef<HTMLDivElement>(null);
-    const { open: isMenuOpen, onOpen: onMenuOpen, onClose: onMenuClose } = useDisclosure();
+    const { open: isMenuOpen, onOpen: onMenuOpenRaw, onClose: onMenuCloseRaw } = useDisclosure();
+    const menuOpenRef = useRef(false);
+
+    const onMenuOpen = useCallback(() => {
+        onMenuOpenRaw();
+        menuOpenRef.current = true;
+        window.history.pushState({ menuDrawer: true }, "");
+    }, [onMenuOpenRaw]);
+
+    const onMenuClose = useCallback(() => {
+        onMenuCloseRaw();
+        if (menuOpenRef.current) {
+            menuOpenRef.current = false;
+            if (window.history.state?.menuDrawer) {
+                window.history.back();
+            }
+        }
+    }, [onMenuCloseRaw]);
+
+    useEffect(() => {
+        const handlePopState = (e: PopStateEvent) => {
+            if (menuOpenRef.current) {
+                menuOpenRef.current = false;
+                onMenuCloseRaw();
+            }
+        };
+        window.addEventListener("popstate", handlePopState);
+        return () => window.removeEventListener("popstate", handlePopState);
+    }, [onMenuCloseRaw]);
 
     useEffect(() => {
         if (user?.uid) {
@@ -65,13 +93,16 @@ function ExploreContent() {
         }
     }, [user]);
 
-    const isUserLoggedIn = useCallback(async () => {
-        const user = await GetCurrentUser();
-        if (user?.uid) {
-            updateUser({ email: user.email || "", uid: user.uid });
-            setIsAnonymous(user.isAnonymous);
-        }
-        onAuthStateChanged(auth, async (user) => {
+    useEffect(() => {
+        (async () => {
+            const user = await GetCurrentUser();
+            if (user?.uid) {
+                updateUser({ email: user.email || "", uid: user.uid });
+                setIsAnonymous(user.isAnonymous);
+            }
+        })();
+
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
             if (user && user.uid && (user.isAnonymous || user.emailVerified)) {
                 updateUser({ email: user.email || "", uid: user.uid });
                 setIsAnonymous(user.isAnonymous);
@@ -84,11 +115,8 @@ function ExploreContent() {
                 return router.push("/");
             }
         });
+        return unsubscribe;
     }, [router]);
-
-    useEffect(() => {
-        isUserLoggedIn();
-    }, [isUserLoggedIn]);
 
     useEffect(() => {
         audioElement.current?.pause();

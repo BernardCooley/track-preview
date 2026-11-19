@@ -236,7 +236,7 @@ const SignUp = () => {
                     </Text>
                     <Text fontSize="md" color="brand.textSecondary" maxW="320px">
                         A confirmation email has been sent to{" "}
-                        <strong>{email}</strong>. Please verify your account.
+                        <strong>{email}</strong>. Please verify your email and then you can log in.
                     </Text>
                 </VStack>
             )}

@@ -3,7 +3,7 @@
 import { Box, Button, Center, Dialog, Flex, Link, Text, VStack } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
 import { useAuthContext } from "../../Contexts/AuthContext";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../firebase/firebaseInit";
 import { SignInAnonymously } from "../../firebase/utils";
@@ -40,19 +40,16 @@ export default function Home() {
         },
     ];
 
-    const isUserLoggedIn = useCallback(async () => {
-        onAuthStateChanged(auth, (user) => {
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
             if (user && user.uid) {
                 router.push("/explore");
             } else {
                 setLoading(false);
             }
         });
+        return unsubscribe;
     }, [router]);
-
-    useEffect(() => {
-        isUserLoggedIn();
-    }, [isUserLoggedIn]);
 
     if (loading) {
         return (
