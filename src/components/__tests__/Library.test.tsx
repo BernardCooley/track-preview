@@ -71,6 +71,53 @@ describe("Library", () => {
         mockUseTrackList.mockReturnValue(baseHookReturn as any);
     });
 
+    describe("filter persistence across release navigation", () => {
+        const filtersContext = {
+            libraryFilters: {
+                selectedGenres: ["Techno"],
+                activeSortField: "artist" as const,
+                activeSortDirection: "desc" as const,
+            },
+            updateLibraryFilters: vi.fn(),
+        };
+
+        it("shows filters from context in library view", () => {
+            render(<Library />, { trackContext: filtersContext });
+
+            expect(screen.getByRole("button", { name: "Techno" })).toBeInTheDocument();
+            expect(screen.getByText(/Artist \(Z-A\)/i)).toBeInTheDocument();
+        });
+
+        it("hides filter buttons in release view", () => {
+            mockUseTrackList.mockReturnValue({
+                ...baseHookReturn,
+                currentReleaseTrack: mockTrack,
+                previousTracks: [mockTrack, mockTrack2],
+            } as any);
+
+            render(<Library />, { trackContext: filtersContext });
+
+            expect(screen.queryByRole("button", { name: "Techno" })).not.toBeInTheDocument();
+            expect(screen.queryByText(/Artist \(Z-A\)/i)).not.toBeInTheDocument();
+        });
+
+        it("restores filter buttons after returning from release view", () => {
+            mockUseTrackList.mockReturnValue({
+                ...baseHookReturn,
+                currentReleaseTrack: mockTrack,
+                previousTracks: [mockTrack, mockTrack2],
+            } as any);
+
+            const { rerender } = render(<Library />, { trackContext: filtersContext });
+
+            mockUseTrackList.mockReturnValue(baseHookReturn as any);
+            rerender(<Library />);
+
+            expect(screen.getByRole("button", { name: "Techno" })).toBeInTheDocument();
+            expect(screen.getByText(/Artist \(Z-A\)/i)).toBeInTheDocument();
+        });
+    });
+
     it("calls getTracks on mount when changesMade[4] is true", () => {
         mockUseTrackList.mockReturnValue({
             ...baseHookReturn,

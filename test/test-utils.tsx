@@ -42,6 +42,8 @@ const defaultTrackContext: TrackContextProps = {
     updatePreviousTracks: vi.fn(),
     changesMade: { 2: true, 3: true, 4: true },
     updateChangesMade: vi.fn(),
+    libraryFilters: { selectedGenres: ["all"], activeSortField: null, activeSortDirection: "asc" as const },
+    updateLibraryFilters: vi.fn(),
 };
 
 interface CustomRenderOptions extends Omit<RenderOptions, "wrapper"> {

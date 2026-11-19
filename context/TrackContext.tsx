@@ -1,7 +1,15 @@
 'use client';
 
 import React, { createContext, MutableRefObject, ReactNode, useCallback, useContext, useRef, useState } from "react";
-import { ReviewTracks, Track } from "../types";
+import { ReviewTracks, SortDirection, Track } from "../types";
+
+type TrackKeys = keyof Track;
+
+interface LibraryFilters {
+    selectedGenres: string[];
+    activeSortField: TrackKeys | null;
+    activeSortDirection: SortDirection;
+}
 
 interface TrackContextProps {
     currentlyPlaying: string | undefined;
@@ -28,6 +36,8 @@ interface TrackContextProps {
         4: boolean;
     };
     updateChangesMade: (reviewStep: number, changesMade: boolean) => void;
+    libraryFilters: LibraryFilters;
+    updateLibraryFilters: (filters: Partial<LibraryFilters>) => void;
 }
 
 export const TrackContext = createContext<TrackContextProps | null>(null);
@@ -76,6 +86,16 @@ export const TrackContextProvider = ({ children }: { children: ReactNode }) => {
         3: true,
         4: true,
     });
+
+    const [libraryFilters, setLibraryFilters] = useState<LibraryFilters>({
+        selectedGenres: ["all"],
+        activeSortField: null,
+        activeSortDirection: "asc",
+    });
+
+    const updateLibraryFilters = useCallback((filters: Partial<LibraryFilters>) => {
+        setLibraryFilters((prev) => ({ ...prev, ...filters }));
+    }, []);
 
     const onTrackEndedRef = useRef<(() => void) | null>(null);
     const onSkipRef = useRef<(() => void) | null>(null);
@@ -139,6 +159,8 @@ export const TrackContextProvider = ({ children }: { children: ReactNode }) => {
                 updatePreviousTracks,
                 changesMade,
                 updateChangesMade,
+                libraryFilters,
+                updateLibraryFilters,
             }}
         >
             {children}

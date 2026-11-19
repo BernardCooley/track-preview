@@ -64,14 +64,15 @@ const LibraryTable = ({
     playAllRequested,
     onPlayAllStarted,
 }: Props) => {
-    const { onTrackEndedRef, onSkipRef, onPreviousRef, playingPositionRef, setTrackLoading } = useTrackContext();
+    const { onTrackEndedRef, onSkipRef, onPreviousRef, playingPositionRef, setTrackLoading, libraryFilters, updateLibraryFilters } = useTrackContext();
     const playingIndexRef = useRef<number | null>(null);
     const blobCache = useRef<Map<string, string>>(new Map());
 
-    const [selectedGenres, setSelectedGenres] = useState<string[]>(["all"]);
+    const { selectedGenres, activeSortField, activeSortDirection } = libraryFilters;
+    const setSelectedGenres = (genres: string[]) => updateLibraryFilters({ selectedGenres: genres });
+    const setActiveSortField = (field: TrackKeys | null) => updateLibraryFilters({ activeSortField: field });
+    const setActiveSortDirection = (dir: SortDirection) => updateLibraryFilters({ activeSortDirection: dir });
     const [showGenreSelector, setShowGenreSelector] = useState(false);
-    const [activeSortField, setActiveSortField] = useState<TrackKeys | null>(null);
-    const [activeSortDirection, setActiveSortDirection] = useState<SortDirection>("asc");
 
     const availableGenres = useMemo(() => {
         const genreSet = new Set<string>();
