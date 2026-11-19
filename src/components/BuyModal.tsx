@@ -48,7 +48,7 @@ const BuyModal = ({
             <Dialog.Backdrop />
             <Dialog.Positioner>
                 <Dialog.Content
-                    minH="300px"
+                    minH="auto"
                     m={[3, 6]}
                     bg="brand.bg"
                     shadow="2xl"
@@ -128,14 +128,6 @@ const BuyModal = ({
                                     </GridItem>
                                 ))}
                             </Grid>
-                            <Text
-                                fontSize="xs"
-                                color="brand.textMuted"
-                                textAlign="center"
-                                mt={5}
-                            >
-                                Results may vary by store. Some links may be affiliate links — we may earn a small commission at no extra cost to you.
-                            </Text>
                         </Box>
 
                         <Flex
