@@ -6,7 +6,7 @@
         "dev": "next dev",
         "build": "next build",
         "start": "next start",
-        "lint": "next lint",
+        "lint": "eslint .",
         "tsc": "tsc --noEmit",
         "postinstall": "prisma generate && chakra typegen ./ChakraTheme.ts",
         "migrateprod": "dotenv -e npx prisma db push npx prisma migrate deploy",
