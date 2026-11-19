@@ -17,7 +17,8 @@
         "addslugtotracks": "node scraping_tracks/addslugtotracks.js",
         "searchTracksSpotify": "node scraping_tracks/searchTracksSpotify.js",
         "searchTracksDeezer": "node scraping_tracks/searchTracksDeezer.js",
-        "test": "jest --watch",
+        "test": "vitest",
+        "test:run": "vitest run",
         "runlocaldb": "docker run --rm -p 5432:5432 -e POSTGRES_HOST_AUTH_METHOD=trust postgres"
     },
     "dependencies": {
@@ -29,19 +30,17 @@
         "@mui/icons-material": "5.18.0",
         "@mui/material": "5.18.0",
         "@prisma/client": "5.22.0",
-        "@types/react": "18.3.31",
-        "@types/react-dom": "18.3.7",
         "@vercel/postgres": "0.10.0",
         "aws-amplify": "6.22.2",
         "axios": "1.21.1",
         "deezer-public-api": "1.0.4",
-        "eslint": "8.57.1",
-        "eslint-config-next": "15.5.29",
         "firebase": "10.12.5",
         "framer-motion": "10.18.0",
         "next": "16.4.6",
         "node-fetch": "3.3.2",
         "node-itunes-search": "1.2.3",
+        "puppeteer-extra": "^3.3.6",
+        "puppeteer-extra-plugin-stealth": "^2.11.2",
         "rc-progress": "3.5.1",
         "react": "18.3.1",
         "react-device-detect": "2.2.3",
@@ -59,14 +58,35 @@
         "@aws-amplify/backend": "0.15.1",
         "@aws-amplify/backend-cli": "0.16.0",
         "@chakra-ui/cli": "^3.38.0",
+        "@types/react": "18.3.31",
+        "@types/react-dom": "18.3.7",
+        "eslint": "8.57.1",
+        "eslint-config-next": "15.5.29",
+        "@testing-library/dom": "^10.4.2",
+        "@testing-library/jest-dom": "^7.0.1",
+        "@testing-library/react": "^16.3.3",
+        "@testing-library/user-event": "^14.6.12",
         "@types/node": "20.19.43",
         "@types/uuid": "9.0.8",
+        "@vitejs/plugin-react": "^6.3.0",
         "encoding": "0.1.14",
+        "jsdom": "^31.0.1",
+        "msw": "^3.0.7",
         "prisma": "5.22.0",
         "puppeteer": "21.11.0",
         "puppeteer-extra": "3.3.6",
         "puppeteer-extra-plugin-stealth": "2.11.2",
-        "typescript": "5.9.3"
+        "typescript": "5.9.3",
+        "vite": "^8.3.8",
+        "vitest": "^5.1.1"
+    },
+    "overrides": {
+        "msw": {
+            "graphql": "15.8.0"
+        },
+        "vitest": {
+            "@types/node": "$@types/node"
+        }
     },
     "prisma": {
         "seed": "node prisma/seed.js",

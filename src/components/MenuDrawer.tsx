@@ -86,9 +86,26 @@ const MenuDrawer = ({ isOpen, onClose }: Props) => {
                                 linkText="How it works"
                                 href="/how-it-works"
                             />
+                            <MenuDrawerItem
+                                pathname={pathname}
+                                linkText="Legal"
+                                href="/legal"
+                            />
                         </Flex>
 
                         <Separator borderColor="brand.divider" my={4} />
+
+                        <Text
+                            fontSize="xs"
+                            fontWeight="semibold"
+                            color="brand.textMuted"
+                            textTransform="uppercase"
+                            letterSpacing="wider"
+                            px={3}
+                            mb={2}
+                        >
+                            Settings
+                        </Text>
 
                         <Flex
                             alignItems="center"
@@ -125,6 +142,7 @@ const MenuDrawer = ({ isOpen, onClose }: Props) => {
                         <Flex
                             alignItems="center"
                             justifyContent="space-between"
+                            gap={3}
                             px={3}
                             py={2}
                             rounded="lg"
@@ -141,7 +159,7 @@ const MenuDrawer = ({ isOpen, onClose }: Props) => {
                                     fontSize="xs"
                                     color="brand.textMuted"
                                 >
-                                    Review liked tracks twice before they reach your library
+                                    Review liked tracks twice before they reach your library. Turning off will move in-review tracks to your library
                                 </Text>
                             </Flex>
                             <Switch.Root
@@ -158,6 +176,48 @@ const MenuDrawer = ({ isOpen, onClose }: Props) => {
                                         updateChangesMade(2, true);
                                         updateChangesMade(3, true);
                                         updateChangesMade(4, true);
+                                    }
+                                }}
+                            >
+                                <Switch.HiddenInput />
+                                <Switch.Control>
+                                    <Switch.Thumb />
+                                </Switch.Control>
+                            </Switch.Root>
+                        </Flex>
+
+                        <Flex
+                            alignItems="center"
+                            justifyContent="space-between"
+                            gap={3}
+                            px={3}
+                            py={2}
+                            rounded="lg"
+                        >
+                            <Flex direction="column">
+                                <Text
+                                    fontSize="md"
+                                    fontWeight="medium"
+                                    color="brand.textSecondary"
+                                >
+                                    Swipe mode
+                                </Text>
+                                <Text
+                                    fontSize="xs"
+                                    color="brand.textMuted"
+                                >
+                                    Like or skip tracks by swiping
+                                </Text>
+                            </Flex>
+                            <Switch.Root
+                                checked={userProfile?.swipeMode ?? true}
+                                onCheckedChange={async (details) => {
+                                    if (user?.uid) {
+                                        const newProfile = await mutateUserProfile({
+                                            userId: user.uid,
+                                            swipeMode: details.checked,
+                                        });
+                                        updateUserProfile(newProfile);
                                     }
                                 }}
                             >

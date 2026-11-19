@@ -1,7 +1,7 @@
 "use client";
 
 import { TextInput } from "@/components/TextInput";
-import { Box, Button, Flex, IconButton, Text } from "@chakra-ui/react";
+import { Box, Button, Field, Flex, IconButton, Text } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
@@ -41,12 +41,13 @@ const PasswordReset = ({}: Props) => {
         try {
             await ResetPassword(formData.email);
             setAuthError(null);
-            setSubmitting(false);
-            router.push("/loginRegister?login=true?passwordReset=true");
+            router.push("/loginRegister?login=true&passwordReset=true");
         } catch (error) {
             setAuthError(
                 "Error sending password reset email. Please check your email and password and try again."
             );
+        } finally {
+            setSubmitting(false);
         }
     };
 
@@ -127,6 +128,15 @@ const PasswordReset = ({}: Props) => {
                         </Button>
                     </Flex>
                 </form>
+                {authError && (
+                    <Box mt={4}>
+                        <Field.Root invalid>
+                            <Field.ErrorText fontSize="sm">
+                                {authError}
+                            </Field.ErrorText>
+                        </Field.Root>
+                    </Box>
+                )}
             </Box>
         </Flex>
     );

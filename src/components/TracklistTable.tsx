@@ -92,7 +92,7 @@ const TracklistTable = ({
                     )}
 
                     <Box
-                        maxH="68vh"
+                        maxH="calc(100dvh - 100px)"
                         overflowY="auto"
                         overflowX="auto"
                         w="full"

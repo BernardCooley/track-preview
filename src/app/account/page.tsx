@@ -11,6 +11,8 @@ import {
 } from "@chakra-ui/react";
 import { toaster } from "@/components/toaster";
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Center } from "@chakra-ui/react";
+import BouncingDotsLoader from "@/components/BouncingLoaderDots";
 import {
     DeleteUser,
     LogOut,
@@ -19,9 +21,8 @@ import {
     UpdateUserPassword,
 } from "../../../firebase/utils";
 import { useRouter } from "next/navigation";
-import Header from "@/components/Header";
+import BackHeader from "@/components/BackHeader";
 import EditIcon from "@mui/icons-material/Edit";
-import SaveIcon from "@mui/icons-material/Save";
 import {
     getAuth,
     onAuthStateChanged,
@@ -29,10 +30,10 @@ import {
 } from "firebase/auth";
 import { auth } from "../../../firebase/firebaseInit";
 import { User } from "../../../types";
-import CloseIcon from "@mui/icons-material/Close";
 import { TextInput } from "@/components/TextInput";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import AuthGuard from "@/components/AuthGuard";
 
 const Settings = () => {
     const { open: isOpen, onOpen, onClose } = useDisclosure();
@@ -44,14 +45,19 @@ const Settings = () => {
     const [passwordTouched, setPasswordTouched] = useState<boolean>(false);
     const [user, setUser] = useState<User | null>(null);
     const [newEmail, setNewEmail] = useState<string>("");
+    const [currentPassword, setCurrentPassword] = useState<string>("");
     const [newPassword, setNewPassword] = useState<string>("");
     const [errors, setErrors] = useState<{
         email: string;
+        currentPassword: string;
         password: string;
-    }>({ email: "", password: "" });
+    }>({ email: "", currentPassword: "", password: "" });
     const id = "accountToast";
     const [userAccount, setUserAccount] = useState<UserAccount | null>(null);
     const [showPassword, setShowPassword] = useState<boolean>(false);
+    const [deleting, setDeleting] = useState<boolean>(false);
+    const [emailUpdated, setEmailUpdated] = useState<boolean>(false);
+    const [updatedEmail, setUpdatedEmail] = useState<string>("");
 
     const showToast = useCallback(
         ({ type, title, description, duration }: { type?: string; title?: string; description?: string; duration?: number }) => {
@@ -73,7 +79,7 @@ const Settings = () => {
                 setUser({ email: user.email, uid: user.uid });
             }
         });
-    }, [router]);
+    }, []);
 
     useEffect(() => {
         isUserLoggedIn();
@@ -84,11 +90,28 @@ const Settings = () => {
     };
 
     const deleteAccount = async () => {
+        setDeleting(true);
         try {
             await DeleteUser();
-            router.push("/loginRegister?login=false?accountDeleted=true");
-        } catch (error) {
-            console.log(error);
+            router.push("/");
+        } catch (error: any) {
+            setDeleting(false);
+            if (error.code === "auth/requires-recent-login") {
+                showToast({
+                    title: "Please log in again to delete your account.",
+                    description: "Redirecting you to the login page...",
+                    type: "info",
+                });
+                setTimeout(() => {
+                    router.push("/loginRegister?login=true&isAttemptingAccountEdit=true");
+                }, 5000);
+            } else {
+                showToast({
+                    title: "Error deleting account.",
+                    description: "Please try again later.",
+                    type: "error",
+                });
+            }
         }
     };
 
@@ -100,15 +123,11 @@ const Settings = () => {
                 if (auth?.currentUser) {
                     await SendVerificationEmail(auth.currentUser);
                 }
-                showToast({
-                    title: "Email updated.",
-                    description:
-                        "Your email has been updated. A verification email has been sent to your new email address.",
-                    type: "success",
-                });
+                setUpdatedEmail(newEmail);
+                setEmailUpdated(true);
                 setTimeout(async () => {
-                    await LogOut(router, "/loginRegister?login=true");
-                }, 5000);
+                    await LogOut(router, "/loginRegister?login=true&verifyEmail=true");
+                }, 8000);
             } catch (error: any) {
                 if (error.code === "auth/requires-recent-login") {
                     showToast({
@@ -132,34 +151,25 @@ const Settings = () => {
         }
     };
 
-    const updatePassword = async (newPassword: string) => {
+    const updatePassword = async (currentPassword: string, newPassword: string) => {
         if (userAccount) {
             try {
-                await UpdateUserPassword(newPassword, userAccount);
+                await UpdateUserPassword(currentPassword, newPassword, userAccount);
                 showToast({
                     title: "Password updated.",
-                    description:
-                        "Your password has been updated. Please log in again with your new password.",
+                    description: "Your password has been updated successfully.",
                     type: "success",
                 });
-                setTimeout(async () => {
-                    await LogOut(router, "/loginRegister?login=true");
-                }, 5000);
+                resetPasswordState();
             } catch (error: any) {
-                if (error.code === "auth/requires-recent-login") {
-                    showToast({
-                        title: "Please log in again to make changes to your account.",
-                        description: "Redirecting you to the login page...",
-                        type: "info",
-                    });
-                    setTimeout(() => {
-                        router.push(
-                            "/loginRegister?login=true&isAttemptingAccountEdit=true"
-                        );
-                    }, 5000);
+                if (error.code === "auth/wrong-password" || error.code === "auth/invalid-credential") {
+                    setErrors((prev) => ({
+                        ...prev,
+                        currentPassword: "Current password is incorrect.",
+                    }));
                 } else {
                     showToast({
-                        title: "Error updating email.",
+                        title: "Error updating password.",
                         description: "Please try again later.",
                         type: "error",
                     });
@@ -171,67 +181,71 @@ const Settings = () => {
     const resetEmailState = () => {
         setEmailTouched(false);
         setEditingEmail(false);
+        setNewEmail("");
         setErrors((prev) => ({ ...prev, email: "" }));
     };
 
     const resetPasswordState = () => {
         setPasswordTouched(false);
         setEditingPassword(false);
-        setErrors((prev) => ({ ...prev, password: "" }));
+        setCurrentPassword("");
+        setNewPassword("");
+        setShowPassword(false);
+        setErrors((prev) => ({ ...prev, currentPassword: "", password: "" }));
     };
 
-    interface FieldIconsProps {
-        isEditing: boolean;
-        touched: boolean;
-        isErrors: boolean;
-        onSaveClick: () => void;
-        onEditClick: () => void;
-        onCancelClick: () => void;
+
+    if (deleting) {
+        return (
+            <Center h="100dvh" flexDirection="column" gap={6} bg="brand.bg">
+                <Text
+                    fontSize={["3xl", "4xl", "5xl"]}
+                    fontFamily="brand"
+                    color="brand.textPrimary"
+                    letterSpacing="wider"
+                >
+                    PHONIQUEST
+                </Text>
+                <Text color="brand.textSecondary" fontSize="md">
+                    Deleting your account...
+                </Text>
+                <BouncingDotsLoader />
+            </Center>
+        );
     }
 
-    const FieldIcons = ({
-        isEditing,
-        touched,
-        isErrors,
-        onSaveClick,
-        onEditClick,
-        onCancelClick,
-    }: FieldIconsProps) => {
+    if (emailUpdated) {
         return (
-            <Flex gap={1} alignItems="center">
-                {touched && !isErrors && (
-                    <IconButton
-                        variant="tertiary"
-                        onClick={onSaveClick}
-                        aria-label="Save"
+            <Flex direction="column" minH="100dvh" bg="brand.bg">
+                <BackHeader title="Account" />
+                <Center flex={1} flexDirection="column" gap={6} px={[4, 6]}>
+                    <Box
+                        w="64px"
+                        h="64px"
+                        rounded="full"
+                        bg="brand.successSubtle"
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="center"
                         color="brand.success"
-                        size="sm"
+                        fontSize="2xl"
                     >
-                        <SaveIcon fontSize="small" />
-                    </IconButton>
-                )}
-                <IconButton
-                    variant="tertiary"
-                    onClick={() => {
-                        if (!isEditing) {
-                            onEditClick();
-                        } else {
-                            onCancelClick();
-                        }
-                    }}
-                    aria-label={isEditing ? "Cancel" : "Edit"}
-                    color="brand.textSecondary"
-                    size="sm"
-                >
-                    {!isEditing ? (
-                        <EditIcon fontSize="small" />
-                    ) : (
-                        <CloseIcon fontSize="small" />
-                    )}
-                </IconButton>
+                        ✓
+                    </Box>
+                    <Text fontSize="xl" fontWeight="semibold" color="brand.textPrimary">
+                        Email updated
+                    </Text>
+                    <Text fontSize="md" color="brand.textSecondary" maxW="320px" textAlign="center">
+                        A confirmation email has been sent to{" "}
+                        <strong>{updatedEmail}</strong>. Please verify your new email address.
+                    </Text>
+                    <Text fontSize="sm" color="brand.textMuted">
+                        Redirecting to sign in...
+                    </Text>
+                </Center>
             </Flex>
         );
-    };
+    }
 
     return (
         <Flex direction="column" minH="100dvh" bg="brand.bg">
@@ -243,53 +257,88 @@ const Settings = () => {
                 <Dialog.Backdrop />
                 <Dialog.Positioner>
                     <Dialog.Content
+                        m={[3, 6]}
                         bg="brand.bg"
+                        shadow="2xl"
                         border="1px solid"
                         borderColor="brand.border"
                         rounded="modal"
-                        mx={[3, 6]}
+                        overflow="hidden"
                     >
-                        <Dialog.Header
-                            fontSize="lg"
-                            fontWeight="semibold"
-                            color="brand.textPrimary"
-                            borderBottom="1px solid"
-                            borderBottomColor="brand.divider"
-                        >
-                            Delete Account
-                        </Dialog.Header>
-                        <Dialog.Body py={5}>
-                            <Text color="brand.textSecondary">
-                                {`Are you sure? You can't undo this action afterwards.`}
-                            </Text>
-                        </Dialog.Body>
-                        <Dialog.Footer
-                            borderTop="1px solid"
-                            borderTopColor="brand.divider"
-                            gap={3}
-                        >
-                            <Button
-                                ref={cancelRef}
-                                onClick={onClose}
-                                variant="outline"
+                        <Flex direction="column">
+                            <Flex
+                                px={[4, 5]}
+                                pt={[4, 5]}
+                                pb={3}
+                                alignItems="center"
+                                justifyContent="space-between"
                             >
-                                Cancel
-                            </Button>
-                            <Button
-                                variant="warning"
-                                onClick={async () => {
-                                    deleteAccount();
-                                    onClose();
+                                <Text
+                                    fontSize="lg"
+                                    fontWeight="semibold"
+                                    color="brand.textPrimary"
+                                    letterSpacing="-0.01em"
+                                >
+                                    Delete Account
+                                </Text>
+                                <Dialog.CloseTrigger
+                                    position="relative"
+                                    top="auto"
+                                    right="auto"
+                                    color="brand.textMuted"
+                                    _hover={{ color: "brand.textPrimary" }}
+                                />
+                            </Flex>
+
+                            <Box
+                                h="1px"
+                                bg="brand.divider"
+                                mx={[4, 5]}
+                            />
+
+                            <Box px={[4, 5]} py={5}>
+                                <Flex direction="column" gap={3}>
+                                    <Text color="brand.textSecondary" fontSize="sm">
+                                        {`Are you sure? You can't undo this action afterwards.`}
+                                    </Text>
+                                </Flex>
+                            </Box>
+
+                            <Flex
+                                gap={3}
+                                px={[4, 5]}
+                                py={4}
+                                justifyContent="flex-end"
+                                css={{
+                                    backdropFilter: "blur(16px)",
+                                    WebkitBackdropFilter: "blur(16px)",
+                                    background: "color-mix(in srgb, var(--chakra-colors-brand-bg) 80%, transparent)",
+                                    borderTop: "1px solid var(--chakra-colors-brand-divider)",
                                 }}
                             >
-                                Delete account
-                            </Button>
-                        </Dialog.Footer>
+                                <Button
+                                    ref={cancelRef}
+                                    variant="outline"
+                                    onClick={onClose}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    variant="warning"
+                                    onClick={async () => {
+                                        deleteAccount();
+                                        onClose();
+                                    }}
+                                >
+                                    Delete account
+                                </Button>
+                            </Flex>
+                        </Flex>
                     </Dialog.Content>
                 </Dialog.Positioner>
             </Dialog.Root>
 
-            <Header />
+            <BackHeader title="Account" />
 
             <Flex
                 flex={1}
@@ -339,7 +388,7 @@ const Settings = () => {
                                 gap={3}
                             >
                                 {editingEmail ? (
-                                    <Box flex={1}>
+                                    <Flex direction="column" gap={3} flex={1}>
                                         <TextInput
                                             error={errors.email}
                                             helperText="Enter your new email address"
@@ -368,30 +417,56 @@ const Settings = () => {
                                                             ...prev,
                                                             email: "",
                                                         }));
+                                                        setNewEmail(e.target.value);
                                                         setEmailTouched(false);
                                                     }
                                                 },
-                                                defaultValue: user?.email,
+                                                value: newEmail,
                                             }}
                                         />
-                                    </Box>
+                                        <Flex gap={3} justifyContent="flex-end">
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => resetEmailState()}
+                                            >
+                                                Cancel
+                                            </Button>
+                                            <Button
+                                                variant="primary"
+                                                size="sm"
+                                                disabled={
+                                                    !emailTouched ||
+                                                    errors.email !== ""
+                                                }
+                                                onClick={() => {
+                                                    updateEmailAddress(newEmail);
+                                                    resetEmailState();
+                                                }}
+                                            >
+                                                Save
+                                            </Button>
+                                        </Flex>
+                                    </Flex>
                                 ) : (
-                                    <Text color="brand.textPrimary" fontSize="md">
-                                        {user?.email}
-                                    </Text>
+                                    <>
+                                        <Text color="brand.textPrimary" fontSize="md">
+                                            {user?.email}
+                                        </Text>
+                                        <IconButton
+                                            variant="tertiary"
+                                            onClick={() => {
+                                                setNewEmail(user?.email || "");
+                                                setEditingEmail(true);
+                                            }}
+                                            aria-label="Edit"
+                                            color="brand.textSecondary"
+                                            size="sm"
+                                        >
+                                            <EditIcon fontSize="small" />
+                                        </IconButton>
+                                    </>
                                 )}
-                                <FieldIcons
-                                    isEditing={editingEmail}
-                                    touched={emailTouched}
-                                    isErrors={errors.email !== "" && errors.email !== undefined}
-                                    onSaveClick={() => {
-                                        updateEmailAddress(newEmail);
-                                        setEditingEmail(false);
-                                        setEmailTouched(false);
-                                    }}
-                                    onEditClick={() => setEditingEmail(true)}
-                                    onCancelClick={() => resetEmailState()}
-                                />
                             </Flex>
                         </Box>
 
@@ -420,32 +495,26 @@ const Settings = () => {
                                 gap={3}
                             >
                                 {editingPassword ? (
-                                    <Box flex={1}>
+                                    <Flex direction="column" gap={3} flex={1}>
                                         <TextInput
                                             type={showPassword ? "text" : "password"}
-                                            error={errors.password}
-                                            helperText="Enter your new password"
+                                            error={errors.currentPassword}
+                                            helperText="Enter your current password"
                                             title=""
                                             size="md"
                                             fieldProps={{
                                                 onChange: (e) => {
-                                                    if (e.target.value.length > 6) {
-                                                        setErrors((prev) => ({
-                                                            ...prev,
-                                                            password: "",
-                                                        }));
-                                                        setNewPassword(e.target.value);
-                                                        setPasswordTouched(true);
-                                                    } else {
-                                                        setErrors((prev) => ({
-                                                            ...prev,
-                                                            password:
-                                                                "Password must be more than 6 characters long.",
-                                                        }));
-                                                        setPasswordTouched(false);
-                                                    }
+                                                    setCurrentPassword(e.target.value);
+                                                    setErrors((prev) => ({
+                                                        ...prev,
+                                                        currentPassword: "",
+                                                    }));
+                                                    setPasswordTouched(
+                                                        e.target.value.length > 0 &&
+                                                        newPassword.length >= 6
+                                                    );
                                                 },
-                                                defaultValue: "",
+                                                value: currentPassword,
                                             }}
                                             rightIcon={
                                                 <IconButton
@@ -469,26 +538,76 @@ const Settings = () => {
                                                 </IconButton>
                                             }
                                         />
-                                    </Box>
+                                        <TextInput
+                                            type={showPassword ? "text" : "password"}
+                                            error={errors.password}
+                                            helperText="Enter your new password"
+                                            title=""
+                                            size="md"
+                                            fieldProps={{
+                                                onChange: (e) => {
+                                                    if (e.target.value.length >= 6) {
+                                                        setErrors((prev) => ({
+                                                            ...prev,
+                                                            password: "",
+                                                        }));
+                                                        setNewPassword(e.target.value);
+                                                        setPasswordTouched(
+                                                            currentPassword.length > 0
+                                                        );
+                                                    } else {
+                                                        setErrors((prev) => ({
+                                                            ...prev,
+                                                            password:
+                                                                "Password must be at least 6 characters long.",
+                                                        }));
+                                                        setNewPassword(e.target.value);
+                                                        setPasswordTouched(false);
+                                                    }
+                                                },
+                                                value: newPassword,
+                                            }}
+                                        />
+                                        <Flex gap={3} justifyContent="flex-end">
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => resetPasswordState()}
+                                            >
+                                                Cancel
+                                            </Button>
+                                            <Button
+                                                variant="primary"
+                                                size="sm"
+                                                disabled={
+                                                    !passwordTouched ||
+                                                    errors.password !== "" ||
+                                                    errors.currentPassword !== ""
+                                                }
+                                                onClick={() => {
+                                                    updatePassword(currentPassword, newPassword);
+                                                }}
+                                            >
+                                                Save
+                                            </Button>
+                                        </Flex>
+                                    </Flex>
                                 ) : (
-                                    <Text color="brand.textPrimary" fontSize="md">
-                                        **********
-                                    </Text>
+                                    <>
+                                        <Text color="brand.textPrimary" fontSize="md">
+                                            **********
+                                        </Text>
+                                        <IconButton
+                                            variant="tertiary"
+                                            onClick={() => setEditingPassword(true)}
+                                            aria-label="Edit"
+                                            color="brand.textSecondary"
+                                            size="sm"
+                                        >
+                                            <EditIcon fontSize="small" />
+                                        </IconButton>
+                                    </>
                                 )}
-                                <FieldIcons
-                                    isEditing={editingPassword}
-                                    touched={passwordTouched}
-                                    isErrors={
-                                        errors.password !== "" && errors.password !== undefined
-                                    }
-                                    onSaveClick={() => {
-                                        updatePassword(newPassword);
-                                        setEditingPassword(false);
-                                        setPasswordTouched(false);
-                                    }}
-                                    onEditClick={() => setEditingPassword(true)}
-                                    onCancelClick={() => resetPasswordState()}
-                                />
                             </Flex>
                         </Box>
                     </Flex>
@@ -501,10 +620,10 @@ const Settings = () => {
                     justifyContent="space-between"
                     alignItems="center"
                 >
-                    <Button variant="outline" onClick={logout}>
+                    <Button variant="outline" onClick={logout} disabled={editingEmail || editingPassword}>
                         Log out
                     </Button>
-                    <Button variant="cancel" onClick={onOpen}>
+                    <Button variant="cancel" onClick={onOpen} disabled={editingEmail || editingPassword}>
                         Delete account
                     </Button>
                 </Flex>
@@ -513,4 +632,10 @@ const Settings = () => {
     );
 };
 
-export default Settings;
+const AccountPage = () => (
+    <AuthGuard>
+        <Settings />
+    </AuthGuard>
+);
+
+export default AccountPage;

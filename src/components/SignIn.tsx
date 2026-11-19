@@ -19,6 +19,8 @@ import { toaster } from "@/components/toaster";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { LoginUser } from "../../firebase/utils";
+import { signOut } from "firebase/auth";
+import { auth } from "../../firebase/firebaseInit";
 import { useLocalStorage } from "usehooks-ts";
 
 interface FormData {
@@ -82,17 +84,15 @@ const SignIn = () => {
                 } else {
                     router.push("/explore");
                 }
+                setAuthError(null);
+                setHasPreviouslyLoggedIn(true);
             } else {
-                showToast({
-                    type: "error",
-                    title: "Email not verified",
-                    description:
-                        "Please check your email to verify your account.",
-                });
+                await signOut(auth);
+                setAuthError(
+                    "Your email address has not been verified. Please check your inbox for a verification link before signing in."
+                );
             }
             setSubmitting(false);
-            setAuthError(null);
-            setHasPreviouslyLoggedIn(true);
         } catch (error) {
             showToast({
                 title: "Error signing in.",

@@ -9,6 +9,7 @@ interface Props {
     animationDuration: number;
     image: Track["thumbnail"];
     curatedMode?: boolean;
+    targetStep?: number | null;
     startPosition?: { x: number; y: number } | null;
     thumbnailRect?: DOMRect | null;
 }
@@ -21,6 +22,7 @@ const RecordAnimation = ({
     animationDuration,
     image,
     curatedMode,
+    targetStep: targetStepOverride,
     startPosition,
     thumbnailRect,
 }: Props) => {
@@ -34,7 +36,7 @@ const RecordAnimation = ({
 
     useEffect(() => {
         if (animate === "like") {
-            const targetStep = !curatedMode && reviewStep === 1 ? 4 : reviewStep + 1;
+            const targetStep = targetStepOverride ?? (!curatedMode && reviewStep === 1 ? 4 : reviewStep + 1);
             const nextTab = document.querySelector(
                 `[data-tab-step="${targetStep}"]`
             ) as HTMLElement | null;

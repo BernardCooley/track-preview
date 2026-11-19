@@ -5,7 +5,7 @@ import { deezerGenreMap, appGenreToDeezerIds } from "../../../../../data/deezerG
 
 const DeezerPublicApi = require("deezer-public-api");
 
-const GENRES_PER_RUN = 10;
+const GENRES_PER_RUN = 20;
 
 const genreSearchTerms: Record<string, string[]> = {
     "Punk/Hardcore": ["punk rock", "hardcore punk"],
