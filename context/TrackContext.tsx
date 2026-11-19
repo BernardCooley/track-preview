@@ -7,6 +7,11 @@ interface TrackContextProps {
     currentlyPlaying: string | undefined;
     updateCurrentlyPlaying: (trackId: string | undefined) => void;
     onTrackEndedRef: MutableRefObject<(() => void) | null>;
+    onSkipRef: MutableRefObject<(() => void) | null>;
+    onPreviousRef: MutableRefObject<(() => void) | null>;
+    playingPositionRef: MutableRefObject<{ index: number; total: number } | null>;
+    trackLoading: "skip" | "previous" | null;
+    setTrackLoading: (loading: "skip" | "previous" | null) => void;
     reviewTracks: ReviewTracks;
     updateReviewTracks: (
         reviewStep: number,
@@ -73,6 +78,11 @@ export const TrackContextProvider = ({ children }: { children: ReactNode }) => {
     });
 
     const onTrackEndedRef = useRef<(() => void) | null>(null);
+    const onSkipRef = useRef<(() => void) | null>(null);
+    const onPreviousRef = useRef<(() => void) | null>(null);
+    const playingPositionRef = useRef<{ index: number; total: number } | null>(null);
+    const [trackLoading, setTrackLoadingState] = useState<"skip" | "previous" | null>(null);
+    const setTrackLoading = useCallback((loading: "skip" | "previous" | null) => setTrackLoadingState(loading), []);
 
     const updateCurrentlyPlaying = (trackId: string | undefined) => {
         setCurrentlyPlaying(trackId || "");
@@ -116,6 +126,11 @@ export const TrackContextProvider = ({ children }: { children: ReactNode }) => {
                 currentlyPlaying,
                 updateCurrentlyPlaying,
                 onTrackEndedRef,
+                onSkipRef,
+                onPreviousRef,
+                playingPositionRef,
+                trackLoading,
+                setTrackLoading,
                 reviewTracks,
                 updateReviewTracks,
                 currentReleaseTrack,

@@ -73,7 +73,7 @@ const LibraryTable = ({
     playAllRequested,
     onPlayAllStarted,
 }: Props) => {
-    const { onTrackEndedRef } = useTrackContext();
+    const { onTrackEndedRef, onSkipRef, onPreviousRef, playingPositionRef, setTrackLoading } = useTrackContext();
     const playingIndexRef = useRef<number | null>(null);
     const blobCache = useRef<Map<string, string>>(new Map());
 
@@ -131,13 +131,17 @@ const LibraryTable = ({
             setPlayingTrackId(undefined);
             updateCurrentlyPlaying(undefined);
             playingIndexRef.current = null;
+            playingPositionRef.current = null;
+            setTrackLoading(null);
             onTrackEndedRef.current = null;
             return;
         }
         const track = tracks[index];
         playingIndexRef.current = index;
+        playingPositionRef.current = { index, total: tracks.length };
         setPlayingTrackId(track.id);
         const url = await fetchPreviewAsBlob(track.id);
+        setTrackLoading(null);
         if (url) {
             updateCurrentlyPlaying(url);
         } else {
@@ -151,9 +155,36 @@ const LibraryTable = ({
         }
     }, [playTrackAtIndex]);
 
+    const handleSkip = useCallback(() => {
+        if (playingIndexRef.current !== null) {
+            setTrackLoading("skip");
+            playTrackAtIndex(playingIndexRef.current + 1);
+        }
+    }, [playTrackAtIndex]);
+
+    const handlePrevious = useCallback(() => {
+        if (playingIndexRef.current !== null && playingIndexRef.current > 0) {
+            setTrackLoading("previous");
+            playTrackAtIndex(playingIndexRef.current - 1);
+        }
+    }, [playTrackAtIndex]);
+
+    const setAllRefs = useCallback(() => {
+        onTrackEndedRef.current = handleTrackEnded;
+        onSkipRef.current = handleSkip;
+        onPreviousRef.current = handlePrevious;
+    }, [handleTrackEnded, handleSkip, handlePrevious]);
+
+    const clearAllRefs = useCallback(() => {
+        onTrackEndedRef.current = null;
+        onSkipRef.current = null;
+        onPreviousRef.current = null;
+        playingPositionRef.current = null;
+    }, []);
+
     useEffect(() => {
         if (playAllRequested && reviewTracks[4].tracks.length > 0) {
-            onTrackEndedRef.current = handleTrackEnded;
+            setAllRefs();
             playTrackAtIndex(0);
             onPlayAllStarted?.();
         }
@@ -161,12 +192,12 @@ const LibraryTable = ({
 
     useEffect(() => {
         if (playingIndexRef.current !== null) {
-            onTrackEndedRef.current = handleTrackEnded;
+            setAllRefs();
         }
-    }, [handleTrackEnded]);
+    }, [setAllRefs]);
 
     useEffect(() => {
-        return () => { onTrackEndedRef.current = null; };
+        return () => { clearAllRefs(); };
     }, []);
 
     const getTrProps = (
@@ -194,13 +225,13 @@ const LibraryTable = ({
                     setPlayingTrackId(undefined);
                     updateCurrentlyPlaying(undefined);
                     playingIndexRef.current = null;
-                    onTrackEndedRef.current = null;
+                    playingPositionRef.current = null;
+                    clearAllRefs();
                 } else {
                     const index = reviewTracks[4].tracks.findIndex(t => t.id === track.id);
-                    if (currentReleaseTrack && index >= 0) {
-                        onTrackEndedRef.current = handleTrackEnded;
-                        playingIndexRef.current = index;
-                    }
+                    playingIndexRef.current = index >= 0 ? index : null;
+                    playingPositionRef.current = index >= 0 ? { index, total: reviewTracks[4].tracks.length } : null;
+                    setAllRefs();
                     setPlayingTrackId(track.id);
                     const url = await fetchPreviewAsBlob(track.id);
                     updateCurrentlyPlaying(url);

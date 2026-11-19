@@ -24,6 +24,11 @@ const defaultTrackContext: TrackContextProps = {
     currentlyPlaying: undefined,
     updateCurrentlyPlaying: vi.fn(),
     onTrackEndedRef: { current: null },
+    onSkipRef: { current: null },
+    onPreviousRef: { current: null },
+    playingPositionRef: { current: null },
+    trackLoading: null,
+    setTrackLoading: vi.fn(),
     reviewTracks: {
         1: { tracks: [], currentTrack: 0 },
         2: { tracks: [], currentTrack: 0 },
