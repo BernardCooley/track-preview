@@ -384,6 +384,10 @@ const TrackReviewCard = ({
                                 w="full"
                                 position="relative"
                                 zIndex={1}
+                                onTouchStart={(e) => e.stopPropagation()}
+                                onTouchMove={(e) => e.stopPropagation()}
+                                onTouchEnd={(e) => e.stopPropagation()}
+                                onMouseDown={(e) => e.stopPropagation()}
                             >
                                 <AudioPlayer
                                     ref={playerRef}
