@@ -32,8 +32,6 @@ const Library = () => {
         setTrackToDelete,
         trackToBuy,
         setTrackToBuy,
-        clickDisabled,
-        setClickDisabled,
         sortBy,
         setSortBy,
         sortDirection,
@@ -124,9 +122,7 @@ const Library = () => {
                     currentReleaseTrack={currentReleaseTrack}
                     reviewTracks={reviewTracks}
                     currentlyPlaying={currentlyPlaying}
-                    clickDisabled={clickDisabled}
                     updateCurrentlyPlaying={updateCurrentlyPlaying}
-                    setClickDisabled={setClickDisabled}
                     setTrackToBuy={setTrackToBuy}
                     setTrackToDelete={setTrackToDelete}
                     updateCurrentReleaseTrack={updateCurrentReleaseTrack}

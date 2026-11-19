@@ -29,9 +29,7 @@ interface Props {
     currentReleaseTrack: Track | null;
     reviewTracks: ReviewTracks;
     currentlyPlaying: string | undefined;
-    clickDisabled: boolean;
     updateCurrentlyPlaying: (url: string | undefined) => void;
-    setClickDisabled: React.Dispatch<React.SetStateAction<boolean>>;
     setTrackToBuy: React.Dispatch<React.SetStateAction<number | null>>;
     setTrackToDelete: React.Dispatch<React.SetStateAction<number | null>>;
     updateCurrentReleaseTrack: (track: Track) => void;
@@ -52,9 +50,7 @@ const LibraryTable = ({
     currentReleaseTrack,
     reviewTracks,
     currentlyPlaying,
-    clickDisabled,
     updateCurrentlyPlaying,
-    setClickDisabled,
     setTrackToBuy,
     setTrackToDelete,
     updateCurrentReleaseTrack,
@@ -90,7 +86,6 @@ const LibraryTable = ({
         ) {
             updatePreviousTracks(reviewTracks[4].tracks);
             getTracks(reviewTracks[4].tracks[index]);
-            setClickDisabled(false);
         }
     };
 
@@ -100,8 +95,6 @@ const LibraryTable = ({
 
     const getTrProps = (
         track: Track,
-        currentlyPlaying: string | undefined,
-        clickDisabled: boolean,
         updateCurrentlyPlaying: (url: string | undefined) => void
     ) => {
         const isPlaying = playingTrackId === track.id;
@@ -121,15 +114,13 @@ const LibraryTable = ({
             },
             bg: isPlaying ? "brand.primarySubtle" : "transparent",
             onClick: async () => {
-                if (!clickDisabled) {
-                    if (playingTrackId === track.id) {
-                        setPlayingTrackId(undefined);
-                        updateCurrentlyPlaying(undefined);
-                    } else {
-                        setPlayingTrackId(track.id);
-                        const url = await resolvePreviewUrl(track.id);
-                        updateCurrentlyPlaying(url);
-                    }
+                if (playingTrackId === track.id) {
+                    setPlayingTrackId(undefined);
+                    updateCurrentlyPlaying(undefined);
+                } else {
+                    setPlayingTrackId(track.id);
+                    const url = await resolvePreviewUrl(track.id);
+                    updateCurrentlyPlaying(url);
                 }
             },
         };
@@ -170,18 +161,13 @@ const LibraryTable = ({
     };
 
     const ActionButtons = ({ index }: { index: number }) => (
-        <Flex alignItems="center" gap={1}>
+        <Flex alignItems="center" gap={1} onClick={(e) => e.stopPropagation()}>
             <IconButton
-                onMouseEnter={() => setClickDisabled(true)}
-                onMouseLeave={() => setClickDisabled(false)}
                 color="brand.primary"
                 fontSize="xl"
                 bg="transparent"
                 shadow="none"
-                onClick={(e) => {
-                    e.stopPropagation();
-                    setTrackToBuy(index);
-                }}
+                onClick={() => setTrackToBuy(index)}
                 rounded="full"
                 variant="tertiary"
                 aria-label="buy track"
@@ -190,8 +176,6 @@ const LibraryTable = ({
                 <ShopIcon fontSize="inherit" />
             </IconButton>
             <TrackMenuOptions
-                onMouseEnter={() => setClickDisabled(true)}
-                onMouseLeave={() => setClickDisabled(false)}
                 onTrackDelete={() => setTrackToDelete(index)}
                 onViewRelease={() => gotToRelease(index)}
                 index={index}
@@ -246,8 +230,6 @@ const LibraryTable = ({
                             key={track.id}
                             {...getTrProps(
                                 track,
-                                currentlyPlaying,
-                                clickDisabled,
                                 updateCurrentlyPlaying
                             )}
                             borderBottom="1px solid"
@@ -334,8 +316,6 @@ const LibraryTable = ({
                             key={track.id}
                             {...getTrProps(
                                 track,
-                                currentlyPlaying,
-                                clickDisabled,
                                 updateCurrentlyPlaying
                             )}
                             borderBottom="1px solid"

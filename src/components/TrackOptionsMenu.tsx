@@ -1,40 +1,23 @@
 import { Menu, Button } from "@chakra-ui/react";
-import React, { useRef } from "react";
+import React from "react";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 
 interface TrackOptionsProps {
     index: number;
-    onMouseEnter: () => void;
-    onMouseLeave: () => void;
     onTrackDelete: (index: number) => void;
     onViewRelease: (index: number) => void;
 }
 
 const TrackMenuOptions = ({
     index,
-    onMouseEnter,
-    onMouseLeave,
     onTrackDelete,
     onViewRelease,
 }: TrackOptionsProps) => {
-    const openRef = useRef(false);
-
     return (
-        <Menu.Root
-            onOpenChange={({ open }) => {
-                openRef.current = open;
-                if (open) {
-                    onMouseEnter();
-                } else {
-                    onMouseLeave();
-                }
-            }}
-        >
+        <Menu.Root>
             <Menu.Trigger asChild>
                 <Button
-                    onClick={(e) => e.stopPropagation()}
                     variant="tertiary"
-                    onMouseEnter={onMouseEnter}
                     size="sm"
                     color="brand.textMuted"
                 >

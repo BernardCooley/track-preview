@@ -32,7 +32,6 @@ export const useTrackList = () => {
     const cancelRef = useRef<HTMLButtonElement>(null);
     const [trackToDelete, setTrackToDelete] = useState<number | null>(null);
     const [trackToBuy, setTrackToBuy] = useState<number | null>(null);
-    const [clickDisabled, setClickDisabled] = useState<boolean>(false);
     const [sortBy, setSortBy] = useState<keyof Track | "">("title");
     const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
 
@@ -60,7 +59,6 @@ export const useTrackList = () => {
                 }
                 onClose();
                 setTrackToDelete(null);
-                setClickDisabled(false);
             } catch (error) {}
         }
     };
@@ -153,8 +151,6 @@ export const useTrackList = () => {
         setTrackToDelete,
         trackToBuy,
         setTrackToBuy,
-        clickDisabled,
-        setClickDisabled,
         sortBy,
         setSortBy,
         sortDirection,
