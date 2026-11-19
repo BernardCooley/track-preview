@@ -60,6 +60,7 @@ export const useTrackList = () => {
                 }
                 onClose();
                 setTrackToDelete(null);
+                setClickDisabled(false);
             } catch (error) {}
         }
     };
