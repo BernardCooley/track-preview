@@ -1,4 +1,4 @@
-name: Tests
+name: CI
 
 on:
   push:
@@ -7,11 +7,14 @@ on:
     branches: [main, develop]
 
 jobs:
-  test:
+  test-and-deploy:
     runs-on: ubuntu-latest
 
     env:
       PUPPETEER_SKIP_DOWNLOAD: true
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
     steps:
       - uses: actions/checkout@v4
@@ -22,4 +25,53 @@ jobs:
           cache: npm
 
       - run: npm install
-      - run: npx vitest run
+
+      - name: Run tests
+        run: npx vitest run
+
+      - name: Install Vercel CLI
+        if: github.event_name == 'push'
+        run: npm install -g vercel
+
+      - name: Pull Vercel environment
+        if: github.event_name == 'push'
+        run: vercel pull --yes --token=$VERCEL_TOKEN
+
+      - name: Set Vercel env vars
+        if: github.event_name == 'push'
+        run: |
+          for VAR_NAME in POSTGRES_URL POSTGRES_URL_NON_POOLING; do
+            VAR_VALUE="${!VAR_NAME}"
+            for TARGET in preview production; do
+              EXISTING=$(curl -s -H "Authorization: Bearer $VERCEL_TOKEN" \
+                "https://api.vercel.com/v9/projects/$VERCEL_PROJECT_ID/env?teamId=$VERCEL_ORG_ID" \
+                | jq -r ".envs[] | select(.key==\"$VAR_NAME\" and (.target[] | . ==\"$TARGET\")) | .id" | head -1)
+              if [ -n "$EXISTING" ]; then
+                curl -s -X PATCH -H "Authorization: Bearer $VERCEL_TOKEN" -H "Content-Type: application/json" \
+                  "https://api.vercel.com/v9/projects/$VERCEL_PROJECT_ID/env/$EXISTING?teamId=$VERCEL_ORG_ID" \
+                  -d "{\"value\":\"$VAR_VALUE\"}"
+              else
+                curl -s -X POST -H "Authorization: Bearer $VERCEL_TOKEN" -H "Content-Type: application/json" \
+                  "https://api.vercel.com/v9/projects/$VERCEL_PROJECT_ID/env?teamId=$VERCEL_ORG_ID" \
+                  -d "{\"key\":\"$VAR_NAME\",\"value\":\"$VAR_VALUE\",\"type\":\"encrypted\",\"target\":[\"$TARGET\"]}"
+              fi
+            done
+          done
+        env:
+          POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
+          POSTGRES_URL_NON_POOLING: ${{ secrets.POSTGRES_URL_NON_POOLING }}
+
+      - name: Build
+        if: github.event_name == 'push'
+        run: vercel build ${{ github.ref == 'refs/heads/main' && '--prod' || '' }} --token=$VERCEL_TOKEN
+        env:
+          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ github.ref == 'refs/heads/main' && secrets.NEXT_PUBLIC_FIREBASE_API_KEY_PROD || secrets.NEXT_PUBLIC_FIREBASE_API_KEY_DEV }}
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ github.ref == 'refs/heads/main' && secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID_PROD || secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID_DEV }}
+          FIREBASE_AUTH_DOMAIN: ${{ github.ref == 'refs/heads/main' && secrets.FIREBASE_AUTH_DOMAIN_PROD || secrets.FIREBASE_AUTH_DOMAIN_DEV }}
+          FIREBASE_APP_ID: ${{ github.ref == 'refs/heads/main' && secrets.FIREBASE_APP_ID_PROD || secrets.FIREBASE_APP_ID_DEV }}
+          POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
+          POSTGRES_URL_NON_POOLING: ${{ secrets.POSTGRES_URL_NON_POOLING }}
+
+      - name: Deploy
+        if: github.event_name == 'push'
+        run: vercel deploy --prebuilt ${{ github.ref == 'refs/heads/main' && '--prod' || '' }} --token=$VERCEL_TOKEN

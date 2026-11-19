@@ -69,6 +69,7 @@ const genreSearchTerms: Record<string, string[]> = {
     "Deep House": ["deep house", "deep house music"],
     "Dubstep": ["dubstep"],
     "Trance": ["trance music"],
+    "Electro": ["electro music", "electro funk", "electro bass"],
     "Electronica": ["electronica"],
     "International": ["world music"],
 };

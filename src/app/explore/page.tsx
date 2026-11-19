@@ -15,6 +15,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import Library from "@/components/Library";
 import MenuDrawer from "@/components/MenuDrawer";
 import { getUserProfile, createUser } from "@/bff/bff";
+import { toaster } from "@/components/toaster";
 import { useTrackContext } from "../../../context/TrackContext";
 import { useAuthContext } from "../../../Contexts/AuthContext";
 import { GetCurrentUser } from "../../../firebase/utils";
@@ -35,7 +36,7 @@ function ExploreContent() {
     const { currentlyPlaying, updateCurrentlyPlaying } = useTrackContext();
     const audioElement = useRef<HTMLAudioElement>(null);
     const [currentStep, setCurrentStep] = useState<number>(0);
-    const { updateUser, user, updateUserProfile, userProfile, isAnonymous, setIsAnonymous } = useAuthContext();
+    const { updateUser, user, updateUserProfile, userProfile, isAnonymous, setIsAnonymous, profileError, setProfileError } = useAuthContext();
     const reviewStep = searchParams?.get("reviewStep");
     const pageRef = useRef<HTMLDivElement>(null);
     const { open: isMenuOpen, onOpen: onMenuOpen, onClose: onMenuClose } = useDisclosure();
@@ -43,12 +44,23 @@ function ExploreContent() {
     useEffect(() => {
         if (user?.uid) {
             (async () => {
-                let userProf = await getUserProfile({ userId: user.uid });
-                if (!userProf && isAnonymous) {
-                    await createUser({ userId: user.uid, isAnonymous: true });
-                    userProf = await getUserProfile({ userId: user.uid });
+                try {
+                    setProfileError(false);
+                    let userProf = await getUserProfile({ userId: user.uid });
+                    if (!userProf && isAnonymous) {
+                        await createUser({ userId: user.uid, isAnonymous: true });
+                        userProf = await getUserProfile({ userId: user.uid });
+                    }
+                    updateUserProfile(userProf);
+                } catch {
+                    setProfileError(true);
+                    toaster.create({
+                        title: "Unable to load your profile",
+                        description: "Some features may be unavailable. Please try again later.",
+                        type: "error",
+                        duration: 8000,
+                    });
                 }
-                updateUserProfile(userProf);
             })();
         }
     }, [user]);
@@ -208,6 +220,28 @@ function ExploreContent() {
                 </IconButton>
             </Flex>
             </Box>
+
+            {profileError && (
+                <Box
+                    bg="red.900"
+                    color="red.200"
+                    px={4}
+                    py={3}
+                    textAlign="center"
+                    fontSize="sm"
+                >
+                    Unable to load your profile. Some features may be unavailable.{" "}
+                    <Button
+                        variant="plain"
+                        size="xs"
+                        color="red.200"
+                        textDecoration="underline"
+                        onClick={() => window.location.reload()}
+                    >
+                        Retry
+                    </Button>
+                </Box>
+            )}
 
             <Box flex={1} overflow="hidden" position="relative">
             <Box maxW={["none", "none", "none", "1000px"]} mx="auto" h="full">

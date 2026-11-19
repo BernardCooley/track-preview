@@ -213,9 +213,23 @@ const TrackReviewCard = ({
                                 >
                                     <SwipeOutlinedIcon style={{ fontSize: "56px" }} />
                                 </Box>
-                                <Text fontSize="sm" fontWeight="medium" color="whiteAlpha.900">
-                                    Swipe to skip or like
-                                </Text>
+                                <Flex gap={3} alignItems="center">
+                                    <Text fontSize="sm" color="red.400">
+                                        Skip
+                                    </Text>
+                                    <Text fontSize="sm" color="whiteAlpha.500">
+                                        &larr;
+                                    </Text>
+                                    <Text fontSize="sm" fontWeight="medium" color="whiteAlpha.900">
+                                        Swipe
+                                    </Text>
+                                    <Text fontSize="sm" color="whiteAlpha.500">
+                                        &rarr;
+                                    </Text>
+                                    <Text fontSize="sm" color="green.400">
+                                        Like
+                                    </Text>
+                                </Flex>
                             </Flex>
                         </Flex>
                     )}
@@ -384,6 +398,10 @@ const TrackReviewCard = ({
                                 w="full"
                                 position="relative"
                                 zIndex={1}
+                                onTouchStart={(e) => e.stopPropagation()}
+                                onTouchMove={(e) => e.stopPropagation()}
+                                onTouchEnd={(e) => e.stopPropagation()}
+                                onMouseDown={(e) => e.stopPropagation()}
                             >
                                 <AudioPlayer
                                     ref={playerRef}

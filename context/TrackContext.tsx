@@ -1,11 +1,17 @@
 'use client';
 
-import React, { createContext, ReactNode, useContext, useState } from "react";
+import React, { createContext, MutableRefObject, ReactNode, useCallback, useContext, useRef, useState } from "react";
 import { ReviewTracks, Track } from "../types";
 
 interface TrackContextProps {
     currentlyPlaying: string | undefined;
     updateCurrentlyPlaying: (trackId: string | undefined) => void;
+    onTrackEndedRef: MutableRefObject<(() => void) | null>;
+    onSkipRef: MutableRefObject<(() => void) | null>;
+    onPreviousRef: MutableRefObject<(() => void) | null>;
+    playingPositionRef: MutableRefObject<{ index: number; total: number } | null>;
+    trackLoading: "skip" | "previous" | null;
+    setTrackLoading: (loading: "skip" | "previous" | null) => void;
     reviewTracks: ReviewTracks;
     updateReviewTracks: (
         reviewStep: number,
@@ -71,6 +77,13 @@ export const TrackContextProvider = ({ children }: { children: ReactNode }) => {
         4: true,
     });
 
+    const onTrackEndedRef = useRef<(() => void) | null>(null);
+    const onSkipRef = useRef<(() => void) | null>(null);
+    const onPreviousRef = useRef<(() => void) | null>(null);
+    const playingPositionRef = useRef<{ index: number; total: number } | null>(null);
+    const [trackLoading, setTrackLoadingState] = useState<"skip" | "previous" | null>(null);
+    const setTrackLoading = useCallback((loading: "skip" | "previous" | null) => setTrackLoadingState(loading), []);
+
     const updateCurrentlyPlaying = (trackId: string | undefined) => {
         setCurrentlyPlaying(trackId || "");
     };
@@ -112,6 +125,12 @@ export const TrackContextProvider = ({ children }: { children: ReactNode }) => {
             value={{
                 currentlyPlaying,
                 updateCurrentlyPlaying,
+                onTrackEndedRef,
+                onSkipRef,
+                onPreviousRef,
+                playingPositionRef,
+                trackLoading,
+                setTrackLoading,
                 reviewTracks,
                 updateReviewTracks,
                 currentReleaseTrack,

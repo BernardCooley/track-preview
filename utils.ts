@@ -51,22 +51,23 @@ export const camelcaseToTitleCase = (str: string) => {
         .replace(/^./, (str) => str.toUpperCase());
 };
 
-export const formatBuyUrl = (track: Track, platform: BuyPlatforms) => {
+export const formatBuyUrl = (track: Track, platform: BuyPlatforms, searchTitle?: string) => {
     if (!track) return "";
+    const title = searchTitle || track.title;
     if (platform === "juno") {
-        return `https://www.juno.co.uk/search/?q%5Ball%5D%5B%5D=${track.artist} ${track.title}&hide_forthcoming=0`;
+        return `https://www.juno.co.uk/search/?q%5Ball%5D%5B%5D=${track.artist} ${title}&hide_forthcoming=0`;
     } else if (platform === "beatport") {
-        return `https://www.beatport.com/search?q=${track.artist} ${track.title}`;
+        return `https://www.beatport.com/search?q=${track.artist} ${title}`;
     } else if (platform === "juno download") {
-        return `https://www.junodownload.com/search/?q%5Ball%5D%5B%5D=${track.artist} ${track.title}`;
+        return `https://www.junodownload.com/search/?q%5Ball%5D%5B%5D=${track.artist} ${title}`;
     } else if (platform === "discogs") {
-        return `https://www.discogs.com/search/?q=${track.artist} ${track.title}`;
+        return `https://www.discogs.com/search/?q=${track.artist} ${title}`;
     } else if (platform === "bandcamp") {
-        return `https://bandcamp.com/search?q=${track.artist} ${track.title}`;
+        return `https://bandcamp.com/search?q=${track.artist} ${title}`;
     } else if (platform === "apple music") {
-        return `https://music.apple.com/search?term=${track.artist} ${track.title}`;
+        return `https://music.apple.com/search?term=${track.artist} ${title}`;
     } else if (platform === "bleep") {
-        return `https://bleep.com/search/query?q=${track.artist}+-+${track.title}`;
+        return `https://bleep.com/search/query?q=${track.artist}+-+${title}`;
     }
 };
 

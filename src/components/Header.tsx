@@ -15,17 +15,29 @@ import { auth } from "../../firebase/firebaseInit";
 import { GetCurrentUser } from "../../firebase/utils";
 import { useAuthContext } from "../../Contexts/AuthContext";
 import { getUserProfile } from "@/bff/bff";
+import { toaster } from "@/components/toaster";
 
 const Header = () => {
     const pathname = usePathname();
     const { open: isOpen, onOpen, onClose } = useDisclosure();
-    const { user, updateUser, updateUserProfile } = useAuthContext();
+    const { user, updateUser, updateUserProfile, setProfileError } = useAuthContext();
 
     useEffect(() => {
         if (user?.uid) {
             (async () => {
-                const userProf = await getUserProfile({ userId: user.uid });
-                updateUserProfile(userProf);
+                try {
+                    setProfileError(false);
+                    const userProf = await getUserProfile({ userId: user.uid });
+                    updateUserProfile(userProf);
+                } catch {
+                    setProfileError(true);
+                    toaster.create({
+                        title: "Unable to load your profile",
+                        description: "Some features may be unavailable. Please try again later.",
+                        type: "error",
+                        duration: 8000,
+                    });
+                }
             })();
         }
     }, [user]);

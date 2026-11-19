@@ -16,11 +16,19 @@ const defaultAuthContext = {
     updateUserProfile: vi.fn(),
     isAnonymous: false,
     setIsAnonymous: vi.fn(),
+    profileError: false,
+    setProfileError: vi.fn(),
 };
 
 const defaultTrackContext: TrackContextProps = {
     currentlyPlaying: undefined,
     updateCurrentlyPlaying: vi.fn(),
+    onTrackEndedRef: { current: null },
+    onSkipRef: { current: null },
+    onPreviousRef: { current: null },
+    playingPositionRef: { current: null },
+    trackLoading: null,
+    setTrackLoading: vi.fn(),
     reviewTracks: {
         1: { tracks: [], currentTrack: 0 },
         2: { tracks: [], currentTrack: 0 },

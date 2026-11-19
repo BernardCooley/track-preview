@@ -21,7 +21,7 @@ export const useTrackReview = (reviewStep: number) => {
         "recentGenres",
         []
     );
-    const { user, userProfile, updateUserProfile, isAnonymous } = useAuthContext();
+    const { user, userProfile, updateUserProfile, isAnonymous, profileError } = useAuthContext();
     const [prevUserProfile, setPrevUserProfile] = useState<UserProfile | null>(
         userProfile
     );
@@ -61,17 +61,18 @@ export const useTrackReview = (reviewStep: number) => {
         setPrevUserProfile(userProfile);
     }, [userProfile]);
 
-    const fetchPreview = useCallback(async (trackId: string): Promise<string | null> => {
+    const fetchPreview = useCallback(async (trackId: string, signal?: AbortSignal): Promise<string | null> => {
         if (previewCache.current.has(trackId)) return previewCache.current.get(trackId)!;
         if (unplayableTracks.current.has(trackId)) return null;
 
         try {
             const proxyUrl = await resolvePreviewUrl(trackId);
+            if (signal?.aborted) return null;
             if (!proxyUrl) {
                 unplayableTracks.current.add(trackId);
                 return null;
             }
-            const res = await fetch(proxyUrl);
+            const res = await fetch(proxyUrl, { signal });
             if (!res.ok) {
                 unplayableTracks.current.add(trackId);
                 return null;
@@ -80,7 +81,8 @@ export const useTrackReview = (reviewStep: number) => {
             const objectUrl = URL.createObjectURL(blob);
             previewCache.current.set(trackId, objectUrl);
             return objectUrl;
-        } catch {
+        } catch (e) {
+            if (e instanceof DOMException && e.name === "AbortError") return null;
             unplayableTracks.current.add(trackId);
             return null;
         }
@@ -105,7 +107,7 @@ export const useTrackReview = (reviewStep: number) => {
     }, [fetchPreview]);
 
     useEffect(() => {
-        let revoked = false;
+        const abortController = new AbortController();
 
         if (!currentTrack) return;
 
@@ -116,10 +118,14 @@ export const useTrackReview = (reviewStep: number) => {
 
         const tracks = reviewTracks[reviewStep].tracks;
         const currentIndex = tracks.findIndex((t) => t.id === currentTrack.id);
-        if (currentIndex === -1) return;
+        if (currentIndex === -1) {
+            setPreviewLoading(false);
+            setLoading(false);
+            return;
+        }
 
         const tryTrackAtIndex = async (idx: number) => {
-            if (revoked) return;
+            if (abortController.signal.aborted) return;
             if (idx >= tracks.length) {
                 setPreviewLoading(false);
                 setLoading(false);
@@ -133,8 +139,8 @@ export const useTrackReview = (reviewStep: number) => {
                 return;
             }
 
-            const blobUrl = await fetchPreview(track.id);
-            if (revoked) return;
+            const blobUrl = await fetchPreview(track.id, abortController.signal);
+            if (abortController.signal.aborted) return;
 
             if (!blobUrl) {
                 tryTrackAtIndex(idx + 1);
@@ -149,7 +155,7 @@ export const useTrackReview = (reviewStep: number) => {
         tryTrackAtIndex(currentIndex);
 
         return () => {
-            revoked = true;
+            abortController.abort();
         };
     }, [currentTrack]);
 
@@ -420,5 +426,6 @@ export const useTrackReview = (reviewStep: number) => {
         trialLimitReached,
         trialLikeCount,
         isAnonymous,
+        profileError,
     };
 };

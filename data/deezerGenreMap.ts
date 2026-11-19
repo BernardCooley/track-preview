@@ -32,7 +32,6 @@ export const appGenreToDeezerIds: Record<string, number[]> = {
     Rock: [152],
     Dance: [113],
     "Indie/Alternative": [85],
-    Electro: [106],
     "Folk/Americana": [466],
     Reggae: [144],
     Jazz: [129],

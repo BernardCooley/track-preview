@@ -21,6 +21,12 @@ const mockUpdateChangesMade = vi.fn();
 const defaultTrackContext: TrackContextProps = {
     currentlyPlaying: undefined,
     updateCurrentlyPlaying: mockUpdateCurrentlyPlaying,
+    onTrackEndedRef: { current: null },
+    onSkipRef: { current: null },
+    onPreviousRef: { current: null },
+    playingPositionRef: { current: null },
+    trackLoading: null,
+    setTrackLoading: vi.fn(),
     reviewTracks: {
         1: { tracks: [], currentTrack: 0 },
         2: { tracks: [], currentTrack: 0 },
@@ -47,6 +53,8 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
                     updateUserProfile: vi.fn(),
                     isAnonymous: false,
                     setIsAnonymous: vi.fn(),
+                    profileError: false,
+                    setProfileError: vi.fn(),
                 }}
             >
                 <TrackContext.Provider value={defaultTrackContext as TrackContextProps}>
@@ -199,6 +207,82 @@ describe("useTrackList", () => {
 
         await waitFor(() => {
             expect(apiCalled).toBe(true);
+        });
+    });
+
+    it("addTrackToLibrary calls sendToLibrary API and updates libraryTrackIds", async () => {
+        let apiBody: any = null;
+        server.use(
+            http.post("/api/sendToLibrary", async ({ request }) => {
+                apiBody = await request.json();
+                return HttpResponse.json({ success: true });
+            })
+        );
+
+        const { result } = renderHook(() => useTrackList(), { wrapper });
+
+        await act(async () => {
+            await result.current.addTrackToLibrary(mockTrack2);
+        });
+
+        await waitFor(() => {
+            expect(apiBody).toEqual({ trackId: "track-2", userId: "user-1" });
+            expect(result.current.libraryTrackIds.has("track-2")).toBe(true);
+        });
+    });
+
+    it("addTrackToLibrary flags changesMade for step 4", async () => {
+        server.use(
+            http.post("/api/sendToLibrary", () => {
+                return HttpResponse.json({ success: true });
+            })
+        );
+
+        const { result } = renderHook(() => useTrackList(), { wrapper });
+
+        await act(async () => {
+            await result.current.addTrackToLibrary(mockTrack);
+        });
+
+        await waitFor(() => {
+            expect(mockUpdateChangesMade).toHaveBeenCalledWith(4, true);
+        });
+    });
+
+    it("addTrackToLibrary clears addingTrackId after completion", async () => {
+        server.use(
+            http.post("/api/sendToLibrary", () => {
+                return HttpResponse.json({ success: true });
+            })
+        );
+
+        const { result } = renderHook(() => useTrackList(), { wrapper });
+
+        await act(async () => {
+            await result.current.addTrackToLibrary(mockTrack);
+        });
+
+        await waitFor(() => {
+            expect(result.current.addingTrackId).toBeNull();
+        });
+    });
+
+    it("addTrackToLibrary clears addingTrackId on failure", async () => {
+        server.use(
+            http.post("/api/sendToLibrary", () => {
+                return HttpResponse.error();
+            })
+        );
+
+        const { result } = renderHook(() => useTrackList(), { wrapper });
+
+        await act(async () => {
+            await result.current.addTrackToLibrary(mockTrack);
+        });
+
+        await waitFor(() => {
+            expect(result.current.addingTrackId).toBeNull();
+            expect(result.current.libraryTrackIds.has("track-1")).toBe(false);
         });
     });
 });

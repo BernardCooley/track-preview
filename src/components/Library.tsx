@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Badge, Center, Flex } from "@chakra-ui/react";
 import Loading from "./Loading";
 import { buyLinks } from "../../consts";
@@ -7,6 +7,7 @@ import DeleteTrackDialog from "./DeleteTrackDialog";
 import LibraryTable from "./LibraryTable";
 import ReleaseHeader from "./ReleaseHeader";
 import { useTrackList } from "@/hooks/useTrackList";
+import { Track } from "../../types";
 
 const Library = () => {
     const {
@@ -32,8 +33,6 @@ const Library = () => {
         setTrackToDelete,
         trackToBuy,
         setTrackToBuy,
-        clickDisabled,
-        setClickDisabled,
         sortBy,
         setSortBy,
         sortDirection,
@@ -42,13 +41,33 @@ const Library = () => {
         closeBuyModal,
         closeDialog,
         deleteTrack,
+        addTrackToLibrary,
+        addingTrackId,
+        libraryTrackIds,
+        setLibraryTrackIds,
     } = useTrackList();
 
+    const [releaseBuyTrack, setReleaseBuyTrack] = useState<Track | null>(null);
+    const [playAllRequested, setPlayAllRequested] = useState(false);
+
+    const onBuyRelease = useCallback(() => {
+        if (currentReleaseTrack) {
+            setReleaseBuyTrack(currentReleaseTrack);
+            onBuyModalOpen();
+        }
+    }, [currentReleaseTrack, onBuyModalOpen]);
+
+    const handleCloseBuyModal = useCallback(() => {
+        closeBuyModal();
+        setReleaseBuyTrack(null);
+    }, [closeBuyModal]);
+
     useEffect(() => {
+        if (currentReleaseTrack) return;
         if (changesMade[4] || reviewTracks[4].tracks.length === 0) {
             getTracks(null);
         }
-    }, [user, changesMade[4]]);
+    }, [user, changesMade[4], currentReleaseTrack]);
 
     useEffect(() => {
         if (trackToDelete || trackToDelete === 0) {
@@ -67,6 +86,12 @@ const Library = () => {
             setLoading(false);
         }
     }, [noTracks]);
+
+    useEffect(() => {
+        if (currentReleaseTrack && previousTracks.length > 0) {
+            setLibraryTrackIds(new Set(previousTracks.map(t => t.id)));
+        }
+    }, [currentReleaseTrack]);
 
     return (
         <Flex position="relative" direction="column" h="full" overflow="auto">
@@ -93,10 +118,11 @@ const Library = () => {
 
             <BuyModal
                 buyModalIsOpen={buyModalIsOpen}
-                closeBuyModal={closeBuyModal}
+                closeBuyModal={handleCloseBuyModal}
                 buyLinks={buyLinks}
                 reviewTracks={reviewTracks}
                 trackToBuy={trackToBuy}
+                releaseTrack={releaseBuyTrack}
             />
             <DeleteTrackDialog
                 isOpen={isOpen}
@@ -114,27 +140,28 @@ const Library = () => {
                     updateCurrentReleaseTrack={updateCurrentReleaseTrack}
                     previousTracks={previousTracks}
                     currentReleaseTrack={currentReleaseTrack}
+                    onBuyRelease={onBuyRelease}
+                    onPlayAll={() => setPlayAllRequested(true)}
                 />
             )}
 
             {!loading && !noTracks && (
                 <LibraryTable
-                    sortBy={sortBy}
-                    sortDirection={sortDirection}
                     currentReleaseTrack={currentReleaseTrack}
                     reviewTracks={reviewTracks}
                     currentlyPlaying={currentlyPlaying}
-                    clickDisabled={clickDisabled}
                     updateCurrentlyPlaying={updateCurrentlyPlaying}
-                    setClickDisabled={setClickDisabled}
                     setTrackToBuy={setTrackToBuy}
                     setTrackToDelete={setTrackToDelete}
                     updateCurrentReleaseTrack={updateCurrentReleaseTrack}
                     updatePreviousTracks={updatePreviousTracks}
                     getTracks={getTracks}
                     updateReviewTracks={updateReviewTracks}
-                    setSortBy={setSortBy}
-                    setSortDirection={setSortDirection}
+                    addTrackToLibrary={addTrackToLibrary}
+                    addingTrackId={addingTrackId}
+                    libraryTrackIds={libraryTrackIds}
+                    playAllRequested={playAllRequested}
+                    onPlayAllStarted={() => setPlayAllRequested(false)}
                 />
             )}
         </Flex>

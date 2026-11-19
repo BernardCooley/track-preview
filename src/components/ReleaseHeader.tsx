@@ -1,6 +1,8 @@
 import React from "react";
-import { Button, Flex, Text } from "@chakra-ui/react";
+import { Flex, IconButton, Text } from "@chakra-ui/react";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import ShopIcon from "@mui/icons-material/Shop";
 import { Track } from "../../types";
 
 interface Props {
@@ -13,6 +15,8 @@ interface Props {
     updateCurrentReleaseTrack: (track: Track | null) => void;
     previousTracks: Track[];
     currentReleaseTrack: Track;
+    onBuyRelease: () => void;
+    onPlayAll: () => void;
 }
 
 const ReleaseHeader = ({
@@ -21,6 +25,8 @@ const ReleaseHeader = ({
     updateCurrentReleaseTrack,
     previousTracks,
     currentReleaseTrack,
+    onBuyRelease,
+    onPlayAll,
 }: Props) => {
     return (
         <Flex
@@ -34,21 +40,25 @@ const ReleaseHeader = ({
             bg="brand.surfaceRaised"
             flexWrap="wrap"
         >
-            <Button
-                variant="outline"
-                height="36px"
-                px={3}
-                fontSize="sm"
+            <IconButton
+                variant="tertiary"
+                bg="transparent"
+                shadow="none"
+                rounded="full"
+                size="sm"
+                fontSize="xl"
+                color="brand.textMuted"
+                _hover={{ color: "brand.textPrimary" }}
+                aria-label="Back to library"
                 onClick={() => {
                     updateReviewTracks(4, previousTracks, 0);
                     updatePreviousTracks([]);
                     updateCurrentReleaseTrack(null);
                 }}
             >
-                <ChevronLeftIcon style={{ fontSize: "18px" }} />
-                Library
-            </Button>
-            <Flex direction="column" gap={0.5}>
+                <ChevronLeftIcon fontSize="inherit" />
+            </IconButton>
+            <Flex direction="column" gap={0.5} flex={1}>
                 <Flex gap={2} alignItems="baseline">
                     <Text fontSize="xs" color="brand.textMuted">
                         Artist:
@@ -74,6 +84,32 @@ const ReleaseHeader = ({
                     </Text>
                 </Flex>
             </Flex>
+            <IconButton
+                color="brand.primary"
+                fontSize="xl"
+                bg="transparent"
+                shadow="none"
+                onClick={onPlayAll}
+                rounded="full"
+                variant="tertiary"
+                aria-label="play all"
+                size="sm"
+            >
+                <PlayArrowIcon fontSize="inherit" />
+            </IconButton>
+            <IconButton
+                color="brand.primary"
+                fontSize="xl"
+                bg="transparent"
+                shadow="none"
+                onClick={onBuyRelease}
+                rounded="full"
+                variant="tertiary"
+                aria-label="buy release"
+                size="sm"
+            >
+                <ShopIcon fontSize="inherit" />
+            </IconButton>
         </Flex>
     );
 };
