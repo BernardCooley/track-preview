@@ -327,13 +327,11 @@ const TrackReview = memo(
                             profileLoaded={userProfile ? true : false}
                             autoplayLoading={autoplayLoading}
                             onAutoPlayToggle={async () => {
-                                setAutoplayLoading(true);
                                 const newProfile = await mutateUserProfile({
                                     userId: user?.uid || "",
                                     autoplay: !userProfile?.autoplay,
                                 });
                                 updateUserProfile(newProfile);
-                                setAutoplayLoading(false);
                             }}
                             preferredAutoPlay={userProfile?.autoplay || false}
                             trackList={reviewTracks[reviewStep].tracks}
