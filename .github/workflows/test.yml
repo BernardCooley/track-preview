@@ -40,10 +40,26 @@ jobs:
       - name: Set Vercel env vars
         if: github.event_name == 'push'
         run: |
-          echo "${{ secrets.POSTGRES_URL }}" | vercel env add POSTGRES_URL --environment preview --token=$VERCEL_TOKEN --force
-          echo "${{ secrets.POSTGRES_URL_NON_POOLING }}" | vercel env add POSTGRES_URL_NON_POOLING --environment preview --token=$VERCEL_TOKEN --force
-          echo "${{ secrets.POSTGRES_URL }}" | vercel env add POSTGRES_URL --environment production --token=$VERCEL_TOKEN --force
-          echo "${{ secrets.POSTGRES_URL_NON_POOLING }}" | vercel env add POSTGRES_URL_NON_POOLING --environment production --token=$VERCEL_TOKEN --force
+          for VAR_NAME in POSTGRES_URL POSTGRES_URL_NON_POOLING; do
+            VAR_VALUE="${!VAR_NAME}"
+            for TARGET in preview production; do
+              EXISTING=$(curl -s -H "Authorization: Bearer $VERCEL_TOKEN" \
+                "https://api.vercel.com/v9/projects/$VERCEL_PROJECT_ID/env?teamId=$VERCEL_ORG_ID" \
+                | jq -r ".envs[] | select(.key==\"$VAR_NAME\" and (.target[] | . ==\"$TARGET\")) | .id" | head -1)
+              if [ -n "$EXISTING" ]; then
+                curl -s -X PATCH -H "Authorization: Bearer $VERCEL_TOKEN" -H "Content-Type: application/json" \
+                  "https://api.vercel.com/v9/projects/$VERCEL_PROJECT_ID/env/$EXISTING?teamId=$VERCEL_ORG_ID" \
+                  -d "{\"value\":\"$VAR_VALUE\"}"
+              else
+                curl -s -X POST -H "Authorization: Bearer $VERCEL_TOKEN" -H "Content-Type: application/json" \
+                  "https://api.vercel.com/v9/projects/$VERCEL_PROJECT_ID/env?teamId=$VERCEL_ORG_ID" \
+                  -d "{\"key\":\"$VAR_NAME\",\"value\":\"$VAR_VALUE\",\"type\":\"encrypted\",\"target\":[\"$TARGET\"]}"
+              fi
+            done
+          done
+        env:
+          POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
+          POSTGRES_URL_NON_POOLING: ${{ secrets.POSTGRES_URL_NON_POOLING }}
 
       - name: Build
         if: github.event_name == 'push'
