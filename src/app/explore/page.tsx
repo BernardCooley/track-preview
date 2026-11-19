@@ -33,7 +33,7 @@ import Link from "next/link";
 function ExploreContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const { currentlyPlaying, updateCurrentlyPlaying } = useTrackContext();
+    const { currentlyPlaying, updateCurrentlyPlaying, playingTrack, setPlayingTrack } = useTrackContext();
     const audioElement = useRef<HTMLAudioElement>(null);
     const [currentStep, setCurrentStep] = useState<number>(0);
     const { updateUser, user, updateUserProfile, userProfile, isAnonymous, setIsAnonymous, profileError, setProfileError } = useAuthContext();
@@ -93,6 +93,7 @@ function ExploreContent() {
     useEffect(() => {
         audioElement.current?.pause();
         updateCurrentlyPlaying(undefined);
+        setPlayingTrack(null);
     }, [currentStep]);
 
     useEffect(() => {
@@ -136,8 +137,8 @@ function ExploreContent() {
 
     const showAudioPlayer =
         currentStep === 4 &&
-        currentlyPlaying !== undefined &&
-        currentlyPlaying.length > 0;
+        (playingTrack !== null ||
+            (currentlyPlaying !== undefined && currentlyPlaying.length > 0));
 
     return (
         <Flex direction="column" h="100dvh" ref={pageRef} bg="brand.bg">

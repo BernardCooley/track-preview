@@ -1,5 +1,6 @@
 import type { MutableRefObject } from "react";
 import type { Track, ReviewTracks } from "../types";
+import type { PlayingTrackInfo } from "../context/TrackContext";
 
 export interface TrackContextProps {
     currentlyPlaying: string | undefined;
@@ -10,6 +11,8 @@ export interface TrackContextProps {
     playingPositionRef: MutableRefObject<{ index: number; total: number } | null>;
     trackLoading: "skip" | "previous" | null;
     setTrackLoading: (loading: "skip" | "previous" | null) => void;
+    playingTrack: PlayingTrackInfo | null;
+    setPlayingTrack: (track: PlayingTrackInfo | null) => void;
     reviewTracks: ReviewTracks;
     updateReviewTracks: (reviewStep: number, tracks: Track[], currentTrackIndex: number) => void;
     currentReleaseTrack: Track | null;

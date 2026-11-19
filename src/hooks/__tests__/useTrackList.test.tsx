@@ -27,6 +27,8 @@ const defaultTrackContext: TrackContextProps = {
     playingPositionRef: { current: null },
     trackLoading: null,
     setTrackLoading: vi.fn(),
+    playingTrack: null,
+    setPlayingTrack: vi.fn(),
     reviewTracks: {
         1: { tracks: [], currentTrack: 0 },
         2: { tracks: [], currentTrack: 0 },

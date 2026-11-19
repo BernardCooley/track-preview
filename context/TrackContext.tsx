@@ -3,6 +3,12 @@
 import React, { createContext, MutableRefObject, ReactNode, useCallback, useContext, useRef, useState } from "react";
 import { ReviewTracks, Track } from "../types";
 
+export interface PlayingTrackInfo {
+    title: string;
+    artist: string;
+    thumbnail: string;
+}
+
 interface TrackContextProps {
     currentlyPlaying: string | undefined;
     updateCurrentlyPlaying: (trackId: string | undefined) => void;
@@ -12,6 +18,8 @@ interface TrackContextProps {
     playingPositionRef: MutableRefObject<{ index: number; total: number } | null>;
     trackLoading: "skip" | "previous" | null;
     setTrackLoading: (loading: "skip" | "previous" | null) => void;
+    playingTrack: PlayingTrackInfo | null;
+    setPlayingTrack: (track: PlayingTrackInfo | null) => void;
     reviewTracks: ReviewTracks;
     updateReviewTracks: (
         reviewStep: number,
@@ -83,6 +91,8 @@ export const TrackContextProvider = ({ children }: { children: ReactNode }) => {
     const playingPositionRef = useRef<{ index: number; total: number } | null>(null);
     const [trackLoading, setTrackLoadingState] = useState<"skip" | "previous" | null>(null);
     const setTrackLoading = useCallback((loading: "skip" | "previous" | null) => setTrackLoadingState(loading), []);
+    const [playingTrack, setPlayingTrackState] = useState<PlayingTrackInfo | null>(null);
+    const setPlayingTrack = useCallback((track: PlayingTrackInfo | null) => setPlayingTrackState(track), []);
 
     const updateCurrentlyPlaying = (trackId: string | undefined) => {
         setCurrentlyPlaying(trackId || "");
@@ -131,6 +141,8 @@ export const TrackContextProvider = ({ children }: { children: ReactNode }) => {
                 playingPositionRef,
                 trackLoading,
                 setTrackLoading,
+                playingTrack,
+                setPlayingTrack,
                 reviewTracks,
                 updateReviewTracks,
                 currentReleaseTrack,

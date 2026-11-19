@@ -65,7 +65,7 @@ const LibraryTable = ({
     playAllRequested,
     onPlayAllStarted,
 }: Props) => {
-    const { onTrackEndedRef, onSkipRef, onPreviousRef, playingPositionRef, setTrackLoading } = useTrackContext();
+    const { onTrackEndedRef, onSkipRef, onPreviousRef, playingPositionRef, setTrackLoading, setPlayingTrack } = useTrackContext();
     const {
         selectedGenres, activeSortField, activeSortDirection,
         setSelectedGenres, setSort, setReleaseTrackId,
@@ -157,6 +157,7 @@ const LibraryTable = ({
         if (index < 0 || index >= tracks.length) {
             setPlayingTrackId(undefined);
             updateCurrentlyPlaying(undefined);
+            setPlayingTrack(null);
             playingIndexRef.current = null;
             playingPositionRef.current = null;
             setTrackLoading(null);
@@ -167,6 +168,7 @@ const LibraryTable = ({
         playingIndexRef.current = index;
         playingPositionRef.current = { index, total: tracks.length };
         setPlayingTrackId(track.id);
+        setPlayingTrack({ title: track.title, artist: track.artist, thumbnail: track.thumbnail });
         const url = await fetchPreviewAsBlob(track.id);
         setTrackLoading(null);
         if (url) {
@@ -251,6 +253,7 @@ const LibraryTable = ({
                 if (playingTrackId === track.id) {
                     setPlayingTrackId(undefined);
                     updateCurrentlyPlaying(undefined);
+                    setPlayingTrack(null);
                     playingIndexRef.current = null;
                     playingPositionRef.current = null;
                     clearAllRefs();
@@ -260,6 +263,7 @@ const LibraryTable = ({
                     playingPositionRef.current = index >= 0 ? { index, total: reviewTracks[4].tracks.length } : null;
                     setAllRefs();
                     setPlayingTrackId(track.id);
+                    setPlayingTrack({ title: track.title, artist: track.artist, thumbnail: track.thumbnail });
                     const url = await fetchPreviewAsBlob(track.id);
                     updateCurrentlyPlaying(url);
                 }
