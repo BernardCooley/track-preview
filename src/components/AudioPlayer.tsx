@@ -3,7 +3,7 @@ import { Box } from "@chakra-ui/react";
 import { useTrackContext } from "../../context/TrackContext";
 
 const AudioPlayer = forwardRef<HTMLAudioElement>((props, ref) => {
-    const { currentlyPlaying } = useTrackContext();
+    const { currentlyPlaying, onTrackEndedRef } = useTrackContext();
     const localRef = useRef<HTMLAudioElement | null>(null);
 
     useEffect(() => {
@@ -28,6 +28,7 @@ const AudioPlayer = forwardRef<HTMLAudioElement>((props, ref) => {
                 }}
                 src={currentlyPlaying || undefined}
                 controls
+                onEnded={() => onTrackEndedRef.current?.()}
             />
         </Box>
     );

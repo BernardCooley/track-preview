@@ -1,11 +1,12 @@
 'use client';
 
-import React, { createContext, ReactNode, useContext, useState } from "react";
+import React, { createContext, MutableRefObject, ReactNode, useCallback, useContext, useRef, useState } from "react";
 import { ReviewTracks, Track } from "../types";
 
 interface TrackContextProps {
     currentlyPlaying: string | undefined;
     updateCurrentlyPlaying: (trackId: string | undefined) => void;
+    onTrackEndedRef: MutableRefObject<(() => void) | null>;
     reviewTracks: ReviewTracks;
     updateReviewTracks: (
         reviewStep: number,
@@ -71,6 +72,8 @@ export const TrackContextProvider = ({ children }: { children: ReactNode }) => {
         4: true,
     });
 
+    const onTrackEndedRef = useRef<(() => void) | null>(null);
+
     const updateCurrentlyPlaying = (trackId: string | undefined) => {
         setCurrentlyPlaying(trackId || "");
     };
@@ -112,6 +115,7 @@ export const TrackContextProvider = ({ children }: { children: ReactNode }) => {
             value={{
                 currentlyPlaying,
                 updateCurrentlyPlaying,
+                onTrackEndedRef,
                 reviewTracks,
                 updateReviewTracks,
                 currentReleaseTrack,

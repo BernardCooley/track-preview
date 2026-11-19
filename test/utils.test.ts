@@ -135,6 +135,26 @@ describe("formatBuyUrl", () => {
         const url = formatBuyUrl(track, "juno download");
         expect(url).toContain("junodownload.com");
     });
+
+    it("uses searchTitle override instead of track title", () => {
+        const url = formatBuyUrl(track, "beatport", "Album Name");
+        expect(url).toContain("Album Name");
+        expect(url).not.toContain("Morning Light");
+    });
+
+    it("uses track title when searchTitle is not provided", () => {
+        const url = formatBuyUrl(track, "beatport");
+        expect(url).toContain("Morning Light");
+    });
+
+    it("uses searchTitle for all platforms", () => {
+        const platforms = ["juno", "beatport", "juno download", "discogs", "bandcamp", "apple music", "bleep"] as const;
+        for (const platform of platforms) {
+            const url = formatBuyUrl(track, platform, "Custom Release");
+            expect(url).toContain("Custom Release");
+            expect(url).not.toContain("Morning Light");
+        }
+    });
 });
 
 describe("generateSlug", () => {

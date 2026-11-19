@@ -1,6 +1,7 @@
 import React from "react";
 import { Flex, IconButton, Text } from "@chakra-ui/react";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import ShopIcon from "@mui/icons-material/Shop";
 import { Track } from "../../types";
 
@@ -15,6 +16,7 @@ interface Props {
     previousTracks: Track[];
     currentReleaseTrack: Track;
     onBuyRelease: () => void;
+    onPlayAll: () => void;
 }
 
 const ReleaseHeader = ({
@@ -24,6 +26,7 @@ const ReleaseHeader = ({
     previousTracks,
     currentReleaseTrack,
     onBuyRelease,
+    onPlayAll,
 }: Props) => {
     return (
         <Flex
@@ -81,6 +84,19 @@ const ReleaseHeader = ({
                     </Text>
                 </Flex>
             </Flex>
+            <IconButton
+                color="brand.primary"
+                fontSize="xl"
+                bg="transparent"
+                shadow="none"
+                onClick={onPlayAll}
+                rounded="full"
+                variant="tertiary"
+                aria-label="play all"
+                size="sm"
+            >
+                <PlayArrowIcon fontSize="inherit" />
+            </IconButton>
             <IconButton
                 color="brand.primary"
                 fontSize="xl"

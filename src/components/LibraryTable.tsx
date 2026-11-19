@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import {
     Box,
     Button,
@@ -18,6 +18,7 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import TrackMenuOptions from "./TrackOptionsMenu";
 import { camelcaseToTitleCase, getFormattedDate } from "../../utils";
 import { resolvePreviewUrl } from "@/bff/bff";
+import { useTrackContext } from "../../context/TrackContext";
 
 type TrackKeys = keyof Track;
 
@@ -47,6 +48,8 @@ interface Props {
     addTrackToLibrary: (track: Track) => Promise<void>;
     addingTrackId: string | null;
     libraryTrackIds: Set<string>;
+    playAllRequested?: boolean;
+    onPlayAllStarted?: () => void;
 }
 
 const LibraryTable = ({
@@ -67,7 +70,11 @@ const LibraryTable = ({
     addTrackToLibrary,
     addingTrackId,
     libraryTrackIds,
+    playAllRequested,
+    onPlayAllStarted,
 }: Props) => {
+    const { onTrackEndedRef } = useTrackContext();
+    const playingIndexRef = useRef<number | null>(null);
     const sortTracks = (field: TrackKeys) => {
         const order = sortBy === field ? sortDirection : "asc";
 
@@ -101,6 +108,50 @@ const LibraryTable = ({
         string | undefined
     >();
 
+    const playTrackAtIndex = useCallback(async (index: number) => {
+        const tracks = reviewTracks[4].tracks;
+        if (index < 0 || index >= tracks.length) {
+            setPlayingTrackId(undefined);
+            updateCurrentlyPlaying(undefined);
+            playingIndexRef.current = null;
+            onTrackEndedRef.current = null;
+            return;
+        }
+        const track = tracks[index];
+        playingIndexRef.current = index;
+        setPlayingTrackId(track.id);
+        const url = await resolvePreviewUrl(track.id);
+        if (url) {
+            updateCurrentlyPlaying(url);
+        } else {
+            playTrackAtIndex(index + 1);
+        }
+    }, [reviewTracks, updateCurrentlyPlaying]);
+
+    const handleTrackEnded = useCallback(() => {
+        if (playingIndexRef.current !== null) {
+            playTrackAtIndex(playingIndexRef.current + 1);
+        }
+    }, [playTrackAtIndex]);
+
+    useEffect(() => {
+        if (playAllRequested && reviewTracks[4].tracks.length > 0) {
+            onTrackEndedRef.current = handleTrackEnded;
+            playTrackAtIndex(0);
+            onPlayAllStarted?.();
+        }
+    }, [playAllRequested]);
+
+    useEffect(() => {
+        if (playingIndexRef.current !== null) {
+            onTrackEndedRef.current = handleTrackEnded;
+        }
+    }, [handleTrackEnded]);
+
+    useEffect(() => {
+        return () => { onTrackEndedRef.current = null; };
+    }, []);
+
     const getTrProps = (
         track: Track,
         updateCurrentlyPlaying: (url: string | undefined) => void
@@ -125,7 +176,14 @@ const LibraryTable = ({
                 if (playingTrackId === track.id) {
                     setPlayingTrackId(undefined);
                     updateCurrentlyPlaying(undefined);
+                    playingIndexRef.current = null;
+                    onTrackEndedRef.current = null;
                 } else {
+                    const index = reviewTracks[4].tracks.findIndex(t => t.id === track.id);
+                    if (currentReleaseTrack && index >= 0) {
+                        onTrackEndedRef.current = handleTrackEnded;
+                        playingIndexRef.current = index;
+                    }
                     setPlayingTrackId(track.id);
                     const url = await resolvePreviewUrl(track.id);
                     updateCurrentlyPlaying(url);

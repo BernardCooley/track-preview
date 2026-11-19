@@ -21,6 +21,7 @@ const mockUpdateChangesMade = vi.fn();
 const defaultTrackContext: TrackContextProps = {
     currentlyPlaying: undefined,
     updateCurrentlyPlaying: mockUpdateCurrentlyPlaying,
+    onTrackEndedRef: { current: null },
     reviewTracks: {
         1: { tracks: [], currentTrack: 0 },
         2: { tracks: [], currentTrack: 0 },

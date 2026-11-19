@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import "../../../test/mocks/firebase";
 import "../../../test/mocks/navigation";
 import { render } from "../../../test/test-utils";
@@ -108,5 +109,55 @@ describe("Library", () => {
         expect(setArg.has("track-1")).toBe(true);
         expect(setArg.has("track-2")).toBe(true);
         expect(setArg.has("track-3")).toBe(true);
+    });
+
+    describe("release view header", () => {
+        it("renders play all and buy release buttons when viewing a release", () => {
+            mockUseTrackList.mockReturnValue({
+                ...baseHookReturn,
+                currentReleaseTrack: mockTrack,
+                previousTracks: [mockTrack, mockTrack2],
+            } as any);
+
+            render(<Library />);
+
+            expect(screen.getByRole("button", { name: /play all/i })).toBeInTheDocument();
+            expect(screen.getByRole("button", { name: /buy release/i })).toBeInTheDocument();
+        });
+
+        it("renders back to library button when viewing a release", () => {
+            mockUseTrackList.mockReturnValue({
+                ...baseHookReturn,
+                currentReleaseTrack: mockTrack,
+                previousTracks: [mockTrack, mockTrack2],
+            } as any);
+
+            render(<Library />);
+
+            expect(screen.getByRole("button", { name: /back to library/i })).toBeInTheDocument();
+        });
+
+        it("does not render release header buttons in library view", () => {
+            render(<Library />);
+
+            expect(screen.queryByRole("button", { name: /play all/i })).not.toBeInTheDocument();
+            expect(screen.queryByRole("button", { name: /buy release/i })).not.toBeInTheDocument();
+        });
+
+        it("opens buy modal when buy release button is clicked", async () => {
+            const onBuyModalOpen = vi.fn();
+            mockUseTrackList.mockReturnValue({
+                ...baseHookReturn,
+                currentReleaseTrack: mockTrack,
+                previousTracks: [mockTrack, mockTrack2],
+                onBuyModalOpen,
+            } as any);
+
+            const user = userEvent.setup();
+            render(<Library />);
+
+            await user.click(screen.getByRole("button", { name: /buy release/i }));
+            expect(onBuyModalOpen).toHaveBeenCalled();
+        });
     });
 });

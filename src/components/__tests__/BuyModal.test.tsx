@@ -72,4 +72,30 @@ describe("BuyModal", () => {
         render(<BuyModal {...defaultProps} trackToBuy={null} />);
         expect(screen.getByText("Buy")).toBeInTheDocument();
     });
+
+    describe("release mode", () => {
+        const releaseProps = {
+            ...defaultProps,
+            trackToBuy: null,
+            releaseTrack: mockTrack,
+        };
+
+        it("shows 'Buy Release' title when releaseTrack is provided", () => {
+            render(<BuyModal {...releaseProps} />);
+            expect(screen.getByText("Buy Release")).toBeInTheDocument();
+        });
+
+        it("displays artist and release title", () => {
+            render(<BuyModal {...releaseProps} />);
+            expect(screen.getByText(mockTrack.artist)).toBeInTheDocument();
+            expect(screen.getByText(mockTrack.releaseTitle)).toBeInTheDocument();
+        });
+
+        it("filters buy links by genre of the release track", () => {
+            const countryTrack = { ...mockTrack, genre: "Country" };
+            render(<BuyModal {...releaseProps} releaseTrack={countryTrack} />);
+            expect(screen.queryByText("Beatport")).not.toBeInTheDocument();
+            expect(screen.getByText("Discogs")).toBeInTheDocument();
+        });
+    });
 });

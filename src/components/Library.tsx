@@ -48,6 +48,7 @@ const Library = () => {
     } = useTrackList();
 
     const [releaseBuyTrack, setReleaseBuyTrack] = useState<Track | null>(null);
+    const [playAllRequested, setPlayAllRequested] = useState(false);
 
     const onBuyRelease = useCallback(() => {
         if (currentReleaseTrack) {
@@ -140,6 +141,7 @@ const Library = () => {
                     previousTracks={previousTracks}
                     currentReleaseTrack={currentReleaseTrack}
                     onBuyRelease={onBuyRelease}
+                    onPlayAll={() => setPlayAllRequested(true)}
                 />
             )}
 
@@ -162,6 +164,8 @@ const Library = () => {
                     addTrackToLibrary={addTrackToLibrary}
                     addingTrackId={addingTrackId}
                     libraryTrackIds={libraryTrackIds}
+                    playAllRequested={playAllRequested}
+                    onPlayAllStarted={() => setPlayAllRequested(false)}
                 />
             )}
         </Flex>

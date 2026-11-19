@@ -23,6 +23,7 @@ const defaultAuthContext = {
 const defaultTrackContext: TrackContextProps = {
     currentlyPlaying: undefined,
     updateCurrentlyPlaying: vi.fn(),
+    onTrackEndedRef: { current: null },
     reviewTracks: {
         1: { tracks: [], currentTrack: 0 },
         2: { tracks: [], currentTrack: 0 },
