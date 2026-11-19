@@ -13,6 +13,8 @@ import {
 import { ReviewTracks, SortDirection, Track } from "../../types";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import ShopIcon from "@mui/icons-material/Shop";
+import LibraryAddIcon from "@mui/icons-material/LibraryAdd";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import TrackMenuOptions from "./TrackOptionsMenu";
 import { camelcaseToTitleCase, getFormattedDate } from "../../utils";
 import { resolvePreviewUrl } from "@/bff/bff";
@@ -42,6 +44,9 @@ interface Props {
     ) => void;
     setSortBy: React.Dispatch<React.SetStateAction<keyof Track | "">>;
     setSortDirection: React.Dispatch<React.SetStateAction<SortDirection>>;
+    addTrackToLibrary: (track: Track) => Promise<void>;
+    addingTrackId: string | null;
+    libraryTrackIds: Set<string>;
 }
 
 const LibraryTable = ({
@@ -59,6 +64,9 @@ const LibraryTable = ({
     updateReviewTracks,
     setSortBy,
     setSortDirection,
+    addTrackToLibrary,
+    addingTrackId,
+    libraryTrackIds,
 }: Props) => {
     const sortTracks = (field: TrackKeys) => {
         const order = sortBy === field ? sortDirection : "asc";
@@ -183,6 +191,51 @@ const LibraryTable = ({
         </Flex>
     );
 
+    const AddToLibraryButton = ({ track }: { track: Track }) => {
+        const isInLibrary = libraryTrackIds.has(track.id);
+        const isAdding = addingTrackId === track.id;
+
+        if (isInLibrary) {
+            return (
+                <Flex alignItems="center" onClick={(e) => e.stopPropagation()}>
+                    <IconButton
+                        color="brand.primary"
+                        fontSize="xl"
+                        bg="transparent"
+                        shadow="none"
+                        rounded="full"
+                        variant="tertiary"
+                        aria-label="Already in library"
+                        size="sm"
+                        disabled
+                    >
+                        <CheckCircleIcon fontSize="inherit" />
+                    </IconButton>
+                </Flex>
+            );
+        }
+
+        return (
+            <Flex alignItems="center" onClick={(e) => e.stopPropagation()}>
+                <IconButton
+                    color="brand.textMuted"
+                    fontSize="xl"
+                    bg="transparent"
+                    shadow="none"
+                    onClick={() => addTrackToLibrary(track)}
+                    rounded="full"
+                    variant="tertiary"
+                    aria-label="Add to library"
+                    size="sm"
+                    loading={isAdding}
+                    _hover={{ color: "brand.primary" }}
+                >
+                    <LibraryAddIcon fontSize="inherit" />
+                </IconButton>
+            </Flex>
+        );
+    };
+
     return (
         <Box
             transition="padding 0.2s ease-in-out"
@@ -219,9 +272,7 @@ const LibraryTable = ({
                         <Table.ColumnHeader color="brand.textMuted" py={2} px={2}>
                             <TableHeading title="releaseDate" />
                         </Table.ColumnHeader>
-                        {!currentReleaseTrack && (
-                            <Table.ColumnHeader py={2} px={2} w="80px" />
-                        )}
+                        <Table.ColumnHeader py={2} px={2} w="80px" />
                     </Table.Row>
                 </Table.Header>
                 <Table.Body>
@@ -288,11 +339,13 @@ const LibraryTable = ({
                                         track.releaseYear}
                                 </Text>
                             </Table.Cell>
-                            {!currentReleaseTrack && (
-                                <Table.Cell py={3} px={2}>
+                            <Table.Cell py={3} px={2}>
+                                {currentReleaseTrack ? (
+                                    <AddToLibraryButton track={track} />
+                                ) : (
                                     <ActionButtons index={index} />
-                                </Table.Cell>
-                            )}
+                                )}
+                            </Table.Cell>
                         </Table.Row>
                     ))}
                 </Table.Body>
@@ -305,9 +358,7 @@ const LibraryTable = ({
                         <Table.ColumnHeader color="brand.textMuted" py={2} px={2}>
                             <TableHeading title="title" />
                         </Table.ColumnHeader>
-                        {!currentReleaseTrack && (
-                            <Table.ColumnHeader py={2} px={2} w="70px" />
-                        )}
+                        <Table.ColumnHeader py={2} px={2} w="70px" />
                     </Table.Row>
                 </Table.Header>
                 <Table.Body>
@@ -366,11 +417,13 @@ const LibraryTable = ({
                                     </Flex>
                                 </Flex>
                             </Table.Cell>
-                            {!currentReleaseTrack && (
-                                <Table.Cell py={2.5} px={2}>
+                            <Table.Cell py={2.5} px={2}>
+                                {currentReleaseTrack ? (
+                                    <AddToLibraryButton track={track} />
+                                ) : (
                                     <ActionButtons index={index} />
-                                </Table.Cell>
-                            )}
+                                )}
+                            </Table.Cell>
                         </Table.Row>
                     ))}
                 </Table.Body>

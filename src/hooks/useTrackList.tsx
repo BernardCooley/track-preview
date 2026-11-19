@@ -3,7 +3,7 @@ import { useDisclosure } from "@chakra-ui/react";
 import { toaster } from "@/components/toaster";
 import { Track } from "../../types";
 import { useTrackContext } from "../../context/TrackContext";
-import { fetchRelease, fetchTracks, updateTrackReviewStep } from "@/bff/bff";
+import { fetchRelease, fetchTracks, updateTrackReviewStep, sendToLibrary } from "@/bff/bff";
 import { useAuthContext } from "../../Contexts/AuthContext";
 
 export const useTrackList = () => {
@@ -108,6 +108,24 @@ export const useTrackList = () => {
         [user]
     );
 
+    const [libraryTrackIds, setLibraryTrackIds] = useState<Set<string>>(new Set());
+    const [addingTrackId, setAddingTrackId] = useState<string | null>(null);
+
+    const addTrackToLibrary = async (track: Track) => {
+        if (!user?.uid) return;
+        setAddingTrackId(track.id);
+        try {
+            await sendToLibrary({ trackId: track.id, userId: user.uid });
+            setLibraryTrackIds(prev => new Set(prev).add(track.id));
+            updateChangesMade(4, true);
+            showToast({ type: "success", title: "Track added to library" });
+        } catch (error) {
+            showToast({ type: "error", title: "Failed to add track" });
+        } finally {
+            setAddingTrackId(null);
+        }
+    };
+
     const closeDialog = () => {
         onClose();
         setTrackToDelete(null);
@@ -124,6 +142,10 @@ export const useTrackList = () => {
         getTracks,
         showToast,
         deleteTrack,
+        addTrackToLibrary,
+        addingTrackId,
+        libraryTrackIds,
+        setLibraryTrackIds,
         user,
         currentlyPlaying,
         updateCurrentlyPlaying,

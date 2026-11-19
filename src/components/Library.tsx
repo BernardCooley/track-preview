@@ -40,13 +40,18 @@ const Library = () => {
         closeBuyModal,
         closeDialog,
         deleteTrack,
+        addTrackToLibrary,
+        addingTrackId,
+        libraryTrackIds,
+        setLibraryTrackIds,
     } = useTrackList();
 
     useEffect(() => {
+        if (currentReleaseTrack) return;
         if (changesMade[4] || reviewTracks[4].tracks.length === 0) {
             getTracks(null);
         }
-    }, [user, changesMade[4]]);
+    }, [user, changesMade[4], currentReleaseTrack]);
 
     useEffect(() => {
         if (trackToDelete || trackToDelete === 0) {
@@ -65,6 +70,12 @@ const Library = () => {
             setLoading(false);
         }
     }, [noTracks]);
+
+    useEffect(() => {
+        if (currentReleaseTrack && previousTracks.length > 0) {
+            setLibraryTrackIds(new Set(previousTracks.map(t => t.id)));
+        }
+    }, [currentReleaseTrack]);
 
     return (
         <Flex position="relative" direction="column" h="full" overflow="auto">
@@ -131,6 +142,9 @@ const Library = () => {
                     updateReviewTracks={updateReviewTracks}
                     setSortBy={setSortBy}
                     setSortDirection={setSortDirection}
+                    addTrackToLibrary={addTrackToLibrary}
+                    addingTrackId={addingTrackId}
+                    libraryTrackIds={libraryTrackIds}
                 />
             )}
         </Flex>
