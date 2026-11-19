@@ -1,17 +1,19 @@
 "use client";
 
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
     Box,
     Button,
     Flex,
     IconButton,
     Image,
+    Menu,
     Table,
     Text,
 } from "@chakra-ui/react";
 import { ReviewTracks, SortDirection, Track } from "../../types";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import SwapVertIcon from "@mui/icons-material/SwapVert";
 import ShopIcon from "@mui/icons-material/Shop";
 import LibraryAddIcon from "@mui/icons-material/LibraryAdd";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
@@ -19,6 +21,7 @@ import TrackMenuOptions from "./TrackOptionsMenu";
 import { camelcaseToTitleCase, getFormattedDate } from "../../utils";
 import { resolvePreviewUrl } from "@/bff/bff";
 import { useTrackContext } from "../../context/TrackContext";
+import GenreModal from "./GenreModal";
 
 type TrackKeys = keyof Track;
 
@@ -76,6 +79,58 @@ const LibraryTable = ({
     const { onTrackEndedRef, onSkipRef, onPreviousRef, playingPositionRef, setTrackLoading } = useTrackContext();
     const playingIndexRef = useRef<number | null>(null);
     const blobCache = useRef<Map<string, string>>(new Map());
+
+    const [selectedGenres, setSelectedGenres] = useState<string[]>(["all"]);
+    const [showGenreSelector, setShowGenreSelector] = useState(false);
+    const [activeSortField, setActiveSortField] = useState<TrackKeys | null>(null);
+    const [activeSortDirection, setActiveSortDirection] = useState<SortDirection>("asc");
+
+    const availableGenres = useMemo(() => {
+        const genreSet = new Set<string>();
+        reviewTracks[4].tracks.forEach((t) => {
+            if (t.genre) genreSet.add(t.genre);
+        });
+        return Array.from(genreSet).sort((a, b) => a.localeCompare(b));
+    }, [reviewTracks[4].tracks]);
+
+    const hasGenreFilter = !selectedGenres.some((g) => g.toLowerCase() === "all") && selectedGenres.length > 0;
+
+    const filteredTracks = useMemo(() => {
+        let tracks = reviewTracks[4].tracks;
+        if (hasGenreFilter) {
+            tracks = tracks.filter((t) => selectedGenres.includes(t.genre));
+        }
+        if (activeSortField) {
+            tracks = [...tracks].sort((a, b) => {
+                const aVal = a[activeSortField] ?? "";
+                const bVal = b[activeSortField] ?? "";
+                if (aVal < bVal) return activeSortDirection === "asc" ? -1 : 1;
+                if (aVal > bVal) return activeSortDirection === "asc" ? 1 : -1;
+                return 0;
+            });
+        }
+        return tracks;
+    }, [reviewTracks[4].tracks, selectedGenres, hasGenreFilter, activeSortField, activeSortDirection]);
+
+    const genreLabel = hasGenreFilter
+        ? selectedGenres.length === 1
+            ? selectedGenres[0]
+            : `${selectedGenres.length} genres`
+        : "All genres";
+
+    const handleSortButton = (field: TrackKeys) => {
+        if (activeSortField === field) {
+            setActiveSortDirection(activeSortDirection === "asc" ? "desc" : "asc");
+        } else {
+            setActiveSortField(field);
+            setActiveSortDirection("asc");
+        }
+    };
+
+    const clearSort = () => {
+        setActiveSortField(null);
+        setActiveSortDirection("asc");
+    };
 
     const fetchPreviewAsBlob = useCallback(async (trackId: string): Promise<string> => {
         if (blobCache.current.has(trackId)) return blobCache.current.get(trackId)!;
@@ -274,28 +329,34 @@ const LibraryTable = ({
         );
     };
 
-    const ActionButtons = ({ index }: { index: number }) => (
-        <Flex alignItems="center" gap={1} onClick={(e) => e.stopPropagation()}>
-            <IconButton
-                color="brand.primary"
-                fontSize="xl"
-                bg="transparent"
-                shadow="none"
-                onClick={() => setTrackToBuy(index)}
-                rounded="full"
-                variant="tertiary"
-                aria-label="buy track"
-                size="sm"
-            >
-                <ShopIcon fontSize="inherit" />
-            </IconButton>
-            <TrackMenuOptions
-                onTrackDelete={() => setTrackToDelete(index)}
-                onViewRelease={() => gotToRelease(index)}
-                index={index}
-            />
-        </Flex>
-    );
+    const getOriginalIndex = (track: Track) =>
+        reviewTracks[4].tracks.findIndex((t) => t.id === track.id);
+
+    const ActionButtons = ({ track }: { track: Track }) => {
+        const origIndex = getOriginalIndex(track);
+        return (
+            <Flex alignItems="center" gap={1} onClick={(e) => e.stopPropagation()}>
+                <IconButton
+                    color="brand.primary"
+                    fontSize="xl"
+                    bg="transparent"
+                    shadow="none"
+                    onClick={() => setTrackToBuy(origIndex)}
+                    rounded="full"
+                    variant="tertiary"
+                    aria-label="buy track"
+                    size="sm"
+                >
+                    <ShopIcon fontSize="inherit" />
+                </IconButton>
+                <TrackMenuOptions
+                    onTrackDelete={() => setTrackToDelete(origIndex)}
+                    onViewRelease={() => gotToRelease(origIndex)}
+                    index={origIndex}
+                />
+            </Flex>
+        );
+    };
 
     const AddToLibraryButton = ({ track }: { track: Track }) => {
         const isInLibrary = libraryTrackIds.has(track.id);
@@ -362,6 +423,121 @@ const LibraryTable = ({
                 },
             }}
         >
+            <GenreModal
+                showGenreSelector={showGenreSelector}
+                setShowGenreSelector={setShowGenreSelector}
+                selectedGenres={selectedGenres}
+                onApply={(genres) => {
+                    setSelectedGenres(genres);
+                    setShowGenreSelector(false);
+                }}
+                availableGenres={availableGenres}
+                onCancel={() => setShowGenreSelector(false)}
+            />
+
+            {!currentReleaseTrack && (
+                <Flex px={[3, 4]} pt={2} pb={0} gap={1.5} alignItems="center">
+                    <Button
+                        variant={hasGenreFilter ? "subtle" : "surface"}
+                        onClick={() => setShowGenreSelector(true)}
+                        size="xs"
+                        px={2.5}
+                        h={7}
+                        fontSize="xs"
+                    >
+                        {genreLabel}
+                    </Button>
+
+                    <Menu.Root>
+                        <Menu.Trigger asChild>
+                            <Button
+                                variant={activeSortField ? "subtle" : "surface"}
+                                size="xs"
+                                h={7}
+                                px={activeSortField ? 2.5 : 0}
+                                w={activeSortField ? "auto" : 7}
+                                fontSize="xs"
+                                aria-label="Sort"
+                            >
+                                <SwapVertIcon style={{ fontSize: "16px" }} />
+                                {activeSortField && (
+                                    <Text textTransform="capitalize">
+                                        {activeSortField} ({activeSortDirection === "asc" ? "A-Z" : "Z-A"})
+                                    </Text>
+                                )}
+                            </Button>
+                        </Menu.Trigger>
+                        <Menu.Positioner>
+                            <Menu.Content
+                                bg="brand.bg"
+                                color="brand.textPrimary"
+                                padding={1}
+                                border="1px solid"
+                                borderColor="brand.border"
+                                shadow="lg"
+                                rounded="lg"
+                                minW="140px"
+                            >
+                                {(["title", "artist", "genre"] as TrackKeys[]).map((field) => {
+                                    const isActive = activeSortField === field;
+                                    return (
+                                        <Menu.Item
+                                            key={field}
+                                            value={field}
+                                            p={2.5}
+                                            fontSize="sm"
+                                            rounded="md"
+                                            bg="transparent"
+                                            color={isActive ? "brand.primary" : "brand.textSecondary"}
+                                            fontWeight={isActive ? "semibold" : "normal"}
+                                            cursor="pointer"
+                                            _hover={{
+                                                bg: "brand.surfaceHover",
+                                                color: isActive ? "brand.primary" : "brand.textPrimary",
+                                            }}
+                                            onClick={() => handleSortButton(field)}
+                                        >
+                                            <Flex alignItems="center" justifyContent="space-between" w="full">
+                                                <Text textTransform="capitalize">{field}</Text>
+                                                {isActive && (
+                                                    <Box
+                                                        transform={activeSortDirection === "asc" ? "" : "rotate(180deg)"}
+                                                        transition="transform 0.2s ease"
+                                                    >
+                                                        <KeyboardArrowUpIcon style={{ fontSize: "16px" }} />
+                                                    </Box>
+                                                )}
+                                            </Flex>
+                                        </Menu.Item>
+                                    );
+                                })}
+                                {activeSortField && (
+                                    <>
+                                        <Box h="1px" bg="brand.divider" my={1} />
+                                        <Menu.Item
+                                            value="clear"
+                                            p={2.5}
+                                            fontSize="sm"
+                                            rounded="md"
+                                            bg="transparent"
+                                            color="brand.textMuted"
+                                            cursor="pointer"
+                                            _hover={{
+                                                bg: "brand.surfaceHover",
+                                                color: "brand.textPrimary",
+                                            }}
+                                            onClick={clearSort}
+                                        >
+                                            Clear sort
+                                        </Menu.Item>
+                                    </>
+                                )}
+                            </Menu.Content>
+                        </Menu.Positioner>
+                    </Menu.Root>
+                </Flex>
+            )}
+
             {/* Desktop table */}
             <Table.Root display={["none", "none", "table"]}>
                 {!currentReleaseTrack && (
@@ -384,7 +560,7 @@ const LibraryTable = ({
                     </Table.Header>
                 )}
                 <Table.Body>
-                    {reviewTracks[4].tracks.map((track, index) => (
+                    {filteredTracks.map((track) => (
                         <Table.Row
                             key={track.id}
                             {...getTrProps(
@@ -455,7 +631,7 @@ const LibraryTable = ({
                                 {currentReleaseTrack ? (
                                     <AddToLibraryButton track={track} />
                                 ) : (
-                                    <ActionButtons index={index} />
+                                    <ActionButtons track={track} />
                                 )}
                             </Table.Cell>
                         </Table.Row>
@@ -476,7 +652,7 @@ const LibraryTable = ({
                     </Table.Header>
                 )}
                 <Table.Body>
-                    {reviewTracks[4].tracks.map((track, index) => (
+                    {filteredTracks.map((track) => (
                         <Table.Row
                             key={track.id}
                             {...getTrProps(
@@ -535,7 +711,7 @@ const LibraryTable = ({
                                 {currentReleaseTrack ? (
                                     <AddToLibraryButton track={track} />
                                 ) : (
-                                    <ActionButtons index={index} />
+                                    <ActionButtons track={track} />
                                 )}
                             </Table.Cell>
                         </Table.Row>
