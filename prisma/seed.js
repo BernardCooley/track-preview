@@ -22,6 +22,19 @@ function shuffle(arr) {
 }
 
 async function main() {
+    const existing = await prisma.user.findFirst({
+        where: { firebaseId: "b5dBBCVeiYUP0armJWHPnh9bDjf2" },
+    });
+    if (!existing) {
+        await prisma.user.create({
+            data: {
+                id: "b5dBBCVeiYUP0armJWHPnh9bDjf2",
+                firebaseId: "b5dBBCVeiYUP0armJWHPnh9bDjf2",
+            },
+        });
+    }
+    console.log("Seeded user with Firebase ID b5dBBCVeiYUP0armJWHPnh9bDjf2");
+
     const genreBuckets = {};
     let totalFiles = 0;
 

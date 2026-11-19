@@ -287,7 +287,7 @@ export default function Home() {
                             <Box px={[4, 5]} py={5}>
                                 <Flex direction="column" gap={3}>
                                     <Text color="brand.textSecondary" fontSize="sm">
-                                        You'll be able to discover and like tracks straight away as a guest. However:
+                                        You&apos;ll be able to discover and like tracks straight away as a guest. However:
                                     </Text>
                                     <VStack gap={2} align="stretch" pl={1}>
                                         <Text color="brand.textSecondary" fontSize="sm">

@@ -24,10 +24,48 @@ jobs:
           node-version: 22
           cache: npm
 
+      - name: Cache Prisma client
+        uses: actions/cache@v4
+        with:
+          path: node_modules/.prisma
+          key: prisma-${{ hashFiles('prisma/schema.prisma') }}
+
       - run: npm install
+
+      - name: Audit dependencies
+        continue-on-error: true
+        run: npm audit --audit-level=high
+
+      - name: Type check
+        run: npm run tsc
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Validate Prisma schema
+        run: npx prisma validate
+        env:
+          POSTGRES_URL: postgres://dummy
+          POSTGRES_URL_NON_POOLING: postgres://dummy
 
       - name: Run tests
         run: npx vitest run
+
+      - name: Bundle size report
+        if: github.event_name == 'pull_request'
+        run: |
+          npx next build 2>&1 | tee /tmp/build-output.txt
+          echo '### Bundle Size Report' >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          sed -n '/Route/,/^$/p' /tmp/build-output.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+        env:
+          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY_DEV }}
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID_DEV }}
+          FIREBASE_AUTH_DOMAIN: ${{ secrets.FIREBASE_AUTH_DOMAIN_DEV }}
+          FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID_DEV }}
+          POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
+          POSTGRES_URL_NON_POOLING: ${{ secrets.POSTGRES_URL_NON_POOLING }}
 
       - name: Install Vercel CLI
         if: github.event_name == 'push'

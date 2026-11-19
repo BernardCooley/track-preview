@@ -42,28 +42,39 @@ NEXT_PUBLIC_SPOTIFY_SECRET=
 npm install
 ```
 
-### 2. Start the local database
+### 2. Set up the local database (one command)
 
-In a separate terminal (the container is ephemeral and data is lost when stopped):
+Starts Colima, runs PostgreSQL in Docker, pushes the Prisma schema, seeds the database and opens Prisma Studio:
 
 ```bash
+npm run setup:local
+```
+
+The database container runs in the background — use `docker ps` to see it and `docker stop <id>` when done. Data is lost when the container is stopped.
+
+### Or do it step by step
+
+Start the database in a separate terminal:
+
+```bash
+colima start
 npm run runlocaldb
 ```
 
-### 3. Push the schema to the database
-
-This must be done every time the Docker container is restarted:
+Push the schema (must be done every time the Docker container is restarted):
 
 ```bash
 npx prisma db push
 ```
 
-### 4. Seed the database
-
-Seeds ~500 tracks per genre from the scraped data in `scraping_tracks/`:
+Seed the database (~500 tracks per genre from the scraped data in `scraping_tracks/`):
 
 ```bash
 npx prisma db seed
+```
+
+```bash
+npx prisma studio
 ```
 
 ### Reset the database (migrate + seed in one step)

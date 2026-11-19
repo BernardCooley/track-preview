@@ -6,7 +6,7 @@
         "dev": "next dev",
         "build": "next build",
         "start": "next start",
-        "lint": "next lint",
+        "lint": "eslint .",
         "tsc": "tsc --noEmit",
         "postinstall": "prisma generate && chakra typegen ./ChakraTheme.ts",
         "migrateprod": "dotenv -e npx prisma db push npx prisma migrate deploy",
@@ -19,7 +19,8 @@
         "searchTracksDeezer": "node scraping_tracks/searchTracksDeezer.js",
         "test": "vitest",
         "test:run": "vitest run",
-        "runlocaldb": "docker run --rm -p 5432:5432 -e POSTGRES_HOST_AUTH_METHOD=trust postgres"
+        "runlocaldb": "docker run --rm -p 5432:5432 -e POSTGRES_HOST_AUTH_METHOD=trust postgres",
+        "setup:local": "colima start && docker run --rm -d -p 5432:5432 -e POSTGRES_HOST_AUTH_METHOD=trust postgres && sleep 3 && npx prisma db push && npx prisma db seed && npx prisma studio"
     },
     "dependencies": {
         "@chakra-ui/react": "3.38.0",

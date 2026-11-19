@@ -33,7 +33,7 @@ import Link from "next/link";
 function ExploreContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const { currentlyPlaying, updateCurrentlyPlaying } = useTrackContext();
+    const { currentlyPlaying, updateCurrentlyPlaying, playingTrack, setPlayingTrack } = useTrackContext();
     const audioElement = useRef<HTMLAudioElement>(null);
     const [currentStep, setCurrentStep] = useState<number>(0);
     const { updateUser, user, updateUserProfile, userProfile, isAnonymous, setIsAnonymous, profileError, setProfileError } = useAuthContext();
@@ -75,7 +75,9 @@ function ExploreContent() {
             if (user && user.uid && (user.isAnonymous || user.emailVerified)) {
                 updateUser({ email: user.email || "", uid: user.uid });
                 setIsAnonymous(user.isAnonymous);
-                return router.push(`/explore/?reviewStep=${reviewStep || 1}`);
+                const params = new URLSearchParams(searchParams?.toString() || "");
+                if (!params.has("reviewStep")) params.set("reviewStep", "1");
+                return router.push(`/explore/?${params.toString()}`);
             } else if (user && user.uid && user.email && !user.emailVerified) {
                 return router.push("/loginRegister?login=true&verifyEmail=true");
             } else {
@@ -91,6 +93,7 @@ function ExploreContent() {
     useEffect(() => {
         audioElement.current?.pause();
         updateCurrentlyPlaying(undefined);
+        setPlayingTrack(null);
     }, [currentStep]);
 
     useEffect(() => {
@@ -104,7 +107,9 @@ function ExploreContent() {
         if (reviewStep) {
             const step = parseInt(reviewStep);
             if (!userProfile?.curatedMode && (step === 2 || step === 3)) {
-                router.replace(`/explore?reviewStep=1`);
+                const p = new URLSearchParams(searchParams?.toString() || "");
+                p.set("reviewStep", "1");
+                router.replace(`/explore?${p.toString()}`);
                 return;
             }
             setCurrentStep(step);
@@ -132,8 +137,8 @@ function ExploreContent() {
 
     const showAudioPlayer =
         currentStep === 4 &&
-        currentlyPlaying !== undefined &&
-        currentlyPlaying.length > 0;
+        (playingTrack !== null ||
+            (currentlyPlaying !== undefined && currentlyPlaying.length > 0));
 
     return (
         <Flex direction="column" h="100dvh" ref={pageRef} bg="brand.bg">
@@ -176,9 +181,17 @@ function ExploreContent() {
                             key={button.name}
                             data-tab-step={button.step}
                             variant={currentStep === button.step ? "tabSelected" : "tabDeselected"}
-                            onClick={() =>
-                                router.push(`/explore?reviewStep=${button.step}`)
-                            }
+                            onClick={() => {
+                                const p = new URLSearchParams(searchParams?.toString() || "");
+                                p.set("reviewStep", String(button.step));
+                                if (button.step !== 4) {
+                                    p.delete("genres");
+                                    p.delete("sort");
+                                    p.delete("sortDir");
+                                    p.delete("release");
+                                }
+                                router.push(`/explore?${p.toString()}`);
+                            }}
                             gap={1}
                             px={[3, 4]}
                             h="44px"
