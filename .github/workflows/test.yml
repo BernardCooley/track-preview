@@ -40,10 +40,10 @@ jobs:
       - name: Set Vercel env vars
         if: github.event_name == 'push'
         run: |
-          echo "${{ secrets.POSTGRES_URL }}" | vercel env add POSTGRES_URL preview --token=$VERCEL_TOKEN --force
-          echo "${{ secrets.POSTGRES_URL_NON_POOLING }}" | vercel env add POSTGRES_URL_NON_POOLING preview --token=$VERCEL_TOKEN --force
-          echo "${{ secrets.POSTGRES_URL }}" | vercel env add POSTGRES_URL production --token=$VERCEL_TOKEN --force
-          echo "${{ secrets.POSTGRES_URL_NON_POOLING }}" | vercel env add POSTGRES_URL_NON_POOLING production --token=$VERCEL_TOKEN --force
+          echo "${{ secrets.POSTGRES_URL }}" | vercel env add POSTGRES_URL --environment preview --token=$VERCEL_TOKEN --force
+          echo "${{ secrets.POSTGRES_URL_NON_POOLING }}" | vercel env add POSTGRES_URL_NON_POOLING --environment preview --token=$VERCEL_TOKEN --force
+          echo "${{ secrets.POSTGRES_URL }}" | vercel env add POSTGRES_URL --environment production --token=$VERCEL_TOKEN --force
+          echo "${{ secrets.POSTGRES_URL_NON_POOLING }}" | vercel env add POSTGRES_URL_NON_POOLING --environment production --token=$VERCEL_TOKEN --force
 
       - name: Build
         if: github.event_name == 'push'
