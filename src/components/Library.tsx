@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Badge, Center, Flex } from "@chakra-ui/react";
 import Loading from "./Loading";
 import { buyLinks } from "../../consts";
@@ -7,6 +7,7 @@ import DeleteTrackDialog from "./DeleteTrackDialog";
 import LibraryTable from "./LibraryTable";
 import ReleaseHeader from "./ReleaseHeader";
 import { useTrackList } from "@/hooks/useTrackList";
+import { Track } from "../../types";
 
 const Library = () => {
     const {
@@ -45,6 +46,20 @@ const Library = () => {
         libraryTrackIds,
         setLibraryTrackIds,
     } = useTrackList();
+
+    const [releaseBuyTrack, setReleaseBuyTrack] = useState<Track | null>(null);
+
+    const onBuyRelease = useCallback(() => {
+        if (currentReleaseTrack) {
+            setReleaseBuyTrack(currentReleaseTrack);
+            onBuyModalOpen();
+        }
+    }, [currentReleaseTrack, onBuyModalOpen]);
+
+    const handleCloseBuyModal = useCallback(() => {
+        closeBuyModal();
+        setReleaseBuyTrack(null);
+    }, [closeBuyModal]);
 
     useEffect(() => {
         if (currentReleaseTrack) return;
@@ -102,10 +117,11 @@ const Library = () => {
 
             <BuyModal
                 buyModalIsOpen={buyModalIsOpen}
-                closeBuyModal={closeBuyModal}
+                closeBuyModal={handleCloseBuyModal}
                 buyLinks={buyLinks}
                 reviewTracks={reviewTracks}
                 trackToBuy={trackToBuy}
+                releaseTrack={releaseBuyTrack}
             />
             <DeleteTrackDialog
                 isOpen={isOpen}
@@ -123,6 +139,7 @@ const Library = () => {
                     updateCurrentReleaseTrack={updateCurrentReleaseTrack}
                     previousTracks={previousTracks}
                     currentReleaseTrack={currentReleaseTrack}
+                    onBuyRelease={onBuyRelease}
                 />
             )}
 

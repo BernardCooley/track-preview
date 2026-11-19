@@ -6,14 +6,15 @@ import { capitaliseWords, formatBuyUrl } from "../../utils";
 interface Props {
     track: Track;
     buyLink: IBuyLink;
+    searchTitle?: string;
 }
 
-const BuyLink = ({ track, buyLink }: Props) => {
+const BuyLink = ({ track, buyLink, searchTitle }: Props) => {
     return (
         <Link
             target="_blank"
             rel="noopener noreferrer"
-            href={formatBuyUrl(track, buyLink.platform)}
+            href={formatBuyUrl(track, buyLink.platform, searchTitle)}
             transition="transform 0.15s ease"
             _hover={{
                 transform: "scale(1.05)",

@@ -9,7 +9,7 @@ import {
 } from "@chakra-ui/react";
 import React, { useMemo } from "react";
 import BuyLink from "./BuyLink";
-import { IBuyLink, ReviewTracks } from "../../types";
+import { IBuyLink, ReviewTracks, Track } from "../../types";
 import { getRelevantBuyLinks } from "../../utils";
 
 interface Props {
@@ -18,6 +18,7 @@ interface Props {
     buyLinks: IBuyLink[];
     reviewTracks: ReviewTracks;
     trackToBuy: number | null;
+    releaseTrack?: Track | null;
 }
 
 const BuyModal = ({
@@ -26,8 +27,12 @@ const BuyModal = ({
     buyLinks,
     reviewTracks,
     trackToBuy,
+    releaseTrack,
 }: Props) => {
-    const track = trackToBuy !== null ? reviewTracks[4].tracks[trackToBuy] : null;
+    const track = releaseTrack || (trackToBuy !== null ? reviewTracks[4].tracks[trackToBuy] : null);
+    const isReleaseBuy = !!releaseTrack;
+    const searchTitle = isReleaseBuy ? releaseTrack!.releaseTitle : undefined;
+
     const filteredLinks = useMemo(
         () => (track ? getRelevantBuyLinks(buyLinks, track.genre) : buyLinks),
         [buyLinks, track]
@@ -66,7 +71,7 @@ const BuyModal = ({
                                 color="brand.textPrimary"
                                 letterSpacing="-0.01em"
                             >
-                                Buy
+                                {isReleaseBuy ? "Buy Release" : "Buy"}
                             </Text>
                             <Dialog.CloseTrigger
                                 position="relative"
@@ -83,6 +88,27 @@ const BuyModal = ({
                             mx={[4, 5]}
                         />
 
+                        {isReleaseBuy && track && (
+                            <Flex px={[4, 5]} pt={4} gap={2} direction="column">
+                                <Flex gap={2} alignItems="baseline">
+                                    <Text fontSize="xs" color="brand.textMuted">
+                                        Artist:
+                                    </Text>
+                                    <Text fontSize="sm" color="brand.textPrimary">
+                                        {track.artist}
+                                    </Text>
+                                </Flex>
+                                <Flex gap={2} alignItems="baseline">
+                                    <Text fontSize="xs" color="brand.textMuted">
+                                        Release:
+                                    </Text>
+                                    <Text fontSize="sm" color="brand.textPrimary">
+                                        {track.releaseTitle}
+                                    </Text>
+                                </Flex>
+                            </Flex>
+                        )}
+
                         <Box px={[4, 5]} py={5}>
                             <Grid templateColumns="repeat(3, 1fr)" gap={4}>
                                 {filteredLinks.map((buyLink) => (
@@ -97,6 +123,7 @@ const BuyModal = ({
                                         <BuyLink
                                             track={track!}
                                             buyLink={buyLink}
+                                            searchTitle={searchTitle}
                                         />
                                     </GridItem>
                                 ))}
