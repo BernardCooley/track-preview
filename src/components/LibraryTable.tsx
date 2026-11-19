@@ -11,7 +11,7 @@ import {
     Table,
     Text,
 } from "@chakra-ui/react";
-import { ReviewTracks, SortDirection, Track } from "../../types";
+import { ReviewTracks, Track } from "../../types";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import SwapVertIcon from "@mui/icons-material/SwapVert";
 import ShopIcon from "@mui/icons-material/Shop";
@@ -21,6 +21,7 @@ import TrackMenuOptions from "./TrackOptionsMenu";
 import { getFormattedDate } from "../../utils";
 import { resolvePreviewUrl } from "@/bff/bff";
 import { useTrackContext } from "../../context/TrackContext";
+import { useLibraryParams } from "@/hooks/useLibraryParams";
 import GenreModal from "./GenreModal";
 
 type TrackKeys = keyof Track;
@@ -64,14 +65,14 @@ const LibraryTable = ({
     playAllRequested,
     onPlayAllStarted,
 }: Props) => {
-    const { onTrackEndedRef, onSkipRef, onPreviousRef, playingPositionRef, setTrackLoading, libraryFilters, updateLibraryFilters } = useTrackContext();
+    const { onTrackEndedRef, onSkipRef, onPreviousRef, playingPositionRef, setTrackLoading } = useTrackContext();
+    const {
+        selectedGenres, activeSortField, activeSortDirection,
+        setSelectedGenres, setSort, setReleaseTrackId,
+    } = useLibraryParams();
     const playingIndexRef = useRef<number | null>(null);
     const blobCache = useRef<Map<string, string>>(new Map());
 
-    const { selectedGenres, activeSortField, activeSortDirection } = libraryFilters;
-    const setSelectedGenres = (genres: string[]) => updateLibraryFilters({ selectedGenres: genres });
-    const setActiveSortField = (field: TrackKeys | null) => updateLibraryFilters({ activeSortField: field });
-    const setActiveSortDirection = (dir: SortDirection) => updateLibraryFilters({ activeSortDirection: dir });
     const [showGenreSelector, setShowGenreSelector] = useState(false);
 
     const availableGenres = useMemo(() => {
@@ -109,16 +110,14 @@ const LibraryTable = ({
 
     const handleSortButton = (field: TrackKeys) => {
         if (activeSortField === field) {
-            setActiveSortDirection(activeSortDirection === "asc" ? "desc" : "asc");
+            setSort(field, activeSortDirection === "asc" ? "desc" : "asc");
         } else {
-            setActiveSortField(field);
-            setActiveSortDirection("asc");
+            setSort(field, "asc");
         }
     };
 
     const clearSort = () => {
-        setActiveSortField(null);
-        setActiveSortDirection("asc");
+        setSort(null);
     };
 
     const fetchPreviewAsBlob = useCallback(async (trackId: string): Promise<string> => {
@@ -137,15 +136,15 @@ const LibraryTable = ({
         }
     }, []);
     const gotToRelease = (index: number) => {
-        updateCurrentReleaseTrack(reviewTracks[4].tracks[index]);
+        const track = reviewTracks[4].tracks[index];
+        updateCurrentReleaseTrack(track);
+        setReleaseTrackId(track.id);
         if (
-            currentReleaseTrack?.releaseTitle !==
-                reviewTracks[4].tracks[index].releaseTitle &&
-            currentReleaseTrack?.releaseDate !==
-                reviewTracks[4].tracks[index].releaseDate
+            currentReleaseTrack?.releaseTitle !== track.releaseTitle &&
+            currentReleaseTrack?.releaseDate !== track.releaseDate
         ) {
             updatePreviousTracks(reviewTracks[4].tracks);
-            getTracks(reviewTracks[4].tracks[index]);
+            getTracks(track);
         }
     };
 

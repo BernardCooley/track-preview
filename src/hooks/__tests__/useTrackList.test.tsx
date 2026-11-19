@@ -40,8 +40,6 @@ const defaultTrackContext: TrackContextProps = {
     updatePreviousTracks: vi.fn(),
     changesMade: { 2: true, 3: true, 4: true },
     updateChangesMade: mockUpdateChangesMade,
-    libraryFilters: { selectedGenres: ["all"], activeSortField: null, activeSortDirection: "asc" as const },
-    updateLibraryFilters: vi.fn(),
 };
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (

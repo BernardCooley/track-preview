@@ -1,7 +1,5 @@
 import type { MutableRefObject } from "react";
-import type { Track, ReviewTracks, SortDirection } from "../types";
-
-type TrackKeys = keyof Track;
+import type { Track, ReviewTracks } from "../types";
 
 export interface TrackContextProps {
     currentlyPlaying: string | undefined;
@@ -20,6 +18,4 @@ export interface TrackContextProps {
     updatePreviousTracks: (tracks: Track[]) => void;
     changesMade: { 2: boolean; 3: boolean; 4: boolean };
     updateChangesMade: (reviewStep: number, changesMade: boolean) => void;
-    libraryFilters: { selectedGenres: string[]; activeSortField: TrackKeys | null; activeSortDirection: SortDirection };
-    updateLibraryFilters: (filters: Partial<{ selectedGenres: string[]; activeSortField: TrackKeys | null; activeSortDirection: SortDirection }>) => void;
 }

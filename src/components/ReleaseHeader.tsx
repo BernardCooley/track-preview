@@ -4,6 +4,7 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import ShopIcon from "@mui/icons-material/Shop";
 import { Track } from "../../types";
+import { useLibraryParams } from "@/hooks/useLibraryParams";
 
 interface Props {
     updateReviewTracks: (
@@ -28,6 +29,7 @@ const ReleaseHeader = ({
     onBuyRelease,
     onPlayAll,
 }: Props) => {
+    const { setReleaseTrackId } = useLibraryParams();
     return (
         <Flex
             gap={4}
@@ -54,6 +56,7 @@ const ReleaseHeader = ({
                     updateReviewTracks(4, previousTracks, 0);
                     updatePreviousTracks([]);
                     updateCurrentReleaseTrack(null);
+                    setReleaseTrackId(null);
                 }}
             >
                 <ChevronLeftIcon fontSize="inherit" />

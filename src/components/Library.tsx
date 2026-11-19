@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Badge, Center, Flex } from "@chakra-ui/react";
 import Loading from "./Loading";
 import { buyLinks } from "../../consts";
@@ -7,6 +7,7 @@ import DeleteTrackDialog from "./DeleteTrackDialog";
 import LibraryTable from "./LibraryTable";
 import ReleaseHeader from "./ReleaseHeader";
 import { useTrackList } from "@/hooks/useTrackList";
+import { useLibraryParams } from "@/hooks/useLibraryParams";
 import { Track } from "../../types";
 
 const Library = () => {
@@ -47,8 +48,29 @@ const Library = () => {
         setLibraryTrackIds,
     } = useTrackList();
 
+    const { releaseTrackId, setReleaseTrackId } = useLibraryParams();
     const [releaseBuyTrack, setReleaseBuyTrack] = useState<Track | null>(null);
     const [playAllRequested, setPlayAllRequested] = useState(false);
+    const releaseRestoredRef = useRef(false);
+
+    useEffect(() => {
+        if (
+            releaseRestoredRef.current ||
+            !releaseTrackId ||
+            currentReleaseTrack ||
+            reviewTracks[4].tracks.length === 0
+        ) return;
+
+        const track = reviewTracks[4].tracks.find((t) => t.id === releaseTrackId);
+        if (track) {
+            releaseRestoredRef.current = true;
+            updateCurrentReleaseTrack(track);
+            updatePreviousTracks(reviewTracks[4].tracks);
+            getTracks(track);
+        } else {
+            setReleaseTrackId(null);
+        }
+    }, [releaseTrackId, reviewTracks[4].tracks.length]);
 
     const onBuyRelease = useCallback(() => {
         if (currentReleaseTrack) {

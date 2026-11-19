@@ -1,8 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "../../../test/mocks/firebase";
-import "../../../test/mocks/navigation";
+import { mockSearchParams } from "../../../test/mocks/navigation";
 import { render } from "../../../test/test-utils";
 import Library from "../Library";
 import { mockTrack, mockTrack2, mockTrack3 } from "../../../test/mocks/data";
@@ -71,44 +71,58 @@ describe("Library", () => {
         mockUseTrackList.mockReturnValue(baseHookReturn as any);
     });
 
-    describe("filter persistence across release navigation", () => {
-        const filtersContext = {
-            libraryFilters: {
-                selectedGenres: ["Techno"],
-                activeSortField: "artist" as const,
-                activeSortDirection: "desc" as const,
-            },
-            updateLibraryFilters: vi.fn(),
-        };
+    describe("filter persistence via URL params", () => {
+        afterEach(() => {
+            mockSearchParams.delete("genres");
+            mockSearchParams.delete("sort");
+            mockSearchParams.delete("sortDir");
+            mockSearchParams.delete("release");
+        });
 
-        it("shows filters from context in library view", () => {
-            render(<Library />, { trackContext: filtersContext });
+        it("reads genre filter from URL params", () => {
+            mockSearchParams.set("genres", "Techno");
+            render(<Library />);
 
             expect(screen.getByRole("button", { name: "Techno" })).toBeInTheDocument();
+        });
+
+        it("reads sort filter from URL params", () => {
+            mockSearchParams.set("sort", "artist");
+            mockSearchParams.set("sortDir", "desc");
+            render(<Library />);
+
             expect(screen.getByText(/Artist \(Z-A\)/i)).toBeInTheDocument();
         });
 
         it("hides filter buttons in release view", () => {
+            mockSearchParams.set("genres", "Techno");
+            mockSearchParams.set("sort", "artist");
+            mockSearchParams.set("sortDir", "desc");
+
             mockUseTrackList.mockReturnValue({
                 ...baseHookReturn,
                 currentReleaseTrack: mockTrack,
                 previousTracks: [mockTrack, mockTrack2],
             } as any);
 
-            render(<Library />, { trackContext: filtersContext });
+            render(<Library />);
 
             expect(screen.queryByRole("button", { name: "Techno" })).not.toBeInTheDocument();
             expect(screen.queryByText(/Artist \(Z-A\)/i)).not.toBeInTheDocument();
         });
 
-        it("restores filter buttons after returning from release view", () => {
+        it("preserves filter params after returning from release view", () => {
+            mockSearchParams.set("genres", "Techno");
+            mockSearchParams.set("sort", "artist");
+            mockSearchParams.set("sortDir", "desc");
+
             mockUseTrackList.mockReturnValue({
                 ...baseHookReturn,
                 currentReleaseTrack: mockTrack,
                 previousTracks: [mockTrack, mockTrack2],
             } as any);
 
-            const { rerender } = render(<Library />, { trackContext: filtersContext });
+            const { rerender } = render(<Library />);
 
             mockUseTrackList.mockReturnValue(baseHookReturn as any);
             rerender(<Library />);
