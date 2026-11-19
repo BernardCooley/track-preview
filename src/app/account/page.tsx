@@ -72,10 +72,14 @@ const Settings = () => {
     );
 
     const isUserLoggedIn = useCallback(async () => {
-        onAuthStateChanged(auth, (user) => {
-            if (user && user.email && user.uid) {
-                setUserAccount(user);
-                setUser({ email: user.email, uid: user.uid });
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                await user.reload();
+                const refreshed = auth.currentUser;
+                if (refreshed && refreshed.email && refreshed.uid) {
+                    setUserAccount(refreshed);
+                    setUser({ email: refreshed.email, uid: refreshed.uid });
+                }
             }
         });
     }, []);
