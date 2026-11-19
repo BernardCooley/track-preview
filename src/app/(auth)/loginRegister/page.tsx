@@ -142,7 +142,7 @@ const AuthPageContent = () => {
                             Email not verified
                         </Text>
                         <Text fontSize="sm" color="brand.textSecondary">
-                            Please check your inbox for a verification link before signing in.
+                            Please check your inbox for a verification link and then you can log in.
                         </Text>
                         <Button
                             variant="outline"
