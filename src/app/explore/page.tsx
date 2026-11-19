@@ -8,7 +8,7 @@ import {
     Text,
     useDisclosure,
 } from "@chakra-ui/react";
-import { Suspense, useEffect, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import AudioPlayer from "@/components/AudioPlayer";
 import { useRouter, useSearchParams } from "next/navigation";
 import { onAuthStateChanged } from "firebase/auth";
@@ -39,7 +39,35 @@ function ExploreContent() {
     const { updateUser, user, updateUserProfile, userProfile, isAnonymous, setIsAnonymous, profileError, setProfileError } = useAuthContext();
     const reviewStep = searchParams?.get("reviewStep");
     const pageRef = useRef<HTMLDivElement>(null);
-    const { open: isMenuOpen, onOpen: onMenuOpen, onClose: onMenuClose } = useDisclosure();
+    const { open: isMenuOpen, onOpen: onMenuOpenRaw, onClose: onMenuCloseRaw } = useDisclosure();
+    const menuOpenRef = useRef(false);
+
+    const onMenuOpen = useCallback(() => {
+        onMenuOpenRaw();
+        menuOpenRef.current = true;
+        window.history.pushState({ menuDrawer: true }, "");
+    }, [onMenuOpenRaw]);
+
+    const onMenuClose = useCallback(() => {
+        onMenuCloseRaw();
+        if (menuOpenRef.current) {
+            menuOpenRef.current = false;
+            if (window.history.state?.menuDrawer) {
+                window.history.back();
+            }
+        }
+    }, [onMenuCloseRaw]);
+
+    useEffect(() => {
+        const handlePopState = (e: PopStateEvent) => {
+            if (menuOpenRef.current) {
+                menuOpenRef.current = false;
+                onMenuCloseRaw();
+            }
+        };
+        window.addEventListener("popstate", handlePopState);
+        return () => window.removeEventListener("popstate", handlePopState);
+    }, [onMenuCloseRaw]);
 
     useEffect(() => {
         if (user?.uid) {
