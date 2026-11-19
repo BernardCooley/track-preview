@@ -8,7 +8,7 @@ import {
     Text,
     useDisclosure,
 } from "@chakra-ui/react";
-import { Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import AudioPlayer from "@/components/AudioPlayer";
 import { useRouter, useSearchParams } from "next/navigation";
 import { onAuthStateChanged } from "firebase/auth";
@@ -65,13 +65,16 @@ function ExploreContent() {
         }
     }, [user]);
 
-    const isUserLoggedIn = useCallback(async () => {
-        const user = await GetCurrentUser();
-        if (user?.uid) {
-            updateUser({ email: user.email || "", uid: user.uid });
-            setIsAnonymous(user.isAnonymous);
-        }
-        onAuthStateChanged(auth, async (user) => {
+    useEffect(() => {
+        (async () => {
+            const user = await GetCurrentUser();
+            if (user?.uid) {
+                updateUser({ email: user.email || "", uid: user.uid });
+                setIsAnonymous(user.isAnonymous);
+            }
+        })();
+
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
             if (user && user.uid && (user.isAnonymous || user.emailVerified)) {
                 updateUser({ email: user.email || "", uid: user.uid });
                 setIsAnonymous(user.isAnonymous);
@@ -84,11 +87,8 @@ function ExploreContent() {
                 return router.push("/");
             }
         });
+        return unsubscribe;
     }, [router]);
-
-    useEffect(() => {
-        isUserLoggedIn();
-    }, [isUserLoggedIn]);
 
     useEffect(() => {
         audioElement.current?.pause();

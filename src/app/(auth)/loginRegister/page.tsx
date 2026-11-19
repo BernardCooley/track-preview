@@ -45,19 +45,16 @@ const AuthPageContent = () => {
         []
     );
 
-    const isUserLoggedIn = useCallback(async () => {
-        onAuthStateChanged(auth, (user) => {
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
             if (user && user.email && user.uid && !user.isAnonymous && user.emailVerified) {
                 router.push("/explore");
             } else {
                 setLoading(false);
             }
         });
+        return unsubscribe;
     }, [router]);
-
-    useEffect(() => {
-        isUserLoggedIn();
-    }, [isUserLoggedIn]);
 
     useEffect(() => {
         if (isPasswordReset) {

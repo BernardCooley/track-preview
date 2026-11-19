@@ -174,4 +174,23 @@ describe("LoginRegister", () => {
 
         expect(screen.queryByText("Email not verified")).not.toBeInTheDocument();
     });
+
+    it("unsubscribes onAuthStateChanged listener on unmount", async () => {
+        const unsubscribe = vi.fn();
+        mockOnAuthStateChanged.mockImplementation((_auth: unknown, callback: any) => {
+            callback(null);
+            return unsubscribe;
+        });
+        mockSearchParams.set("login", "true");
+        const AuthPage = await loadPage();
+        const { unmount } = render(<AuthPage />);
+
+        await waitFor(() => {
+            expect(screen.getByText("Sign in")).toBeInTheDocument();
+        });
+
+        unmount();
+        expect(unsubscribe).toHaveBeenCalled();
+    });
+
 });
