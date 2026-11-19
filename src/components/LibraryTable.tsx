@@ -258,23 +258,25 @@ const LibraryTable = ({
         >
             {/* Desktop table */}
             <Table.Root display={["none", "none", "table"]}>
-                <Table.Header>
-                    <Table.Row>
-                        <Table.ColumnHeader color="brand.textMuted" py={2} px={2}>
-                            <TableHeading title="title" />
-                        </Table.ColumnHeader>
-                        <Table.ColumnHeader color="brand.textMuted" py={2} px={2}>
-                            <TableHeading title="releaseTitle" />
-                        </Table.ColumnHeader>
-                        <Table.ColumnHeader color="brand.textMuted" py={2} px={2}>
-                            <TableHeading title="genre" />
-                        </Table.ColumnHeader>
-                        <Table.ColumnHeader color="brand.textMuted" py={2} px={2}>
-                            <TableHeading title="releaseDate" />
-                        </Table.ColumnHeader>
-                        <Table.ColumnHeader py={2} px={2} w="80px" />
-                    </Table.Row>
-                </Table.Header>
+                {!currentReleaseTrack && (
+                    <Table.Header>
+                        <Table.Row>
+                            <Table.ColumnHeader color="brand.textMuted" py={2} px={2}>
+                                <TableHeading title="title" />
+                            </Table.ColumnHeader>
+                            <Table.ColumnHeader color="brand.textMuted" py={2} px={2}>
+                                <TableHeading title="releaseTitle" />
+                            </Table.ColumnHeader>
+                            <Table.ColumnHeader color="brand.textMuted" py={2} px={2}>
+                                <TableHeading title="genre" />
+                            </Table.ColumnHeader>
+                            <Table.ColumnHeader color="brand.textMuted" py={2} px={2}>
+                                <TableHeading title="releaseDate" />
+                            </Table.ColumnHeader>
+                            <Table.ColumnHeader py={2} px={2} w="80px" />
+                        </Table.Row>
+                    </Table.Header>
+                )}
                 <Table.Body>
                     {reviewTracks[4].tracks.map((track, index) => (
                         <Table.Row
@@ -286,7 +288,7 @@ const LibraryTable = ({
                             borderBottom="1px solid"
                             borderBottomColor="brand.divider"
                         >
-                            <Table.Cell py={3} px={2}>
+                            <Table.Cell py={3} px={2} w={currentReleaseTrack ? "full" : "auto"}>
                                 <Flex alignItems="center" gap={4} pl={2}>
                                     <Image
                                         rounded="lg"
@@ -301,7 +303,7 @@ const LibraryTable = ({
                                             lineClamp={2}
                                             fontSize="sm"
                                             color="brand.textPrimary"
-                                            maxW={36}
+                                            maxW={currentReleaseTrack ? "none" : 36}
                                             css={{ textWrap: "wrap" }}
                                             fontWeight={
                                                 playingTrackId === track.id
@@ -314,7 +316,7 @@ const LibraryTable = ({
                                         <Text
                                             fontSize="xs"
                                             color="brand.textMuted"
-                                            maxW={36}
+                                            maxW={currentReleaseTrack ? "none" : 36}
                                             css={{ textWrap: "wrap" }}
                                         >
                                             {track.artist}
@@ -323,22 +325,26 @@ const LibraryTable = ({
                                 </Flex>
                             </Table.Cell>
 
-                            <Table.Cell py={3} px={2}>
-                                <Text maxW={48} css={{ textWrap: "wrap" }} fontSize="sm">
-                                    {track.releaseTitle}
-                                </Text>
-                            </Table.Cell>
-                            <Table.Cell py={3} px={2}>
-                                <Text maxW={20} css={{ textWrap: "wrap" }} fontSize="sm">
-                                    {track.genre}
-                                </Text>
-                            </Table.Cell>
-                            <Table.Cell py={3} px={2}>
-                                <Text fontSize="sm">
-                                    {getFormattedDate(track.releaseDate) ||
-                                        track.releaseYear}
-                                </Text>
-                            </Table.Cell>
+                            {!currentReleaseTrack && (
+                                <>
+                                    <Table.Cell py={3} px={2}>
+                                        <Text maxW={48} css={{ textWrap: "wrap" }} fontSize="sm">
+                                            {track.releaseTitle}
+                                        </Text>
+                                    </Table.Cell>
+                                    <Table.Cell py={3} px={2}>
+                                        <Text maxW={20} css={{ textWrap: "wrap" }} fontSize="sm">
+                                            {track.genre}
+                                        </Text>
+                                    </Table.Cell>
+                                    <Table.Cell py={3} px={2}>
+                                        <Text fontSize="sm">
+                                            {getFormattedDate(track.releaseDate) ||
+                                                track.releaseYear}
+                                        </Text>
+                                    </Table.Cell>
+                                </>
+                            )}
                             <Table.Cell py={3} px={2}>
                                 {currentReleaseTrack ? (
                                     <AddToLibraryButton track={track} />
@@ -353,14 +359,16 @@ const LibraryTable = ({
 
             {/* Mobile table */}
             <Table.Root display={["table", "table", "none"]}>
-                <Table.Header>
-                    <Table.Row>
-                        <Table.ColumnHeader color="brand.textMuted" py={2} px={2}>
-                            <TableHeading title="title" />
-                        </Table.ColumnHeader>
-                        <Table.ColumnHeader py={2} px={2} w="70px" />
-                    </Table.Row>
-                </Table.Header>
+                {!currentReleaseTrack && (
+                    <Table.Header>
+                        <Table.Row>
+                            <Table.ColumnHeader color="brand.textMuted" py={2} px={2}>
+                                <TableHeading title="title" />
+                            </Table.ColumnHeader>
+                            <Table.ColumnHeader py={2} px={2} w="70px" />
+                        </Table.Row>
+                    </Table.Header>
+                )}
                 <Table.Body>
                     {reviewTracks[4].tracks.map((track, index) => (
                         <Table.Row
@@ -372,7 +380,7 @@ const LibraryTable = ({
                             borderBottom="1px solid"
                             borderBottomColor="brand.divider"
                         >
-                            <Table.Cell py={2.5} px={2} maxW={0}>
+                            <Table.Cell py={2.5} px={2} maxW={currentReleaseTrack ? "none" : 0}>
                                 <Flex alignItems="center" gap={3} pl={2}>
                                     <Image
                                         rounded="lg"
