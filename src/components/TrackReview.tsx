@@ -15,9 +15,10 @@ import YearModal from "./YearModal";
 import GenreModal from "./GenreModal";
 import FilterTags from "./FilterTags";
 import TrackReviewCard from "./TrackReviewCard";
-import { mutateUserProfile } from "@/bff/bff";
+import { mutateUserProfile, sendToLibrary } from "@/bff/bff";
 import { genres } from "../../data/genres";
 import { useTrackReview } from "@/hooks/useTrackReview";
+import { useTrackContext } from "../../context/TrackContext";
 import RecordAnimation from "./RecordAnimation";
 import TracklistTable from "./TracklistTable";
 import TrackTransition from "./TrackTransition";
@@ -61,6 +62,7 @@ const TrackReview = memo(
             isAnonymous,
         } = useTrackReview(reviewStep);
 
+        const { updateChangesMade } = useTrackContext();
         const router = useRouter();
 
         const userGenres = userProfile?.genres;
@@ -91,6 +93,7 @@ const TrackReview = memo(
             useDisclosure();
         const animationDuration = 0.9;
         const [animate, setAnimate] = useState<"like" | "dislike" | null>(null);
+        const [animationTargetStep, setAnimationTargetStep] = useState<number | null>(null);
         const [playOnLoad, setPlayOnLoad] = useState(false);
 
         useEffect(() => {
@@ -125,6 +128,7 @@ const TrackReview = memo(
                     animationDuration={animationDuration}
                     image={animationImage}
                     curatedMode={userProfile?.curatedMode ?? false}
+                    targetStep={animationTargetStep}
                     startPosition={animationStart}
                     thumbnailRect={thumbnailRect}
                 />
@@ -337,6 +341,7 @@ const TrackReview = memo(
                     {currentTrack && !previewLoading && !loading && (
                         <TrackReviewCard
                             swipeMode={userProfile?.swipeMode ?? true}
+                            curatedMode={userProfile?.curatedMode ?? false}
                             noTracks={noTracks}
                             loading={loading}
                             reviewStep={reviewStep}
@@ -359,6 +364,7 @@ const TrackReview = memo(
                             currentTrack={currentTrack}
                             previewUrl={resolvedPreviewUrl}
                             onLikeOrDislike={async (val) => {
+                                setAnimationTargetStep(null);
                                 setSwipeTint(val ? "like" : "dislike");
                                 const trackInfo = document.querySelector("[data-track-info]");
                                 if (trackInfo) {
@@ -377,6 +383,38 @@ const TrackReview = memo(
                                 const animationMs = morphMs + animationDuration * 1000 + (animationDuration * 1000) / 2;
                                 await new Promise((r) => setTimeout(r, animationMs));
                                 await likeOrDislike(val);
+                            }}
+                            onSendToLibrary={async () => {
+                                if (!currentTrack || !user?.uid) return;
+                                setAnimationTargetStep(4);
+                                setSwipeTint("like");
+                                const trackInfo = document.querySelector("[data-track-info]");
+                                if (trackInfo) {
+                                    const rect = trackInfo.getBoundingClientRect();
+                                    setAnimationStart({ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 });
+                                }
+                                const thumb = document.querySelector("[data-track-thumbnail]");
+                                if (thumb) {
+                                    setThumbnailRect(thumb.getBoundingClientRect());
+                                }
+                                setAnimate("like");
+                                setAnimationImage(currentTrack?.thumbnail || "");
+                                const morphMs = 250;
+                                const animationMs = morphMs + animationDuration * 1000 + (animationDuration * 1000) / 2;
+                                await new Promise((r) => setTimeout(r, animationMs));
+                                await sendToLibrary({
+                                    trackId: currentTrack.id,
+                                    userId: user.uid,
+                                });
+                                const remaining = reviewTracks[reviewStep].tracks.filter(
+                                    (t) => t.id !== currentTrack.id
+                                );
+                                const currentIndex = reviewTracks[reviewStep].tracks.findIndex(
+                                    (t) => t.id === currentTrack.id
+                                );
+                                const nextIndex = Math.min(currentIndex, remaining.length - 1);
+                                updateReviewTracks(reviewStep, remaining, Math.max(nextIndex, 0));
+                                updateChangesMade(4, true);
                             }}
                             onAudioPlay={() => {
                                 setIsPlaying(true);

@@ -44,6 +44,8 @@ interface Props {
     toggleTracklist: () => void;
     isShowingTracklist: boolean;
     swipeMode: boolean;
+    curatedMode: boolean;
+    onSendToLibrary: () => void;
 }
 
 const TrackReviewCard = ({
@@ -66,6 +68,8 @@ const TrackReviewCard = ({
     toggleTracklist,
     isShowingTracklist,
     swipeMode,
+    curatedMode,
+    onSendToLibrary,
 }: Props) => {
     const playerRef = useRef<AudioPlayer>(null);
     const indexOfCurrentTrack = trackList.findIndex(
@@ -319,7 +323,60 @@ const TrackReviewCard = ({
                                     </Box>
                                 )}
 
-                            <Flex flex={1} />
+                            <Flex flex={1} alignItems="flex-end" justifyContent="center" pb={12} position="relative" zIndex={1}>
+                                <Flex direction="column" alignItems="center" gap={6}>
+                                    {!swipeMode && (
+                                        <Flex justifyContent="center" alignItems="center" gap={[8, 12]}>
+                                            <TrackCardIcon
+                                                ariaLabel="dislike button"
+                                                onClick={async () => onLikeOrDislike(false)}
+                                                colorPalette="red"
+                                                Icon={ThumbDownAltTwoToneIcon}
+                                            />
+                                            <TrackCardIcon
+                                                ariaLabel="like button"
+                                                onClick={async () => onLikeOrDislike(true)}
+                                                colorPalette="green"
+                                                Icon={ThumbUpAltTwoToneIcon}
+                                            />
+                                        </Flex>
+                                    )}
+                                    {curatedMode && (
+                                        <Box
+                                            onClick={onSendToLibrary}
+                                            rounded="full"
+                                            py={1}
+                                            px={3}
+                                            display="flex"
+                                            alignItems="center"
+                                            justifyContent="center"
+                                            gap={1.5}
+                                            border="1px solid"
+                                            borderColor="brand.border"
+                                            bg="blackAlpha.500"
+                                            cursor="pointer"
+                                            transition="all 0.2s ease"
+                                            _hover={{
+                                                borderColor: "brand.primary",
+                                                bg: "brand.primarySubtle",
+                                            }}
+                                            _active={{
+                                                transform: "scale(0.95)",
+                                            }}
+                                            color="whiteAlpha.900"
+                                        >
+                                            <Text
+                                                fontSize="xs"
+                                                fontWeight="medium"
+                                                userSelect="none"
+                                                whiteSpace="nowrap"
+                                            >
+                                                Save to library
+                                            </Text>
+                                        </Box>
+                                    )}
+                                </Flex>
+                            </Flex>
 
                             <Flex
                                 direction="column"
@@ -327,22 +384,6 @@ const TrackReviewCard = ({
                                 position="relative"
                                 zIndex={1}
                             >
-                                {!swipeMode && (
-                                    <Flex w="full" justifyContent="center" gap={[8, 12]} py={4}>
-                                        <TrackCardIcon
-                                            ariaLabel="dislike button"
-                                            onClick={async () => onLikeOrDislike(false)}
-                                            colorPalette="red"
-                                            Icon={ThumbDownAltTwoToneIcon}
-                                        />
-                                        <TrackCardIcon
-                                            ariaLabel="like button"
-                                            onClick={async () => onLikeOrDislike(true)}
-                                            colorPalette="green"
-                                            Icon={ThumbUpAltTwoToneIcon}
-                                        />
-                                    </Flex>
-                                )}
                                 <AudioPlayer
                                     ref={playerRef}
                                     style={{ backgroundColor: "transparent" }}
@@ -467,31 +508,31 @@ const TrackReviewCard = ({
                                                 borderColor: "brand.primary",
                                             }}
                                         >
-                                            {profileLoaded && !autoplayLoading ? (
-                                                <Text
-                                                    fontSize="xs"
-                                                    fontWeight="medium"
-                                                    color={
-                                                        preferredAutoPlay
-                                                            ? "brand.primary"
-                                                            : "brand.textSecondary"
-                                                    }
-                                                    userSelect="none"
-                                                >
-                                                    AutoPlay
-                                                </Text>
-                                            ) : (
-                                                <Flex
-                                                    w="full"
-                                                    justifyContent="center"
-                                                >
-                                                    <Spinner
-                                                        color="brand.primary"
-                                                        size="xs"
-                                                    />
-                                                </Flex>
-                                            )}
-                                        </Box>,
+                                                {profileLoaded && !autoplayLoading ? (
+                                                    <Text
+                                                        fontSize="xs"
+                                                        fontWeight="medium"
+                                                        color={
+                                                            preferredAutoPlay
+                                                                ? "brand.primary"
+                                                                : "brand.textSecondary"
+                                                        }
+                                                        userSelect="none"
+                                                    >
+                                                        AutoPlay
+                                                    </Text>
+                                                ) : (
+                                                    <Flex
+                                                        w="full"
+                                                        justifyContent="center"
+                                                    >
+                                                        <Spinner
+                                                            color="brand.primary"
+                                                            size="xs"
+                                                        />
+                                                    </Flex>
+                                                )}
+                                            </Box>,
                                     ]}
                                 />
                                 <Separator borderColor="brand.divider" />

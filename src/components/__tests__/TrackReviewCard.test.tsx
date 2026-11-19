@@ -48,6 +48,8 @@ describe("TrackReviewCard", () => {
         toggleTracklist: vi.fn(),
         isShowingTracklist: false,
         swipeMode: true,
+        curatedMode: false,
+        onSendToLibrary: vi.fn(),
     };
 
     beforeEach(() => {

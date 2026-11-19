@@ -181,6 +181,21 @@ export const updateTrackReviewStep = async ({
     return userTracks;
 };
 
+interface SendToLibraryProps {
+    trackId: string;
+    userId: string;
+}
+
+export const sendToLibrary = async ({
+    trackId,
+    userId,
+}: SendToLibraryProps): Promise<{ success: boolean } | null> => {
+    return await fetchWithErrorHandling("/api/sendToLibrary", "POST", {
+        trackId,
+        userId,
+    });
+};
+
 interface CreateUserProps {
     userId: string;
     isAnonymous?: boolean;
