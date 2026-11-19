@@ -8,7 +8,7 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { ZodType, z } from "zod";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
-import { ResetPassword } from "../../../../firebase/utils";
+import { sendPasswordResetEmail } from "@/bff/bff";
 
 interface Props {}
 
@@ -39,7 +39,7 @@ const PasswordReset = ({}: Props) => {
     const performPasswordReset = async (formData: FormData) => {
         setSubmitting(true);
         try {
-            await ResetPassword(formData.email);
+            await sendPasswordResetEmail(formData.email);
             setAuthError(null);
             router.push("/loginRegister?login=true&passwordReset=true");
         } catch (error) {

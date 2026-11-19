@@ -22,9 +22,8 @@ import { UserCredential } from "firebase/auth";
 import {
     LinkAnonymousAccount,
     RegisterUser,
-    SendVerificationEmail,
 } from "../../firebase/utils";
-import { createUser, mutateUserProfile } from "@/bff/bff";
+import { createUser, mutateUserProfile, sendVerificationEmail } from "@/bff/bff";
 import { auth } from "../../firebase/firebaseInit";
 
 interface FormData {
@@ -138,7 +137,7 @@ const SignUp = () => {
         }
 
         try {
-            await SendVerificationEmail(newUser.user);
+            await sendVerificationEmail(newUser.user.email!);
         } catch (error) {
             showToast({
                 title: "Verification email failed to send.",

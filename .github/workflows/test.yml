@@ -107,6 +107,13 @@ jobs:
           NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ github.ref == 'refs/heads/main' && secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID_PROD || secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID_DEV }}
           FIREBASE_AUTH_DOMAIN: ${{ github.ref == 'refs/heads/main' && secrets.FIREBASE_AUTH_DOMAIN_PROD || secrets.FIREBASE_AUTH_DOMAIN_DEV }}
           FIREBASE_APP_ID: ${{ github.ref == 'refs/heads/main' && secrets.FIREBASE_APP_ID_PROD || secrets.FIREBASE_APP_ID_DEV }}
+          FIREBASE_CLIENT_EMAIL: ${{ github.ref == 'refs/heads/main' && secrets.FIREBASE_CLIENT_EMAIL_PROD || secrets.FIREBASE_CLIENT_EMAIL_DEV }}
+          FIREBASE_PRIVATE_KEY: ${{ github.ref == 'refs/heads/main' && secrets.FIREBASE_PRIVATE_KEY_PROD || secrets.FIREBASE_PRIVATE_KEY_DEV }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_SECURE: ${{ secrets.SMTP_SECURE }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
           POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
           POSTGRES_URL_NON_POOLING: ${{ secrets.POSTGRES_URL_NON_POOLING }}
 

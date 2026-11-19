@@ -314,6 +314,18 @@ export const resolvePreviewUrl = async (
     }
 };
 
+export const sendVerificationEmail = async (email: string): Promise<void> => {
+    await fetchWithErrorHandling("/api/sendVerificationEmail", "POST", {
+        email,
+    });
+};
+
+export const sendPasswordResetEmail = async (email: string): Promise<void> => {
+    await fetchWithErrorHandling("/api/sendPasswordResetEmail", "POST", {
+        email,
+    });
+};
+
 export const getTrialLikeCount = async ({
     userId,
 }: {
