@@ -12,10 +12,11 @@ const ToggleTracklist = ({ toggleTracklist, isShowingTracklist }: Props) => {
             variant="ghost"
             onClick={toggleTracklist}
             fontSize="sm"
-            color={isShowingTracklist ? "brand.textMuted" : "brand.textSecondary"}
+            color="whiteAlpha.900"
             rounded="none"
             roundedBottomLeft="lg"
-            bg={isShowingTracklist ? "transparent" : "brand.surface"}
+            bg="blackAlpha.500"
+            backdropFilter="blur(4px)"
             _hover={{
                 bg: "brand.surfaceHover",
                 color: "brand.textPrimary",

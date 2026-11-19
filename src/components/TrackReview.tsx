@@ -91,6 +91,7 @@ const TrackReview = memo(
             useDisclosure();
         const animationDuration = 0.9;
         const [animate, setAnimate] = useState<"like" | "dislike" | null>(null);
+        const [playOnLoad, setPlayOnLoad] = useState(false);
 
         useEffect(() => {
             if (currentTrack) {
@@ -139,6 +140,23 @@ const TrackReview = memo(
                             ? "rgba(16, 185, 129, 0.12)"
                             : "rgba(239, 68, 68, 0.12)"
                         }
+                    />
+                )}
+                {!animate && reviewStep > 1 && reviewStep < 4 && (
+                    <TracklistTable
+                        noTracks={noTracks}
+                        loading={loading}
+                        reviewStep={reviewStep}
+                        toggleTracklist={toggleTracklist}
+                        isShowingTracklist={isShowingTracklist}
+                        isOpen={isShowingTracklist}
+                        tracklist={reviewTracks}
+                        currentlyPlaying={currentTrack}
+                        updateCurrentlyPlaying={(track) => {
+                            setPlayOnLoad(true);
+                            setCurrentTrack(track);
+                            toggleTracklist();
+                        }}
                     />
                 )}
                 {loading && !animate && !currentTrack && (
@@ -337,7 +355,7 @@ const TrackReview = memo(
                             trackList={reviewTracks[reviewStep].tracks}
                             setCurrentTrack={setCurrentTrack}
                             isOpen={reviewStep === 1 || !isShowingTracklist}
-                            autoplay={userProfile?.autoplay || false}
+                            autoplay={userProfile?.autoplay || playOnLoad}
                             currentTrack={currentTrack}
                             previewUrl={resolvedPreviewUrl}
                             onLikeOrDislike={async (val) => {
@@ -362,22 +380,7 @@ const TrackReview = memo(
                             }}
                             onAudioPlay={() => {
                                 setIsPlaying(true);
-                            }}
-                        />
-                    )}
-                    {!animate && reviewStep > 1 && reviewStep < 4 && (
-                        <TracklistTable
-                            noTracks={noTracks}
-                            loading={loading}
-                            reviewStep={reviewStep}
-                            toggleTracklist={toggleTracklist}
-                            isShowingTracklist={isShowingTracklist}
-                            isOpen={isShowingTracklist}
-                            tracklist={reviewTracks}
-                            currentlyPlaying={currentTrack}
-                            updateCurrentlyPlaying={(track) => {
-                                setCurrentTrack(track);
-                                toggleTracklist();
+                                setPlayOnLoad(false);
                             }}
                         />
                     )}
