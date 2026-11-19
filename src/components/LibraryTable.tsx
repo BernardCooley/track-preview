@@ -75,6 +75,23 @@ const LibraryTable = ({
 }: Props) => {
     const { onTrackEndedRef } = useTrackContext();
     const playingIndexRef = useRef<number | null>(null);
+    const blobCache = useRef<Map<string, string>>(new Map());
+
+    const fetchPreviewAsBlob = useCallback(async (trackId: string): Promise<string> => {
+        if (blobCache.current.has(trackId)) return blobCache.current.get(trackId)!;
+        const proxyUrl = await resolvePreviewUrl(trackId);
+        if (!proxyUrl) return "";
+        try {
+            const res = await fetch(proxyUrl);
+            if (!res.ok) return "";
+            const blob = await res.blob();
+            const objectUrl = URL.createObjectURL(blob);
+            blobCache.current.set(trackId, objectUrl);
+            return objectUrl;
+        } catch {
+            return "";
+        }
+    }, []);
     const sortTracks = (field: TrackKeys) => {
         const order = sortBy === field ? sortDirection : "asc";
 
@@ -120,13 +137,13 @@ const LibraryTable = ({
         const track = tracks[index];
         playingIndexRef.current = index;
         setPlayingTrackId(track.id);
-        const url = await resolvePreviewUrl(track.id);
+        const url = await fetchPreviewAsBlob(track.id);
         if (url) {
             updateCurrentlyPlaying(url);
         } else {
             playTrackAtIndex(index + 1);
         }
-    }, [reviewTracks, updateCurrentlyPlaying]);
+    }, [reviewTracks, updateCurrentlyPlaying, fetchPreviewAsBlob]);
 
     const handleTrackEnded = useCallback(() => {
         if (playingIndexRef.current !== null) {
@@ -185,7 +202,7 @@ const LibraryTable = ({
                         playingIndexRef.current = index;
                     }
                     setPlayingTrackId(track.id);
-                    const url = await resolvePreviewUrl(track.id);
+                    const url = await fetchPreviewAsBlob(track.id);
                     updateCurrentlyPlaying(url);
                 }
             },
