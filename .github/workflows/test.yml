@@ -7,7 +7,62 @@ on:
     branches: [main, develop]
 
 jobs:
-  test-and-deploy:
+  checks:
+    runs-on: ubuntu-latest
+
+    env:
+      PUPPETEER_SKIP_DOWNLOAD: true
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Cache Prisma client
+        uses: actions/cache@v4
+        with:
+          path: node_modules/.prisma
+          key: prisma-${{ hashFiles('prisma/schema.prisma') }}
+
+      - run: npm install
+
+      - name: Audit dependencies
+        run: npm audit --audit-level=high
+
+      - name: Type check
+        run: npm run tsc
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Validate Prisma migrations
+        run: npx prisma validate
+
+      - name: Run tests
+        run: npx vitest run
+
+      - name: Bundle size report
+        if: github.event_name == 'pull_request'
+        run: |
+          npx next build 2>&1 | tee /tmp/build-output.txt
+          echo '### Bundle Size Report' >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          sed -n '/Route/,/^$/p' /tmp/build-output.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+        env:
+          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY_DEV }}
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID_DEV }}
+          FIREBASE_AUTH_DOMAIN: ${{ secrets.FIREBASE_AUTH_DOMAIN_DEV }}
+          FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID_DEV }}
+          POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
+          POSTGRES_URL_NON_POOLING: ${{ secrets.POSTGRES_URL_NON_POOLING }}
+
+  deploy:
+    needs: checks
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
 
     env:
@@ -24,27 +79,21 @@ jobs:
           node-version: 22
           cache: npm
 
+      - name: Cache Prisma client
+        uses: actions/cache@v4
+        with:
+          path: node_modules/.prisma
+          key: prisma-${{ hashFiles('prisma/schema.prisma') }}
+
       - run: npm install
 
-      - name: Type check
-        run: npm run tsc
-
-      - name: Lint
-        run: npm run lint
-
-      - name: Run tests
-        run: npx vitest run
-
       - name: Install Vercel CLI
-        if: github.event_name == 'push'
         run: npm install -g vercel
 
       - name: Pull Vercel environment
-        if: github.event_name == 'push'
         run: vercel pull --yes --token=$VERCEL_TOKEN
 
       - name: Set Vercel env vars
-        if: github.event_name == 'push'
         run: |
           for VAR_NAME in POSTGRES_URL POSTGRES_URL_NON_POOLING; do
             VAR_VALUE="${!VAR_NAME}"
@@ -68,7 +117,6 @@ jobs:
           POSTGRES_URL_NON_POOLING: ${{ secrets.POSTGRES_URL_NON_POOLING }}
 
       - name: Build
-        if: github.event_name == 'push'
         run: vercel build ${{ github.ref == 'refs/heads/main' && '--prod' || '' }} --token=$VERCEL_TOKEN
         env:
           NEXT_PUBLIC_FIREBASE_API_KEY: ${{ github.ref == 'refs/heads/main' && secrets.NEXT_PUBLIC_FIREBASE_API_KEY_PROD || secrets.NEXT_PUBLIC_FIREBASE_API_KEY_DEV }}
@@ -79,5 +127,69 @@ jobs:
           POSTGRES_URL_NON_POOLING: ${{ secrets.POSTGRES_URL_NON_POOLING }}
 
       - name: Deploy
-        if: github.event_name == 'push'
-        run: vercel deploy --prebuilt ${{ github.ref == 'refs/heads/main' && '--prod' || '' }} --token=$VERCEL_TOKEN
+        id: deploy
+        run: |
+          URL=$(vercel deploy --prebuilt ${{ github.ref == 'refs/heads/main' && '--prod' || '' }} --token=$VERCEL_TOKEN)
+          echo "url=$URL" >> $GITHUB_OUTPUT
+
+  preview-comment:
+    needs: checks
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel
+
+      - name: Get preview URL
+        id: preview
+        run: |
+          URL=$(vercel ls --token=$VERCEL_TOKEN 2>/dev/null | grep -m1 "${{ github.head_ref }}" | awk '{print $2}' || echo "")
+          if [ -z "$URL" ]; then
+            vercel pull --yes --token=$VERCEL_TOKEN
+            vercel build --token=$VERCEL_TOKEN
+            URL=$(vercel deploy --prebuilt --token=$VERCEL_TOKEN)
+          fi
+          echo "url=$URL" >> $GITHUB_OUTPUT
+
+      - name: Comment preview URL on PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const url = '${{ steps.preview.outputs.url }}';
+            if (!url) return;
+            const body = `🔗 **Preview deployment:** ${url}`;
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const existing = comments.find(c => c.body.includes('Preview deployment:'));
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }
