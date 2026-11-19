@@ -49,7 +49,7 @@ export const useTrackReview = (reviewStep: number) => {
     const comparisonUserProfile = (profile: UserProfile | null) => {
         if (profile === null) return;
 
-        const { autoplay, curatedMode, isAnonymous, lastActiveAt, ...rest } = profile;
+        const { autoplay, curatedMode, isAnonymous, lastActiveAt, swipeMode, ...rest } = profile;
         return JSON.stringify(rest);
     };
 

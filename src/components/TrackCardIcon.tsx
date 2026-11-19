@@ -25,12 +25,12 @@ const TrackCardIcon = ({
             shadow="none"
             onClick={onClick}
             variant="ghost"
-            w="auto"
-            h="auto"
+            w={["84px", "100px", "112px"]}
+            h={["84px", "100px", "112px"]}
             colorPalette={colorPalette}
             aria-label={ariaLabel}
             fontSize={["44px", "56px", "64px"]}
-            bg="brand.surface"
+            bg="blackAlpha.400"
             border="1px solid"
             borderColor="brand.border"
             rounded="full"
@@ -52,7 +52,7 @@ const TrackCardIcon = ({
                     : {}
             }
         >
-            <Icon fontSize="inherit" />
+            <Icon fontSize="inherit" style={{ color: colorPalette === "red" ? "#f87171" : colorPalette === "green" ? "#4ade80" : undefined }} />
         </IconButton>
     );
 };
