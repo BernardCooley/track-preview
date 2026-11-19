@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Flex, IconButton, Text } from "@chakra-ui/react";
+import { Flex, IconButton, Text } from "@chakra-ui/react";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ShopIcon from "@mui/icons-material/Shop";
 import { Track } from "../../types";
@@ -37,20 +37,24 @@ const ReleaseHeader = ({
             bg="brand.surfaceRaised"
             flexWrap="wrap"
         >
-            <Button
-                variant="outline"
-                height="36px"
-                px={3}
-                fontSize="sm"
+            <IconButton
+                variant="tertiary"
+                bg="transparent"
+                shadow="none"
+                rounded="full"
+                size="sm"
+                fontSize="xl"
+                color="brand.textMuted"
+                _hover={{ color: "brand.textPrimary" }}
+                aria-label="Back to library"
                 onClick={() => {
                     updateReviewTracks(4, previousTracks, 0);
                     updatePreviousTracks([]);
                     updateCurrentReleaseTrack(null);
                 }}
             >
-                <ChevronLeftIcon style={{ fontSize: "18px" }} />
-                Library
-            </Button>
+                <ChevronLeftIcon fontSize="inherit" />
+            </IconButton>
             <Flex direction="column" gap={0.5} flex={1}>
                 <Flex gap={2} alignItems="baseline">
                     <Text fontSize="xs" color="brand.textMuted">
