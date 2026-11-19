@@ -40,6 +40,11 @@ jobs:
       - name: Build
         if: github.event_name == 'push'
         run: vercel build ${{ github.ref == 'refs/heads/main' && '--prod' || '' }} --token=$VERCEL_TOKEN
+        env:
+          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ github.ref == 'refs/heads/main' && secrets.NEXT_PUBLIC_FIREBASE_API_KEY_PROD || secrets.NEXT_PUBLIC_FIREBASE_API_KEY_DEV }}
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ github.ref == 'refs/heads/main' && secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID_PROD || secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID_DEV }}
+          FIREBASE_AUTH_DOMAIN: ${{ github.ref == 'refs/heads/main' && secrets.FIREBASE_AUTH_DOMAIN_PROD || secrets.FIREBASE_AUTH_DOMAIN_DEV }}
+          FIREBASE_APP_ID: ${{ github.ref == 'refs/heads/main' && secrets.FIREBASE_APP_ID_PROD || secrets.FIREBASE_APP_ID_DEV }}
 
       - name: Deploy
         if: github.event_name == 'push'
