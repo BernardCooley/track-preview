@@ -7,11 +7,14 @@ on:
     branches: [main, develop]
 
 jobs:
-  test:
+  test-and-deploy:
     runs-on: ubuntu-latest
 
     env:
       PUPPETEER_SKIP_DOWNLOAD: true
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
     steps:
       - uses: actions/checkout@v4
@@ -22,29 +25,22 @@ jobs:
           cache: npm
 
       - run: npm install
-      - run: npx vitest run
 
-  deploy:
-    needs: test
-    if: github.event_name == 'push'
-    runs-on: ubuntu-latest
-
-    env:
-      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-
-    steps:
-      - uses: actions/checkout@v4
+      - name: Run tests
+        run: npx vitest run
 
       - name: Install Vercel CLI
+        if: github.event_name == 'push'
         run: npm install -g vercel
 
       - name: Pull Vercel environment
+        if: github.event_name == 'push'
         run: vercel pull --yes --token=$VERCEL_TOKEN
 
       - name: Build
+        if: github.event_name == 'push'
         run: vercel build ${{ github.ref == 'refs/heads/main' && '--prod' || '' }} --token=$VERCEL_TOKEN
 
       - name: Deploy
+        if: github.event_name == 'push'
         run: vercel deploy --prebuilt ${{ github.ref == 'refs/heads/main' && '--prod' || '' }} --token=$VERCEL_TOKEN
