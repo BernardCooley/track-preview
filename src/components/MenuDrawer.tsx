@@ -159,7 +159,7 @@ const MenuDrawer = ({ isOpen, onClose }: Props) => {
                                     fontSize="xs"
                                     color="brand.textMuted"
                                 >
-                                    Review liked tracks twice before they reach your library
+                                    Review liked tracks twice before they reach your library. Turning off will move in-review tracks to your library
                                 </Text>
                             </Flex>
                             <Switch.Root

@@ -352,18 +352,19 @@ const TrackReviewCard = ({
                                             justifyContent="center"
                                             gap={1.5}
                                             border="1px solid"
-                                            borderColor="brand.border"
-                                            bg="blackAlpha.500"
+                                            borderColor="brand.primary"
+                                            bg="brand.primarySubtle"
                                             cursor="pointer"
                                             transition="all 0.2s ease"
                                             _hover={{
-                                                borderColor: "brand.primary",
-                                                bg: "brand.primarySubtle",
+                                                borderColor: "brand.border",
+                                                bg: "blackAlpha.500",
+                                                color: "whiteAlpha.900",
                                             }}
                                             _active={{
                                                 transform: "scale(0.95)",
                                             }}
-                                            color="whiteAlpha.900"
+                                            color="black"
                                         >
                                             <Text
                                                 fontSize="xs"
