@@ -21,7 +21,7 @@ export const useTrackReview = (reviewStep: number) => {
         "recentGenres",
         []
     );
-    const { user, userProfile, updateUserProfile, isAnonymous } = useAuthContext();
+    const { user, userProfile, updateUserProfile, isAnonymous, profileError } = useAuthContext();
     const [prevUserProfile, setPrevUserProfile] = useState<UserProfile | null>(
         userProfile
     );
@@ -420,5 +420,6 @@ export const useTrackReview = (reviewStep: number) => {
         trialLimitReached,
         trialLikeCount,
         isAnonymous,
+        profileError,
     };
 };

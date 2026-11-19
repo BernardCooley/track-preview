@@ -47,6 +47,8 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
                     updateUserProfile: vi.fn(),
                     isAnonymous: false,
                     setIsAnonymous: vi.fn(),
+                    profileError: false,
+                    setProfileError: vi.fn(),
                 }}
             >
                 <TrackContext.Provider value={defaultTrackContext as TrackContextProps}>

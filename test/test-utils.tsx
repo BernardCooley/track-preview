@@ -16,6 +16,8 @@ const defaultAuthContext = {
     updateUserProfile: vi.fn(),
     isAnonymous: false,
     setIsAnonymous: vi.fn(),
+    profileError: false,
+    setProfileError: vi.fn(),
 };
 
 const defaultTrackContext: TrackContextProps = {

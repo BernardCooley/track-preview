@@ -7,6 +7,8 @@ interface AuthContextProps {
     updateUser: (user: User | null) => void;
     userProfile: UserProfile | null;
     updateUserProfile: (userProfile: UserProfile | null) => void;
+    profileError: boolean;
+    setProfileError: (val: boolean) => void;
     isAnonymous: boolean;
     setIsAnonymous: (val: boolean) => void;
 }
@@ -29,6 +31,7 @@ export const AuthContextProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
     const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
     const [isAnonymous, setIsAnonymous] = useState<boolean>(false);
+    const [profileError, setProfileError] = useState<boolean>(false);
 
     const updateUser = (user: User | null) => {
         setUser(user);
@@ -45,6 +48,8 @@ export const AuthContextProvider = ({ children }: { children: ReactNode }) => {
                 updateUser,
                 userProfile,
                 updateUserProfile,
+                profileError,
+                setProfileError,
                 isAnonymous,
                 setIsAnonymous,
             }}

@@ -60,6 +60,7 @@ const TrackReview = memo(
             trialLimitReached,
             trialLikeCount,
             isAnonymous,
+            profileError,
         } = useTrackReview(reviewStep);
 
         const { updateChangesMade } = useTrackContext();
@@ -248,36 +249,38 @@ const TrackReview = memo(
                                         : <>We don&apos;t currently have any tracks matching your filters.<br />Try adjusting them or try again later.</>}
                                 </Text>
                             </VStack>
-                            <VStack gap={2} w="full">
-                                <Flex gap={2} w="full">
-                                    <Button
-                                        variant="subtle"
-                                        size="sm"
-                                        flex={1}
-                                        onClick={() => setShowYearSelector(true)}
-                                    >
-                                        Change years
-                                    </Button>
-                                    <Button
-                                        variant="subtle"
-                                        size="sm"
-                                        flex={1}
-                                        onClick={() => setShowGenreSelector(true)}
-                                    >
-                                        Change genre
-                                    </Button>
-                                </Flex>
-                                {hasActiveFilters && (
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        w="full"
-                                        onClick={resetFilters}
-                                    >
-                                        Reset all filters
-                                    </Button>
-                                )}
-                            </VStack>
+                            {!profileError && (
+                                <VStack gap={2} w="full">
+                                    <Flex gap={2} w="full">
+                                        <Button
+                                            variant="subtle"
+                                            size="sm"
+                                            flex={1}
+                                            onClick={() => setShowYearSelector(true)}
+                                        >
+                                            Change years
+                                        </Button>
+                                        <Button
+                                            variant="subtle"
+                                            size="sm"
+                                            flex={1}
+                                            onClick={() => setShowGenreSelector(true)}
+                                        >
+                                            Change genre
+                                        </Button>
+                                    </Flex>
+                                    {hasActiveFilters && (
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            w="full"
+                                            onClick={resetFilters}
+                                        >
+                                            Reset all filters
+                                        </Button>
+                                    )}
+                                </VStack>
+                            )}
                         </VStack>
                     </Center>
                 )}
@@ -305,7 +308,7 @@ const TrackReview = memo(
                     onCancel={() => setShowYearSelector(false)}
                 />
 
-                {reviewStep === 1 && !(noTracks && !loading) && (
+                {reviewStep === 1 && !(noTracks && !loading) && !profileError && (
                     <Box px={[4, 6]} py={3}>
                         {user?.uid && (
                             <FilterTags
