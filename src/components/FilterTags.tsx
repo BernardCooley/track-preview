@@ -1,4 +1,4 @@
-import { Flex, Spinner, Text } from "@chakra-ui/react";
+import { Flex, Text } from "@chakra-ui/react";
 import React from "react";
 import { getCurrentYear } from "../../utils";
 import { YearRange } from "../../types";
@@ -7,7 +7,6 @@ import { Button } from "@chakra-ui/react";
 interface Props {
     genres?: string[] | null;
     yearRange?: YearRange | null;
-    profileLoaded: boolean;
     onGenreClick?: () => void;
     onYearClick?: () => void;
     reviewStep: number;
@@ -34,7 +33,6 @@ function hasYearFilter(yearRange?: YearRange | null): boolean {
 const FilterTags = ({
     genres,
     yearRange,
-    profileLoaded,
     onGenreClick,
     onYearClick,
     reviewStep,
@@ -52,36 +50,28 @@ const FilterTags = ({
             <Button
                 variant={genreActive ? "subtle" : "surface"}
                 onClick={onGenreClick}
-                pointerEvents={profileLoaded ? "auto" : "none"}
                 minW="80px"
                 justifyContent="center"
             >
-                {genres ? (
-                    <Text userSelect="none" fontSize="sm">
-                        {getGenreLabel(genres)}
-                    </Text>
-                ) : (
-                    <Spinner color="brand.primary" size="xs" />
-                )}
+                <Text userSelect="none" fontSize="sm">
+                    {getGenreLabel(genres)}
+                </Text>
             </Button>
 
             <Button
                 variant={yearActive ? "subtle" : "surface"}
                 onClick={onYearClick}
-                pointerEvents={profileLoaded ? "auto" : "none"}
                 minW="70px"
                 justifyContent="center"
             >
-                {yearRange && profileLoaded ? (
-                    <Text userSelect="none" fontSize="sm">
-                        {yearRange.from === 1960 &&
-                        yearRange.to === getCurrentYear()
-                            ? "All years"
-                            : `${yearRange.from} - ${yearRange?.to}`}
-                    </Text>
-                ) : (
-                    <Spinner color="brand.primary" size="xs" />
-                )}
+                <Text userSelect="none" fontSize="sm">
+                    {yearRange && yearRange.from === 1960 &&
+                    yearRange.to === getCurrentYear()
+                        ? "All years"
+                        : yearRange
+                            ? `${yearRange.from} - ${yearRange.to}`
+                            : "All years"}
+                </Text>
             </Button>
         </Flex>
     );

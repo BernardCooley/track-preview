@@ -40,7 +40,6 @@ describe("TrackReviewCard", () => {
         setCurrentTrack: vi.fn(),
         onAutoPlayToggle: vi.fn(),
         preferredAutoPlay: false,
-        profileLoaded: true,
         autoplayLoading: false,
         noTracks: false,
         loading: false,

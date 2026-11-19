@@ -8,15 +8,14 @@ import FilterTags from "../FilterTags";
 
 describe("FilterTags", () => {
     const defaultProps = {
-        profileLoaded: true,
         reviewStep: 1,
         onGenreClick: vi.fn(),
         onYearClick: vi.fn(),
     };
 
-    it("shows a spinner when genres is null (still loading)", () => {
+    it("shows 'All genres' when genres is null", () => {
         render(<FilterTags {...defaultProps} genres={null} yearRange={{ from: 1960, to: 2026 }} />);
-        expect(screen.queryByText("All genres")).not.toBeInTheDocument();
+        expect(screen.getByText("All genres")).toBeInTheDocument();
     });
 
     it("shows 'All genres' when genres contains 'all'", () => {
