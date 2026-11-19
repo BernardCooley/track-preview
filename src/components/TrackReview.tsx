@@ -86,6 +86,7 @@ const TrackReview = memo(
         const [animationImage, setAnimationImage] = useState<string>("");
         const [animationStart, setAnimationStart] = useState<{ x: number; y: number } | null>(null);
         const [thumbnailRect, setThumbnailRect] = useState<DOMRect | null>(null);
+        const [swipeTint, setSwipeTint] = useState<"like" | "dislike" | null>(null);
         const { open: isShowingTracklist, onToggle: toggleTracklist } =
             useDisclosure();
         const animationDuration = 0.9;
@@ -109,6 +110,7 @@ const TrackReview = memo(
             if (animate) {
                 setTimeout(() => {
                     setAnimate(null);
+                    setSwipeTint(null);
                 }, 250 + animationDuration * 1000 + (animationDuration * 1000) / 2);
             }
         }, [animate]);
@@ -127,6 +129,18 @@ const TrackReview = memo(
                 />
             )}
             <Flex direction="column" position="relative" h="full" overflow="auto">
+                {swipeTint && (
+                    <Box
+                        position="absolute"
+                        inset={0}
+                        pointerEvents="none"
+                        zIndex={0}
+                        bg={swipeTint === "like"
+                            ? "rgba(16, 185, 129, 0.12)"
+                            : "rgba(239, 68, 68, 0.12)"
+                        }
+                    />
+                )}
                 {loading && !animate && !currentTrack && (
                     <Center position="absolute" inset={0} zIndex={150}>
                         <TrackTransition />
@@ -304,6 +318,7 @@ const TrackReview = memo(
                 >
                     {currentTrack && !previewLoading && !loading && (
                         <TrackReviewCard
+                            swipeMode={userProfile?.swipeMode ?? true}
                             noTracks={noTracks}
                             loading={loading}
                             reviewStep={reviewStep}
@@ -328,6 +343,7 @@ const TrackReview = memo(
                             currentTrack={currentTrack}
                             previewUrl={resolvedPreviewUrl}
                             onLikeOrDislike={async (val) => {
+                                setSwipeTint(val ? "like" : "dislike");
                                 const trackInfo = document.querySelector("[data-track-info]");
                                 if (trackInfo) {
                                     const rect = trackInfo.getBoundingClientRect();

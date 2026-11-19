@@ -17,6 +17,7 @@ model User {
   yearFrom   Int      @default(1960)
   yearTo      Int      @default(dbgenerated("extract(year from now())::int"))
   curatedMode  Boolean  @default(false)
+  swipeMode    Boolean  @default(true)
   isAnonymous  Boolean  @default(false)
   lastActiveAt DateTime @default(now())
   Review       Review[]

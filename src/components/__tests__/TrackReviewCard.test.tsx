@@ -47,6 +47,7 @@ describe("TrackReviewCard", () => {
         reviewStep: 1,
         toggleTracklist: vi.fn(),
         isShowingTracklist: false,
+        swipeMode: true,
     };
 
     beforeEach(() => {
@@ -73,8 +74,8 @@ describe("TrackReviewCard", () => {
         expect(screen.getByText("2023")).toBeInTheDocument();
     });
 
-    it("renders like and dislike buttons", () => {
-        render(<TrackReviewCard {...defaultProps} />);
+    it("renders like and dislike buttons in button mode", () => {
+        render(<TrackReviewCard {...defaultProps} swipeMode={false} />);
         expect(screen.getByLabelText("like button")).toBeInTheDocument();
         expect(screen.getByLabelText("dislike button")).toBeInTheDocument();
     });
@@ -82,7 +83,7 @@ describe("TrackReviewCard", () => {
     it("calls onLikeOrDislike(true) when like button clicked", async () => {
         const onLikeOrDislike = vi.fn(() => Promise.resolve());
         const user = userEvent.setup();
-        render(<TrackReviewCard {...defaultProps} onLikeOrDislike={onLikeOrDislike} />);
+        render(<TrackReviewCard {...defaultProps} swipeMode={false} onLikeOrDislike={onLikeOrDislike} />);
 
         await user.click(screen.getByLabelText("like button"));
         expect(onLikeOrDislike).toHaveBeenCalledWith(true);
@@ -91,7 +92,7 @@ describe("TrackReviewCard", () => {
     it("calls onLikeOrDislike(false) when dislike button clicked", async () => {
         const onLikeOrDislike = vi.fn(() => Promise.resolve());
         const user = userEvent.setup();
-        render(<TrackReviewCard {...defaultProps} onLikeOrDislike={onLikeOrDislike} />);
+        render(<TrackReviewCard {...defaultProps} swipeMode={false} onLikeOrDislike={onLikeOrDislike} />);
 
         await user.click(screen.getByLabelText("dislike button"));
         expect(onLikeOrDislike).toHaveBeenCalledWith(false);

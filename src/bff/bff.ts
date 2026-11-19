@@ -200,6 +200,7 @@ interface UpdateUserAutoplayProps {
     autoplay?: boolean;
     curatedMode?: boolean;
     isAnonymous?: boolean;
+    swipeMode?: boolean;
     genres?: string[];
     yearFrom?: number;
     yearTo?: number;
@@ -210,6 +211,7 @@ export const mutateUserProfile = async ({
     autoplay,
     curatedMode,
     isAnonymous,
+    swipeMode,
     genres,
     yearFrom,
     yearTo,
@@ -223,6 +225,7 @@ export const mutateUserProfile = async ({
                 autoplay,
                 curatedMode,
                 isAnonymous,
+                swipeMode,
                 genres,
                 yearFrom,
                 yearTo,
