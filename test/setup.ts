@@ -1,4 +1,10 @@
 import "@testing-library/jest-dom/vitest";
+
+globalThis.ResizeObserver = class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+};
 import { cleanup } from "@testing-library/react";
 import { afterEach, afterAll, beforeAll } from "vitest";
 import { server } from "./mocks/server";
