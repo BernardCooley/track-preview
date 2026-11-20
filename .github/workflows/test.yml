@@ -81,7 +81,7 @@ jobs:
       - name: Set Vercel env vars
         if: github.event_name == 'push'
         run: |
-          for VAR_NAME in POSTGRES_URL POSTGRES_URL_NON_POOLING; do
+          for VAR_NAME in POSTGRES_URL POSTGRES_URL_NON_POOLING DISCORD_WEBHOOK_URL CRON_SECRET; do
             VAR_VALUE="${!VAR_NAME}"
             for TARGET in preview production; do
               EXISTING=$(curl -s -H "Authorization: Bearer $VERCEL_TOKEN" \
@@ -101,6 +101,8 @@ jobs:
         env:
           POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
           POSTGRES_URL_NON_POOLING: ${{ secrets.POSTGRES_URL_NON_POOLING }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
 
       - name: Build
         if: github.event_name == 'push'
