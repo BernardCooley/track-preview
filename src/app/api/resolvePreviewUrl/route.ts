@@ -1,7 +1,6 @@
 import prisma from "@/lib/prisma";
+import { deezer } from "@/lib/deezer";
 import { NextResponse } from "next/server";
-
-const DeezerPublicApi = require("deezer-public-api");
 
 function toProxyUrl(url: string): string {
     if (!url) return "";
@@ -23,7 +22,6 @@ export async function POST(req: Request) {
             );
         }
 
-        const deezer = new DeezerPublicApi();
         let freshUrl = "";
         let discoveredDeezerTrackId = track.deezerTrackId;
 
