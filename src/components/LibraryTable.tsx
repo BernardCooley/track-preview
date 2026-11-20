@@ -431,6 +431,8 @@ const LibraryTable = ({
                         w={7}
                         fontSize="xs"
                         aria-label="Filter bought tracks"
+                        borderLeft={hideBought ? "2px solid" : "2px solid transparent"}
+                        borderLeftColor={hideBought ? "brand.primary" : "transparent"}
                         color={hideBought ? "brand.primary" : undefined}
                     >
                         <RemoveShoppingCartIcon style={{ fontSize: "14px" }} />
