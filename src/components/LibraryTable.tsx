@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import {
     Box,
     Button,
+    Center,
     Flex,
     IconButton,
     Image,
@@ -430,6 +431,8 @@ const LibraryTable = ({
                         w={7}
                         fontSize="xs"
                         aria-label="Filter bought tracks"
+                        borderLeft={hideBought ? "2px solid" : "2px solid transparent"}
+                        borderLeftColor={hideBought ? "brand.primary" : "transparent"}
                         color={hideBought ? "brand.primary" : undefined}
                     >
                         <RemoveShoppingCartIcon style={{ fontSize: "14px" }} />
@@ -524,6 +527,14 @@ const LibraryTable = ({
                     </Menu.Root>
                     </Flex>
                 </Flex>
+            )}
+
+            {filteredTracks.length === 0 && hideBought && reviewTracks[4].tracks.length > 0 && (
+                <Center py={12}>
+                    <Text fontSize="sm" color="brand.textMuted">
+                        All tracks have been bought
+                    </Text>
+                </Center>
             )}
 
             {/* Desktop table */}

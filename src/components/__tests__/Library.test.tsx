@@ -17,6 +17,8 @@ vi.mock("@/hooks/useTrackList", () => ({
 import { useTrackList } from "@/hooks/useTrackList";
 const mockUseTrackList = vi.mocked(useTrackList);
 
+const mockToggleTrackPurchased = vi.fn();
+
 const baseHookReturn = {
     user: { uid: "user-1", email: "test@test.com" },
     currentlyPlaying: undefined,
@@ -63,6 +65,7 @@ const baseHookReturn = {
     addingTrackId: null,
     libraryTrackIds: new Set<string>(),
     setLibraryTrackIds: mockSetLibraryTrackIds,
+    toggleTrackPurchased: mockToggleTrackPurchased,
 };
 
 describe("Library", () => {
@@ -219,6 +222,174 @@ describe("Library", () => {
 
             await user.click(screen.getByRole("button", { name: /buy release/i }));
             expect(onBuyModalOpen).toHaveBeenCalled();
+        });
+    });
+
+    describe("purchased features", () => {
+        afterEach(() => {
+            mockSearchParams.delete("hideBought");
+        });
+
+        it("shows 'Mark as bought' in track options menu", async () => {
+            const user = userEvent.setup();
+            render(<Library />);
+
+            const menuButtons = screen.getAllByRole("button", { name: "" });
+            const optionsButton = menuButtons.find(
+                (btn) => btn.querySelector("[data-testid='MoreHorizIcon']")
+            );
+            if (optionsButton) {
+                await user.click(optionsButton);
+                expect(screen.getByText("Mark as bought")).toBeInTheDocument();
+            }
+        });
+
+        it("shows 'Mark as not bought' for purchased tracks", async () => {
+            const purchasedTrack = { ...mockTrack, purchased: true };
+            mockUseTrackList.mockReturnValue({
+                ...baseHookReturn,
+                reviewTracks: {
+                    ...baseHookReturn.reviewTracks,
+                    4: { tracks: [purchasedTrack, mockTrack2], currentTrack: 0 },
+                },
+            } as any);
+
+            const user = userEvent.setup();
+            render(<Library />);
+
+            const menuButtons = screen.getAllByRole("button", { name: "" });
+            const optionsButton = menuButtons.find(
+                (btn) => btn.querySelector("[data-testid='MoreHorizIcon']")
+            );
+            if (optionsButton) {
+                await user.click(optionsButton);
+                expect(screen.getByText("Mark as not bought")).toBeInTheDocument();
+            }
+        });
+
+        it("renders check badge on purchased track buy button", () => {
+            const purchasedTrack = { ...mockTrack, purchased: true };
+            mockUseTrackList.mockReturnValue({
+                ...baseHookReturn,
+                reviewTracks: {
+                    ...baseHookReturn.reviewTracks,
+                    4: { tracks: [purchasedTrack, mockTrack2], currentTrack: 0 },
+                },
+            } as any);
+
+            render(<Library />);
+
+            const boughtButtons = screen.getAllByRole("button", { name: "bought" });
+            expect(boughtButtons.length).toBeGreaterThan(0);
+        });
+
+        it("renders normal buy button for non-purchased tracks", () => {
+            render(<Library />);
+
+            const buyButtons = screen.getAllByRole("button", { name: "buy track" });
+            expect(buyButtons.length).toBeGreaterThan(0);
+            expect(screen.queryByRole("button", { name: "bought" })).not.toBeInTheDocument();
+        });
+
+        it("renders hide bought filter button", () => {
+            render(<Library />);
+
+            expect(screen.getByRole("button", { name: "Filter bought tracks" })).toBeInTheDocument();
+        });
+
+        it("hides purchased tracks when hideBought filter is active", () => {
+            mockSearchParams.set("hideBought", "true");
+
+            const purchasedTrack = { ...mockTrack, purchased: true };
+            mockUseTrackList.mockReturnValue({
+                ...baseHookReturn,
+                reviewTracks: {
+                    ...baseHookReturn.reviewTracks,
+                    4: { tracks: [purchasedTrack, mockTrack2], currentTrack: 0 },
+                },
+            } as any);
+
+            render(<Library />);
+
+            expect(screen.queryByText("Test Track")).not.toBeInTheDocument();
+            expect(screen.getAllByText("Another Track").length).toBeGreaterThan(0);
+        });
+
+        it("shows all tracks when hideBought filter is not active", () => {
+            const purchasedTrack = { ...mockTrack, purchased: true };
+            mockUseTrackList.mockReturnValue({
+                ...baseHookReturn,
+                reviewTracks: {
+                    ...baseHookReturn.reviewTracks,
+                    4: { tracks: [purchasedTrack, mockTrack2], currentTrack: 0 },
+                },
+            } as any);
+
+            render(<Library />);
+
+            expect(screen.getAllByText("Test Track").length).toBeGreaterThan(0);
+            expect(screen.getAllByText("Another Track").length).toBeGreaterThan(0);
+        });
+
+        it("shows empty state message when all tracks are bought and filter is active", () => {
+            mockSearchParams.set("hideBought", "true");
+
+            const purchasedTrack1 = { ...mockTrack, purchased: true };
+            const purchasedTrack2 = { ...mockTrack2, purchased: true };
+            mockUseTrackList.mockReturnValue({
+                ...baseHookReturn,
+                reviewTracks: {
+                    ...baseHookReturn.reviewTracks,
+                    4: { tracks: [purchasedTrack1, purchasedTrack2], currentTrack: 0 },
+                },
+            } as any);
+
+            render(<Library />);
+
+            expect(screen.getByText("All tracks have been bought")).toBeInTheDocument();
+        });
+
+        it("does not show empty state when filter is off even if all tracks are purchased", () => {
+            const purchasedTrack1 = { ...mockTrack, purchased: true };
+            const purchasedTrack2 = { ...mockTrack2, purchased: true };
+            mockUseTrackList.mockReturnValue({
+                ...baseHookReturn,
+                reviewTracks: {
+                    ...baseHookReturn.reviewTracks,
+                    4: { tracks: [purchasedTrack1, purchasedTrack2], currentTrack: 0 },
+                },
+            } as any);
+
+            render(<Library />);
+
+            expect(screen.queryByText("All tracks have been bought")).not.toBeInTheDocument();
+        });
+
+        it("reads hideBought filter from URL params", () => {
+            mockSearchParams.set("hideBought", "true");
+
+            const purchasedTrack = { ...mockTrack, purchased: true };
+            mockUseTrackList.mockReturnValue({
+                ...baseHookReturn,
+                reviewTracks: {
+                    ...baseHookReturn.reviewTracks,
+                    4: { tracks: [purchasedTrack, mockTrack2], currentTrack: 0 },
+                },
+            } as any);
+
+            render(<Library />);
+
+            expect(screen.queryByText("Test Track")).not.toBeInTheDocument();
+        });
+
+        it("includes purchased in sort options", async () => {
+            const user = userEvent.setup();
+            render(<Library />);
+
+            const sortButton = screen.getByRole("button", { name: "Sort" });
+            await user.click(sortButton);
+
+            expect(screen.getByText("Bought")).toBeInTheDocument();
         });
     });
 });
