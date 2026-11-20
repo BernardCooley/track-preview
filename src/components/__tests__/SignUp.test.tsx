@@ -5,14 +5,25 @@ import "../../../test/mocks/firebase";
 import "../../../test/mocks/navigation";
 import { render } from "../../../test/test-utils";
 import SignUp from "../SignUp";
-import { RegisterUser, SendVerificationEmail } from "../../../firebase/utils";
+import { RegisterUser } from "../../../firebase/utils";
+import { sendVerificationEmail, createUser } from "@/bff/bff";
 import { auth } from "../../../firebase/firebaseInit";
 import type { UserCredential, User as FirebaseUser } from "firebase/auth";
 import { http, HttpResponse } from "msw";
 import { server } from "../../../test/mocks/server";
 
+vi.mock("@/bff/bff", async () => {
+    const actual = await vi.importActual<Record<string, unknown>>("@/bff/bff");
+    return {
+        ...actual,
+        sendVerificationEmail: vi.fn(() => Promise.resolve()),
+        createUser: vi.fn(() => Promise.resolve({ userId: "new-user-123" })),
+    };
+});
+
 const mockRegisterUser = vi.mocked(RegisterUser);
-const mockSendVerificationEmail = vi.mocked(SendVerificationEmail);
+const mockSendVerificationEmail = vi.mocked(sendVerificationEmail);
+const mockCreateUser = vi.mocked(createUser);
 
 const makeCredential = (overrides: Partial<FirebaseUser> = {}): UserCredential => {
     const mockUser = {
@@ -106,7 +117,7 @@ describe("SignUp", () => {
         await fillAndSubmitForm(user);
 
         await waitFor(() => {
-            expect(mockSendVerificationEmail).toHaveBeenCalledWith(cred.user);
+            expect(mockSendVerificationEmail).toHaveBeenCalledWith("new@example.com");
         });
     });
 
@@ -139,12 +150,7 @@ describe("SignUp", () => {
     it("cleans up Firebase user when Postgres createUser fails", async () => {
         const cred = makeCredential();
         mockRegisterUser.mockResolvedValue(cred);
-
-        server.use(
-            http.post("/api/createUser", () => {
-                return HttpResponse.json({ error: "DB error" }, { status: 400 });
-            })
-        );
+        mockCreateUser.mockRejectedValueOnce(new Error("DB error"));
 
         const user = userEvent.setup();
         render(<SignUp />);
