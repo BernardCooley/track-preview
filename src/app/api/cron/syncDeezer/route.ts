@@ -1,10 +1,9 @@
 import prisma from "@/lib/prisma";
 import { notifyDiscord } from "@/lib/notifyDiscord";
+import { deezer } from "@/lib/deezer";
 import { NextResponse } from "next/server";
 import { genres } from "../../../../../data/genres";
 import { deezerGenreMap, appGenreToDeezerIds } from "../../../../../data/deezerGenreMap";
-
-const DeezerPublicApi = require("deezer-public-api");
 
 const GENRES_PER_RUN = 20;
 
@@ -126,7 +125,6 @@ export async function GET(req: Request) {
     const syncAll = searchParams.get("all") === "true";
 
     try {
-        const deezer = new DeezerPublicApi();
         const allTracks: any[] = [];
 
         const chartResponse = await deezer.chart.tracks(100);

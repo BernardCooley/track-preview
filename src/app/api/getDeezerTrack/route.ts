@@ -1,12 +1,11 @@
 import { NextResponse } from "next/server";
+import { deezer } from "@/lib/deezer";
 import { SearchedTrack } from "../../../../types";
-const DeezerPublicApi = require("deezer-public-api");
 
 export async function POST(req: Request) {
     const { trackToSearch, releaseYear } = await req.json();
 
     try {
-        const deezer = new DeezerPublicApi();
         const tracks = await deezer.search.track(trackToSearch);
 
         if (tracks?.data.length > 0) {
