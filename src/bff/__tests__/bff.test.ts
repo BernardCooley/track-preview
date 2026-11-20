@@ -10,6 +10,7 @@ import {
     updateTrackReviewStep,
     resolvePreviewUrl,
     getTrialLikeCount,
+    togglePurchased,
     handleFetchErrors,
     GoneError,
     NotFoundError,
@@ -185,5 +186,56 @@ describe("getTrialLikeCount", () => {
 
         const result = await getTrialLikeCount({ userId: "user-1" });
         expect(result).toBe(0);
+    });
+});
+
+describe("togglePurchased", () => {
+    it("sends trackId, userId and purchased flag", async () => {
+        let apiBody: any = null;
+        server.use(
+            http.post("/api/togglePurchased", async ({ request }) => {
+                apiBody = await request.json();
+                return HttpResponse.json({ success: true });
+            })
+        );
+
+        const result = await togglePurchased({
+            trackId: "track-1",
+            userId: "user-1",
+            purchased: true,
+        });
+
+        expect(apiBody).toEqual({ trackId: "track-1", userId: "user-1", purchased: true });
+        expect(result).toEqual({ success: true });
+    });
+
+    it("sends purchased false to unmark", async () => {
+        let apiBody: any = null;
+        server.use(
+            http.post("/api/togglePurchased", async ({ request }) => {
+                apiBody = await request.json();
+                return HttpResponse.json({ success: true });
+            })
+        );
+
+        await togglePurchased({
+            trackId: "track-1",
+            userId: "user-1",
+            purchased: false,
+        });
+
+        expect(apiBody).toEqual({ trackId: "track-1", userId: "user-1", purchased: false });
+    });
+
+    it("throws on server error", async () => {
+        server.use(
+            http.post("/api/togglePurchased", () => {
+                return HttpResponse.json({ error: "Failed" }, { status: 404 });
+            })
+        );
+
+        await expect(
+            togglePurchased({ trackId: "track-1", userId: "user-1", purchased: true })
+        ).rejects.toThrow();
     });
 });

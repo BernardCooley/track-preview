@@ -287,4 +287,171 @@ describe("useTrackList", () => {
             expect(result.current.libraryTrackIds.has("track-1")).toBe(false);
         });
     });
+
+    describe("toggleTrackPurchased", () => {
+        it("optimistically updates track to purchased and calls API", async () => {
+            let apiBody: any = null;
+            server.use(
+                http.post("/api/togglePurchased", async ({ request }) => {
+                    apiBody = await request.json();
+                    return HttpResponse.json({ success: true });
+                })
+            );
+
+            const { result } = renderHook(() => useTrackList(), { wrapper });
+
+            await act(async () => {
+                await result.current.toggleTrackPurchased(0);
+            });
+
+            await waitFor(() => {
+                expect(apiBody).toEqual({
+                    trackId: "track-1",
+                    userId: "user-1",
+                    purchased: true,
+                });
+                expect(mockUpdateReviewTracks).toHaveBeenCalledWith(
+                    4,
+                    expect.arrayContaining([
+                        expect.objectContaining({ id: "track-1", purchased: true }),
+                    ]),
+                    0
+                );
+            });
+        });
+
+        it("toggles purchased back to false for already purchased track", async () => {
+            const purchasedTrack = { ...mockTrack, purchased: true };
+            const customTrackContext = {
+                ...defaultTrackContext,
+                reviewTracks: {
+                    ...defaultTrackContext.reviewTracks,
+                    4: { tracks: [purchasedTrack, mockTrack2, mockTrack3], currentTrack: 0 },
+                },
+            };
+
+            const customWrapper = ({ children }: { children: React.ReactNode }) => (
+                <ChakraProvider value={system}>
+                    <Theme appearance="light">
+                        <AuthContext.Provider
+                            value={{
+                                user: { uid: "user-1", email: "test@test.com" },
+                                updateUser: vi.fn(),
+                                userProfile: null,
+                                updateUserProfile: vi.fn(),
+                                isAnonymous: false,
+                                setIsAnonymous: vi.fn(),
+                                profileError: false,
+                                setProfileError: vi.fn(),
+                            }}
+                        >
+                            <TrackContext.Provider value={customTrackContext as TrackContextProps}>
+                                {children}
+                            </TrackContext.Provider>
+                        </AuthContext.Provider>
+                    </Theme>
+                </ChakraProvider>
+            );
+
+            let apiBody: any = null;
+            server.use(
+                http.post("/api/togglePurchased", async ({ request }) => {
+                    apiBody = await request.json();
+                    return HttpResponse.json({ success: true });
+                })
+            );
+
+            const { result } = renderHook(() => useTrackList(), { wrapper: customWrapper });
+
+            await act(async () => {
+                await result.current.toggleTrackPurchased(0);
+            });
+
+            await waitFor(() => {
+                expect(apiBody).toEqual({
+                    trackId: "track-1",
+                    userId: "user-1",
+                    purchased: false,
+                });
+            });
+        });
+
+        it("only updates the targeted track, leaving others unchanged", async () => {
+            server.use(
+                http.post("/api/togglePurchased", () => {
+                    return HttpResponse.json({ success: true });
+                })
+            );
+
+            const { result } = renderHook(() => useTrackList(), { wrapper });
+
+            await act(async () => {
+                await result.current.toggleTrackPurchased(1);
+            });
+
+            await waitFor(() => {
+                const call = mockUpdateReviewTracks.mock.calls[0];
+                const updatedTracks = call[1];
+                expect(updatedTracks[0].id).toBe("track-1");
+                expect(updatedTracks[0].purchased).toBeFalsy();
+                expect(updatedTracks[1]).toEqual(expect.objectContaining({ id: "track-2", purchased: true }));
+                expect(updatedTracks[2].id).toBe("track-3");
+                expect(updatedTracks[2].purchased).toBeFalsy();
+            });
+        });
+
+        it("reverts on API failure", async () => {
+            server.use(
+                http.post("/api/togglePurchased", () => {
+                    return HttpResponse.error();
+                })
+            );
+
+            const { result } = renderHook(() => useTrackList(), { wrapper });
+
+            await act(async () => {
+                await result.current.toggleTrackPurchased(0);
+            });
+
+            await waitFor(() => {
+                expect(mockUpdateReviewTracks).toHaveBeenCalledTimes(2);
+                const revertCall = mockUpdateReviewTracks.mock.calls[1];
+                const revertedTracks = revertCall[1];
+                expect(revertedTracks[0]).toEqual(expect.objectContaining({ id: "track-1", purchased: false }));
+            });
+        });
+
+        it("does nothing when user is not logged in", async () => {
+            const noUserWrapper = ({ children }: { children: React.ReactNode }) => (
+                <ChakraProvider value={system}>
+                    <Theme appearance="light">
+                        <AuthContext.Provider
+                            value={{
+                                user: null,
+                                updateUser: vi.fn(),
+                                userProfile: null,
+                                updateUserProfile: vi.fn(),
+                                isAnonymous: false,
+                                setIsAnonymous: vi.fn(),
+                                profileError: false,
+                                setProfileError: vi.fn(),
+                            }}
+                        >
+                            <TrackContext.Provider value={defaultTrackContext as TrackContextProps}>
+                                {children}
+                            </TrackContext.Provider>
+                        </AuthContext.Provider>
+                    </Theme>
+                </ChakraProvider>
+            );
+
+            const { result } = renderHook(() => useTrackList(), { wrapper: noUserWrapper });
+
+            await act(async () => {
+                await result.current.toggleTrackPurchased(0);
+            });
+
+            expect(mockUpdateReviewTracks).not.toHaveBeenCalled();
+        });
+    });
 });

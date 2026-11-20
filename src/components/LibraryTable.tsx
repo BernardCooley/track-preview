@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import {
     Box,
     Button,
+    Center,
     Flex,
     IconButton,
     Image,
@@ -524,6 +525,14 @@ const LibraryTable = ({
                     </Menu.Root>
                     </Flex>
                 </Flex>
+            )}
+
+            {filteredTracks.length === 0 && hideBought && reviewTracks[4].tracks.length > 0 && (
+                <Center py={12}>
+                    <Text fontSize="sm" color="brand.textMuted">
+                        All tracks have been bought
+                    </Text>
+                </Center>
             )}
 
             {/* Desktop table */}

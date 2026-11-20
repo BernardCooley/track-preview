@@ -73,6 +73,10 @@ export const handlers = [
         return HttpResponse.json(null);
     }),
 
+    http.post("/api/togglePurchased", () => {
+        return HttpResponse.json({ success: true });
+    }),
+
     http.get("/api/getSpotifyAccessToken", () => {
         return HttpResponse.json({ access_token: "mock-token", expires_in: 3600, token_type: "Bearer" });
     }),
