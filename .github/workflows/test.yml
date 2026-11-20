@@ -116,3 +116,11 @@ jobs:
       - name: Deploy
         if: github.event_name == 'push'
         run: vercel deploy --prebuilt ${{ github.ref == 'refs/heads/main' && '--prod' || '' }} --token=$VERCEL_TOKEN
+
+      - name: Merge main into develop
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && success()
+        run: |
+          git fetch origin develop
+          git checkout develop
+          git merge origin/main --no-edit
+          git push origin develop
