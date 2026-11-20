@@ -3,7 +3,7 @@ import { useDisclosure } from "@chakra-ui/react";
 import { toaster } from "@/components/toaster";
 import { Track } from "../../types";
 import { useTrackContext } from "../../context/TrackContext";
-import { fetchRelease, fetchTracks, updateTrackReviewStep, sendToLibrary } from "@/bff/bff";
+import { fetchRelease, fetchTracks, updateTrackReviewStep, sendToLibrary, togglePurchased as togglePurchasedApi } from "@/bff/bff";
 import { useAuthContext } from "../../Contexts/AuthContext";
 
 export const useTrackList = () => {
@@ -126,6 +126,26 @@ export const useTrackList = () => {
         }
     };
 
+    const toggleTrackPurchased = async (trackIndex: number) => {
+        if (!user?.uid) return;
+        const track = reviewTracks[4].tracks[trackIndex];
+        if (!track) return;
+        const newPurchased = !track.purchased;
+        const updatedTracks = reviewTracks[4].tracks.map((t, i) =>
+            i === trackIndex ? { ...t, purchased: newPurchased } : t
+        );
+        updateReviewTracks(4, updatedTracks, reviewTracks[4].currentTrack);
+        try {
+            await togglePurchasedApi({ trackId: track.id, userId: user.uid, purchased: newPurchased });
+        } catch {
+            const revertedTracks = reviewTracks[4].tracks.map((t, i) =>
+                i === trackIndex ? { ...t, purchased: !newPurchased } : t
+            );
+            updateReviewTracks(4, revertedTracks, reviewTracks[4].currentTrack);
+            showToast({ type: "error", title: "Failed to update track" });
+        }
+    };
+
     const closeDialog = () => {
         onClose();
         setTrackToDelete(null);
@@ -146,6 +166,7 @@ export const useTrackList = () => {
         addingTrackId,
         libraryTrackIds,
         setLibraryTrackIds,
+        toggleTrackPurchased,
         user,
         currentlyPlaying,
         updateCurrentlyPlaying,

@@ -46,6 +46,7 @@ const Library = () => {
         addingTrackId,
         libraryTrackIds,
         setLibraryTrackIds,
+        toggleTrackPurchased,
     } = useTrackList();
 
     const { releaseTrackId, setReleaseTrackId } = useLibraryParams();
@@ -182,6 +183,7 @@ const Library = () => {
                     addTrackToLibrary={addTrackToLibrary}
                     addingTrackId={addingTrackId}
                     libraryTrackIds={libraryTrackIds}
+                    toggleTrackPurchased={toggleTrackPurchased}
                     playAllRequested={playAllRequested}
                     onPlayAllStarted={() => setPlayAllRequested(false)}
                 />

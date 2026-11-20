@@ -17,6 +17,7 @@ import SwapVertIcon from "@mui/icons-material/SwapVert";
 import ShopIcon from "@mui/icons-material/Shop";
 import LibraryAddIcon from "@mui/icons-material/LibraryAdd";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import RemoveShoppingCartIcon from "@mui/icons-material/RemoveShoppingCart";
 import TrackMenuOptions from "./TrackOptionsMenu";
 import { getFormattedDate } from "../../utils";
 import { resolvePreviewUrl } from "@/bff/bff";
@@ -44,6 +45,7 @@ interface Props {
     addTrackToLibrary: (track: Track) => Promise<void>;
     addingTrackId: string | null;
     libraryTrackIds: Set<string>;
+    toggleTrackPurchased: (index: number) => void;
     playAllRequested?: boolean;
     onPlayAllStarted?: () => void;
 }
@@ -62,13 +64,14 @@ const LibraryTable = ({
     addTrackToLibrary,
     addingTrackId,
     libraryTrackIds,
+    toggleTrackPurchased,
     playAllRequested,
     onPlayAllStarted,
 }: Props) => {
     const { onTrackEndedRef, onSkipRef, onPreviousRef, playingPositionRef, setTrackLoading, setPlayingTrack } = useTrackContext();
     const {
-        selectedGenres, activeSortField, activeSortDirection,
-        setSelectedGenres, setSort, setReleaseTrackId,
+        selectedGenres, activeSortField, activeSortDirection, hideBought,
+        setSelectedGenres, setSort, setReleaseTrackId, setHideBought,
     } = useLibraryParams();
     const playingIndexRef = useRef<number | null>(null);
     const blobCache = useRef<Map<string, string>>(new Map());
@@ -90,6 +93,9 @@ const LibraryTable = ({
         if (hasGenreFilter) {
             tracks = tracks.filter((t) => selectedGenres.includes(t.genre));
         }
+        if (hideBought) {
+            tracks = tracks.filter((t) => !t.purchased);
+        }
         if (activeSortField) {
             tracks = [...tracks].sort((a, b) => {
                 const aVal = a[activeSortField] ?? "";
@@ -100,7 +106,7 @@ const LibraryTable = ({
             });
         }
         return tracks;
-    }, [reviewTracks[4].tracks, selectedGenres, hasGenreFilter, activeSortField, activeSortDirection]);
+    }, [reviewTracks[4].tracks, selectedGenres, hasGenreFilter, hideBought, activeSortField, activeSortDirection]);
 
     const genreLabel = hasGenreFilter
         ? selectedGenres.length === 1
@@ -286,14 +292,35 @@ const LibraryTable = ({
                     onClick={() => setTrackToBuy(origIndex)}
                     rounded="full"
                     variant="tertiary"
-                    aria-label="buy track"
+                    aria-label={track.purchased ? "bought" : "buy track"}
                     size="sm"
+                    cursor="pointer"
+                    position="relative"
                 >
                     <ShopIcon fontSize="inherit" />
+                    {track.purchased && (
+                        <Box
+                            position="absolute"
+                            bottom={0}
+                            right={0}
+                            bg="brand.primary"
+                            color="white"
+                            rounded="full"
+                            w={3.5}
+                            h={3.5}
+                            display="flex"
+                            alignItems="center"
+                            justifyContent="center"
+                        >
+                            <CheckCircleIcon style={{ fontSize: "10px" }} />
+                        </Box>
+                    )}
                 </IconButton>
                 <TrackMenuOptions
                     onTrackDelete={() => setTrackToDelete(origIndex)}
                     onViewRelease={() => gotToRelease(origIndex)}
+                    onTogglePurchased={() => toggleTrackPurchased(origIndex)}
+                    purchased={track.purchased}
                     index={origIndex}
                 />
             </Flex>
@@ -394,6 +421,20 @@ const LibraryTable = ({
                         {genreLabel}
                     </Button>
 
+                    <Button
+                        variant="surface"
+                        onClick={() => setHideBought(!hideBought)}
+                        size="xs"
+                        h={7}
+                        px={0}
+                        w={7}
+                        fontSize="xs"
+                        aria-label="Filter bought tracks"
+                        color={hideBought ? "brand.primary" : undefined}
+                    >
+                        <RemoveShoppingCartIcon style={{ fontSize: "14px" }} />
+                    </Button>
+
                     <Menu.Root>
                         <Menu.Trigger asChild>
                             <Button
@@ -408,7 +449,7 @@ const LibraryTable = ({
                                 <SwapVertIcon style={{ fontSize: "16px" }} />
                                 {activeSortField && (
                                     <Text textTransform="capitalize">
-                                        {activeSortField} ({activeSortDirection === "asc" ? "A-Z" : "Z-A"})
+                                        {activeSortField === "purchased" ? "Bought" : activeSortField} ({activeSortDirection === "asc" ? "A-Z" : "Z-A"})
                                     </Text>
                                 )}
                             </Button>
@@ -424,7 +465,7 @@ const LibraryTable = ({
                                 rounded="lg"
                                 minW="140px"
                             >
-                                {(["title", "artist", "genre"] as TrackKeys[]).map((field) => {
+                                {(["title", "artist", "genre", "purchased"] as TrackKeys[]).map((field) => {
                                     const isActive = activeSortField === field;
                                     return (
                                         <Menu.Item
@@ -444,7 +485,7 @@ const LibraryTable = ({
                                             onClick={() => handleSortButton(field)}
                                         >
                                             <Flex alignItems="center" justifyContent="space-between" w="full">
-                                                <Text textTransform="capitalize">{field}</Text>
+                                                <Text textTransform="capitalize">{field === "purchased" ? "Bought" : field}</Text>
                                                 {isActive && (
                                                     <Box
                                                         transform={activeSortDirection === "asc" ? "" : "rotate(180deg)"}

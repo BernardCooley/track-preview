@@ -6,7 +6,7 @@ import { SortDirection, Track } from "../../types";
 
 type TrackKeys = keyof Track;
 
-const VALID_SORT_FIELDS: TrackKeys[] = ["title", "artist", "genre"];
+const VALID_SORT_FIELDS: TrackKeys[] = ["title", "artist", "genre", "purchased"];
 const VALID_SORT_DIRS: SortDirection[] = ["asc", "desc"];
 
 export function useLibraryParams() {
@@ -28,6 +28,10 @@ export function useLibraryParams() {
     const activeSortDirection = useMemo((): SortDirection => {
         const raw = searchParams?.get("sortDir") as SortDirection | null;
         return raw && VALID_SORT_DIRS.includes(raw) ? raw : "asc";
+    }, [searchParams]);
+
+    const hideBought = useMemo(() => {
+        return searchParams?.get("hideBought") === "true";
     }, [searchParams]);
 
     const releaseTrackId = useMemo(() => {
@@ -74,6 +78,13 @@ export function useLibraryParams() {
         [updateParams]
     );
 
+    const setHideBought = useCallback(
+        (hide: boolean) => {
+            updateParams({ hideBought: hide ? "true" : null });
+        },
+        [updateParams]
+    );
+
     const setReleaseTrackId = useCallback(
         (trackId: string | null) => {
             updateParams({ release: trackId });
@@ -95,11 +106,13 @@ export function useLibraryParams() {
         selectedGenres,
         activeSortField,
         activeSortDirection,
+        hideBought,
         releaseTrackId,
         setSelectedGenres,
         setActiveSortField,
         setActiveSortDirection,
         setSort,
+        setHideBought,
         setReleaseTrackId,
     };
 }

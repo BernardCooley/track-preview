@@ -196,6 +196,24 @@ export const sendToLibrary = async ({
     });
 };
 
+interface TogglePurchasedProps {
+    trackId: string;
+    userId: string;
+    purchased: boolean;
+}
+
+export const togglePurchased = async ({
+    trackId,
+    userId,
+    purchased,
+}: TogglePurchasedProps): Promise<{ success: boolean } | null> => {
+    return await fetchWithErrorHandling("/api/togglePurchased", "POST", {
+        trackId,
+        userId,
+        purchased,
+    });
+};
+
 interface CreateUserProps {
     userId: string;
     isAnonymous?: boolean;

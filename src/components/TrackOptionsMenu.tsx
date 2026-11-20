@@ -4,14 +4,18 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 
 interface TrackOptionsProps {
     index: number;
+    purchased?: boolean;
     onTrackDelete: (index: number) => void;
     onViewRelease: (index: number) => void;
+    onTogglePurchased?: (index: number) => void;
 }
 
 const TrackMenuOptions = ({
     index,
+    purchased,
     onTrackDelete,
     onViewRelease,
+    onTogglePurchased,
 }: TrackOptionsProps) => {
     return (
         <Menu.Root>
@@ -35,6 +39,24 @@ const TrackMenuOptions = ({
                     rounded="lg"
                     minW="140px"
                 >
+                    {onTogglePurchased && (
+                        <Menu.Item
+                            value="togglePurchased"
+                            p={2.5}
+                            fontSize="sm"
+                            rounded="md"
+                            bg="transparent"
+                            color={purchased ? "brand.primary" : "brand.textSecondary"}
+                            cursor="pointer"
+                            _hover={{
+                                bg: "brand.surfaceHover",
+                                color: "brand.textPrimary",
+                            }}
+                            onClick={() => onTogglePurchased(index)}
+                        >
+                            {purchased ? "Mark as not bought" : "Mark as bought"}
+                        </Menu.Item>
+                    )}
                     <Menu.Item
                         value="delete"
                         p={2.5}
