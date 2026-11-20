@@ -30,11 +30,10 @@ export async function POST(req: Request) {
     `;
 
     const q2 = `
-        SELECT * FROM "Track"
-        WHERE id IN (
-            SELECT "trackId" FROM "Review" WHERE "userId" = '${userId}' AND "currentReviewStep" = ${reviewStep}
-        )
-        ORDER BY title ASC
+        SELECT t.*, r."purchased" FROM "Track" t
+        INNER JOIN "Review" r ON r."trackId" = t.id
+        WHERE r."userId" = '${userId}' AND r."currentReviewStep" = ${reviewStep}
+        ORDER BY t.title ASC
         ${limitCondition}
     `;
 
