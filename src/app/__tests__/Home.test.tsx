@@ -61,7 +61,7 @@ describe("Home (Splash)", () => {
         render(<Home />);
 
         await waitFor(() => {
-            expect(screen.getByText("Get Started")).toBeInTheDocument();
+            expect(screen.getByText("Continue as guest")).toBeInTheDocument();
         });
     });
 
@@ -90,7 +90,7 @@ describe("Home (Splash)", () => {
         const { unmount } = render(<Home />);
 
         await waitFor(() => {
-            expect(screen.getByText("Get Started")).toBeInTheDocument();
+            expect(screen.getByText("Continue as guest")).toBeInTheDocument();
         });
 
         unmount();
@@ -121,23 +121,23 @@ describe("Home (Splash)", () => {
         expect(mockRouter.push).toHaveBeenCalledWith("/loginRegister?login=true");
     });
 
-    it("opens trial dialog when Get Started is clicked and no user in context", async () => {
+    it("opens trial dialog when Continue as guest is clicked and no user in context", async () => {
         const Home = await loadPage();
         const user = userEvent.setup();
         render(<Home />);
 
         await waitFor(() => {
-            expect(screen.getByText("Get Started")).toBeInTheDocument();
+            expect(screen.getByText("Continue as guest")).toBeInTheDocument();
         });
 
-        await user.click(screen.getByText("Get Started"));
+        await user.click(screen.getByText("Continue as guest"));
 
         await waitFor(() => {
             expect(screen.getByText("Try without an account")).toBeInTheDocument();
         });
     });
 
-    it("navigates to /explore when Get Started is clicked and user exists in context", async () => {
+    it("navigates to /explore when Continue as guest is clicked and user exists in context", async () => {
         const Home = await loadPage();
         const user = userEvent.setup();
         render(<Home />, {
@@ -147,10 +147,10 @@ describe("Home (Splash)", () => {
         });
 
         await waitFor(() => {
-            expect(screen.getByText("Get Started")).toBeInTheDocument();
+            expect(screen.getByText("Continue as guest")).toBeInTheDocument();
         });
 
-        await user.click(screen.getByText("Get Started"));
+        await user.click(screen.getByText("Continue as guest"));
 
         expect(mockRouter.push).toHaveBeenCalledWith("/explore");
     });

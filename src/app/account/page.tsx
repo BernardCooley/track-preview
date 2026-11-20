@@ -16,15 +16,14 @@ import BouncingDotsLoader from "@/components/BouncingLoaderDots";
 import {
     DeleteUser,
     LogOut,
-    SendVerificationEmail,
     UpdateUserEmail,
     UpdateUserPassword,
 } from "../../../firebase/utils";
+import { sendVerificationEmail } from "@/bff/bff";
 import { useRouter } from "next/navigation";
 import BackHeader from "@/components/BackHeader";
 import EditIcon from "@mui/icons-material/Edit";
 import {
-    getAuth,
     onAuthStateChanged,
     User as UserAccount,
 } from "firebase/auth";
@@ -73,10 +72,14 @@ const Settings = () => {
     );
 
     const isUserLoggedIn = useCallback(async () => {
-        onAuthStateChanged(auth, (user) => {
-            if (user && user.email && user.uid) {
-                setUserAccount(user);
-                setUser({ email: user.email, uid: user.uid });
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                await user.reload();
+                const refreshed = auth.currentUser;
+                if (refreshed && refreshed.email && refreshed.uid) {
+                    setUserAccount(refreshed);
+                    setUser({ email: refreshed.email, uid: refreshed.uid });
+                }
             }
         });
     }, []);
@@ -119,10 +122,7 @@ const Settings = () => {
         if (userAccount) {
             try {
                 await UpdateUserEmail(newEmail, userAccount);
-                const auth = getAuth();
-                if (auth?.currentUser) {
-                    await SendVerificationEmail(auth.currentUser);
-                }
+                await sendVerificationEmail(newEmail);
                 setUpdatedEmail(newEmail);
                 setEmailUpdated(true);
                 setTimeout(async () => {

@@ -3,6 +3,7 @@
 import {
     Box,
     Button,
+    Center,
     Flex,
     IconButton,
     Text,
@@ -20,6 +21,7 @@ import { useTrackContext } from "../../../context/TrackContext";
 import { useAuthContext } from "../../../Contexts/AuthContext";
 import { GetCurrentUser } from "../../../firebase/utils";
 import AuthGuard from "@/components/AuthGuard";
+import BouncingDotsLoader from "@/components/BouncingLoaderDots";
 import { auth } from "../../../firebase/firebaseInit";
 import TrackReview from "@/components/TrackReview";
 import LooksOneIcon from "@mui/icons-material/LooksOne";
@@ -167,6 +169,22 @@ function ExploreContent() {
         currentStep === 4 &&
         (playingTrack !== null ||
             (currentlyPlaying !== undefined && currentlyPlaying.length > 0));
+
+    if (!userProfile) {
+        return (
+            <Center h="100dvh" flexDirection="column" gap={8}>
+                <Text
+                    fontSize={["3xl", "4xl", "5xl"]}
+                    fontFamily="brand"
+                    color="brand.textPrimary"
+                    letterSpacing="wider"
+                >
+                    PHONIQUEST
+                </Text>
+                <BouncingDotsLoader />
+            </Center>
+        );
+    }
 
     return (
         <Flex direction="column" h="100dvh" ref={pageRef} bg="brand.bg">

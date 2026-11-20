@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event";
 import "../../../../test/mocks/navigation";
 import { render } from "../../../../test/test-utils";
 import PasswordReset from "../resetPassword/page";
-import { ResetPassword } from "../../../../firebase/utils";
+import { sendPasswordResetEmail } from "@/bff/bff";
 import { mockRouter } from "../../../../test/mocks/navigation";
 
 vi.mock("../../../../firebase/firebaseInit", () => ({
@@ -13,20 +13,22 @@ vi.mock("../../../../firebase/firebaseInit", () => ({
 }));
 
 vi.mock("../../../../firebase/utils", () => ({
-    ResetPassword: vi.fn(() => Promise.resolve()),
     LoginUser: vi.fn(),
     LogOut: vi.fn(),
     RegisterUser: vi.fn(),
     SignInAnonymously: vi.fn(),
     LinkAnonymousAccount: vi.fn(),
     DeleteUser: vi.fn(),
-    SendVerificationEmail: vi.fn(() => Promise.resolve()),
     GetCurrentUser: vi.fn(() => Promise.resolve(null)),
     UpdateUserEmail: vi.fn(() => Promise.resolve()),
     UpdateUserPassword: vi.fn(() => Promise.resolve()),
 }));
 
-const mockResetPassword = vi.mocked(ResetPassword);
+vi.mock("@/bff/bff", () => ({
+    sendPasswordResetEmail: vi.fn(() => Promise.resolve()),
+}));
+
+const mockResetPassword = vi.mocked(sendPasswordResetEmail);
 
 describe("PasswordReset", () => {
     beforeEach(() => {

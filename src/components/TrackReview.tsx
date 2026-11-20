@@ -319,7 +319,6 @@ const TrackReview = memo(
                                 onGenreClick={() =>
                                     setShowGenreSelector((prev) => !prev)
                                 }
-                                profileLoaded={userProfile ? true : false}
                                 genres={userProfile?.genres}
                                 yearRange={{
                                     from: userProfile?.yearFrom || 1960,
@@ -350,7 +349,7 @@ const TrackReview = memo(
                             reviewStep={reviewStep}
                             toggleTracklist={toggleTracklist}
                             isShowingTracklist={isShowingTracklist}
-                            profileLoaded={userProfile ? true : false}
+
                             autoplayLoading={autoplayLoading}
                             onAutoPlayToggle={async () => {
                                 const newProfile = await mutateUserProfile({

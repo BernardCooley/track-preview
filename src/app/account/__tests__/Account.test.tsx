@@ -4,20 +4,28 @@ import userEvent from "@testing-library/user-event";
 import "../../../../test/mocks/navigation";
 import { render } from "../../../../test/test-utils";
 import Settings from "../page";
-import { DeleteUser, LogOut, UpdateUserEmail, UpdateUserPassword, SendVerificationEmail } from "../../../../firebase/utils";
+import { DeleteUser, LogOut, UpdateUserEmail, UpdateUserPassword } from "../../../../firebase/utils";
+import { sendVerificationEmail } from "@/bff/bff";
 import { onAuthStateChanged, getAuth } from "firebase/auth";
 import { mockRouter } from "../../../../test/mocks/navigation";
 import type { User as FirebaseUser } from "firebase/auth";
 
 vi.mock("../../../../firebase/firebaseInit", () => ({
-    auth: { currentUser: null },
+    auth: {
+        currentUser: {
+            uid: "test-123",
+            email: "user@example.com",
+            emailVerified: true,
+            isAnonymous: false,
+            reload: vi.fn(() => Promise.resolve()),
+        },
+    },
     provider: {},
 }));
 
 vi.mock("../../../../firebase/utils", () => ({
     DeleteUser: vi.fn(),
     LogOut: vi.fn(),
-    SendVerificationEmail: vi.fn(() => Promise.resolve()),
     UpdateUserEmail: vi.fn(() => Promise.resolve()),
     UpdateUserPassword: vi.fn(() => Promise.resolve()),
     GetCurrentUser: vi.fn(() => Promise.resolve(null)),
@@ -30,6 +38,10 @@ const mockCurrentUser = {
     isAnonymous: false,
 } as FirebaseUser;
 
+vi.mock("@/bff/bff", () => ({
+    sendVerificationEmail: vi.fn(() => Promise.resolve()),
+}));
+
 vi.mock("firebase/auth", () => ({
     getAuth: vi.fn(() => ({ currentUser: mockCurrentUser })),
     onAuthStateChanged: vi.fn((_auth: unknown, callback: (user: FirebaseUser | null) => void) => {
@@ -38,7 +50,8 @@ vi.mock("firebase/auth", () => ({
             email: "user@example.com",
             emailVerified: true,
             isAnonymous: false,
-        } as FirebaseUser);
+            reload: vi.fn(() => Promise.resolve()),
+        } as unknown as FirebaseUser);
         return vi.fn();
     }),
     signOut: vi.fn(() => Promise.resolve()),
@@ -52,7 +65,7 @@ const mockDeleteUser = vi.mocked(DeleteUser);
 const mockLogOut = vi.mocked(LogOut);
 const mockUpdateUserEmail = vi.mocked(UpdateUserEmail);
 const mockUpdateUserPassword = vi.mocked(UpdateUserPassword);
-const mockSendVerificationEmail = vi.mocked(SendVerificationEmail);
+const mockSendVerificationEmail = vi.mocked(sendVerificationEmail);
 const mockGetAuth = vi.mocked(getAuth);
 
 describe("Account Settings", () => {
@@ -64,6 +77,7 @@ describe("Account Settings", () => {
                 email: "user@example.com",
                 emailVerified: true,
                 isAnonymous: false,
+                reload: vi.fn(() => Promise.resolve()),
             });
             return vi.fn();
         });

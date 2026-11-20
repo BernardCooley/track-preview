@@ -22,6 +22,7 @@ import { LoginUser } from "../../firebase/utils";
 import { signOut } from "firebase/auth";
 import { auth } from "../../firebase/firebaseInit";
 import { useLocalStorage } from "usehooks-ts";
+import { sendVerificationEmail } from "@/bff/bff";
 
 interface FormData {
     email: string;
@@ -46,6 +47,8 @@ const SignIn = () => {
     const [submitting, setSubmitting] = useState(false);
     const router = useRouter();
     const [authError, setAuthError] = useState<string | null>(null);
+    const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
+    const [resending, setResending] = useState(false);
     const id = "loginToast";
 
     const showToast = useCallback(
@@ -87,7 +90,9 @@ const SignIn = () => {
                 setAuthError(null);
                 setHasPreviouslyLoggedIn(true);
             } else {
+                const email = user?.user.email;
                 await signOut(auth);
+                setUnverifiedEmail(email || null);
                 setAuthError(
                     "Your email address has not been verified. Please check your inbox for a verification link and then you can log in."
                 );
@@ -182,6 +187,35 @@ const SignIn = () => {
                             {authError}
                         </Field.ErrorText>
                     </Field.Root>
+                    {unverifiedEmail && (
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            mt={3}
+                            loading={resending}
+                            onClick={async () => {
+                                setResending(true);
+                                try {
+                                    await sendVerificationEmail(unverifiedEmail);
+                                    showToast({
+                                        title: "Verification email sent.",
+                                        description: "Please check your inbox.",
+                                        type: "success",
+                                    });
+                                } catch {
+                                    showToast({
+                                        title: "Failed to resend verification email.",
+                                        description: "Please try again later.",
+                                        type: "error",
+                                    });
+                                } finally {
+                                    setResending(false);
+                                }
+                            }}
+                        >
+                            Resend verification email
+                        </Button>
+                    )}
                 </Box>
             )}
         </Flex>

@@ -36,7 +36,6 @@ interface Props {
     setCurrentTrack: (track: Track) => void;
     onAutoPlayToggle: () => void;
     preferredAutoPlay: boolean;
-    profileLoaded: boolean;
     autoplayLoading?: boolean;
     noTracks: boolean;
     loading: boolean;
@@ -60,7 +59,6 @@ const TrackReviewCard = ({
     setCurrentTrack,
     onAutoPlayToggle,
     preferredAutoPlay,
-    profileLoaded,
     autoplayLoading = false,
     noTracks,
     loading,
@@ -527,7 +525,7 @@ const TrackReviewCard = ({
                                                 borderColor: "brand.primary",
                                             }}
                                         >
-                                                {profileLoaded && !autoplayLoading ? (
+                                                {!autoplayLoading ? (
                                                     <Text
                                                         fontSize="xs"
                                                         fontWeight="medium"
