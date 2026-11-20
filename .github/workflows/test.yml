@@ -124,7 +124,7 @@ jobs:
       - name: Merge main into develop
         if: github.event_name == 'push' && github.ref == 'refs/heads/main' && success()
         run: |
-          git fetch origin develop
+          git fetch --unshallow origin
           git checkout develop
           git merge origin/main --no-edit
           git push origin develop
