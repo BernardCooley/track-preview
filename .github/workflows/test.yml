@@ -7,7 +7,7 @@ on:
     branches: [main, develop]
 
 concurrency:
-  group: ci
+  group: ci-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
