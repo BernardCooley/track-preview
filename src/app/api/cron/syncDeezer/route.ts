@@ -1,4 +1,5 @@
 import prisma from "@/lib/prisma";
+import { notifyDiscord } from "@/lib/notifyDiscord";
 import { NextResponse } from "next/server";
 import { genres } from "../../../../../data/genres";
 import { deezerGenreMap, appGenreToDeezerIds } from "../../../../../data/deezerGenreMap";
@@ -197,6 +198,10 @@ export async function GET(req: Request) {
             skipDuplicates: true,
         });
 
+        await notifyDiscord(
+            `**Deezer cron sync complete**\nInserted: ${result.count}/${allTracks.length} tracks\nGenres: ${todaysGenres.join(", ")}`
+        );
+
         return NextResponse.json({
             inserted: result.count,
             total: allTracks.length,
@@ -204,6 +209,9 @@ export async function GET(req: Request) {
         });
     } catch (error: any) {
         console.error("Deezer sync error:", error);
+        await notifyDiscord(
+            `**Deezer cron sync failed**\nError: ${error.message || "Unknown error"}`
+        );
         return NextResponse.json(
             {
                 error: error.message || "Sync failed",
