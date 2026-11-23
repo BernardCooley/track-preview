@@ -10,6 +10,20 @@ const transporter = nodemailer.createTransport({
     },
 });
 
+function buildPlainText({
+    heading,
+    body,
+    buttonText,
+    buttonUrl,
+}: {
+    heading: string;
+    body: string;
+    buttonText: string;
+    buttonUrl: string;
+}) {
+    return `${heading}\n\n${body}\n\n${buttonText}: ${buttonUrl}\n\nIf you didn't request this, you can safely ignore this email.\n\nPhoniquest — Discover new music`;
+}
+
 function buildEmailHtml({
     heading,
     body,
@@ -71,29 +85,33 @@ function buildEmailHtml({
 }
 
 export async function sendVerificationEmail(email: string, link: string) {
+    const content = {
+        heading: "Verify your email",
+        body: "Thanks for signing up for Phoniquest! Please verify your email address by clicking the button below.",
+        buttonText: "Verify Email",
+        buttonUrl: link,
+    };
     await transporter.sendMail({
         from: `"Phoniquest" <${process.env.SMTP_USER}>`,
         to: email,
         subject: "Verify your email for Phoniquest",
-        html: buildEmailHtml({
-            heading: "Verify your email",
-            body: "Thanks for signing up for Phoniquest! Please verify your email address by clicking the button below.",
-            buttonText: "Verify Email",
-            buttonUrl: link,
-        }),
+        text: buildPlainText(content),
+        html: buildEmailHtml(content),
     });
 }
 
 export async function sendPasswordResetEmail(email: string, link: string) {
+    const content = {
+        heading: "Reset your password",
+        body: "We received a request to reset your password. Click the button below to choose a new one.",
+        buttonText: "Reset Password",
+        buttonUrl: link,
+    };
     await transporter.sendMail({
         from: `"Phoniquest" <${process.env.SMTP_USER}>`,
         to: email,
         subject: "Reset your Phoniquest password",
-        html: buildEmailHtml({
-            heading: "Reset your password",
-            body: "We received a request to reset your password. Click the button below to choose a new one.",
-            buttonText: "Reset Password",
-            buttonUrl: link,
-        }),
+        text: buildPlainText(content),
+        html: buildEmailHtml(content),
     });
 }
