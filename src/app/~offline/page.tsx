@@ -18,7 +18,7 @@ export default function OfflinePage() {
                     color="brand.textPrimary"
                     mb={2}
                 >
-                    You're offline
+                    You&apos;re offline
                 </Text>
                 <Text fontSize="sm" color="brand.textSecondary">
                     Phoniquest needs an internet connection to discover and
