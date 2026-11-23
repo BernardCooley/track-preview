@@ -154,4 +154,51 @@ describe("Home (Splash)", () => {
 
         expect(mockRouter.push).toHaveBeenCalledWith("/explore");
     });
+
+    it("renders JSON-LD structured data", async () => {
+        const Home = await loadPage();
+        const { container } = render(<Home />);
+
+        await waitFor(() => {
+            expect(screen.getByText("Continue as guest")).toBeInTheDocument();
+        });
+
+        const script = container.querySelector('script[type="application/ld+json"]');
+        expect(script).toBeInTheDocument();
+
+        const jsonLd = JSON.parse(script!.textContent!);
+        expect(jsonLd["@type"]).toBe("WebApplication");
+        expect(jsonLd.name).toBe("Phoniquest");
+        expect(jsonLd.applicationCategory).toBe("MusicApplication");
+        expect(jsonLd.url).toBe("https://www.phoniquest.com");
+    });
+
+    it("uses semantic HTML elements", async () => {
+        const Home = await loadPage();
+        const { container } = render(<Home />);
+
+        await waitFor(() => {
+            expect(screen.getByText("Continue as guest")).toBeInTheDocument();
+        });
+
+        expect(container.querySelector("main")).toBeInTheDocument();
+        expect(container.querySelector("header")).toBeInTheDocument();
+        expect(container.querySelector("footer")).toBeInTheDocument();
+        expect(container.querySelector("nav")).toBeInTheDocument();
+        expect(container.querySelector("h1")).toBeInTheDocument();
+        expect(container.querySelector("ul")).toBeInTheDocument();
+        expect(container.querySelectorAll("li").length).toBeGreaterThan(0);
+    });
+
+    it("renders the heading as an h1 with the app name", async () => {
+        const Home = await loadPage();
+        render(<Home />);
+
+        await waitFor(() => {
+            expect(screen.getByText("Continue as guest")).toBeInTheDocument();
+        });
+
+        const h1 = screen.getByRole("heading", { level: 1 });
+        expect(h1).toHaveTextContent("PHONIQUEST");
+    });
 });
