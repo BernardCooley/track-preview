@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Box, Button, Dialog, Flex, Text, VStack } from "@chakra-ui/react";
+import { Box, Button, Dialog, Flex, Image, Text, VStack } from "@chakra-ui/react";
 import { useAuthContext } from "../../Contexts/AuthContext";
 import { createCheckoutSession } from "@/bff/bff";
 
@@ -53,14 +53,22 @@ const UpgradePrompt = ({ featureName, onClose }: Props) => {
                             alignItems="center"
                             justifyContent="space-between"
                         >
-                            <Text
-                                fontSize="lg"
-                                fontWeight="semibold"
-                                color="brand.textPrimary"
-                                letterSpacing="-0.01em"
-                            >
-                                Upgrade to Pro
-                            </Text>
+                            <Flex alignItems="center" gap={2.5}>
+                                <Image
+                                    src="/logo_1x.png"
+                                    alt="Phoniquest"
+                                    h={6}
+                                    w="auto"
+                                />
+                                <Text
+                                    fontSize="lg"
+                                    fontWeight="semibold"
+                                    color="brand.textPrimary"
+                                    letterSpacing="-0.01em"
+                                >
+                                    Upgrade to Pro
+                                </Text>
+                            </Flex>
                             <Dialog.CloseTrigger
                                 position="relative"
                                 top="auto"
@@ -97,19 +105,25 @@ const UpgradePrompt = ({ featureName, onClose }: Props) => {
                                         color="brand.textSecondary"
                                         fontSize="sm"
                                     >
-                                        • Unlimited library
+                                        • Filter and sort your library by genre, artist, and more
                                     </Text>
                                     <Text
                                         color="brand.textSecondary"
                                         fontSize="sm"
                                     >
-                                        • Advanced filters and curated mode
+                                        • Mark tracks as bought to manage your collection
                                     </Text>
                                     <Text
                                         color="brand.textSecondary"
                                         fontSize="sm"
                                     >
-                                        • Support independent music discovery
+                                        • Browse full releases from your library
+                                    </Text>
+                                    <Text
+                                        color="brand.textSecondary"
+                                        fontSize="sm"
+                                    >
+                                        • Curate your collection with two-stage review
                                     </Text>
                                 </VStack>
                             </Flex>

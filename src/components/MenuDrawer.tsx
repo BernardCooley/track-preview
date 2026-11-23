@@ -18,6 +18,9 @@ import { useThemeContext } from "../../context/ThemeContext";
 import { useAuthContext } from "../../Contexts/AuthContext";
 import { useTrackContext } from "../../context/TrackContext";
 import { mutateUserProfile } from "@/bff/bff";
+import { useSubscription } from "@/hooks/useSubscription";
+import UpgradePrompt from "./UpgradePrompt";
+import StarIcon from "@mui/icons-material/Star";
 
 interface Props {
     isOpen: boolean;
@@ -29,6 +32,7 @@ const MenuDrawer = ({ isOpen, onClose }: Props) => {
     const { appearance, toggleAppearance } = useThemeContext();
     const { user, userProfile, updateUserProfile } = useAuthContext();
     const { updateChangesMade, updateReviewTracks } = useTrackContext();
+    const { isPro, requirePro, upgradeFeature, dismissUpgrade } = useSubscription();
     const [showCuratedConfirm, setShowCuratedConfirm] = useState(false);
 
     const disableCuratedMode = async () => {
@@ -167,13 +171,31 @@ const MenuDrawer = ({ isOpen, onClose }: Props) => {
                             rounded="lg"
                         >
                             <Flex direction="column">
-                                <Text
-                                    fontSize="md"
-                                    fontWeight="medium"
-                                    color="brand.textSecondary"
-                                >
-                                    Curated mode
-                                </Text>
+                                <Flex alignItems="center" gap={1.5}>
+                                    <Text
+                                        fontSize="md"
+                                        fontWeight="medium"
+                                        color="brand.textSecondary"
+                                    >
+                                        Curated mode
+                                    </Text>
+                                    {!isPro && (
+                                        <Flex
+                                            alignItems="center"
+                                            bg="brand.primarySubtle"
+                                            color="brand.primary"
+                                            rounded="full"
+                                            px={1.5}
+                                            py={0.5}
+                                            gap={0.5}
+                                        >
+                                            <StarIcon style={{ fontSize: "10px" }} />
+                                            <Text fontSize="2xs" fontWeight="bold" lineHeight="1">
+                                                PRO
+                                            </Text>
+                                        </Flex>
+                                    )}
+                                </Flex>
                                 <Text
                                     fontSize="xs"
                                     color="brand.textMuted"
@@ -185,6 +207,7 @@ const MenuDrawer = ({ isOpen, onClose }: Props) => {
                                 checked={userProfile?.curatedMode ?? false}
                                 onCheckedChange={async (details) => {
                                     if (details.checked) {
+                                        if (!requirePro("Curated Mode")) return;
                                         if (user?.uid) {
                                             const newProfile = await mutateUserProfile({
                                                 userId: user.uid,
@@ -344,6 +367,8 @@ const MenuDrawer = ({ isOpen, onClose }: Props) => {
                     </Dialog.Content>
                 </Dialog.Positioner>
             </Dialog.Root>
+
+            <UpgradePrompt featureName={upgradeFeature} onClose={dismissUpgrade} />
         </Drawer.Root>
     );
 };
