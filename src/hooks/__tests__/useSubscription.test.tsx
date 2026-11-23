@@ -29,7 +29,7 @@ function makeProfile(
 }
 
 function wrapper(userProfile: UserProfile | null) {
-    return ({ children }: { children: React.ReactNode }) => (
+    const Wrapper = ({ children }: { children: React.ReactNode }) => (
         <AuthContext.Provider
             value={{
                 user: { uid: "user-1", email: "test@test.com" },
@@ -45,6 +45,8 @@ function wrapper(userProfile: UserProfile | null) {
             {children}
         </AuthContext.Provider>
     );
+    Wrapper.displayName = "TestWrapper";
+    return Wrapper;
 }
 
 describe("useSubscription", () => {
