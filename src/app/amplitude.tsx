@@ -1,10 +1,13 @@
 "use client";
 
 import { useEffect } from "react";
-import { initAll } from "@amplitude/unified";
+import { initAll, setUserId } from "@amplitude/unified";
 import { getAmplitudeApiKey } from "@/config/amplitude";
+import { useAuthContext } from "../../Contexts/AuthContext";
 
 export default function Amplitude() {
+    const { user } = useAuthContext();
+
     useEffect(() => {
         initAll(getAmplitudeApiKey(), {
             serverZone: "EU",
@@ -12,6 +15,12 @@ export default function Amplitude() {
             sessionReplay: { sampleRate: 1 },
         });
     }, []);
+
+    useEffect(() => {
+        if (user?.uid) {
+            setUserId(user.uid);
+        }
+    }, [user?.uid]);
 
     return null;
 }
