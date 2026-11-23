@@ -89,6 +89,9 @@
         },
         "vitest": {
             "@types/node": "$@types/node"
+        },
+        "jwks-rsa": {
+            "jose": "5.10.0"
         }
     },
     "prisma": {
