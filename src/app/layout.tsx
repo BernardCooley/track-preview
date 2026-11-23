@@ -16,21 +16,12 @@ export const metadata: Metadata = {
         title: "Phoniquest — Random Music Discovery",
         description:
             "No algorithms, no rankings — just random tracks from 89 genres. Listen, like, and build your own music library.",
-        images: [
-            {
-                url: "/logo_background_4x.png",
-                width: 1060,
-                height: 700,
-                alt: "Phoniquest logo",
-            },
-        ],
     },
     twitter: {
         card: "summary_large_image",
         title: "Phoniquest — Random Music Discovery",
         description:
             "No algorithms, no rankings — just random tracks from 89 genres. Listen, like, and build your own music library.",
-        images: ["/logo_background_4x.png"],
     },
     alternates: {
         canonical: "/",
