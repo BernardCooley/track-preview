@@ -2,9 +2,6 @@ const { withSentryConfig } = require("@sentry/nextjs/config");
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    env: {
-        NEXT_PUBLIC_ENABLE_SUBSCRIPTIONS: process.env.NEXT_PUBLIC_ENABLE_SUBSCRIPTIONS,
-    },
     serverExternalPackages: ["firebase-admin"],
     images: {
         remotePatterns: [
