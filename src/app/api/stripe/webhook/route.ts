@@ -1,5 +1,5 @@
 import prisma from "@/lib/prisma";
-import stripe from "@/lib/stripe";
+import getStripe from "@/lib/stripe";
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 
@@ -33,7 +33,7 @@ export async function POST(req: Request) {
     let event: Stripe.Event;
 
     try {
-        event = stripe!.webhooks.constructEvent(
+        event = getStripe().webhooks.constructEvent(
             body,
             signature,
             process.env.STRIPE_WEBHOOK_SECRET!
@@ -55,7 +55,7 @@ export async function POST(req: Request) {
                 const customerId = session.customer as string;
 
                 const subscription =
-                    await stripe!.subscriptions.retrieve(subscriptionId);
+                    await getStripe().subscriptions.retrieve(subscriptionId);
                 const firebaseId =
                     subscription.metadata.firebaseId ||
                     session.metadata?.firebaseId;
@@ -134,7 +134,7 @@ export async function POST(req: Request) {
 
                 if (subscriptionId) {
                     const subscription =
-                        await stripe!.subscriptions.retrieve(subscriptionId);
+                        await getStripe().subscriptions.retrieve(subscriptionId);
                     const firebaseId = subscription.metadata.firebaseId;
 
                     if (firebaseId) {

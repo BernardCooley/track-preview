@@ -1,5 +1,5 @@
 import prisma from "@/lib/prisma";
-import stripe from "@/lib/stripe";
+import getStripe from "@/lib/stripe";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -24,7 +24,7 @@ export async function POST(req: Request) {
             );
         }
 
-        const session = await stripe!.billingPortal.sessions.create({
+        const session = await getStripe().billingPortal.sessions.create({
             customer: user.stripeCustomerId,
             return_url: `${process.env.NEXT_PUBLIC_APP_URL}/account`,
         });

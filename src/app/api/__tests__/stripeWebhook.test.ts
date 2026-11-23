@@ -13,14 +13,14 @@ vi.mock("@/lib/prisma", () => ({
 }));
 
 vi.mock("@/lib/stripe", () => ({
-    default: {
+    default: () => ({
         webhooks: {
             constructEvent: (...args: any[]) => mockConstructEvent(...args),
         },
         subscriptions: {
             retrieve: (...args: any[]) => mockSubscriptionsRetrieve(...args),
         },
-    },
+    }),
 }));
 
 function makeRequest(body: string, signature: string | null = "sig_test") {

@@ -1,5 +1,5 @@
 import prisma from "@/lib/prisma";
-import stripe from "@/lib/stripe";
+import getStripe from "@/lib/stripe";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -27,7 +27,7 @@ export async function POST(req: Request) {
         let stripeCustomerId = user.stripeCustomerId;
 
         if (!stripeCustomerId) {
-            const customer = await stripe!.customers.create({
+            const customer = await getStripe().customers.create({
                 metadata: { firebaseId: userId },
             });
             stripeCustomerId = customer.id;
@@ -38,7 +38,7 @@ export async function POST(req: Request) {
             });
         }
 
-        const session = await stripe!.checkout.sessions.create({
+        const session = await getStripe().checkout.sessions.create({
             customer: stripeCustomerId,
             mode: "subscription",
             line_items: [

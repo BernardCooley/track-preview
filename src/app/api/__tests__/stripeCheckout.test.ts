@@ -16,7 +16,7 @@ vi.mock("@/lib/prisma", () => ({
 }));
 
 vi.mock("@/lib/stripe", () => ({
-    default: {
+    default: () => ({
         customers: {
             create: (...args: any[]) => mockCustomersCreate(...args),
         },
@@ -30,7 +30,7 @@ vi.mock("@/lib/stripe", () => ({
                 create: (...args: any[]) => mockPortalSessionsCreate(...args),
             },
         },
-    },
+    }),
 }));
 
 function makeRequest(body: object) {
