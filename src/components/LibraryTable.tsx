@@ -407,9 +407,14 @@ const LibraryTable = ({
 
             {!currentReleaseTrack && (
                 <Flex px={[3, 4]} pt={3} pb={2} gap={2.5} direction="column" position="sticky" top={0} zIndex={10} bg="brand.bg">
-                    <Text fontSize="lg" fontWeight="bold" color="brand.textPrimary" letterSpacing="-0.01em">
-                        My Library
-                    </Text>
+                    <Flex alignItems="baseline" justifyContent="space-between">
+                        <Text fontSize="lg" fontWeight="bold" color="brand.textPrimary" letterSpacing="-0.01em">
+                            My Library
+                        </Text>
+                        <Text fontSize="xs" color="brand.textMuted">
+                            {reviewTracks[4].tracks.length} {reviewTracks[4].tracks.length === 1 ? "track" : "tracks"}
+                        </Text>
+                    </Flex>
                     <Flex gap={1.5} alignItems="center">
                     <Button
                         variant={hasGenreFilter ? "subtle" : "surface"}
@@ -439,6 +444,7 @@ const LibraryTable = ({
                     </Button>
 
                     <Menu.Root>
+
                         <Menu.Trigger asChild>
                             <Button
                                 variant={activeSortField ? "subtle" : "surface"}
