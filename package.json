@@ -24,6 +24,7 @@
     },
     "dependencies": {
         "@amplitude/experiment-js-client": "^1.24.0",
+        "@amplitude/experiment-node-server": "^1.13.6",
         "@amplitude/unified": "^1.2.4",
         "@chakra-ui/react": "3.38.0",
         "@emotion/react": "11.14.0",

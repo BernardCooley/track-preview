@@ -1,10 +1,13 @@
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { getServerFlag } from "@/lib/amplitude-experiment-server";
 
 export async function requireProSubscription(
     firebaseId: string
 ): Promise<NextResponse | null> {
-    if (process.env.NEXT_PUBLIC_ENABLE_SUBSCRIPTIONS !== "true") return null;
+    const flagKey = process.env.NEXT_PUBLIC_SUBSCRIPTIONS_FLAG_KEY ?? "enable-subscriptions";
+    const flag = await getServerFlag(flagKey, "off");
+    if (flag !== "on") return null;
 
     const user = await prisma?.user.findFirst({
         where: { firebaseId },
