@@ -13,6 +13,7 @@ vi.mock("@/lib/prisma", () => ({
 describe("requireProSubscription", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        vi.stubEnv("NEXT_PUBLIC_ENABLE_SUBSCRIPTIONS", "true");
     });
 
     it("returns 404 when user not found", async () => {

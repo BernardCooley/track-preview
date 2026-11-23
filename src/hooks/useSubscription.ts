@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { useAuthContext } from "../../Contexts/AuthContext";
 
-const SUBSCRIPTIONS_ENABLED =
-    process.env.NEXT_PUBLIC_ENABLE_SUBSCRIPTIONS === "true";
-
 export const useSubscription = () => {
     const { userProfile } = useAuthContext();
     const [upgradeFeature, setUpgradeFeature] = useState<string | null>(null);
+
+    const subscriptionsEnabled =
+        process.env.NEXT_PUBLIC_ENABLE_SUBSCRIPTIONS === "true";
 
     const isInGracePeriod =
         userProfile?.subscriptionStatus === "PAST_DUE" &&
@@ -14,7 +14,7 @@ export const useSubscription = () => {
         new Date(userProfile.subscriptionExpiresAt) > new Date();
 
     const isPro =
-        !SUBSCRIPTIONS_ENABLED ||
+        !subscriptionsEnabled ||
         (userProfile?.subscriptionTier === "PRO" &&
             (userProfile?.subscriptionStatus === "ACTIVE" || isInGracePeriod));
 

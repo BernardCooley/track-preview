@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import React from "react";
 import { AuthContext } from "../../../Contexts/AuthContext";
@@ -50,6 +50,10 @@ function wrapper(userProfile: UserProfile | null) {
 }
 
 describe("useSubscription", () => {
+    beforeEach(() => {
+        vi.stubEnv("NEXT_PUBLIC_ENABLE_SUBSCRIPTIONS", "true");
+    });
+
     it("isPro is false for FREE tier", () => {
         const { result } = renderHook(() => useSubscription(), {
             wrapper: wrapper(makeProfile({ subscriptionTier: "FREE" })),
