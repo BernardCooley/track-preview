@@ -54,6 +54,7 @@
         "react-range-slider-input": "3.3.5",
         "serwist": "^9.5.15",
         "spotify-web-api-node": "5.0.2",
+        "stripe": "^23.2.0",
         "usehooks-ts": "2.16.0",
         "uuid": "9.0.1",
         "zod": "3.25.76"

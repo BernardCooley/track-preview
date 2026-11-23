@@ -10,18 +10,34 @@ datasource db {
   directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
+enum SubscriptionTier {
+  FREE
+  PRO
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  PAST_DUE
+}
+
 model User {
-  id         String   @id @default(cuid())
-  firebaseId String
-  autoplay   Boolean  @default(false)
-  genres     String[] @default(["all"])
-  yearFrom   Int      @default(1960)
-  yearTo      Int      @default(dbgenerated("extract(year from now())::int"))
-  curatedMode  Boolean  @default(false)
-  swipeMode    Boolean  @default(true)
-  isAnonymous  Boolean  @default(false)
-  lastActiveAt DateTime @default(now())
-  Review       Review[]
+  id                    String              @id @default(cuid())
+  firebaseId            String
+  autoplay              Boolean             @default(false)
+  genres                String[]            @default(["all"])
+  yearFrom              Int                 @default(1960)
+  yearTo                Int                 @default(dbgenerated("extract(year from now())::int"))
+  curatedMode           Boolean             @default(false)
+  swipeMode             Boolean             @default(true)
+  isAnonymous           Boolean             @default(false)
+  lastActiveAt          DateTime            @default(now())
+  subscriptionTier      SubscriptionTier    @default(FREE)
+  stripeCustomerId      String?
+  stripeSubscriptionId  String?
+  subscriptionStatus    SubscriptionStatus?
+  subscriptionExpiresAt DateTime?
+  Review                Review[]
 }
 
 model Review {
