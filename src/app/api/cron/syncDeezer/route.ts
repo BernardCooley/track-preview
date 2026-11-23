@@ -147,41 +147,45 @@ export async function GET(req: Request) {
             }
         }
 
-        for (const genre of todaysGenres) {
+        const genreResults = await Promise.all(todaysGenres.map(async (genre) => {
+            const tracks: any[] = [];
             const deezerIds = appGenreToDeezerIds[genre];
 
             if (deezerIds) {
-                for (const deezerGenreId of deezerIds) {
-                    try {
+                const chartResults = await Promise.allSettled(
+                    deezerIds.map(async (deezerGenreId) => {
                         const chartRes = await fetch(
                             `https://api.deezer.com/chart/${deezerGenreId}/tracks?limit=25`
                         );
-                        const chartData = await chartRes.json();
-                        if (chartData?.data) {
-                            for (const track of chartData.data) {
-                                allTracks.push(mapTrack(track, genre));
-                            }
+                        return chartRes.json();
+                    })
+                );
+                for (const result of chartResults) {
+                    if (result.status === "fulfilled" && result.value?.data) {
+                        for (const track of result.value.data) {
+                            tracks.push(mapTrack(track, genre));
                         }
-                    } catch {
-                        // skip this genre ID on error
                     }
                 }
             }
 
             const searchTerms = genreSearchTerms[genre] || [genre];
-            for (const term of searchTerms) {
-                try {
-                    const searchResponse = await deezer.search.track(term);
-                    if (searchResponse?.data) {
-                        const tracks = searchResponse.data.slice(0, 25);
-                        for (const track of tracks) {
-                            allTracks.push(mapTrack(track, genre));
-                        }
+            const searchResults = await Promise.allSettled(
+                searchTerms.map((term) => deezer.search.track(term))
+            );
+            for (const result of searchResults) {
+                if (result.status === "fulfilled" && result.value?.data) {
+                    for (const track of result.value.data.slice(0, 25)) {
+                        tracks.push(mapTrack(track, genre));
                     }
-                } catch {
-                    // skip on error
                 }
             }
+
+            return tracks;
+        }));
+
+        for (const tracks of genreResults) {
+            allTracks.push(...tracks);
         }
 
         if (!prisma) {

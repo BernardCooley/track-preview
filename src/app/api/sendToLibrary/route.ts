@@ -5,35 +5,18 @@ export async function POST(req: Request) {
     const { trackId, userId } = await req.json();
 
     try {
-        const review = await prisma?.review.findFirst({
-            where: {
-                userId,
-                trackId,
+        await prisma?.review.upsert({
+            where: { userId_trackId: { userId, trackId } },
+            update: {
+                currentReviewStep: 4,
+                furthestReviewStep: 4,
             },
-        });
-
-        if (review) {
-            await prisma?.review.update({
-                where: { id: review.id },
-                data: {
-                    currentReviewStep: 4,
-                    furthestReviewStep: 4,
-                },
-            });
-        } else {
-            await prisma?.review.create({
-                data: {
-                    currentReviewStep: 4,
-                    furthestReviewStep: 4,
-                    Track: { connect: { id: trackId } },
-                    user: { connect: { id: userId } },
-                },
-            });
-        }
-
-        await prisma?.user.update({
-            where: { id: userId },
-            data: { lastActiveAt: new Date() },
+            create: {
+                currentReviewStep: 4,
+                furthestReviewStep: 4,
+                Track: { connect: { id: trackId } },
+                user: { connect: { id: userId } },
+            },
         });
 
         return NextResponse.json({ success: true }, { status: 200 });

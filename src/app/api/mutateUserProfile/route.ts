@@ -12,6 +12,7 @@ export async function POST(req: Request) {
         ...(genres && { genres }),
         ...(yearFrom && { yearFrom }),
         ...(yearTo && { yearTo }),
+        lastActiveAt: new Date(),
     };
 
     try {

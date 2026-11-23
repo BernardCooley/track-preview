@@ -78,8 +78,7 @@ function ExploreContent() {
                     setProfileError(false);
                     let userProf = await getUserProfile({ userId: user.uid });
                     if (!userProf && isAnonymous) {
-                        await createUser({ userId: user.uid, isAnonymous: true });
-                        userProf = await getUserProfile({ userId: user.uid });
+                        userProf = await createUser({ userId: user.uid, isAnonymous: true });
                     }
                     updateUserProfile(userProf);
                 } catch {
