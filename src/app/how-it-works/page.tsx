@@ -1,5 +1,3 @@
-"use client";
-
 import { Box, Flex, Text } from "@chakra-ui/react";
 import BackHeader from "@/components/BackHeader";
 import LooksOneIcon from "@mui/icons-material/LooksOne";
