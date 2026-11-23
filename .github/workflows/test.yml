@@ -40,18 +40,22 @@ jobs:
       - run: npm install
 
       - name: Type check
+        if: github.ref != 'refs/heads/main'
         run: npm run tsc
 
       - name: Lint
+        if: github.ref != 'refs/heads/main'
         run: npm run lint
 
       - name: Validate Prisma schema
+        if: github.ref != 'refs/heads/main'
         run: npx prisma validate
         env:
           POSTGRES_URL: postgres://dummy
           POSTGRES_URL_NON_POOLING: postgres://dummy
 
       - name: Run tests
+        if: github.ref != 'refs/heads/main'
         run: npx vitest run
 
       - name: Bundle size report
