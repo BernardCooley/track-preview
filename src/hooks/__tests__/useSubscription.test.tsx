@@ -10,6 +10,10 @@ vi.mock("@/context/ExperimentContext", () => ({
     useFeatureFlag: () => mockFeatureFlag,
 }));
 
+vi.mock("@/config/amplitude", () => ({
+    getSubscriptionsFlagKey: () => "enable-subscriptions",
+}));
+
 function makeProfile(
     overrides: Partial<UserProfile> = {}
 ): UserProfile {

@@ -69,8 +69,10 @@ export default function RootLayout({
         <html lang="en">
             <body>
                 <SerwistProvider swUrl="/serwist/sw.js">
-                    <Amplitude />
-                    <Providers>{children}</Providers>
+                    <Providers>
+                        <Amplitude />
+                        {children}
+                    </Providers>
                 </SerwistProvider>
             </body>
         </html>
