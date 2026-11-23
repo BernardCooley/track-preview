@@ -31,6 +31,7 @@
         "@mui/icons-material": "5.18.0",
         "@mui/material": "5.18.0",
         "@prisma/client": "5.22.0",
+        "@sentry/nextjs": "^11.16.0",
         "@vercel/postgres": "0.10.0",
         "aws-amplify": "6.22.2",
         "axios": "1.21.1",

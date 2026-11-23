@@ -1,3 +1,5 @@
+const { withSentryConfig } = require("@sentry/nextjs/config");
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     serverExternalPackages: ["firebase-admin"],
@@ -13,4 +15,10 @@ const nextConfig = {
     },
 };
 
-module.exports = nextConfig
+module.exports = withSentryConfig(nextConfig, {
+    org: "phoniquest",
+    project: "phoniquest",
+    silent: !process.env.CI,
+    authToken: process.env.SENTRY_AUTH_TOKEN,
+    widenClientFileUpload: true,
+});

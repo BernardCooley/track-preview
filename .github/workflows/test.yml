@@ -73,6 +73,7 @@ jobs:
           FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID_DEV }}
           POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
           POSTGRES_URL_NON_POOLING: ${{ secrets.POSTGRES_URL_NON_POOLING }}
+          NEXT_PUBLIC_SENTRY_DSN: ${{ secrets.NEXT_PUBLIC_SENTRY_DSN }}
 
       - name: Install Vercel CLI
         if: github.event_name == 'push'
@@ -85,7 +86,7 @@ jobs:
       - name: Set Vercel env vars
         if: github.event_name == 'push'
         run: |
-          for VAR_NAME in POSTGRES_URL POSTGRES_URL_NON_POOLING DISCORD_WEBHOOK_URL CRON_SECRET; do
+          for VAR_NAME in POSTGRES_URL POSTGRES_URL_NON_POOLING DISCORD_WEBHOOK_URL CRON_SECRET NEXT_PUBLIC_SENTRY_DSN SENTRY_AUTH_TOKEN; do
             VAR_VALUE="${!VAR_NAME}"
             for TARGET in preview production; do
               EXISTING=$(curl -s -H "Authorization: Bearer $VERCEL_TOKEN" \
@@ -107,6 +108,8 @@ jobs:
           POSTGRES_URL_NON_POOLING: ${{ secrets.POSTGRES_URL_NON_POOLING }}
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          NEXT_PUBLIC_SENTRY_DSN: ${{ secrets.NEXT_PUBLIC_SENTRY_DSN }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
       - name: Build
         if: github.event_name == 'push'
@@ -125,6 +128,8 @@ jobs:
           SMTP_PASS: ${{ secrets.SMTP_PASS }}
           POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
           POSTGRES_URL_NON_POOLING: ${{ secrets.POSTGRES_URL_NON_POOLING }}
+          NEXT_PUBLIC_SENTRY_DSN: ${{ secrets.NEXT_PUBLIC_SENTRY_DSN }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
       - name: Deploy
         if: github.event_name == 'push'
