@@ -36,8 +36,9 @@ function buildEmailHtml({
     buttonUrl: string;
 }) {
     return `<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <title>Phoniquest</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
@@ -87,7 +88,7 @@ function buildEmailHtml({
 export async function sendVerificationEmail(email: string, link: string) {
     const content = {
         heading: "Verify your email",
-        body: "Thanks for signing up for Phoniquest! Please verify your email address by clicking the button below.",
+        body: "Thanks for signing up for Phoniquest! To get started discovering and previewing new music, please verify your email address by clicking the button below. This helps us keep your account secure and ensures you receive important updates about your account.",
         buttonText: "Verify Email",
         buttonUrl: link,
     };
@@ -103,7 +104,7 @@ export async function sendVerificationEmail(email: string, link: string) {
 export async function sendPasswordResetEmail(email: string, link: string) {
     const content = {
         heading: "Reset your password",
-        body: "We received a request to reset your password. Click the button below to choose a new one.",
+        body: "We received a request to reset the password for your Phoniquest account. Click the button below to choose a new one. If you didn't make this request, you can safely ignore this email and your password will remain unchanged.",
         buttonText: "Reset Password",
         buttonUrl: link,
     };
