@@ -6,8 +6,10 @@ import BuyModal from "./BuyModal";
 import DeleteTrackDialog from "./DeleteTrackDialog";
 import LibraryTable from "./LibraryTable";
 import ReleaseHeader from "./ReleaseHeader";
+import InstallPrompt from "./InstallPrompt";
 import { useTrackList } from "@/hooks/useTrackList";
 import { useLibraryParams } from "@/hooks/useLibraryParams";
+import { useAuthContext } from "../../Contexts/AuthContext";
 import { Track } from "../../types";
 
 const Library = () => {
@@ -49,6 +51,7 @@ const Library = () => {
         toggleTrackPurchased,
     } = useTrackList();
 
+    const { isAnonymous } = useAuthContext();
     const { releaseTrackId, setReleaseTrackId } = useLibraryParams();
     const [releaseBuyTrack, setReleaseBuyTrack] = useState<Track | null>(null);
     const [playAllRequested, setPlayAllRequested] = useState(false);
@@ -165,6 +168,13 @@ const Library = () => {
                     currentReleaseTrack={currentReleaseTrack}
                     onBuyRelease={onBuyRelease}
                     onPlayAll={() => setPlayAllRequested(true)}
+                />
+            )}
+
+            {!loading && !noTracks && (
+                <InstallPrompt
+                    libraryCount={reviewTracks[4].tracks.length}
+                    isAnonymous={isAnonymous}
                 />
             )}
 

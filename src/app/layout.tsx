@@ -1,5 +1,6 @@
 import "./styles/globals.css";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
+import { SerwistProvider } from "@serwist/turbopack/react";
 import { Providers } from "./providers";
 
 export const metadata: Metadata = {
@@ -40,6 +41,22 @@ export const metadata: Metadata = {
         index: true,
         follow: true,
     },
+    applicationName: "Phoniquest",
+    appleWebApp: {
+        capable: true,
+        statusBarStyle: "black-translucent",
+        title: "Phoniquest",
+    },
+    formatDetection: {
+        telephone: false,
+    },
+    icons: {
+        apple: "/apple-touch-icon.png",
+    },
+};
+
+export const viewport: Viewport = {
+    themeColor: "#0a0a0a",
 };
 
 export default function RootLayout({
@@ -50,7 +67,9 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body>
-                <Providers>{children}</Providers>
+                <SerwistProvider swUrl="/serwist/sw.js">
+                    <Providers>{children}</Providers>
+                </SerwistProvider>
             </body>
         </html>
     );
