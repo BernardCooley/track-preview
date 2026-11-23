@@ -62,7 +62,7 @@ describe("PasswordReset", () => {
         });
     });
 
-    it("calls ResetPassword and redirects on success", async () => {
+    it("calls ResetPassword and shows success message on success", async () => {
         mockResetPassword.mockResolvedValue(undefined);
         const user = userEvent.setup();
         render(<PasswordReset />);
@@ -73,7 +73,47 @@ describe("PasswordReset", () => {
 
         await waitFor(() => {
             expect(mockResetPassword).toHaveBeenCalledWith("test@example.com");
-            expect(mockRouter.push).toHaveBeenCalledWith("/loginRegister?login=true&passwordReset=true");
+            expect(screen.getByText(/check your email/i)).toBeInTheDocument();
+            expect(screen.getByText("test@example.com")).toBeInTheDocument();
+            expect(screen.getByRole("button", { name: /back to sign in/i })).toBeInTheDocument();
+            expect(screen.getByRole("button", { name: /try a different email/i })).toBeInTheDocument();
+        });
+    });
+
+    it("navigates to login from success screen", async () => {
+        mockResetPassword.mockResolvedValue(undefined);
+        const user = userEvent.setup();
+        render(<PasswordReset />);
+
+        const emailInput = screen.getByRole("textbox", { name: /email/i });
+        await user.type(emailInput, "test@example.com");
+        await user.click(screen.getByRole("button", { name: /reset password/i }));
+
+        await waitFor(() => {
+            expect(screen.getByText(/check your email/i)).toBeInTheDocument();
+        });
+
+        await user.click(screen.getByRole("button", { name: /back to sign in/i }));
+        expect(mockRouter.push).toHaveBeenCalledWith("/loginRegister?login=true");
+    });
+
+    it("returns to form when clicking try a different email", async () => {
+        mockResetPassword.mockResolvedValue(undefined);
+        const user = userEvent.setup();
+        render(<PasswordReset />);
+
+        const emailInput = screen.getByRole("textbox", { name: /email/i });
+        await user.type(emailInput, "test@example.com");
+        await user.click(screen.getByRole("button", { name: /reset password/i }));
+
+        await waitFor(() => {
+            expect(screen.getByText(/check your email/i)).toBeInTheDocument();
+        });
+
+        await user.click(screen.getByRole("button", { name: /try a different email/i }));
+
+        await waitFor(() => {
+            expect(screen.getByRole("button", { name: /reset password/i })).toBeInTheDocument();
         });
     });
 

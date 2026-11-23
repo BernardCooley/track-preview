@@ -22,7 +22,6 @@ const AuthPageContent = () => {
     const searchParams = useSearchParams();
     const pathname = usePathname();
     const isLogin = searchParams.get("login");
-    const isPasswordReset = searchParams.get("passwordReset");
     const isAccountDeleted = searchParams.get("accountDeleted");
     const isVerifyEmail = searchParams.get("verifyEmail");
     const id = "loginRegisterToast";
@@ -56,16 +55,6 @@ const AuthPageContent = () => {
         return unsubscribe;
     }, [router]);
 
-    useEffect(() => {
-        if (isPasswordReset) {
-            setTimeout(() => showToast({
-                type: "success",
-                title: "Password reset",
-                description: "Please check your email to reset your password.",
-            }), 0);
-            router.push(pathname);
-        }
-    }, [isPasswordReset]);
 
     useEffect(() => {
         if (isAccountDeleted) {
