@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { useAuthContext } from "../../Contexts/AuthContext";
+import { useFeatureFlag } from "@/context/ExperimentContext";
+import { getSubscriptionsFlagKey } from "@/config/amplitude";
 
 export const useSubscription = () => {
     const { userProfile } = useAuthContext();
     const [upgradeFeature, setUpgradeFeature] = useState<string | null>(null);
+    const { value: subscriptionsFlag, isLoaded: flagLoaded } = useFeatureFlag(getSubscriptionsFlagKey(), "off");
 
-    const subscriptionsEnabled =
-        process.env.NEXT_PUBLIC_ENABLE_SUBSCRIPTIONS === "true";
+    const subscriptionsEnabled = flagLoaded && subscriptionsFlag === "on";
 
     const isInGracePeriod =
         userProfile?.subscriptionStatus === "PAST_DUE" &&
@@ -16,7 +18,7 @@ export const useSubscription = () => {
     const isPro =
         !subscriptionsEnabled ||
         (userProfile?.subscriptionTier === "PRO" &&
-            (userProfile?.subscriptionStatus === "ACTIVE" || isInGracePeriod));
+        (userProfile?.subscriptionStatus === "ACTIVE" || isInGracePeriod));
 
     const requirePro = (featureName: string): boolean => {
         if (isPro) return true;

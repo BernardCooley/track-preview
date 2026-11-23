@@ -24,6 +24,9 @@ import { getFormattedDate } from "../../utils";
 import { resolvePreviewUrl } from "@/bff/bff";
 import { useTrackContext } from "../../context/TrackContext";
 import { useLibraryParams } from "@/hooks/useLibraryParams";
+import { useSubscription } from "@/hooks/useSubscription";
+import UpgradePrompt from "./UpgradePrompt";
+import StarIcon from "@mui/icons-material/Star";
 import GenreModal from "./GenreModal";
 
 type TrackKeys = keyof Track;
@@ -70,6 +73,7 @@ const LibraryTable = ({
     onPlayAllStarted,
 }: Props) => {
     const { onTrackEndedRef, onSkipRef, onPreviousRef, playingPositionRef, setTrackLoading, setPlayingTrack } = useTrackContext();
+    const { isPro, requirePro, upgradeFeature, dismissUpgrade } = useSubscription();
     const {
         selectedGenres, activeSortField, activeSortDirection, hideBought,
         setSelectedGenres, setSort, setReleaseTrackId, setHideBought,
@@ -143,6 +147,7 @@ const LibraryTable = ({
         }
     }, []);
     const gotToRelease = (index: number) => {
+        if (!requirePro("Release Browsing")) return;
         const track = reviewTracks[4].tracks[index];
         updateCurrentReleaseTrack(track);
         setReleaseTrackId(track.id);
@@ -290,7 +295,10 @@ const LibraryTable = ({
                     fontSize="xl"
                     bg="transparent"
                     shadow="none"
-                    onClick={() => setTrackToBuy(origIndex)}
+                    onClick={() => {
+                        if (!requirePro("Purchase Tracking")) return;
+                        setTrackToBuy(origIndex);
+                    }}
                     rounded="full"
                     variant="tertiary"
                     aria-label={track.purchased ? "bought" : "buy track"}
@@ -320,7 +328,10 @@ const LibraryTable = ({
                 <TrackMenuOptions
                     onTrackDelete={() => setTrackToDelete(origIndex)}
                     onViewRelease={() => gotToRelease(origIndex)}
-                    onTogglePurchased={() => toggleTrackPurchased(origIndex)}
+                    onTogglePurchased={() => {
+                        if (!requirePro("Purchase Tracking")) return;
+                        toggleTrackPurchased(origIndex);
+                    }}
                     purchased={track.purchased}
                     index={origIndex}
                 />
@@ -416,6 +427,62 @@ const LibraryTable = ({
                         </Text>
                     </Flex>
                     <Flex gap={1.5} alignItems="center">
+                    {!isPro && (
+                        <Flex
+                            border="1px solid"
+                            borderColor="brand.primary"
+                            rounded="lg"
+                            px={1.5}
+                            py={0.5}
+                            gap={1.5}
+                            alignItems="center"
+                            opacity={0.75}
+                            cursor="pointer"
+                            transition="opacity 0.15s ease"
+                            _hover={{ opacity: 1 }}
+                            onClick={() => requirePro("Pro Library Tools")}
+                            role="button"
+                            aria-label="Upgrade to Pro for filters and sorting"
+                        >
+                            <Flex
+                                px={2.5}
+                                h={6}
+                                fontSize="xs"
+                                alignItems="center"
+                                color="brand.textSecondary"
+                                pointerEvents="none"
+                            >
+                                {genreLabel}
+                            </Flex>
+
+                            <Flex h={6} w={6} alignItems="center" justifyContent="center" color="brand.textSecondary" pointerEvents="none">
+                                <RemoveShoppingCartIcon style={{ fontSize: "14px" }} />
+                            </Flex>
+
+                            <Flex h={6} w={6} alignItems="center" justifyContent="center" color="brand.textSecondary" pointerEvents="none">
+                                <SwapVertIcon style={{ fontSize: "16px" }} />
+                            </Flex>
+
+                            <Flex
+                                alignItems="center"
+                                bg="brand.primarySubtle"
+                                color="brand.primary"
+                                rounded="full"
+                                px={1.5}
+                                py={0.5}
+                                gap={0.5}
+                                pointerEvents="none"
+                            >
+                                <StarIcon style={{ fontSize: "10px" }} />
+                                <Text fontSize="2xs" fontWeight="bold" lineHeight="1">
+                                    PRO
+                                </Text>
+                            </Flex>
+                        </Flex>
+                    )}
+
+                    {isPro && (
+                    <>
                     <Button
                         variant={hasGenreFilter ? "subtle" : "surface"}
                         onClick={() => setShowGenreSelector(true)}
@@ -531,6 +598,8 @@ const LibraryTable = ({
                             </Menu.Content>
                         </Menu.Positioner>
                     </Menu.Root>
+                    </>
+                    )}
                     </Flex>
                 </Flex>
             )}
@@ -694,6 +763,8 @@ const LibraryTable = ({
                     ))}
                 </Table.Body>
             </Table.Root>
+
+            <UpgradePrompt featureName={upgradeFeature} onClose={dismissUpgrade} />
         </Box>
     );
 };

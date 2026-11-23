@@ -14,6 +14,18 @@ vi.mock("@/hooks/useTrackList", () => ({
     useTrackList: vi.fn(),
 }));
 
+vi.mock("@/hooks/useSubscription", () => ({
+    useSubscription: () => ({
+        isPro: true,
+        isInGracePeriod: false,
+        subscriptionTier: "PRO",
+        subscriptionStatus: "ACTIVE",
+        upgradeFeature: null,
+        requirePro: () => true,
+        dismissUpgrade: vi.fn(),
+    }),
+}));
+
 import { useTrackList } from "@/hooks/useTrackList";
 const mockUseTrackList = vi.mocked(useTrackList);
 

@@ -10,10 +10,13 @@ vi.mock("@/lib/prisma", () => ({
     },
 }));
 
+vi.mock("@/lib/amplitude-experiment-server", () => ({
+    getServerFlag: () => Promise.resolve("on"),
+}));
+
 describe("requireProSubscription", () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        vi.stubEnv("NEXT_PUBLIC_ENABLE_SUBSCRIPTIONS", "true");
     });
 
     it("returns 404 when user not found", async () => {
