@@ -2,13 +2,11 @@
 
 import { useEffect } from "react";
 import { initAll } from "@amplitude/unified";
+import { getAmplitudeApiKey } from "@/config/amplitude";
 
 export default function Amplitude() {
     useEffect(() => {
-        const apiKey = process.env.NEXT_PUBLIC_AMPLITUDE_API_KEY;
-        if (!apiKey) return;
-
-        initAll(apiKey, {
+        initAll(getAmplitudeApiKey(), {
             serverZone: "EU",
             analytics: { autocapture: true },
             sessionReplay: { sampleRate: 1 },

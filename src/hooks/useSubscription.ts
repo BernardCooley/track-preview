@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { useAuthContext } from "../../Contexts/AuthContext";
 import { useFeatureFlag } from "@/context/ExperimentContext";
+import { getSubscriptionsFlagKey } from "@/config/amplitude";
 
 export const useSubscription = () => {
     const { userProfile } = useAuthContext();
     const [upgradeFeature, setUpgradeFeature] = useState<string | null>(null);
-    const flagKey = process.env.NEXT_PUBLIC_SUBSCRIPTIONS_FLAG_KEY ?? "enable-subscriptions";
-    const { value: subscriptionsFlag, isLoaded: flagLoaded } = useFeatureFlag(flagKey, "off");
+    const { value: subscriptionsFlag, isLoaded: flagLoaded } = useFeatureFlag(getSubscriptionsFlagKey(), "off");
 
     const subscriptionsEnabled = flagLoaded && subscriptionsFlag === "on";
 

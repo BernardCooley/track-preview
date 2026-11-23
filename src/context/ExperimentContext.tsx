@@ -23,17 +23,11 @@ export const ExperimentProvider = ({ children }: { children: ReactNode }) => {
 
     useEffect(() => {
         const client = getExperimentClient();
-        if (!client) {
-            setIsLoaded(true);
-            return;
-        }
-
         client.fetch().then(() => setIsLoaded(true)).catch(() => setIsLoaded(true));
     }, []);
 
     const getFlag = (flagKey: string, fallback = "off"): string => {
         const client = getExperimentClient();
-        if (!client) return fallback;
         const variant = client.variant(flagKey);
         return variant?.value ?? fallback;
     };
