@@ -1,3 +1,7 @@
+vi.hoisted(() => {
+    process.env.NEXT_PUBLIC_ENABLE_SUBSCRIPTIONS = "true";
+});
+
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import React from "react";
@@ -51,7 +55,7 @@ function wrapper(userProfile: UserProfile | null) {
 
 describe("useSubscription", () => {
     beforeEach(() => {
-        vi.stubEnv("NEXT_PUBLIC_ENABLE_SUBSCRIPTIONS", "true");
+        vi.clearAllMocks();
     });
 
     it("isPro is false for FREE tier", () => {
