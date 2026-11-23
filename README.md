@@ -155,7 +155,7 @@ Open the browser console on any page where you're logged in and run:
 fetch('/api/stripe/create-checkout-session', {
   method: 'POST',
   headers: {'Content-Type': 'application/json'},
-  body: JSON.stringify({userId: '<your-firebase-uid>'})
+  body: JSON.stringify({userId: 'nWDEiOWsMVQ7qOFVLzrZvGrEqdN2'})
 }).then(r => r.json()).then(data => window.location.href = data.url)
 ```
 
