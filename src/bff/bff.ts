@@ -413,3 +413,27 @@ export const fetchRelease = async ({
         throw error;
     }
 };
+
+export const createCheckoutSession = async ({
+    userId,
+}: {
+    userId: string;
+}): Promise<{ url: string } | null> => {
+    return await fetchWithErrorHandling(
+        "/api/stripe/create-checkout-session",
+        "POST",
+        { userId }
+    );
+};
+
+export const createPortalSession = async ({
+    userId,
+}: {
+    userId: string;
+}): Promise<{ url: string } | null> => {
+    return await fetchWithErrorHandling(
+        "/api/stripe/create-portal-session",
+        "POST",
+        { userId }
+    );
+};

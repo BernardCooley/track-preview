@@ -32,6 +32,11 @@ CRON_SECRET=local-dev-cron-secret
 
 NEXT_PUBLIC_SPOTIFY_CLIENT_ID=
 NEXT_PUBLIC_SPOTIFY_SECRET=
+
+STRIPE_SECRET_KEY=
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=
+STRIPE_WEBHOOK_SECRET=
+STRIPE_PRO_PRICE_ID=
 ```
 
 ## Local Development Setup
@@ -105,6 +110,62 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
+
+## Testing Stripe Subscription Locally
+
+### 1. Install the Stripe CLI
+
+```bash
+brew install stripe/stripe-cli/stripe
+stripe login
+```
+
+### 2. Add Stripe env vars to `.env`
+
+```
+STRIPE_SECRET_KEY=sk_test_...
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+STRIPE_PRO_PRICE_ID=price_...
+```
+
+Get these from the [Stripe dashboard](https://dashboard.stripe.com/test/apikeys) (use test mode). The price ID comes from Product catalog > your product's recurring price.
+
+### 3. Start the webhook listener
+
+In a separate terminal:
+
+```bash
+stripe listen --forward-to localhost:3000/api/stripe/webhook --events checkout.session.completed,customer.subscription.updated,customer.subscription.deleted,invoice.payment_failed
+```
+
+This prints a `whsec_...` signing secret — use it as `STRIPE_WEBHOOK_SECRET`.
+
+### 4. Start the dev server
+
+```bash
+npm run dev
+```
+
+### 5. Trigger a checkout
+
+Open the browser console on any page where you're logged in and run:
+
+```js
+fetch('/api/stripe/create-checkout-session', {
+  method: 'POST',
+  headers: {'Content-Type': 'application/json'},
+  body: JSON.stringify({userId: '<your-firebase-uid>'})
+}).then(r => r.json()).then(data => window.location.href = data.url)
+```
+
+Use test card `4242 4242 4242 4242` with any future expiry and any CVC.
+
+After checkout, you'll be redirected to `/subscription/success` which polls until your user is updated to PRO, then redirects to `/explore`.
+
+### 6. Verify
+
+Check the `stripe listen` terminal for `<-- [200]` confirming the webhook was received. You can also check the user's `subscriptionTier` in Prisma Studio (`npx prisma studio`).
 
 ## How It Works
 
@@ -291,3 +352,10 @@ Two Vercel cron jobs run daily (configured in `vercel.json`):
 | `src/app/api/getTracks/route.ts` | Main track query API (genre/year filters) |
 | `scraping_tracks/weeklySync.js` | Weekly local sync script (Juno scrape + Deezer search) |
 | `scraping_tracks/latestRelease.json` | Bookmark for incremental Juno scraping |
+| `src/lib/stripe.ts` | Stripe client singleton |
+| `src/app/api/stripe/create-checkout-session/route.ts` | Creates Stripe Checkout session |
+| `src/app/api/stripe/webhook/route.ts` | Handles Stripe webhook events |
+| `src/app/api/stripe/create-portal-session/route.ts` | Creates Stripe Customer Portal session |
+| `src/hooks/useSubscription.ts` | Client-side Pro subscription check |
+| `src/lib/requireProSubscription.ts` | Server-side Pro subscription guard |
+| `prisma/grandfather-pro.js` | One-time script to set existing users to PRO |

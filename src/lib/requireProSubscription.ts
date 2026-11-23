@@ -1,0 +1,39 @@
+import prisma from "@/lib/prisma";
+import { NextResponse } from "next/server";
+
+export async function requireProSubscription(
+    firebaseId: string
+): Promise<NextResponse | null> {
+    const user = await prisma?.user.findFirst({
+        where: { firebaseId },
+        select: {
+            subscriptionTier: true,
+            subscriptionStatus: true,
+            subscriptionExpiresAt: true,
+        },
+    });
+
+    if (!user) {
+        return NextResponse.json(
+            { error: "User not found" },
+            { status: 404 }
+        );
+    }
+
+    if (user.subscriptionTier === "PRO") {
+        if (user.subscriptionStatus === "ACTIVE") return null;
+
+        if (
+            user.subscriptionStatus === "PAST_DUE" &&
+            user.subscriptionExpiresAt &&
+            user.subscriptionExpiresAt > new Date()
+        ) {
+            return null;
+        }
+    }
+
+    return NextResponse.json(
+        { error: "Pro subscription required" },
+        { status: 403 }
+    );
+}
