@@ -23,6 +23,8 @@
         "setup:local": "colima start && docker run --rm -d -p 5432:5432 -e POSTGRES_HOST_AUTH_METHOD=trust postgres && sleep 3 && npx prisma db push && npx prisma db seed && npx prisma studio"
     },
     "dependencies": {
+        "@amplitude/experiment-js-client": "^1.24.0",
+        "@amplitude/unified": "^1.2.4",
         "@chakra-ui/react": "3.38.0",
         "@emotion/react": "11.14.0",
         "@emotion/styled": "^11.14.1",

@@ -2,6 +2,7 @@ import "./styles/globals.css";
 import type { Metadata, Viewport } from "next";
 import { SerwistProvider } from "@serwist/turbopack/react";
 import { Providers } from "./providers";
+import Amplitude from "./amplitude";
 
 export const metadata: Metadata = {
     metadataBase: new URL("https://www.phoniquest.com"),
@@ -68,6 +69,7 @@ export default function RootLayout({
         <html lang="en">
             <body>
                 <SerwistProvider swUrl="/serwist/sw.js">
+                    <Amplitude />
                     <Providers>{children}</Providers>
                 </SerwistProvider>
             </body>

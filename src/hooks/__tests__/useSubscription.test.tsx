@@ -5,6 +5,11 @@ import { AuthContext } from "../../../Contexts/AuthContext";
 import { useSubscription } from "../useSubscription";
 import type { User as UserProfile } from "@prisma/client";
 
+const mockFeatureFlag = vi.hoisted(() => ({ value: "on", isLoaded: true }));
+vi.mock("@/context/ExperimentContext", () => ({
+    useFeatureFlag: () => mockFeatureFlag,
+}));
+
 function makeProfile(
     overrides: Partial<UserProfile> = {}
 ): UserProfile {
@@ -52,6 +57,8 @@ function wrapper(userProfile: UserProfile | null) {
 describe("useSubscription", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        mockFeatureFlag.value = "on";
+        mockFeatureFlag.isLoaded = true;
     });
 
     it("isPro is false for FREE tier", () => {
@@ -169,5 +176,22 @@ describe("useSubscription", () => {
             result.current.dismissUpgrade();
         });
         expect(result.current.upgradeFeature).toBe(null);
+    });
+
+    it("isPro is true for FREE user when feature flag is off", () => {
+        mockFeatureFlag.value = "off";
+        const { result } = renderHook(() => useSubscription(), {
+            wrapper: wrapper(makeProfile({ subscriptionTier: "FREE" })),
+        });
+        expect(result.current.isPro).toBe(true);
+    });
+
+    it("isPro is true when feature flag is not yet loaded", () => {
+        mockFeatureFlag.value = "on";
+        mockFeatureFlag.isLoaded = false;
+        const { result } = renderHook(() => useSubscription(), {
+            wrapper: wrapper(makeProfile({ subscriptionTier: "FREE" })),
+        });
+        expect(result.current.isPro).toBe(true);
     });
 });
