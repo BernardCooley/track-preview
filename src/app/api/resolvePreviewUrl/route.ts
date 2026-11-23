@@ -2,6 +2,9 @@ import prisma from "@/lib/prisma";
 import { deezer } from "@/lib/deezer";
 import { NextResponse } from "next/server";
 
+const previewUrlCache = new Map<string, { url: string; expiresAt: number }>();
+const CACHE_TTL_MS = 1000 * 60 * 60;
+
 function toProxyUrl(url: string): string {
     if (!url) return "";
     return `/api/proxyAudio?url=${encodeURIComponent(url)}`;
@@ -20,6 +23,11 @@ export async function POST(req: Request) {
                 { error: "Track not found" },
                 { status: 404 }
             );
+        }
+
+        const cached = previewUrlCache.get(trackId);
+        if (cached && cached.expiresAt > Date.now()) {
+            return NextResponse.json({ previewUrl: cached.url ? toProxyUrl(cached.url) : "" });
         }
 
         let freshUrl = "";
@@ -74,6 +82,8 @@ export async function POST(req: Request) {
                 },
             });
         }
+
+        previewUrlCache.set(trackId, { url: freshUrl, expiresAt: Date.now() + CACHE_TTL_MS });
 
         return NextResponse.json({
             previewUrl: freshUrl ? toProxyUrl(freshUrl) : "",
