@@ -8,6 +8,7 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { ZodType, z } from "zod";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { sendPasswordResetEmail } from "@/bff/bff";
 
 interface Props {}
@@ -22,6 +23,7 @@ const schema: ZodType<FormData> = z.object({
 
 const PasswordReset = ({}: Props) => {
     const [submitting, setSubmitting] = useState(false);
+    const [emailSent, setEmailSent] = useState(false);
     const router = useRouter();
     const [authError, setAuthError] = useState<string | null>(null);
 
@@ -29,6 +31,7 @@ const PasswordReset = ({}: Props) => {
         register,
         handleSubmit,
         formState: { errors },
+        getValues,
     } = useForm<FormData>({
         resolver: zodResolver(schema),
         defaultValues: {
@@ -41,10 +44,10 @@ const PasswordReset = ({}: Props) => {
         try {
             await sendPasswordResetEmail(formData.email);
             setAuthError(null);
-            router.push("/loginRegister?login=true&passwordReset=true");
+            setEmailSent(true);
         } catch (error) {
             setAuthError(
-                "Error sending password reset email. Please check your email and password and try again."
+                "Error sending password reset email. Please check your email and try again."
             );
         } finally {
             setSubmitting(false);
@@ -95,47 +98,91 @@ const PasswordReset = ({}: Props) => {
                 roundedBottom="none"
                 p={[5, 6]}
             >
-                <Text
-                    fontSize="lg"
-                    fontWeight="semibold"
-                    color="brand.textPrimary"
-                    mb={6}
-                >
-                    Reset password
-                </Text>
-
-                <form
-                    onSubmit={handleSubmit(performPasswordReset)}
-                    style={{ height: "100%" }}
-                >
-                    <Flex direction="column" gap={5}>
-                        <TextInput
-                            helperText="Enter your email address and we'll send you a link to reset your password."
-                            required={true}
-                            title="Email"
-                            size="md"
-                            fieldProps={register("email")}
-                            error={errors.email?.message}
-                        />
-                        <Button
-                            loading={submitting}
-                            type="submit"
-                            variant="primary"
-                            w="full"
-                            onClick={handleSubmit(performPasswordReset)}
+                {emailSent ? (
+                    <Flex direction="column" alignItems="center" textAlign="center" gap={4} py={6}>
+                        <CheckCircleIcon sx={{ fontSize: 48, color: "var(--chakra-colors-brand-primary)" }} />
+                        <Text
+                            fontSize="lg"
+                            fontWeight="semibold"
+                            color="brand.textPrimary"
+                        >
+                            Check your email
+                        </Text>
+                        <Text fontSize="sm" color="brand.textSecondary">
+                            We&apos;ve sent a password reset link to{" "}
+                            <Text as="span" fontWeight="semibold" color="brand.textPrimary">
+                                {getValues("email")}
+                            </Text>
+                            . It may take a few minutes to arrive.
+                        </Text>
+                        <Text fontSize="xs" color="brand.textMuted">
+                            Didn&apos;t receive it? Check your spam folder or try again.
+                        </Text>
+                        <Flex direction="column" gap={3} w="full" mt={2}>
+                            <Button
+                                variant="primary"
+                                w="full"
+                                onClick={() => router.push("/loginRegister?login=true")}
+                            >
+                                Back to sign in
+                            </Button>
+                            <Button
+                                variant="outline"
+                                w="full"
+                                onClick={() => {
+                                    setEmailSent(false);
+                                    setAuthError(null);
+                                }}
+                            >
+                                Try a different email
+                            </Button>
+                        </Flex>
+                    </Flex>
+                ) : (
+                    <>
+                        <Text
+                            fontSize="lg"
+                            fontWeight="semibold"
+                            color="brand.textPrimary"
+                            mb={6}
                         >
                             Reset password
-                        </Button>
-                    </Flex>
-                </form>
-                {authError && (
-                    <Box mt={4}>
-                        <Field.Root invalid>
-                            <Field.ErrorText fontSize="sm">
-                                {authError}
-                            </Field.ErrorText>
-                        </Field.Root>
-                    </Box>
+                        </Text>
+
+                        <form
+                            onSubmit={handleSubmit(performPasswordReset)}
+                            style={{ height: "100%" }}
+                        >
+                            <Flex direction="column" gap={5}>
+                                <TextInput
+                                    helperText="Enter your email address and we'll send you a link to reset your password."
+                                    required={true}
+                                    title="Email"
+                                    size="md"
+                                    fieldProps={register("email")}
+                                    error={errors.email?.message}
+                                />
+                                <Button
+                                    loading={submitting}
+                                    type="submit"
+                                    variant="primary"
+                                    w="full"
+                                    onClick={handleSubmit(performPasswordReset)}
+                                >
+                                    Reset password
+                                </Button>
+                            </Flex>
+                        </form>
+                        {authError && (
+                            <Box mt={4}>
+                                <Field.Root invalid>
+                                    <Field.ErrorText fontSize="sm">
+                                        {authError}
+                                    </Field.ErrorText>
+                                </Field.Root>
+                            </Box>
+                        )}
+                    </>
                 )}
             </Box>
         </Flex>
