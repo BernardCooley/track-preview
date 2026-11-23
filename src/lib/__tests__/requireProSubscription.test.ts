@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 const mockFindFirst = vi.fn();
+const mockGetServerFlag = vi.fn().mockResolvedValue("on");
 
 vi.mock("@/lib/prisma", () => ({
     default: {
@@ -11,12 +12,13 @@ vi.mock("@/lib/prisma", () => ({
 }));
 
 vi.mock("@/lib/amplitude-experiment-server", () => ({
-    getServerFlag: () => Promise.resolve("on"),
+    getServerFlag: (...args: any[]) => mockGetServerFlag(...args),
 }));
 
 describe("requireProSubscription", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        mockGetServerFlag.mockResolvedValue("on");
     });
 
     it("returns 404 when user not found", async () => {
@@ -114,4 +116,22 @@ describe("requireProSubscription", () => {
         expect(result).not.toBeNull();
         expect(result!.status).toBe(403);
     });
+
+    it("returns null (pass) for FREE user when feature flag is off", async () => {
+        vi.resetModules();
+        mockGetServerFlag.mockResolvedValue("off");
+        mockFindFirst.mockResolvedValue({
+            subscriptionTier: "FREE",
+            subscriptionStatus: null,
+            subscriptionExpiresAt: null,
+        });
+        const { requireProSubscription } = await import(
+            "../requireProSubscription"
+        );
+
+        const result = await requireProSubscription("free-user");
+        expect(result).toBeNull();
+        expect(mockFindFirst).not.toHaveBeenCalled();
+    });
+
 });
