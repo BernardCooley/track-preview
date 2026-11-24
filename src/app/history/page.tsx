@@ -401,7 +401,7 @@ function HistoryContent() {
                                         borderLeft="2px solid"
                                         borderLeftColor={filter === "all" ? "brand.primary" : "transparent"}
                                         color={filter === "all" ? "brand.primary" : undefined}
-                                        onClick={() => { setFilterLoading(true); setFilter("all"); }}
+                                        onClick={() => { if (filter !== "all") { setFilterLoading(true); setFilter("all"); } }}
                                     >
                                         All
                                     </Button>
@@ -414,7 +414,7 @@ function HistoryContent() {
                                         borderLeft="2px solid"
                                         borderLeftColor={filter === "skipped-only" ? "brand.primary" : "transparent"}
                                         color={filter === "skipped-only" ? "brand.primary" : undefined}
-                                        onClick={() => { setFilterLoading(true); setFilter("skipped-only"); }}
+                                        onClick={() => { if (filter !== "skipped-only") { setFilterLoading(true); setFilter("skipped-only"); } }}
                                         loading={filterLoading}
                                     >
                                         Skipped only
