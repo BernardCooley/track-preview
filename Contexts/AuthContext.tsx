@@ -1,4 +1,5 @@
 import { User as UserProfile } from "@prisma/client";
+import * as Sentry from "@sentry/nextjs";
 import React, { createContext, ReactNode, useContext, useState } from "react";
 import { User } from "../types";
 
@@ -34,6 +35,11 @@ export const AuthContextProvider = ({ children }: { children: ReactNode }) => {
     const [profileError, setProfileError] = useState<boolean>(false);
 
     const updateUser = (user: User | null) => {
+        if (user) {
+            Sentry.setUser({ id: user.uid, email: user.email });
+        } else {
+            Sentry.setUser(null);
+        }
         setUser(user);
     };
 

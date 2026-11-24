@@ -19,6 +19,7 @@ export const useTrackList = () => {
         updatePreviousTracks,
         changesMade,
         updateChangesMade,
+        setPlayingTrack,
     } = useTrackContext();
     const [loading, setLoading] = useState<boolean>(false);
     const [noTracks, setNoTracks] = useState<boolean>(false);
@@ -46,6 +47,7 @@ export const useTrackList = () => {
                 });
 
                 updateCurrentlyPlaying(undefined);
+                setPlayingTrack(null);
 
                 const filteredTracks: Track[] = reviewTracks[4].tracks.filter(
                     (t) => t.id !== reviewTracks[4].tracks[trackToDelete].id
