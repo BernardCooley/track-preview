@@ -235,6 +235,10 @@ interface UpdateUserAutoplayProps {
     isAnonymous?: boolean;
     swipeMode?: boolean;
     genres?: string[];
+    genreAlerts?: string[];
+    genreAlertFrequency?: string;
+    genreEmailsEnabled?: boolean;
+    email?: string;
     yearFrom?: number;
     yearTo?: number;
 }
@@ -246,6 +250,10 @@ export const mutateUserProfile = async ({
     isAnonymous,
     swipeMode,
     genres,
+    genreAlerts,
+    genreAlertFrequency,
+    genreEmailsEnabled,
+    email,
     yearFrom,
     yearTo,
 }: UpdateUserAutoplayProps): Promise<User> => {
@@ -260,6 +268,10 @@ export const mutateUserProfile = async ({
                 isAnonymous,
                 swipeMode,
                 genres,
+                genreAlerts,
+                genreAlertFrequency,
+                genreEmailsEnabled,
+                email,
                 yearFrom,
                 yearTo,
             }
@@ -530,4 +542,27 @@ export const spotifyDisconnect = async ({
         "POST",
         { userId }
     );
+};
+
+interface FetchNewTracksProps {
+    genres: string[];
+    userId: string;
+    since: string;
+}
+
+export const fetchNewTracks = async ({
+    genres,
+    userId,
+    since,
+}: FetchNewTracksProps): Promise<Track[] | null> => {
+    try {
+        const tracks = await fetchWithErrorHandling("/api/getNewTracks", "POST", {
+            genres,
+            userId,
+            since,
+        });
+        return tracks as Track[];
+    } catch (error) {
+        throw error;
+    }
 };

@@ -101,6 +101,33 @@ export async function sendVerificationEmail(email: string, link: string) {
     });
 }
 
+export async function sendGenreAlertEmail(
+    email: string,
+    genreSummary: { genre: string; count: number }[]
+) {
+    const lines = genreSummary.map((g) => `• ${g.genre}: ${g.count} new track${g.count === 1 ? "" : "s"}`).join("\n");
+    const htmlLines = genreSummary.map((g) =>
+        `<li style="margin:0 0 6px; font-size:15px; color:#555555;">${g.genre}: <strong>${g.count}</strong> new track${g.count === 1 ? "" : "s"}</li>`
+    ).join("");
+
+    const content = {
+        heading: "New tracks in your genres",
+        body: `New tracks have been added in genres you follow:\n\n${lines}`,
+        buttonText: "Start Listening",
+        buttonUrl: `${process.env.NEXT_PUBLIC_APP_URL || "https://phoniquest.com"}/new-tracks?from=email`,
+    };
+
+    const htmlBody = `New tracks have been added in genres you follow:<ul style="margin:12px 0 0; padding-left:20px;">${htmlLines}</ul>`;
+
+    await transporter.sendMail({
+        from: `"Phoniquest" <${process.env.SMTP_USER}>`,
+        to: email,
+        subject: "New tracks in your genres — Phoniquest",
+        text: buildPlainText(content),
+        html: buildEmailHtml({ ...content, body: htmlBody }),
+    });
+}
+
 export async function sendPasswordResetEmail(email: string, link: string) {
     const content = {
         heading: "Reset your password",

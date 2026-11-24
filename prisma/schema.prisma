@@ -21,6 +21,12 @@ enum SubscriptionStatus {
   PAST_DUE
 }
 
+enum AlertFrequency {
+  DAILY
+  WEEKLY
+  MONTHLY
+}
+
 model User {
   id                    String              @id @default(cuid())
   firebaseId            String
@@ -31,6 +37,10 @@ model User {
   curatedMode           Boolean             @default(false)
   swipeMode             Boolean             @default(true)
   isAnonymous           Boolean             @default(false)
+  email                 String?
+  genreAlerts           String[]            @default([])
+  genreAlertFrequency   AlertFrequency      @default(WEEKLY)
+  genreEmailsEnabled    Boolean             @default(false)
   lastActiveAt          DateTime            @default(now())
   subscriptionTier      SubscriptionTier    @default(FREE)
   stripeCustomerId      String?
@@ -71,5 +81,6 @@ model Track {
   releaseYear   Int
   releaseDate   String
   deezerTrackId String?
+  createdAt     DateTime  @default(now())
   review        Review[]
 }
