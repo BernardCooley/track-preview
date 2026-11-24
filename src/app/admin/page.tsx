@@ -64,7 +64,6 @@ const AdminPage = () => {
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
-            console.log("[admin] uid:", user?.uid, "allowed:", ADMIN_UIDS);
             if (user && ADMIN_UIDS.includes(user.uid)) {
                 setAuthorized(true);
                 setCountry(getCountryCookie());
