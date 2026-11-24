@@ -18,7 +18,7 @@ export const useSubscription = () => {
     const isPro =
         !subscriptionsEnabled ||
         (userProfile?.subscriptionTier === "PRO" &&
-        (userProfile?.subscriptionStatus === "ACTIVE" || isInGracePeriod));
+        userProfile?.subscriptionStatus !== "CANCELED");
 
     const requirePro = (featureName: string): boolean => {
         if (isPro) return true;
