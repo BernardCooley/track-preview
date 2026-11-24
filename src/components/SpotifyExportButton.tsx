@@ -164,6 +164,7 @@ const SpotifyExportButton = ({ requirePro, isPro }: Props) => {
             </Box>
 
             <Dialog.Root
+                placement="center"
                 open={open}
                 onOpenChange={(details) => {
                     if (!details.open) setOpen(false);
@@ -210,8 +211,8 @@ const SpotifyExportButton = ({ requirePro, isPro }: Props) => {
                             <Box px={[4, 5]} py={5}>
                                 <Flex direction="column" gap={3}>
                                     <ExportOption
-                                        label="Update Phoniquest Library"
-                                        description="Syncs your library to a single playlist"
+                                        label="Phoniquest Library"
+                                        description="Creates or updates a single playlist with your library"
                                         selected={mode === "default"}
                                         onClick={() => setMode("default")}
                                     />
@@ -356,6 +357,14 @@ const SpotifyExportButton = ({ requirePro, isPro }: Props) => {
                                     loading={exporting}
                                     disabled={!canExport}
                                     onClick={handleExport}
+                                    css={{
+                                        "& .chakra-spinner": {
+                                            WebkitAnimation:
+                                                "spin 1s linear infinite",
+                                            animation:
+                                                "spin 1s linear infinite",
+                                        },
+                                    }}
                                 >
                                     Export
                                 </Button>
