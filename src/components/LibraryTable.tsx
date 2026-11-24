@@ -27,8 +27,10 @@ import { useLibraryParams } from "@/hooks/useLibraryParams";
 import { useSubscription } from "@/hooks/useSubscription";
 import UpgradePrompt from "./UpgradePrompt";
 import StarIcon from "@mui/icons-material/Star";
+import BarChartIcon from "@mui/icons-material/BarChart";
 import GenreModal from "./GenreModal";
 import SpotifyExportButton from "./SpotifyExportButton";
+import LibraryStats from "./LibraryStats";
 
 type TrackKeys = keyof Track;
 
@@ -83,6 +85,7 @@ const LibraryTable = ({
     const blobCache = useRef<Map<string, string>>(new Map());
 
     const [showGenreSelector, setShowGenreSelector] = useState(false);
+    const [showStats, setShowStats] = useState(false);
 
     const availableGenres = useMemo(() => {
         const genreSet = new Set<string>();
@@ -390,7 +393,7 @@ const LibraryTable = ({
             transition="padding 0.2s ease-in-out"
             pb={currentlyPlaying ? 24 : 4}
             flex={1}
-            overflowY="auto"
+            overflowY="scroll"
             overflowX="auto"
             css={{
                 "&::-webkit-scrollbar": {
@@ -599,13 +602,37 @@ const LibraryTable = ({
                             </Menu.Content>
                         </Menu.Positioner>
                     </Menu.Root>
+
                     </>
                     )}
-                    <Box ml="auto">
+                    <Flex ml="auto" gap={1.5} alignItems="center">
+                        <IconButton
+                            variant={showStats ? "subtle" : "surface"}
+                            size="xs"
+                            h={7}
+                            w={7}
+                            aria-label="Library stats"
+                            onClick={() => setShowStats((v) => !v)}
+                        >
+                            <BarChartIcon style={{ fontSize: "16px" }} />
+                        </IconButton>
                         <SpotifyExportButton requirePro={requirePro} isPro={isPro} />
-                    </Box>
+                    </Flex>
                     </Flex>
                 </Flex>
+            )}
+
+            {!currentReleaseTrack && (
+                <Box
+                    overflow="hidden"
+                    transition="max-height 0.5s ease-in-out, opacity 0.4s ease-in-out"
+                    maxH={showStats ? "2000px" : "0px"}
+                    opacity={showStats ? 1 : 0}
+                >
+                    {showStats && (
+                        <LibraryStats onClose={() => setShowStats(false)} isPro={isPro} requirePro={requirePro} />
+                    )}
+                </Box>
             )}
 
             {filteredTracks.length === 0 && hideBought && reviewTracks[4].tracks.length > 0 && (
