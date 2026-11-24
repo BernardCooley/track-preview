@@ -12,16 +12,6 @@ interface Props {
 
 const features = [
     {
-        keys: ["Library Tools"],
-        text: "Filter and sort your library by genre, artist, and more",
-        description: "Find exactly what you're looking for with powerful filters. Sort by genre, artist, date added, and more to keep your collection organised.",
-    },
-    {
-        keys: ["Purchase Tracking"],
-        text: "Mark tracks as bought to manage your collection",
-        description: "Keep track of which tracks you've already bought. Mark purchases directly in your library so you never lose track or buy the same track twice.",
-    },
-    {
         keys: ["Release Browsing"],
         text: "Browse full releases from your library",
         description: "Found a track you love? Browse the full release it came from to discover more tracks by the same artist without leaving Phoniquest.",

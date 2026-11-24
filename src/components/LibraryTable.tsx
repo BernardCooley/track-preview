@@ -29,7 +29,6 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { useAuthContext } from "../../Contexts/AuthContext";
 import NoteIcon from "@mui/icons-material/StickyNote2Outlined";
 import UpgradePrompt from "./UpgradePrompt";
-import StarIcon from "@mui/icons-material/Star";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import GenreModal from "./GenreModal";
 import SpotifyExportButton from "./SpotifyExportButton";
@@ -132,6 +131,7 @@ const LibraryTable = ({
     }, [reviewTracks[4].tracks]);
 
     const hasGenreFilter = !selectedGenres.some((g) => g.toLowerCase() === "all") && selectedGenres.length > 0;
+    const hasBoughtTracks = useMemo(() => reviewTracks[4].tracks.some((t) => t.purchased), [reviewTracks[4].tracks]);
 
     const filteredTracks = useMemo(() => {
         let tracks = reviewTracks[4].tracks;
@@ -335,10 +335,7 @@ const LibraryTable = ({
                     fontSize="xl"
                     bg="transparent"
                     shadow="none"
-                    onClick={() => {
-                        if (!requirePro("Purchase Tracking")) return;
-                        setTrackToBuy(origIndex);
-                    }}
+                    onClick={() => setTrackToBuy(origIndex)}
                     rounded="full"
                     variant="tertiary"
                     aria-label={track.purchased ? "bought" : "buy track"}
@@ -368,10 +365,7 @@ const LibraryTable = ({
                 <TrackMenuOptions
                     onTrackDelete={() => setTrackToDelete(origIndex)}
                     onViewRelease={() => gotToRelease(origIndex)}
-                    onTogglePurchased={() => {
-                        if (!requirePro("Purchase Tracking")) return;
-                        toggleTrackPurchased(origIndex);
-                    }}
+                    onTogglePurchased={() => toggleTrackPurchased(origIndex)}
                     onEditNotes={() => handleEditNotes(origIndex)}
                     purchased={track.purchased}
                     hasNotes={!!track.notes}
@@ -470,62 +464,6 @@ const LibraryTable = ({
                         </Text>
                     </Flex>
                     <Flex gap={1.5} alignItems="center">
-                    {!isPro && (
-                        <Flex
-                            border="1px solid"
-                            borderColor="brand.primary"
-                            rounded="lg"
-                            px={1.5}
-                            py={0.5}
-                            gap={1.5}
-                            alignItems="center"
-                            opacity={0.75}
-                            cursor="pointer"
-                            transition="opacity 0.15s ease"
-                            _hover={{ opacity: 1 }}
-                            onClick={() => requirePro("Library Tools")}
-                            role="button"
-                            aria-label="Upgrade to Pro for filters and sorting"
-                        >
-                            <Flex
-                                px={2.5}
-                                h={6}
-                                fontSize="xs"
-                                alignItems="center"
-                                color="brand.textSecondary"
-                                pointerEvents="none"
-                            >
-                                {genreLabel}
-                            </Flex>
-
-                            <Flex h={6} w={6} alignItems="center" justifyContent="center" color="brand.textSecondary" pointerEvents="none">
-                                <RemoveShoppingCartIcon style={{ fontSize: "14px" }} />
-                            </Flex>
-
-                            <Flex h={6} w={6} alignItems="center" justifyContent="center" color="brand.textSecondary" pointerEvents="none">
-                                <SwapVertIcon style={{ fontSize: "16px" }} />
-                            </Flex>
-
-                            <Flex
-                                alignItems="center"
-                                bg="brand.primarySubtle"
-                                color="brand.primary"
-                                rounded="full"
-                                px={1.5}
-                                py={0.5}
-                                gap={0.5}
-                                pointerEvents="none"
-                            >
-                                <StarIcon style={{ fontSize: "10px" }} />
-                                <Text fontSize="2xs" fontWeight="bold" lineHeight="1">
-                                    PRO
-                                </Text>
-                            </Flex>
-                        </Flex>
-                    )}
-
-                    {isPro && (
-                    <>
                     <Button
                         variant={hasGenreFilter ? "subtle" : "surface"}
                         onClick={() => setShowGenreSelector(true)}
@@ -549,6 +487,8 @@ const LibraryTable = ({
                         borderLeft={hideBought ? "2px solid" : "2px solid transparent"}
                         borderLeftColor={hideBought ? "brand.primary" : "transparent"}
                         color={hideBought ? "brand.primary" : undefined}
+                        disabled={!hasBoughtTracks}
+                        opacity={hasBoughtTracks ? 1 : 0.4}
                     >
                         <RemoveShoppingCartIcon style={{ fontSize: "14px" }} />
                     </Button>
@@ -642,8 +582,6 @@ const LibraryTable = ({
                         </Menu.Positioner>
                     </Menu.Root>
 
-                    </>
-                    )}
                     <Flex ml="auto" gap={1.5} alignItems="center">
                         <IconButton
                             variant={showStats ? "subtle" : "surface"}
