@@ -606,3 +606,22 @@ export const fetchLibraryStats = async ({
         { userId }
     );
 };
+
+export const exportLibrary = async ({
+    userId,
+    format,
+}: {
+    userId: string;
+    format: "csv" | "json";
+}): Promise<Blob> => {
+    const res = await fetch("/api/exportLibrary", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, format }),
+    });
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || "Export failed");
+    }
+    return res.blob();
+};
