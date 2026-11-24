@@ -26,10 +26,20 @@ import { useSubscription } from "@/hooks/useSubscription";
 const mockUseSubscription = vi.mocked(useSubscription);
 
 const mockMutateUserProfile = vi.fn().mockResolvedValue({});
+const mockFetchLibraryStats = vi.fn().mockResolvedValue({
+    totalTracks: 10,
+    purchasedTracks: 3,
+    totalReviewed: 50,
+    genreBreakdown: [{ genre: "Techno", count: 5 }],
+    decadeDistribution: [{ decade: 2000, count: 10 }],
+    topArtists: [{ artist: "Artist A", count: 3 }],
+    topReleases: [],
+});
 vi.mock("@/bff/bff", () => ({
     mutateUserProfile: (...args: unknown[]) => mockMutateUserProfile(...args),
     resolvePreviewUrl: vi.fn(),
     createCheckoutSession: vi.fn(),
+    fetchLibraryStats: (...args: unknown[]) => mockFetchLibraryStats(...args),
 }));
 
 function setSubscription(isPro: boolean) {
@@ -388,6 +398,58 @@ describe("Pro feature gating", () => {
             await user.click(screen.getByRole("button", { name: /All genres/i }));
 
             expect(mockRequirePro).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("3.8 Library stats gating", () => {
+        const authContext = { user: { uid: "user-1", email: "test@test.com" } as any };
+
+        it("free user can open stats panel", async () => {
+            setSubscription(false);
+            const user = userEvent.setup();
+            render(<Library />, { authContext });
+
+            await user.click(screen.getByRole("button", { name: "Library stats" }));
+
+            expect(await screen.findByText("Library Stats")).toBeInTheDocument();
+        });
+
+        it("free user sees summary cards but not detailed breakdowns", async () => {
+            setSubscription(false);
+            const user = userEvent.setup();
+            render(<Library />, { authContext });
+
+            await user.click(screen.getByRole("button", { name: "Library stats" }));
+
+            expect(await screen.findByText("10")).toBeInTheDocument();
+            expect(screen.getByText("3")).toBeInTheDocument();
+            expect(screen.getByText("20%")).toBeInTheDocument();
+            expect(screen.getByText("See more stats")).toBeInTheDocument();
+            expect(screen.queryByText("Genres")).not.toBeInTheDocument();
+            expect(screen.queryByText("Top Artists")).not.toBeInTheDocument();
+        });
+
+        it("free user clicking 'See more stats' calls requirePro", async () => {
+            setSubscription(false);
+            const user = userEvent.setup();
+            render(<Library />, { authContext });
+
+            await user.click(screen.getByRole("button", { name: "Library stats" }));
+            await user.click(await screen.findByText("See more stats"));
+
+            expect(mockRequirePro).toHaveBeenCalledWith("Library Stats");
+        });
+
+        it("Pro user sees full breakdowns", async () => {
+            setSubscription(true);
+            const user = userEvent.setup();
+            render(<Library />, { authContext });
+
+            await user.click(screen.getByRole("button", { name: "Library stats" }));
+
+            expect(await screen.findByText("Genres")).toBeInTheDocument();
+            expect(screen.getByText("Top Artists")).toBeInTheDocument();
+            expect(screen.queryByText("See more stats")).not.toBeInTheDocument();
         });
     });
 });

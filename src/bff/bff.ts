@@ -566,3 +566,25 @@ export const fetchNewTracks = async ({
         throw error;
     }
 };
+
+export interface LibraryStats {
+    totalTracks: number;
+    purchasedTracks: number;
+    totalReviewed: number;
+    genreBreakdown: { genre: string; count: number }[];
+    decadeDistribution: { decade: number; count: number }[];
+    topArtists: { artist: string; count: number }[];
+    topReleases: { releaseTitle: string; artist: string; count: number }[];
+}
+
+export const fetchLibraryStats = async ({
+    userId,
+}: {
+    userId: string;
+}): Promise<LibraryStats | null> => {
+    return await fetchWithErrorHandling<LibraryStats>(
+        "/api/getLibraryStats",
+        "POST",
+        { userId }
+    );
+};

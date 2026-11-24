@@ -46,6 +46,11 @@ const features = [
         text: "Get email alerts and a dedicated page for new tracks in your favourite genres",
         description: "Never miss new music in the genres you care about. Choose the genres you want to follow and get email alerts whenever fresh tracks are added, plus a dedicated page to review them.",
     },
+    {
+        keys: ["Library Stats"],
+        text: "See insights about your library — top genres, decades, and artists",
+        description: "Get a visual breakdown of your music taste. See which genres dominate your library, how your tracks spread across decades, and who your most-saved artists are.",
+    },
 ];
 
 const UpgradePrompt = ({ featureName, onClose }: Props) => {
