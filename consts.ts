@@ -43,26 +43,62 @@ export const buyLinks = [
     {
         platform: "beatport",
         logo: "/logos/beatport.png",
+        regions: [],
     },
     {
         platform: "juno",
         logo: "/logos/juno.jpeg",
+        regions: ["GB", "IE", "FR", "DE", "NL", "BE", "ES", "IT", "PT", "AT", "CH", "SE", "NO", "DK", "FI", "PL"],
     },
     {
-        platform: "discogs",
-        logo: "/logos/discogs.jpeg",
-    },
-    {
-        platform: "bandcamp",
-        logo: "/logos/bandcamp.png",
-    },
-    {
-        platform: "apple music",
-        logo: "/logos/apple_music.jpeg",
+        platform: "rough trade",
+        logo: "/logos/rough_trade.png",
+        regions: ["GB", "IE", "FR", "DE", "NL", "BE", "ES", "IT", "PT", "AT", "CH", "SE", "NO", "DK", "FI", "PL"],
     },
     {
         platform: "bleep",
         logo: "/logos/bleep.png",
+        regions: ["GB", "IE", "FR", "DE", "NL", "BE", "ES", "IT", "PT", "AT", "CH", "SE", "NO", "DK", "FI", "PL"],
+    },
+    {
+        platform: "hhv",
+        logo: "/logos/hhv.png",
+        regions: ["DE", "AT", "CH", "NL", "BE", "FR", "ES", "IT", "PT", "SE", "NO", "DK", "FI", "PL"],
+    },
+    {
+        platform: "dusty groove",
+        logo: "/logos/dusty_groove.png",
+        regions: ["US", "CA", "MX"],
+    },
+    {
+        platform: "turntable lab",
+        logo: "/logos/turntable_lab.png",
+        regions: ["US", "CA", "MX"],
+    },
+    {
+        platform: "disk union",
+        logo: "/logos/disk_union.png",
+        regions: ["JP"],
+    },
+    {
+        platform: "red eye records",
+        logo: "/logos/red_eye_records.png",
+        regions: ["AU", "NZ"],
+    },
+    {
+        platform: "discogs",
+        logo: "/logos/discogs.jpeg",
+        regions: [],
+    },
+    {
+        platform: "bandcamp",
+        logo: "/logos/bandcamp.png",
+        regions: [],
+    },
+    {
+        platform: "apple music",
+        logo: "/logos/apple_music.jpeg",
+        regions: [],
     },
 ] satisfies IBuyLink[];
 

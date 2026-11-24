@@ -155,6 +155,37 @@ describe("formatBuyUrl", () => {
             expect(url).not.toContain("Morning Light");
         }
     });
+
+    it("generates rough trade URL", () => {
+        const url = formatBuyUrl(track, "rough trade");
+        expect(url).toContain("roughtrade.com");
+        expect(url).toContain("Solar Fields");
+    });
+
+    it("generates hhv URL", () => {
+        const url = formatBuyUrl(track, "hhv");
+        expect(url).toContain("hhv.de");
+    });
+
+    it("generates dusty groove URL", () => {
+        const url = formatBuyUrl(track, "dusty groove");
+        expect(url).toContain("dustygroove.com");
+    });
+
+    it("generates turntable lab URL", () => {
+        const url = formatBuyUrl(track, "turntable lab");
+        expect(url).toContain("turntablelab.com");
+    });
+
+    it("generates disk union URL", () => {
+        const url = formatBuyUrl(track, "disk union");
+        expect(url).toContain("diskunion.net");
+    });
+
+    it("generates red eye records URL", () => {
+        const url = formatBuyUrl(track, "red eye records");
+        expect(url).toContain("redeye.com.au");
+    });
 });
 
 describe("generateSlug", () => {
@@ -182,12 +213,13 @@ describe("generateSlug", () => {
 
 describe("getRelevantBuyLinks", () => {
     const allLinks: IBuyLink[] = [
-        { platform: "beatport", logo: "/logos/beatport.png" },
-        { platform: "juno", logo: "/logos/juno.jpeg" },
-        { platform: "discogs", logo: "/logos/discogs.jpeg" },
-        { platform: "bandcamp", logo: "/logos/bandcamp.png" },
-        { platform: "apple music", logo: "/logos/apple_music.jpeg" },
-        { platform: "bleep", logo: "/logos/bleep.png" },
+        { platform: "beatport", logo: "/logos/beatport.png", regions: [] },
+        { platform: "juno", logo: "/logos/juno.jpeg", regions: ["GB"] },
+        { platform: "dusty groove", logo: "/logos/dusty_groove.png", regions: ["US"] },
+        { platform: "discogs", logo: "/logos/discogs.jpeg", regions: [] },
+        { platform: "bandcamp", logo: "/logos/bandcamp.png", regions: [] },
+        { platform: "apple music", logo: "/logos/apple_music.jpeg", regions: [] },
+        { platform: "bleep", logo: "/logos/bleep.png", regions: ["GB"] },
     ];
 
     it("returns specialist stores for Techno", () => {
@@ -211,6 +243,40 @@ describe("getRelevantBuyLinks", () => {
         expect(platforms).toContain("discogs");
         expect(platforms).toContain("bandcamp");
         expect(platforms).toContain("apple music");
+    });
+
+    it("shows regional stores matching the user country", () => {
+        const links = getRelevantBuyLinks(allLinks, "Techno", "GB");
+        const platforms = links.map((l) => l.platform);
+        expect(platforms).toContain("juno");
+        expect(platforms).toContain("bleep");
+        expect(platforms).not.toContain("dusty groove");
+    });
+
+    it("hides regional stores not matching the user country", () => {
+        const links = getRelevantBuyLinks(allLinks, "Techno", "US");
+        const platforms = links.map((l) => l.platform);
+        expect(platforms).toContain("beatport");
+        expect(platforms).not.toContain("juno");
+        expect(platforms).not.toContain("bleep");
+    });
+
+    it("always includes global stores regardless of country", () => {
+        const links = getRelevantBuyLinks(allLinks, "Techno", "JP");
+        const platforms = links.map((l) => l.platform);
+        expect(platforms).toContain("beatport");
+        expect(platforms).toContain("discogs");
+        expect(platforms).toContain("bandcamp");
+        expect(platforms).not.toContain("juno");
+        expect(platforms).not.toContain("dusty groove");
+    });
+
+    it("shows all stores when no country is provided", () => {
+        const links = getRelevantBuyLinks(allLinks, "Techno");
+        const platforms = links.map((l) => l.platform);
+        expect(platforms).toContain("beatport");
+        expect(platforms).toContain("juno");
+        expect(platforms).toContain("bleep");
     });
 });
 
