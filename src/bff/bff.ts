@@ -450,6 +450,22 @@ export const spotifyAuthorize = async ({
     );
 };
 
+export const spotifyExportPlaylist = async ({
+    userId,
+}: {
+    userId: string;
+}): Promise<{
+    playlistUrl: string;
+    totalLibraryTracks: number;
+    matchedTracks: number;
+} | null> => {
+    return await fetchWithErrorHandling(
+        "/api/spotify/export-playlist",
+        "POST",
+        { userId }
+    );
+};
+
 export const spotifyCallback = async ({
     code,
     state,
