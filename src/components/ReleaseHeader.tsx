@@ -53,10 +53,10 @@ const ReleaseHeader = ({
                 _hover={{ color: "brand.textPrimary" }}
                 aria-label="Back to library"
                 onClick={() => {
+                    setReleaseTrackId(null);
+                    updateCurrentReleaseTrack(null);
                     updateReviewTracks(4, previousTracks, 0);
                     updatePreviousTracks([]);
-                    updateCurrentReleaseTrack(null);
-                    setReleaseTrackId(null);
                 }}
             >
                 <ChevronLeftIcon fontSize="inherit" />
