@@ -214,6 +214,24 @@ export const togglePurchased = async ({
     });
 };
 
+interface UpdateReviewNotesProps {
+    trackId: string;
+    userId: string;
+    notes: string | null;
+}
+
+export const updateReviewNotes = async ({
+    trackId,
+    userId,
+    notes,
+}: UpdateReviewNotesProps): Promise<{ success: boolean } | null> => {
+    return await fetchWithErrorHandling("/api/updateReviewNotes", "POST", {
+        trackId,
+        userId,
+        notes,
+    });
+};
+
 interface CreateUserProps {
     userId: string;
     isAnonymous?: boolean;
