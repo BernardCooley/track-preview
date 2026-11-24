@@ -163,7 +163,6 @@ const AdminPage = () => {
                             <Box position="relative" ref={dropdownRef}>
                                 <Flex
                                     as="button"
-                                    type="button"
                                     onClick={() => setDropdownOpen(!dropdownOpen)}
                                     w="full"
                                     px={4}
@@ -209,7 +208,6 @@ const AdminPage = () => {
                                             <Flex
                                                 key={c.code}
                                                 as="button"
-                                                type="button"
                                                 onClick={() => handleCountryChange(c.code)}
                                                 w="full"
                                                 px={4}
