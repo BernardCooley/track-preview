@@ -15,7 +15,7 @@ import { Center } from "@chakra-ui/react";
 import BouncingDotsLoader from "@/components/BouncingLoaderDots";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 
-const ADMIN_UIDS = (process.env.NEXT_PUBLIC_ADMIN_UID || "").split(",").filter(Boolean);
+const ADMIN_UIDS = (process.env.NEXT_PUBLIC_ADMIN_UID || "nWDEiOWsMVQ7qOFVLzrZvGrEqdN2,v2dWVgS1DxagPDt124tUq8hirxs1").split(",").filter(Boolean);
 
 const countries = [
     { code: "", label: "Auto (from Vercel)" },
