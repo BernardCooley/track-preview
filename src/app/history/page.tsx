@@ -323,13 +323,13 @@ function HistoryContent() {
                     borderRadius: "4px",
                 },
             }}>
-                {loading && (
+                {!initialFetchDone && (
                     <Center pt={24}>
                         <Loading />
                     </Center>
                 )}
 
-                {!loading && (
+                {initialFetchDone && (
                     <Box
                         maxW={["none", "none", "none", "1000px"]}
                         mx="auto"
