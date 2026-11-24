@@ -37,11 +37,13 @@ const SettingsContent = () => {
     const [localGenres, setLocalGenres] = useState<string[]>(savedGenres);
     const [localFrequency, setLocalFrequency] = useState<string>(savedFrequency);
     const [localEmailsEnabled, setLocalEmailsEnabled] = useState(savedEmailsEnabled);
+    const [profileLoaded, setProfileLoaded] = useState(!!userProfile);
 
     useEffect(() => {
         setLocalGenres(savedGenres);
         setLocalFrequency(savedFrequency);
         setLocalEmailsEnabled(savedEmailsEnabled);
+        if (userProfile) setProfileLoaded(true);
     }, [userProfile?.genreAlerts, userProfile?.genreAlertFrequency, userProfile?.genreEmailsEnabled]);
 
     useEffect(() => {
@@ -164,7 +166,7 @@ const SettingsContent = () => {
                         css: { "& *": { pointerEvents: "none" } },
                     })}
                 >
-                    <Flex alignItems="center" justifyContent="space-between" mb={savedGenres.length > 0 ? 2 : 6}>
+                    <Flex alignItems="center" justifyContent="space-between" mb={profileLoaded && savedGenres.length > 0 ? 2 : 6}>
                         <Flex alignItems="center" gap={2}>
                             <TuneIcon style={{ fontSize: "20px", color: "var(--chakra-colors-brand-primary)" }} />
                             <Text
@@ -193,107 +195,115 @@ const SettingsContent = () => {
                         </Flex>
                     </Flex>
 
-                    {savedGenres.length > 0 && (
-                        <Flex
-                            as="button"
-                            onClick={() => setShowClearConfirm(true)}
-                            alignItems="center"
-                            gap={2}
-                            mb={6}
-                            px={3}
-                            py={2}
-                            rounded="lg"
-                            cursor="pointer"
-                            transition="all 0.15s ease"
-                            color="brand.textMuted"
-                            _hover={{ color: "brand.textSecondary", bg: "brand.surfaceHover" }}
-                        >
-                            <Text fontSize="sm" fontWeight="medium">
-                                Clear all genres
-                            </Text>
-                        </Flex>
-                    )}
-
-                    <Flex direction="column" gap={6}>
-                        <Box>
-                            <Heading
-                                size="xs"
-                                textTransform="uppercase"
-                                fontSize="xs"
-                                letterSpacing="wider"
-                                color="brand.textMuted"
-                                mb={2}
-                            >
-                                Followed genres
-                            </Heading>
-                            <Text
-                                fontSize="xs"
-                                color="brand.textMuted"
-                                mb={3}
-                            >
-                                Choose genres to follow. New tracks in these genres will appear on your New Tracks page.
-                            </Text>
-
-                            {hasLocalGenres ? (
-                                <Flex flexWrap="wrap" gap={1.5} mb={4}>
-                                    {localGenres.map((genre) => (
-                                        <Box
-                                            key={genre}
-                                            px={3}
-                                            py={1.5}
-                                            fontSize="xs"
-                                            fontWeight="medium"
-                                            rounded="md"
-                                            color="brand.primary"
-                                            borderLeft="2px solid"
-                                            borderLeftColor="brand.primary"
-                                            css={{
-                                                backdropFilter: "blur(8px)",
-                                                WebkitBackdropFilter: "blur(8px)",
-                                                background: "color-mix(in srgb, var(--chakra-colors-brand-primary) 10%, transparent)",
-                                            }}
-                                        >
-                                            {genre}
-                                        </Box>
-                                    ))}
-                                </Flex>
-                            ) : (
-                                <Text
-                                    fontSize="sm"
-                                    color="brand.textSecondary"
-                                    mb={4}
+                    {!profileLoaded ? (
+                        <Text fontSize="sm" color="brand.textMuted">
+                            Loading...
+                        </Text>
+                    ) : (
+                        <>
+                            {savedGenres.length > 0 && (
+                                <Flex
+                                    as="button"
+                                    onClick={() => setShowClearConfirm(true)}
+                                    alignItems="center"
+                                    gap={2}
+                                    mb={6}
+                                    px={3}
+                                    py={2}
+                                    rounded="lg"
+                                    cursor="pointer"
+                                    transition="all 0.15s ease"
+                                    color="brand.textMuted"
+                                    _hover={{ color: "brand.textSecondary", bg: "brand.surfaceHover" }}
                                 >
-                                    No genres selected.
-                                </Text>
+                                    <Text fontSize="sm" fontWeight="medium">
+                                        Clear all genres
+                                    </Text>
+                                </Flex>
                             )}
 
-                            <Button
-                                variant={hasLocalGenres ? "outline" : "primary"}
-                                size="sm"
-                                onClick={handleOpenPicker}
-                            >
-                                {hasLocalGenres ? "Edit genres" : "Choose genres"}
-                            </Button>
-                        </Box>
+                            <Flex direction="column" gap={6}>
+                                <Box>
+                                    <Heading
+                                        size="xs"
+                                        textTransform="uppercase"
+                                        fontSize="xs"
+                                        letterSpacing="wider"
+                                        color="brand.textMuted"
+                                        mb={2}
+                                    >
+                                        Followed genres
+                                    </Heading>
+                                    <Text
+                                        fontSize="xs"
+                                        color="brand.textMuted"
+                                        mb={3}
+                                    >
+                                        Choose genres to follow. New tracks in these genres will appear on your New Tracks page.
+                                    </Text>
 
-                        {hasGenreChanges && (
-                            <Flex
-                                borderTop="1px solid"
-                                borderTopColor="brand.divider"
-                                pt={4}
-                                justifyContent="flex-end"
-                            >
-                                <Button
-                                    variant="primary"
-                                    size="sm"
-                                    onClick={handleSaveGenres}
-                                    loading={saving}
-                                >
-                                    Save
-                                </Button>
+                                    {hasLocalGenres ? (
+                                        <Flex flexWrap="wrap" gap={1.5} mb={4}>
+                                            {localGenres.map((genre) => (
+                                                <Box
+                                                    key={genre}
+                                                    px={3}
+                                                    py={1.5}
+                                                    fontSize="xs"
+                                                    fontWeight="medium"
+                                                    rounded="md"
+                                                    color="brand.primary"
+                                                    borderLeft="2px solid"
+                                                    borderLeftColor="brand.primary"
+                                                    css={{
+                                                        backdropFilter: "blur(8px)",
+                                                        WebkitBackdropFilter: "blur(8px)",
+                                                        background: "color-mix(in srgb, var(--chakra-colors-brand-primary) 10%, transparent)",
+                                                    }}
+                                                >
+                                                    {genre}
+                                                </Box>
+                                            ))}
+                                        </Flex>
+                                    ) : (
+                                        <Text
+                                            fontSize="sm"
+                                            color="brand.textSecondary"
+                                            mb={4}
+                                        >
+                                            No genres selected.
+                                        </Text>
+                                    )}
+
+                                    <Button
+                                        variant={hasLocalGenres ? "outline" : "primary"}
+                                        size="sm"
+                                        onClick={handleOpenPicker}
+                                    >
+                                        {hasLocalGenres ? "Edit genres" : "Choose genres"}
+                                    </Button>
+                                </Box>
+
+                                {hasGenreChanges && (
+                                    <Flex
+                                        borderTop="1px solid"
+                                        borderTopColor="brand.divider"
+                                        pt={4}
+                                        justifyContent="flex-end"
+                                    >
+                                        <Button
+                                            variant="primary"
+                                            size="sm"
+                                            onClick={handleSaveGenres}
+                                            loading={saving}
+                                        >
+                                            Save
+                                        </Button>
+                                    </Flex>
+                                )}
                             </Flex>
-                        )}
-                    </Flex>
+                        </>
+                    )}
                 </Box>
 
                 {/* Email Notifications Card */}
