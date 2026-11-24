@@ -209,6 +209,32 @@ This redirects to Spotify for authorization, then back to `/spotify/callback` wh
 
 Check the user's `spotifyAccessToken`, `spotifyRefreshToken`, and `spotifyTokenExpiresAt` fields in Prisma Studio (`npx prisma studio`).
 
+## Testing Spotify Playlist Export
+
+Requires a connected Spotify account (see above) and at least one track in your library (reviewStep 4).
+
+Open the browser console on any page where you're logged in and run:
+
+```js
+fetch('/api/spotify/export-playlist', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ userId: 'YOUR_FIREBASE_UID' })
+}).then(r => r.json()).then(console.log)
+```
+
+This returns:
+
+```json
+{
+  "playlistUrl": "https://open.spotify.com/playlist/...",
+  "totalLibraryTracks": 20,
+  "matchedTracks": 16
+}
+```
+
+Open the `playlistUrl` in Spotify to verify the tracks were added. Note: this currently creates a new playlist each time — playlist reuse will be handled in the UI (3.3).
+
 ## How It Works
 
 ### Track Data Pipeline
