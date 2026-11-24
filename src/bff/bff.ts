@@ -452,8 +452,12 @@ export const spotifyAuthorize = async ({
 
 export const spotifyExportPlaylist = async ({
     userId,
+    playlistId,
+    playlistName,
 }: {
     userId: string;
+    playlistId?: string;
+    playlistName?: string;
 }): Promise<{
     playlistUrl: string;
     totalLibraryTracks: number;
@@ -461,6 +465,18 @@ export const spotifyExportPlaylist = async ({
 } | null> => {
     return await fetchWithErrorHandling(
         "/api/spotify/export-playlist",
+        "POST",
+        { userId, playlistId, playlistName }
+    );
+};
+
+export const spotifyPlaylists = async ({
+    userId,
+}: {
+    userId: string;
+}): Promise<{ playlists: { id: string; name: string }[] } | null> => {
+    return await fetchWithErrorHandling(
+        "/api/spotify/playlists",
         "POST",
         { userId }
     );
@@ -477,5 +493,17 @@ export const spotifyCallback = async ({
         "/api/spotify/callback",
         "POST",
         { code, state }
+    );
+};
+
+export const spotifyDisconnect = async ({
+    userId,
+}: {
+    userId: string;
+}): Promise<{ success: boolean } | null> => {
+    return await fetchWithErrorHandling(
+        "/api/spotify/disconnect",
+        "POST",
+        { userId }
     );
 };

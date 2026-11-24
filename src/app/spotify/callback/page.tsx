@@ -3,6 +3,8 @@
 import { Center, Text } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../../../../firebase/firebaseInit";
 import BouncingDotsLoader from "@/components/BouncingLoaderDots";
 
 export default function SpotifyCallbackPage() {
@@ -12,6 +14,14 @@ export default function SpotifyCallbackPage() {
     );
     const [errorMessage, setErrorMessage] = useState("");
     const started = useRef(false);
+    const [authReady, setAuthReady] = useState(false);
+
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            if (user) setAuthReady(true);
+        });
+        return unsubscribe;
+    }, []);
 
     useEffect(() => {
         if (started.current) return;
@@ -25,14 +35,12 @@ export default function SpotifyCallbackPage() {
         if (error) {
             setStatus("error");
             setErrorMessage("Spotify authorization was denied.");
-            setTimeout(() => router.replace("/explore"), 3000);
             return;
         }
 
         if (!code || !state) {
             setStatus("error");
             setErrorMessage("Missing authorization parameters.");
-            setTimeout(() => router.replace("/explore"), 3000);
             return;
         }
 
@@ -47,16 +55,23 @@ export default function SpotifyCallbackPage() {
                 if (!res.ok) throw new Error("Token exchange failed");
 
                 setStatus("success");
-                setTimeout(() => router.replace("/explore"), 2000);
             } catch {
                 setStatus("error");
                 setErrorMessage("Failed to connect Spotify account.");
-                setTimeout(() => router.replace("/explore"), 3000);
             }
         };
 
         exchangeCode();
-    }, [router]);
+    }, []);
+
+    useEffect(() => {
+        if (!authReady) return;
+        if (status === "success") {
+            setTimeout(() => router.replace("/explore"), 2000);
+        } else if (status === "error") {
+            setTimeout(() => router.replace("/explore"), 3000);
+        }
+    }, [authReady, status, router]);
 
     return (
         <Center

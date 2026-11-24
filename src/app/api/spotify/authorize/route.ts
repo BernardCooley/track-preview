@@ -25,6 +25,7 @@ export async function POST(req: Request) {
         const state = crypto.randomBytes(16).toString("hex");
 
         const scopes = [
+            "playlist-read-private",
             "playlist-modify-public",
             "playlist-modify-private",
         ].join(" ");

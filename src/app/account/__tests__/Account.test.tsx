@@ -40,6 +40,8 @@ const mockCurrentUser = {
 
 vi.mock("@/bff/bff", () => ({
     sendVerificationEmail: vi.fn(() => Promise.resolve()),
+    getUserProfile: vi.fn(() => Promise.resolve(null)),
+    spotifyDisconnect: vi.fn(() => Promise.resolve({ success: true })),
 }));
 
 vi.mock("firebase/auth", () => ({
