@@ -10,9 +10,49 @@ interface Props {
     onClose: () => void;
 }
 
+const features = [
+    {
+        keys: ["Library Tools"],
+        text: "Filter and sort your library by genre, artist, and more",
+        description: "Find exactly what you're looking for with powerful filters. Sort by genre, artist, date added, and more to keep your collection organised.",
+    },
+    {
+        keys: ["Purchase Tracking"],
+        text: "Mark tracks as bought to manage your collection",
+        description: "Keep track of which tracks you've already bought. Mark purchases directly in your library so you never lose track or buy the same track twice.",
+    },
+    {
+        keys: ["Release Browsing"],
+        text: "Browse full releases from your library",
+        description: "Found a track you love? Browse the full release it came from to discover more tracks by the same artist without leaving Phoniquest.",
+    },
+    {
+        keys: ["Curated Mode"],
+        text: "Curate your collection with two-stage review",
+        description: "Be more selective about what makes it into your library. Liked tracks go through two extra review steps before being added, so only your true favourites make the cut.",
+    },
+    {
+        keys: ["Spotify Export"],
+        text: "Export your library to a Spotify playlist",
+        description: "Take your library with you. Export your tracks to a Spotify playlist so you can listen anywhere, share with friends, or use them in DJ sets.",
+    },
+    {
+        keys: ["Discovery History"],
+        text: "Browse and search your full discovery history",
+        description: "Every track you've ever reviewed, all in one place. Search by title or artist, filter by status, and add skipped tracks back to your library.",
+    },
+];
+
 const UpgradePrompt = ({ featureName, onClose }: Props) => {
     const { user } = useAuthContext();
     const [loading, setLoading] = useState(false);
+
+    const matchedFeature = featureName
+        ? features.find((b) => b.keys.includes(featureName))
+        : null;
+    const otherFeatures = matchedFeature
+        ? features.filter((b) => b !== matchedFeature)
+        : features;
 
     const handleSubscribe = async () => {
         if (!user?.uid) return;
@@ -93,44 +133,39 @@ const UpgradePrompt = ({ featureName, onClose }: Props) => {
                                     >
                                         {featureName}
                                     </Text>{" "}
-                                    is a Pro feature. Upgrade to unlock the
-                                    full Phoniquest experience:
+                                    is a Pro feature.
+                                </Text>
+                                {matchedFeature && (
+                                    <Text
+                                        color="brand.textSecondary"
+                                        fontSize="sm"
+                                    >
+                                        {matchedFeature.description}
+                                    </Text>
+                                )}
+                                <Text
+                                    color="brand.textMuted"
+                                    fontSize="xs"
+                                    fontWeight="semibold"
+                                    textTransform="uppercase"
+                                    letterSpacing="wider"
+                                >
+                                    Pro also includes
                                 </Text>
                                 <VStack
                                     gap={2}
                                     align="stretch"
                                     pl={1}
                                 >
-                                    <Text
-                                        color="brand.textSecondary"
-                                        fontSize="sm"
-                                    >
-                                        • Filter and sort your library by genre, artist, and more
-                                    </Text>
-                                    <Text
-                                        color="brand.textSecondary"
-                                        fontSize="sm"
-                                    >
-                                        • Mark tracks as bought to manage your collection
-                                    </Text>
-                                    <Text
-                                        color="brand.textSecondary"
-                                        fontSize="sm"
-                                    >
-                                        • Browse full releases from your library
-                                    </Text>
-                                    <Text
-                                        color="brand.textSecondary"
-                                        fontSize="sm"
-                                    >
-                                        • Curate your collection with two-stage review
-                                    </Text>
-                                    <Text
-                                        color="brand.textSecondary"
-                                        fontSize="sm"
-                                    >
-                                        • Export your library to a Spotify playlist
-                                    </Text>
+                                    {otherFeatures.map((b) => (
+                                        <Text
+                                            key={b.text}
+                                            color="brand.textSecondary"
+                                            fontSize="sm"
+                                        >
+                                            • {b.text}
+                                        </Text>
+                                    ))}
                                 </VStack>
                             </Flex>
                         </Box>
@@ -157,7 +192,7 @@ const UpgradePrompt = ({ featureName, onClose }: Props) => {
                                 loading={loading}
                                 onClick={handleSubscribe}
                             >
-                                Subscribe
+                                Upgrade
                             </Button>
                         </Flex>
                     </Flex>

@@ -52,6 +52,11 @@ export interface ReviewTracks {
     [key: number]: { tracks: Track[]; currentTrack: number };
 }
 
+export interface DiscoveryHistoryTrack extends Track {
+    currentReviewStep: number;
+    reviewedAt: string;
+}
+
 export type BuyPlatforms =
     | "juno"
     | "beatport"

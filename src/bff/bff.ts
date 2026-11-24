@@ -1,5 +1,5 @@
 import { User } from "@prisma/client";
-import { AccessToken, Review, SearchedTrack, Track } from "../../types";
+import { AccessToken, DiscoveryHistoryTrack, Review, SearchedTrack, Track } from "../../types";
 import { getCurrentYear } from "../../utils";
 
 export class GoneError extends Error {
@@ -494,6 +494,30 @@ export const spotifyCallback = async ({
         "POST",
         { code, state }
     );
+};
+
+interface FetchDiscoveryHistoryProps {
+    userId: string;
+    limit?: number;
+    offset?: number;
+    search?: string;
+    status?: number;
+}
+
+export const fetchDiscoveryHistory = async ({
+    userId,
+    limit,
+    offset,
+    search,
+    status,
+}: FetchDiscoveryHistoryProps): Promise<DiscoveryHistoryTrack[] | null> => {
+    return await fetchWithErrorHandling("/api/getDiscoveryHistory", "POST", {
+        userId,
+        limit,
+        offset,
+        search,
+        status,
+    });
 };
 
 export const spotifyDisconnect = async ({

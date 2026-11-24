@@ -77,6 +77,10 @@ export const handlers = [
         return HttpResponse.json({ success: true });
     }),
 
+    http.post("/api/getDiscoveryHistory", () => {
+        return HttpResponse.json([]);
+    }),
+
     http.get("/api/getSpotifyAccessToken", () => {
         return HttpResponse.json({ access_token: "mock-token", expires_in: 3600, token_type: "Bearer" });
     }),
