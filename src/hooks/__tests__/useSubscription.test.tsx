@@ -36,6 +36,9 @@ function makeProfile(
         spotifyAccessToken: null,
         spotifyRefreshToken: null,
         spotifyTokenExpiresAt: null,
+        email: null,
+        genreAlerts: [],
+        genreAlertFrequency: "WEEKLY",
         ...overrides,
     };
 }

@@ -6,9 +6,10 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 
 interface Props {
     title: string;
+    href?: string;
 }
 
-const BackHeader = ({ title }: Props) => {
+const BackHeader = ({ title, href }: Props) => {
     const router = useRouter();
 
     return (
@@ -30,7 +31,7 @@ const BackHeader = ({ title }: Props) => {
             >
                 <IconButton
                     variant="tertiary"
-                    onClick={() => router.back()}
+                    onClick={() => href ? router.push(href) : router.back()}
                     aria-label="Go back"
                     color="brand.textSecondary"
                 >

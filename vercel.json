@@ -5,8 +5,8 @@
             "schedule": "0 3 * * *"
         },
         {
-            "path": "/api/cron/cleanupAnonymous",
-            "schedule": "0 4 * * *"
+            "path": "/api/cron/dailyMaintenance",
+            "schedule": "0 5 * * *"
         }
     ]
 }

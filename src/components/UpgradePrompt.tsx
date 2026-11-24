@@ -41,6 +41,11 @@ const features = [
         text: "Browse and search your full discovery history",
         description: "Every track you've ever reviewed, all in one place. Search by title or artist, filter by status, and add skipped tracks back to your library.",
     },
+    {
+        keys: ["Genre Alerts", "New Tracks"],
+        text: "Get email alerts and a dedicated page for new tracks in your favourite genres",
+        description: "Never miss new music in the genres you care about. Choose the genres you want to follow and get email alerts whenever fresh tracks are added, plus a dedicated page to review them.",
+    },
 ];
 
 const UpgradePrompt = ({ featureName, onClose }: Props) => {
