@@ -293,8 +293,8 @@ describe("Pro feature gating", () => {
         });
     });
 
-    describe("2.3 Purchase tracking gate", () => {
-        it("calls requirePro when free user clicks buy button", async () => {
+    describe("2.3 Purchase tracking (free for all users)", () => {
+        it("free user can click buy button", async () => {
             setSubscription(false);
             const user = userEvent.setup();
             render(<Library />);
@@ -302,23 +302,11 @@ describe("Pro feature gating", () => {
             const buyButtons = screen.getAllByRole("button", { name: "buy track" });
             await user.click(buyButtons[0]);
 
-            expect(mockRequirePro).toHaveBeenCalledWith("Purchase Tracking");
-            expect(baseHookReturn.setTrackToBuy).not.toHaveBeenCalled();
-        });
-
-        it("allows Pro user to click buy button", async () => {
-            setSubscription(true);
-            const user = userEvent.setup();
-            render(<Library />);
-
-            const buyButtons = screen.getAllByRole("button", { name: "buy track" });
-            await user.click(buyButtons[0]);
-
-            expect(mockRequirePro).toHaveBeenCalledWith("Purchase Tracking");
+            expect(mockRequirePro).not.toHaveBeenCalled();
             expect(baseHookReturn.setTrackToBuy).toHaveBeenCalled();
         });
 
-        it("calls requirePro when free user clicks Mark as bought", async () => {
+        it("free user can click Mark as bought", async () => {
             setSubscription(false);
             const user = userEvent.setup();
             render(<Library />);
@@ -331,58 +319,14 @@ describe("Pro feature gating", () => {
 
             await user.click(screen.getByText("Mark as bought"));
 
-            expect(mockRequirePro).toHaveBeenCalledWith("Purchase Tracking");
-            expect(baseHookReturn.toggleTrackPurchased).not.toHaveBeenCalled();
-        });
-
-        it("opens upgrade prompt when free user clicks filter group (covers hide bought)", async () => {
-            setSubscription(false);
-            const user = userEvent.setup();
-            render(<Library />);
-
-            await user.click(screen.getByRole("button", { name: /Upgrade to Pro/i }));
-
-            expect(mockRequirePro).toHaveBeenCalledWith("Library Tools");
+            expect(mockRequirePro).not.toHaveBeenCalled();
+            expect(baseHookReturn.toggleTrackPurchased).toHaveBeenCalled();
         });
     });
 
-    describe("2.4 Sorting and filtering gate", () => {
-        it("calls requirePro when free user clicks filter group", async () => {
+    describe("2.4 Sorting and filtering (free for all users)", () => {
+        it("free user can open sort menu", async () => {
             setSubscription(false);
-            const user = userEvent.setup();
-            render(<Library />);
-
-            await user.click(screen.getByRole("button", { name: /Upgrade to Pro/i }));
-
-            expect(mockRequirePro).toHaveBeenCalledWith("Library Tools");
-        });
-
-        it("shows PRO badge on filter group for free users", () => {
-            setSubscription(false);
-            render(<Library />);
-
-            expect(screen.getAllByText("PRO").length).toBeGreaterThan(0);
-        });
-
-        it("does not show PRO badge for Pro users", () => {
-            setSubscription(true);
-            render(<Library />);
-
-            expect(screen.queryAllByText("PRO")).toHaveLength(0);
-        });
-
-        it("calls requirePro when free user clicks sort area", async () => {
-            setSubscription(false);
-            const user = userEvent.setup();
-            render(<Library />);
-
-            await user.click(screen.getByRole("button", { name: /Upgrade to Pro/i }));
-
-            expect(mockRequirePro).toHaveBeenCalledWith("Library Tools");
-        });
-
-        it("allows Pro user to open sort menu", async () => {
-            setSubscription(true);
             const user = userEvent.setup();
             render(<Library />);
 
@@ -391,8 +335,8 @@ describe("Pro feature gating", () => {
             expect(screen.getByText("title")).toBeInTheDocument();
         });
 
-        it("Pro user genre filter does not call requirePro", async () => {
-            setSubscription(true);
+        it("free user genre filter does not call requirePro", async () => {
+            setSubscription(false);
             const user = userEvent.setup();
             render(<Library />);
 
