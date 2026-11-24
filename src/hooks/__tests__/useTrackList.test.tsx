@@ -17,6 +17,7 @@ import type { User as UserProfile } from "@prisma/client";
 const mockUpdateReviewTracks = vi.fn();
 const mockUpdateCurrentlyPlaying = vi.fn();
 const mockUpdateChangesMade = vi.fn();
+const mockSetPlayingTrack = vi.fn();
 
 const defaultTrackContext: TrackContextProps = {
     currentlyPlaying: undefined,
@@ -28,7 +29,7 @@ const defaultTrackContext: TrackContextProps = {
     trackLoading: null,
     setTrackLoading: vi.fn(),
     playingTrack: null,
-    setPlayingTrack: vi.fn(),
+    setPlayingTrack: mockSetPlayingTrack,
     reviewTracks: {
         1: { tracks: [], currentTrack: 0 },
         2: { tracks: [], currentTrack: 0 },
@@ -188,7 +189,7 @@ describe("useTrackList", () => {
         });
     });
 
-    it("deleteTrack calls updateTrackReviewStep API", async () => {
+    it("deleteTrack calls updateTrackReviewStep API and clears player", async () => {
         let apiCalled = false;
         server.use(
             http.post("/api/updateTrackReviewStep", () => {
@@ -209,6 +210,8 @@ describe("useTrackList", () => {
 
         await waitFor(() => {
             expect(apiCalled).toBe(true);
+            expect(mockUpdateCurrentlyPlaying).toHaveBeenCalledWith(undefined);
+            expect(mockSetPlayingTrack).toHaveBeenCalledWith(null);
         });
     });
 
