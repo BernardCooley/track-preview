@@ -33,6 +33,9 @@ function makeProfile(
         stripeSubscriptionId: null,
         subscriptionStatus: null,
         subscriptionExpiresAt: null,
+        spotifyAccessToken: null,
+        spotifyRefreshToken: null,
+        spotifyTokenExpiresAt: null,
         ...overrides,
     };
 }

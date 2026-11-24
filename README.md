@@ -167,6 +167,48 @@ After checkout, you'll be redirected to `/subscription/success` which polls unti
 
 Check the `stripe listen` terminal for `<-- [200]` confirming the webhook was received. You can also check the user's `subscriptionTier` in Prisma Studio (`npx prisma studio`).
 
+## Testing Spotify OAuth
+
+The Spotify OAuth flow lets users connect their Spotify account for playlist export (Pro feature).
+
+### Redirect URIs
+
+The following redirect URIs are registered in the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard):
+
+- Local: `http://127.0.0.1:3000/spotify/callback`
+- Dev: `https://track-preview.vercel.app/spotify/callback`
+- Prod: `https://www.phoniquest.com/spotify/callback`
+
+### Trigger the flow locally
+
+With the dev server running, use curl to get the authorize URL:
+
+```bash
+curl -s -X POST http://127.0.0.1:3000/api/spotify/authorize \
+  -H "Content-Type: application/json" \
+  -d '{"userId": "YOUR_FIREBASE_UID"}' | jq .url
+```
+
+Open the returned URL in your browser. After approving on Spotify, you'll be redirected back to `127.0.0.1:3000/spotify/callback` which exchanges the code and stores the tokens.
+
+### Trigger the flow on dev/prod
+
+Open the browser console on any page where you're logged in and run:
+
+```js
+fetch('/api/spotify/authorize', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ userId: 'YOUR_FIREBASE_UID' })
+}).then(r => r.json()).then(d => window.location.href = d.url)
+```
+
+This redirects to Spotify for authorization, then back to `/spotify/callback` which exchanges the code for tokens and stores them on the user record.
+
+### Verify
+
+Check the user's `spotifyAccessToken`, `spotifyRefreshToken`, and `spotifyTokenExpiresAt` fields in Prisma Studio (`npx prisma studio`).
+
 ## How It Works
 
 ### Track Data Pipeline
@@ -358,4 +400,7 @@ Two Vercel cron jobs run daily (configured in `vercel.json`):
 | `src/app/api/stripe/create-portal-session/route.ts` | Creates Stripe Customer Portal session |
 | `src/hooks/useSubscription.ts` | Client-side Pro subscription check |
 | `src/lib/requireProSubscription.ts` | Server-side Pro subscription guard |
+| `src/app/api/spotify/authorize/route.ts` | Generates Spotify OAuth authorize URL |
+| `src/app/api/spotify/callback/route.ts` | Exchanges Spotify auth code for tokens |
+| `src/app/spotify/callback/page.tsx` | Client-side Spotify OAuth redirect handler |
 | `prisma/grandfather-pro.js` | One-time script to set existing users to PRO |

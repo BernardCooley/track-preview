@@ -437,3 +437,29 @@ export const createPortalSession = async ({
         { userId }
     );
 };
+
+export const spotifyAuthorize = async ({
+    userId,
+}: {
+    userId: string;
+}): Promise<{ url: string; state: string } | null> => {
+    return await fetchWithErrorHandling(
+        "/api/spotify/authorize",
+        "POST",
+        { userId }
+    );
+};
+
+export const spotifyCallback = async ({
+    code,
+    state,
+}: {
+    code: string;
+    state: string;
+}): Promise<{ success: boolean } | null> => {
+    return await fetchWithErrorHandling(
+        "/api/spotify/callback",
+        "POST",
+        { code, state }
+    );
+};
