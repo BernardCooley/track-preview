@@ -81,6 +81,7 @@ function HistoryContent() {
     const blobCache = useRef<Map<string, string>>(new Map());
     const sentinelRef = useRef<HTMLDivElement>(null);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
+    const [hasLoadedResults, setHasLoadedResults] = useState(false);
 
     const [addingTrackId, setAddingTrackId] = useState<string | null>(null);
 
@@ -143,14 +144,12 @@ function HistoryContent() {
             return;
         }
 
-        const isInitial = tracks.length === 0;
-        if (!isInitial) setFilterLoading(true);
-        scrollContainerRef.current?.scrollTo(0, 0);
-
         (async () => {
             try {
                 const fetched = await fetchHistory(0, debouncedSearch, statusParam);
+                if (fetched.length > 0) setHasLoadedResults(true);
                 setTracks(fetched);
+                scrollContainerRef.current?.scrollTo(0, 0);
                 setHasMore(fetched.length >= PAGE_SIZE);
             } catch {
                 setTracks([]);
@@ -328,122 +327,119 @@ function HistoryContent() {
                     </Center>
                 )}
 
-                {!loading && tracks.length === 0 && (
-                    <Center pt={24}>
-                        <Badge
-                            variant="outline"
-                            colorPalette="teal"
-                            fontSize={["md", "lg"]}
-                            px={4}
-                            py={2}
-                            rounded="lg"
-                        >
-                            No discovery history yet
-                        </Badge>
-                    </Center>
-                )}
-
-                {!loading && tracks.length > 0 && (
+                {!loading && (
                     <Box
                         maxW={["none", "none", "none", "1000px"]}
                         mx="auto"
                         pb={currentlyPlaying ? 24 : 4}
                     >
-                        <Flex
-                            px={[3, 4]}
-                            pt={3}
-                            pb={2}
-                            gap={2.5}
-                            direction="column"
-                            position="sticky"
-                            top={0}
-                            zIndex={10}
-                            bg="brand.bg"
-                        >
-                            <Flex alignItems="baseline" justifyContent="space-between">
+                        {hasLoadedResults && (
+                            <Flex
+                                px={[3, 4]}
+                                pt={3}
+                                pb={2}
+                                gap={2.5}
+                                direction="column"
+                                position="sticky"
+                                top={0}
+                                zIndex={10}
+                                bg="brand.bg"
+                            >
                                 <Text fontSize="lg" fontWeight="bold" color="brand.textPrimary" letterSpacing="-0.01em">
                                     History
                                 </Text>
-                                <Text fontSize="xs" color="brand.textMuted">
-                                    {tracks.length} {tracks.length === 1 ? "track" : "tracks"}
-                                </Text>
-                            </Flex>
-                            <Flex alignItems="center" gap={2} position="relative">
-                                <Flex
-                                    position="absolute"
-                                    left={2.5}
-                                    color="brand.textMuted"
-                                    pointerEvents="none"
-                                    zIndex={1}
-                                >
-                                    <SearchIcon style={{ fontSize: "16px" }} />
-                                </Flex>
-                                <Input
-                                    placeholder="Search artist or track"
-                                    value={search}
-                                    onChange={(e) => handleSearchChange(e.target.value)}
-                                    size="xs"
-                                    h={7}
-                                    pl={8}
-                                    pr={search ? 7 : 2.5}
-                                    fontSize="xs"
-                                    bg="brand.surface"
-                                    border="1px solid"
-                                    borderColor="brand.border"
-                                    rounded="md"
-                                    color="brand.textPrimary"
-                                    _placeholder={{ color: "brand.textMuted" }}
-                                />
-                                {search && (
-                                    <IconButton
+                                <Flex alignItems="center" gap={2} position="relative">
+                                    <Flex
                                         position="absolute"
-                                        right={0}
-                                        variant="tertiary"
-                                        size="2xs"
-                                        aria-label="Clear search"
+                                        left={2.5}
                                         color="brand.textMuted"
-                                        _hover={{ color: "brand.textPrimary" }}
-                                        onClick={() => handleSearchChange("")}
+                                        pointerEvents="none"
+                                        zIndex={1}
                                     >
-                                        <CloseIcon style={{ fontSize: "14px" }} />
-                                    </IconButton>
-                                )}
+                                        <SearchIcon style={{ fontSize: "16px" }} />
+                                    </Flex>
+                                    <Input
+                                        placeholder="Search artist or track"
+                                        value={search}
+                                        onChange={(e) => handleSearchChange(e.target.value)}
+                                        size="xs"
+                                        h={7}
+                                        pl={8}
+                                        pr={search ? 7 : 2.5}
+                                        fontSize="xs"
+                                        bg="brand.surface"
+                                        border="1px solid"
+                                        borderColor="brand.border"
+                                        rounded="md"
+                                        color="brand.textPrimary"
+                                        _placeholder={{ color: "brand.textMuted" }}
+                                    />
+                                    {search && (
+                                        <IconButton
+                                            position="absolute"
+                                            right={0}
+                                            variant="tertiary"
+                                            size="2xs"
+                                            aria-label="Clear search"
+                                            color="brand.textMuted"
+                                            _hover={{ color: "brand.textPrimary" }}
+                                            onClick={() => handleSearchChange("")}
+                                        >
+                                            <CloseIcon style={{ fontSize: "14px" }} />
+                                        </IconButton>
+                                    )}
+                                </Flex>
+                                <Flex gap={1.5}>
+                                    <Button
+                                        variant="surface"
+                                        size="xs"
+                                        px={2.5}
+                                        h={7}
+                                        fontSize="xs"
+                                        borderLeft="2px solid"
+                                        borderLeftColor={filter === "all" ? "brand.primary" : "transparent"}
+                                        color={filter === "all" ? "brand.primary" : undefined}
+                                        onClick={() => { setFilterLoading(true); setFilter("all"); }}
+                                    >
+                                        All
+                                    </Button>
+                                    <Button
+                                        variant="surface"
+                                        size="xs"
+                                        px={2.5}
+                                        h={7}
+                                        fontSize="xs"
+                                        borderLeft="2px solid"
+                                        borderLeftColor={filter === "skipped-only" ? "brand.primary" : "transparent"}
+                                        color={filter === "skipped-only" ? "brand.primary" : undefined}
+                                        onClick={() => { setFilterLoading(true); setFilter("skipped-only"); }}
+                                        loading={filterLoading}
+                                    >
+                                        Skipped only
+                                    </Button>
+                                </Flex>
                             </Flex>
-                            <Flex gap={1.5}>
-                                <Button
-                                    variant="surface"
-                                    size="xs"
-                                    px={2.5}
-                                    h={7}
-                                    fontSize="xs"
-                                    borderLeft="2px solid"
-                                    borderLeftColor={filter === "all" ? "brand.primary" : "transparent"}
-                                    color={filter === "all" ? "brand.primary" : undefined}
-                                    onClick={() => setFilter("all")}
-                                >
-                                    All
-                                </Button>
-                                <Button
-                                    variant="surface"
-                                    size="xs"
-                                    px={2.5}
-                                    h={7}
-                                    fontSize="xs"
-                                    borderLeft="2px solid"
-                                    borderLeftColor={filter === "skipped-only" ? "brand.primary" : "transparent"}
-                                    color={filter === "skipped-only" ? "brand.primary" : undefined}
-                                    onClick={() => setFilter(filter === "skipped-only" ? "all" : "skipped-only")}
-                                    loading={filterLoading}
-                                >
-                                    Skipped only
-                                </Button>
-                            </Flex>
-                        </Flex>
+                        )}
 
-                        {tracks.length === 0 && !filterLoading && (
+                        {!hasLoadedResults && tracks.length === 0 && !filterLoading && (
+                            <Center pt={24}>
+                                <Badge
+                                    variant="outline"
+                                    colorPalette="teal"
+                                    fontSize={["md", "lg"]}
+                                    px={4}
+                                    py={2}
+                                    rounded="lg"
+                                >
+                                    No discovery history yet
+                                </Badge>
+                            </Center>
+                        )}
+
+                        {hasLoadedResults && tracks.length === 0 && !filterLoading && (
                             <Center pt={12}>
                                 <Text fontSize="sm" color="brand.textMuted">
-                                    No tracks match this filter
+                                    {debouncedSearch ? "No tracks match your search" : "No skipped tracks"}
                                 </Text>
                             </Center>
                         )}
