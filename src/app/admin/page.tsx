@@ -46,12 +46,16 @@ const countries = [
 ];
 
 const getCountryCookie = (): string => {
-    const match = document.cookie.match(/(?:^|;\s*)country=([^;]*)/);
+    const match = document.cookie.match(/(?:^|;\s*)country_override=([^;]*)/);
     return match?.[1] || "";
 };
 
 const setCountryCookie = (code: string) => {
-    document.cookie = `country=${code}; path=/; max-age=86400; SameSite=Lax`;
+    if (code) {
+        document.cookie = `country_override=${code}; path=/; max-age=86400; SameSite=Lax`;
+    } else {
+        document.cookie = `country_override=; path=/; max-age=0; SameSite=Lax`;
+    }
 };
 
 const AdminPage = () => {
