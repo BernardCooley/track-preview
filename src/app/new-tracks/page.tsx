@@ -1,8 +1,7 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
-    Badge,
     Box,
     Button,
     Center,
@@ -21,12 +20,10 @@ import TrackTransition from "@/components/TrackTransition";
 import BouncingDotsLoader from "@/components/BouncingLoaderDots";
 import RecordAnimation from "@/components/RecordAnimation";
 import { useNewTrackReview } from "@/hooks/useNewTrackReview";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 function NewTracksContent() {
     const router = useRouter();
-    const searchParams = useSearchParams();
-    const fromEmail = searchParams?.get("from") === "email";
     const { user, updateUser, updateUserProfile } = useAuthContext();
     const [profileLoaded, setProfileLoaded] = useState(false);
 
@@ -41,7 +38,7 @@ function NewTracksContent() {
         likeOrDislike,
         userProfile,
         isAnonymous,
-    } = useNewTrackReview(fromEmail);
+    } = useNewTrackReview();
 
     const [animate, setAnimate] = useState<"like" | "dislike" | null>(null);
     const [animationImage, setAnimationImage] = useState("");
@@ -90,10 +87,6 @@ function NewTracksContent() {
         );
     }
 
-    const emailsEnabled = userProfile?.genreEmailsEnabled ?? false;
-    const frequencyLabel = fromEmail && emailsEnabled
-        ? (userProfile?.genreAlertFrequency || "WEEKLY").toLowerCase()
-        : "daily";
     const genreCount = userProfile?.genreAlerts?.length || 0;
 
     return (
@@ -127,7 +120,7 @@ function NewTracksContent() {
                         gap={2}
                     >
                                                 <Text fontSize="sm" color="brand.textSecondary">
-                            Showing new tracks from the past {frequencyLabel === "daily" ? "24 hours" : frequencyLabel === "weekly" ? "week" : "month"} in {genreCount} genre{genreCount !== 1 ? "s" : ""} you follow
+                            Showing recently released tracks in {genreCount} genre{genreCount !== 1 ? "s" : ""} you follow
                         </Text>
                     </Flex>
                 </Box>
@@ -172,8 +165,8 @@ function NewTracksContent() {
                                         fontSize="sm"
                                     >
                                         {genreCount === 0
-                                            ? "Set up genre alerts in Settings to get notified when new tracks are added."
-                                            : "There are no new unreviewed tracks in your subscribed genres right now. Check back later!"}
+                                            ? "Follow genres in Settings to see new releases here."
+                                            : "No recent releases in your followed genres right now. Check back later!"}
                                     </Text>
                                 </VStack>
                                 <VStack gap={2} w="full">
@@ -262,9 +255,7 @@ function NewTracksContent() {
 export default function NewTracks() {
     return (
         <AuthGuard>
-            <Suspense>
-                <NewTracksContent />
-            </Suspense>
+            <NewTracksContent />
         </AuthGuard>
     );
 }

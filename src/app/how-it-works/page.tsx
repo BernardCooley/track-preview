@@ -5,6 +5,7 @@ import LooksTwoIcon from "@mui/icons-material/LooksTwo";
 import Looks3Icon from "@mui/icons-material/Looks3";
 import LibraryMusicIcon from "@mui/icons-material/LibraryMusic";
 import TuneIcon from "@mui/icons-material/Tune";
+import QueueMusicIcon from "@mui/icons-material/QueueMusic";
 
 const steps = [
     {
@@ -130,6 +131,40 @@ const HowItWorks = () => {
                                     color="brand.textSecondary"
                                 >
                                     Off by default. When enabled, liked tracks go through two extra review steps before reaching your library. Toggle it in the menu. Turning it off moves any in-progress tracks straight to your library.
+                                </Text>
+                            </Flex>
+                        </Flex>
+
+                        <Flex
+                            mt={6}
+                            gap={4}
+                            p={4}
+                            rounded="lg"
+                            bg="brand.cardBg"
+                            border="1px solid"
+                            borderColor="brand.border"
+                            alignItems="flex-start"
+                        >
+                            <Flex
+                                color="brand.primary"
+                                mt="2px"
+                                flexShrink={0}
+                            >
+                                <QueueMusicIcon style={{ fontSize: "24px" }} />
+                            </Flex>
+                            <Flex direction="column" gap={1}>
+                                <Text
+                                    fontSize="md"
+                                    fontWeight="semibold"
+                                    color="brand.textPrimary"
+                                >
+                                    New tracks
+                                </Text>
+                                <Text
+                                    fontSize="sm"
+                                    color="brand.textSecondary"
+                                >
+                                    Follow genres you love in settings to see recently released tracks on the new tracks page. You can also enable email alerts to get notified when new releases drop.
                                 </Text>
                             </Flex>
                         </Flex>

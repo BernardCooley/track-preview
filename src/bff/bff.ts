@@ -565,19 +565,19 @@ export const spotifyDisconnect = async ({
 interface FetchNewTracksProps {
     genres: string[];
     userId: string;
-    since: string;
+    releasedAfter: string;
 }
 
 export const fetchNewTracks = async ({
     genres,
     userId,
-    since,
+    releasedAfter,
 }: FetchNewTracksProps): Promise<Track[] | null> => {
     try {
         const tracks = await fetchWithErrorHandling("/api/getNewTracks", "POST", {
             genres,
             userId,
-            since,
+            releasedAfter,
         });
         return tracks as Track[];
     } catch (error) {

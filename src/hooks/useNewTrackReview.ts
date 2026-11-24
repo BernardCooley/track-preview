@@ -8,13 +8,9 @@ import {
 } from "@/bff/bff";
 import { Track } from "../../types";
 
-const LOOKBACK_HOURS: Record<string, number> = {
-    DAILY: 24,
-    WEEKLY: 24 * 7,
-    MONTHLY: 24 * 30,
-};
+const RELEASE_WINDOW_DAYS = 90;
 
-export const useNewTrackReview = (fromEmail: boolean) => {
+export const useNewTrackReview = () => {
     const { user, userProfile, isAnonymous } = useAuthContext();
 
     const [tracks, setTracks] = useState<Track[]>([]);
@@ -127,11 +123,9 @@ export const useNewTrackReview = (fromEmail: boolean) => {
             return;
         }
 
-        const freq = fromEmail && userProfile.genreEmailsEnabled
-            ? (userProfile.genreAlertFrequency || "WEEKLY")
-            : "DAILY";
-        const lookbackMs = LOOKBACK_HOURS[freq] * 60 * 60 * 1000;
-        const since = new Date(Date.now() - lookbackMs).toISOString();
+        const cutoff = new Date();
+        cutoff.setDate(cutoff.getDate() - RELEASE_WINDOW_DAYS);
+        const releasedAfter = cutoff.toISOString().split("T")[0];
 
         setLoading(true);
         setNoTracks(false);
@@ -139,7 +133,7 @@ export const useNewTrackReview = (fromEmail: boolean) => {
         fetchNewTracks({
             genres: userProfile.genreAlerts,
             userId: user.uid,
-            since,
+            releasedAfter,
         }).then((result) => {
             if (result && result.length > 0) {
                 setTracks(result);
@@ -160,7 +154,7 @@ export const useNewTrackReview = (fromEmail: boolean) => {
             previewCache.current.forEach((url) => URL.revokeObjectURL(url));
             previewCache.current.clear();
         };
-    }, [user?.uid, userProfile?.genreAlerts, userProfile?.genreAlertFrequency, userProfile?.genreEmailsEnabled]);
+    }, [user?.uid, userProfile?.genreAlerts]);
 
     const likeOrDislike = async (like: boolean) => {
         if (!currentTrack || !user?.uid) return;
