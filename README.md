@@ -1,5 +1,7 @@
 # Phoniquest
 
+Last updated: 2024-06-10
+
 A music discovery app where users can find random tracks by genre and year filters, listen to 30-second previews, and like or dislike them. Liked tracks are saved to the user's library.
 
 Built with Next.js (App Router), Prisma, PostgreSQL, Firebase Auth, and the Deezer API.
