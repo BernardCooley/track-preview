@@ -5,7 +5,7 @@ import { getValidSpotifyToken } from "@/lib/spotifyUserAuth";
 
 export async function POST(req: Request) {
     try {
-        const { userId } = await req.json();
+        const { userId, playlistId, playlistName } = await req.json();
 
         if (!userId) {
             return NextResponse.json(
@@ -53,30 +53,98 @@ export async function POST(req: Request) {
 
         const spotifyUser = await spotifyUserRes.json();
 
-        const createPlaylistRes = await fetch(
-            `https://api.spotify.com/v1/users/${spotifyUser.id}/playlists`,
-            {
-                method: "POST",
-                headers: {
-                    Authorization: `Bearer ${tokens.accessToken}`,
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    name: `Phoniquest Library – ${new Date().toLocaleDateString()}`,
-                    description: "Exported from Phoniquest",
-                    public: false,
-                }),
-            }
-        );
+        let playlist: { id: string; external_urls: { spotify: string } };
+        const defaultName = "Phoniquest Library";
 
-        if (!createPlaylistRes.ok) {
-            return NextResponse.json(
-                { error: "Failed to create Spotify playlist" },
-                { status: 502 }
+        if (playlistId) {
+            const existingRes = await fetch(
+                `https://api.spotify.com/v1/playlists/${playlistId}`,
+                {
+                    headers: { Authorization: `Bearer ${tokens.accessToken}` },
+                }
             );
-        }
+            if (!existingRes.ok) {
+                return NextResponse.json(
+                    { error: "Playlist not found" },
+                    { status: 404 }
+                );
+            }
+            playlist = await existingRes.json();
 
-        const playlist = await createPlaylistRes.json();
+            await fetch(
+                `https://api.spotify.com/v1/playlists/${playlist.id}/tracks`,
+                {
+                    method: "PUT",
+                    headers: {
+                        Authorization: `Bearer ${tokens.accessToken}`,
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ uris: [] }),
+                }
+            );
+        } else {
+            const name = playlistName || defaultName;
+
+            if (!playlistName) {
+                let searchUrl: string | null =
+                    "https://api.spotify.com/v1/me/playlists?limit=50";
+                while (searchUrl) {
+                    const res: Response = await fetch(searchUrl, {
+                        headers: {
+                            Authorization: `Bearer ${tokens.accessToken}`,
+                        },
+                    });
+                    if (!res.ok) break;
+                    const data: any = await res.json();
+                    const existing = data.items.find(
+                        (p: any) => p.name === defaultName
+                    );
+                    if (existing) {
+                        playlist = existing;
+                        await fetch(
+                            `https://api.spotify.com/v1/playlists/${playlist.id}/tracks`,
+                            {
+                                method: "PUT",
+                                headers: {
+                                    Authorization: `Bearer ${tokens.accessToken}`,
+                                    "Content-Type": "application/json",
+                                },
+                                body: JSON.stringify({ uris: [] }),
+                            }
+                        );
+                        break;
+                    }
+                    searchUrl = data.next;
+                }
+            }
+
+            if (!playlist!) {
+                const createRes = await fetch(
+                    `https://api.spotify.com/v1/users/${spotifyUser.id}/playlists`,
+                    {
+                        method: "POST",
+                        headers: {
+                            Authorization: `Bearer ${tokens.accessToken}`,
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            name,
+                            description: "Exported from Phoniquest",
+                            public: false,
+                        }),
+                    }
+                );
+
+                if (!createRes.ok) {
+                    return NextResponse.json(
+                        { error: "Failed to create Spotify playlist" },
+                        { status: 502 }
+                    );
+                }
+
+                playlist = await createRes.json();
+            }
+        }
 
         const trackUris: string[] = [];
         for (const track of libraryTracks) {

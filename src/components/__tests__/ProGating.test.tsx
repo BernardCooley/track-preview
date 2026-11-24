@@ -300,14 +300,14 @@ describe("Pro feature gating", () => {
             setSubscription(false);
             render(<Library />);
 
-            expect(screen.getByText("PRO")).toBeInTheDocument();
+            expect(screen.getAllByText("PRO").length).toBeGreaterThan(0);
         });
 
         it("does not show PRO badge for Pro users", () => {
             setSubscription(true);
             render(<Library />);
 
-            expect(screen.queryByText("PRO")).not.toBeInTheDocument();
+            expect(screen.queryAllByText("PRO")).toHaveLength(0);
         });
 
         it("calls requirePro when free user clicks sort area", async () => {

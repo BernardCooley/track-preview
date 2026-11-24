@@ -28,6 +28,7 @@ import { useSubscription } from "@/hooks/useSubscription";
 import UpgradePrompt from "./UpgradePrompt";
 import StarIcon from "@mui/icons-material/Star";
 import GenreModal from "./GenreModal";
+import SpotifyExportButton from "./SpotifyExportButton";
 
 type TrackKeys = keyof Track;
 
@@ -600,6 +601,9 @@ const LibraryTable = ({
                     </Menu.Root>
                     </>
                     )}
+                    <Box ml="auto">
+                        <SpotifyExportButton requirePro={requirePro} isPro={isPro} />
+                    </Box>
                     </Flex>
                 </Flex>
             )}

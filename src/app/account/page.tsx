@@ -19,7 +19,7 @@ import {
     UpdateUserEmail,
     UpdateUserPassword,
 } from "../../../firebase/utils";
-import { sendVerificationEmail } from "@/bff/bff";
+import { sendVerificationEmail, spotifyDisconnect, getUserProfile } from "@/bff/bff";
 import { useRouter } from "next/navigation";
 import BackHeader from "@/components/BackHeader";
 import EditIcon from "@mui/icons-material/Edit";
@@ -33,11 +33,14 @@ import { TextInput } from "@/components/TextInput";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import AuthGuard from "@/components/AuthGuard";
+import { useAuthContext } from "../../../Contexts/AuthContext";
 
 const Settings = () => {
     const { open: isOpen, onOpen, onClose } = useDisclosure();
     const cancelRef = useRef<HTMLButtonElement>(null);
     const router = useRouter();
+    const { userProfile, updateUserProfile } = useAuthContext();
+    const [disconnectingSpotify, setDisconnectingSpotify] = useState(false);
     const [editingEmail, setEditingEmail] = useState<boolean>(false);
     const [editingPassword, setEditingPassword] = useState<boolean>(false);
     const [emailTouched, setEmailTouched] = useState<boolean>(false);
@@ -87,6 +90,13 @@ const Settings = () => {
     useEffect(() => {
         isUserLoggedIn();
     }, [isUserLoggedIn]);
+
+    useEffect(() => {
+        if (!user?.uid) return;
+        getUserProfile({ userId: user.uid }).then((profile) => {
+            if (profile) updateUserProfile(profile);
+        });
+    }, [user?.uid]);
 
     const logout = async () => {
         LogOut(router);
@@ -194,6 +204,36 @@ const Settings = () => {
         setErrors((prev) => ({ ...prev, currentPassword: "", password: "" }));
     };
 
+    const isSpotifyConnected = !!userProfile?.spotifyAccessToken;
+
+    const handleDisconnectSpotify = async () => {
+        if (!user?.uid) return;
+        setDisconnectingSpotify(true);
+        try {
+            await spotifyDisconnect({ userId: user.uid });
+            if (userProfile) {
+                updateUserProfile({
+                    ...userProfile,
+                    spotifyAccessToken: null,
+                    spotifyRefreshToken: null,
+                    spotifyTokenExpiresAt: null,
+                });
+            }
+            showToast({
+                title: "Spotify disconnected",
+                description: "You can reconnect anytime from your library.",
+                type: "success",
+            });
+        } catch {
+            showToast({
+                title: "Failed to disconnect Spotify",
+                description: "Please try again later.",
+                type: "error",
+            });
+        } finally {
+            setDisconnectingSpotify(false);
+        }
+    };
 
     if (deleting) {
         return (
@@ -607,6 +647,43 @@ const Settings = () => {
                                             <EditIcon fontSize="small" />
                                         </IconButton>
                                     </>
+                                )}
+                            </Flex>
+                        </Box>
+
+                        <Box
+                            borderTop="1px solid"
+                            borderTopColor="brand.divider"
+                            pt={6}
+                        >
+                            <Heading
+                                size="xs"
+                                textTransform="uppercase"
+                                fontSize="xs"
+                                letterSpacing="wider"
+                                color="brand.textMuted"
+                                mb={2}
+                            >
+                                Spotify
+                            </Heading>
+                            <Flex
+                                w="full"
+                                justifyContent="space-between"
+                                alignItems="center"
+                                gap={3}
+                            >
+                                <Text color="brand.textSecondary" fontSize="sm">
+                                    {isSpotifyConnected ? "Connected" : "Not connected"}
+                                </Text>
+                                {isSpotifyConnected && (
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        loading={disconnectingSpotify}
+                                        onClick={handleDisconnectSpotify}
+                                    >
+                                        Disconnect
+                                    </Button>
                                 )}
                             </Flex>
                         </Box>

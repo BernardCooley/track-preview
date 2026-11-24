@@ -125,6 +125,12 @@ const UpgradePrompt = ({ featureName, onClose }: Props) => {
                                     >
                                         • Curate your collection with two-stage review
                                     </Text>
+                                    <Text
+                                        color="brand.textSecondary"
+                                        fontSize="sm"
+                                    >
+                                        • Export your library to a Spotify playlist
+                                    </Text>
                                 </VStack>
                             </Flex>
                         </Box>

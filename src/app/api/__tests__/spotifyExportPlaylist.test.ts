@@ -101,6 +101,7 @@ describe("spotify/export-playlist", () => {
 
         setupFetchSequence([
             { ok: true, json: async () => mockSpotifyUser() },
+            { ok: true, json: async () => ({ items: [], next: null }) },
             { ok: true, json: async () => mockPlaylist() },
             {
                 ok: true,
@@ -143,6 +144,7 @@ describe("spotify/export-playlist", () => {
 
         setupFetchSequence([
             { ok: true, json: async () => mockSpotifyUser() },
+            { ok: true, json: async () => ({ items: [], next: null }) },
             { ok: true, json: async () => mockPlaylist() },
             {
                 ok: true,
@@ -170,6 +172,42 @@ describe("spotify/export-playlist", () => {
         expect(json.matchedTracks).toBe(1);
     });
 
+    it("reuses existing Phoniquest Library playlist", async () => {
+        vi.resetModules();
+        setupTokenUser();
+        mockQueryRaw.mockResolvedValue([
+            { artist: "Artist A", title: "Track A" },
+        ]);
+
+        const existingPlaylist = {
+            id: "existing-pl",
+            name: "Phoniquest Library",
+            external_urls: { spotify: "https://open.spotify.com/playlist/existing-pl" },
+        };
+
+        setupFetchSequence([
+            { ok: true, json: async () => mockSpotifyUser() },
+            { ok: true, json: async () => ({ items: [existingPlaylist], next: null }) },
+            { ok: true, json: async () => ({}) },
+            {
+                ok: true,
+                json: async () => ({
+                    tracks: { items: [{ uri: "spotify:track:aaa" }] },
+                }),
+            },
+            { ok: true, json: async () => ({}) },
+        ]);
+
+        const { POST } = await import("../spotify/export-playlist/route");
+        const res = await POST(makeRequest({ userId: "fb-1" }));
+        const json = await res.json();
+
+        expect(res.status).toBe(200);
+        expect(json.playlistUrl).toBe(
+            "https://open.spotify.com/playlist/existing-pl"
+        );
+    });
+
     it("returns 502 when Spotify user profile fails", async () => {
         vi.resetModules();
         setupTokenUser();
@@ -195,6 +233,7 @@ describe("spotify/export-playlist", () => {
 
         setupFetchSequence([
             { ok: true, json: async () => mockSpotifyUser() },
+            { ok: true, json: async () => ({ items: [], next: null }) },
             { ok: false, json: async () => ({ error: "forbidden" }) },
         ]);
 
