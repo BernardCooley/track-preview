@@ -50,17 +50,22 @@ const SettingsContent = () => {
                 const profile = await getUserProfile({ userId: firebaseUser.uid });
                 if (profile) {
                     updateUserProfile(profile);
-                    if (profile.email !== firebaseUser.email) {
-                        await mutateUserProfile({
+                    const needsEmailSync = profile.email !== firebaseUser.email;
+                    const needsGenreClear = !isPro && profile.genreAlerts.length > 0;
+
+                    if (needsEmailSync || needsGenreClear) {
+                        const updated = await mutateUserProfile({
                             userId: firebaseUser.uid,
-                            email: firebaseUser.email,
+                            ...(needsEmailSync && { email: firebaseUser.email }),
+                            ...(needsGenreClear && { genreAlerts: [], genreEmailsEnabled: false }),
                         });
+                        updateUserProfile(updated);
                     }
                 }
             }
         });
         return unsubscribe;
-    }, []);
+    }, [isPro]);
 
     const hasLocalGenres = localGenres.length > 0;
 
@@ -75,7 +80,6 @@ const SettingsContent = () => {
     const editingEmail = hasEmailChanges;
 
     const handleOpenPicker = () => {
-        if (!requirePro("Genre Alerts")) return;
         setShowGenreSelector(true);
     };
 
@@ -153,6 +157,11 @@ const SettingsContent = () => {
                     opacity={editingEmail ? 0.4 : 1}
                     pointerEvents={editingEmail ? "none" : "auto"}
                     transition="opacity 0.2s ease"
+                    {...(!isPro && {
+                        cursor: "pointer",
+                        onClick: () => requirePro("Genre Alerts"),
+                        css: { "& *": { pointerEvents: "none" } },
+                    })}
                 >
                     <Flex alignItems="center" justifyContent="space-between" mb={savedGenres.length > 0 ? 2 : 6}>
                         <Flex alignItems="center" gap={2}>
@@ -287,7 +296,7 @@ const SettingsContent = () => {
                 </Box>
 
                 {/* Email Notifications Card */}
-                {hasLocalGenres && (
+                {hasLocalGenres && isPro && (
                     <Box
                         w="full"
                         maxW="520px"
