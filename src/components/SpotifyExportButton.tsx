@@ -13,6 +13,7 @@ import {
     spotifyAuthorize,
     spotifyExportPlaylist,
     spotifyPlaylists,
+    UnauthorisedError,
 } from "@/bff/bff";
 import { useAuthContext } from "../../Contexts/AuthContext";
 import { toaster } from "@/components/toaster";
@@ -104,7 +105,15 @@ const SpotifyExportButton = ({ requirePro, isPro }: Props) => {
                     },
                 });
             }
-        } catch {
+        } catch (err) {
+            if (err instanceof UnauthorisedError) {
+                setOpen(false);
+                const result = await spotifyAuthorize({ userId: user.uid });
+                if (result?.url) {
+                    window.location.href = result.url;
+                }
+                return;
+            }
             toaster.create({
                 title: "Export failed",
                 description: "Could not export to Spotify. Please try again.",
