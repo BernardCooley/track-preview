@@ -37,6 +37,9 @@ model User {
   stripeSubscriptionId  String?
   subscriptionStatus    SubscriptionStatus?
   subscriptionExpiresAt DateTime?
+  spotifyAccessToken    String?
+  spotifyRefreshToken   String?
+  spotifyTokenExpiresAt DateTime?
   Review                Review[]
 }
 
