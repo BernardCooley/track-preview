@@ -18,11 +18,12 @@ import StarIcon from "@mui/icons-material/Star";
 interface Props {
     requirePro: (featureName: string) => boolean;
     isPro: boolean;
+    variant?: "icon" | "card";
 }
 
 type ExportFormat = "csv" | "json";
 
-const LibraryExportButton = ({ requirePro, isPro }: Props) => {
+const LibraryExportButton = ({ requirePro, isPro, variant = "icon" }: Props) => {
     const { user } = useAuthContext();
     const [open, setOpen] = useState(false);
     const [exporting, setExporting] = useState(false);
@@ -67,38 +68,82 @@ const LibraryExportButton = ({ requirePro, isPro }: Props) => {
         }
     }, [user?.uid, format]);
 
-    return (
-        <>
-            <Box position="relative">
-                <IconButton
-                    variant="surface"
-                    size="xs"
-                    h={7}
-                    w={7}
-                    px={0}
-                    aria-label="Export library"
-                    onClick={handleClick}
-                >
-                    <DownloadIcon style={{ fontSize: "14px" }} />
-                </IconButton>
+    const trigger = variant === "card" ? (
+        <Box
+            w="full"
+            maxW="520px"
+            bg="brand.cardBg"
+            border="1px solid"
+            borderColor="brand.border"
+            rounded="card"
+            p={[5, 6]}
+            cursor="pointer"
+            onClick={handleClick}
+            transition="all 0.15s ease"
+            _hover={{ borderColor: "brand.primary" }}
+        >
+            <Flex alignItems="center" gap={2}>
+                <DownloadIcon style={{ fontSize: "20px", color: "var(--chakra-colors-brand-primary)" }} />
+                <Text fontSize="lg" fontWeight="semibold" color="brand.textPrimary">
+                    Export Library
+                </Text>
                 {!isPro && (
                     <Flex
-                        position="absolute"
-                        top="-5px"
-                        right="-5px"
                         alignItems="center"
-                        justifyContent="center"
                         bg="brand.primarySubtle"
                         color="brand.primary"
                         rounded="full"
-                        h="14px"
-                        w="14px"
-                        pointerEvents="none"
+                        px={1.5}
+                        py={0.5}
+                        gap={0.5}
                     >
-                        <StarIcon style={{ fontSize: "9px" }} />
+                        <StarIcon style={{ fontSize: "10px" }} />
+                        <Text fontSize="2xs" fontWeight="bold" lineHeight="1">
+                            PRO
+                        </Text>
                     </Flex>
                 )}
-            </Box>
+            </Flex>
+            <Text fontSize="xs" color="brand.textMuted" mt={2}>
+                Download your library as CSV or JSON.
+            </Text>
+        </Box>
+    ) : (
+        <Box position="relative">
+            <IconButton
+                variant="surface"
+                size="xs"
+                h={7}
+                w={7}
+                px={0}
+                aria-label="Export library"
+                onClick={handleClick}
+            >
+                <DownloadIcon style={{ fontSize: "14px" }} />
+            </IconButton>
+            {!isPro && (
+                <Flex
+                    position="absolute"
+                    top="-5px"
+                    right="-5px"
+                    alignItems="center"
+                    justifyContent="center"
+                    bg="brand.primarySubtle"
+                    color="brand.primary"
+                    rounded="full"
+                    h="14px"
+                    w="14px"
+                    pointerEvents="none"
+                >
+                    <StarIcon style={{ fontSize: "9px" }} />
+                </Flex>
+            )}
+        </Box>
+    );
+
+    return (
+        <>
+            {trigger}
 
             <Dialog.Root
                 placement="center"

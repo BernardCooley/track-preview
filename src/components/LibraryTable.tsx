@@ -33,7 +33,6 @@ import BarChartIcon from "@mui/icons-material/BarChart";
 import GenreModal from "./GenreModal";
 import SpotifyExportButton from "./SpotifyExportButton";
 import LibraryStats from "./LibraryStats";
-import LibraryExportButton from "./LibraryExportButton";
 
 type TrackKeys = keyof Track;
 
@@ -594,7 +593,6 @@ const LibraryTable = ({
                         >
                             <BarChartIcon style={{ fontSize: "16px" }} />
                         </IconButton>
-                        <LibraryExportButton requirePro={requirePro} isPro={isPro} />
                         <SpotifyExportButton requirePro={requirePro} isPro={isPro} />
                     </Flex>
                     </Flex>

@@ -14,6 +14,7 @@ import { auth } from "../../../firebase/firebaseInit";
 import StarIcon from "@mui/icons-material/Star";
 import TuneIcon from "@mui/icons-material/Tune";
 import EmailIcon from "@mui/icons-material/Email";
+import LibraryExportButton from "@/components/LibraryExportButton";
 
 const FREQUENCY_OPTIONS = [
     { value: "DAILY", label: "Daily" },
@@ -427,6 +428,8 @@ const SettingsContent = () => {
                         </Flex>
                     </Box>
                 )}
+                {/* Export Library Card */}
+                <LibraryExportButton requirePro={requirePro} isPro={isPro} variant="card" />
             </Flex>
 
             <GenreModal
