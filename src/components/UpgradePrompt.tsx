@@ -46,6 +46,11 @@ const features = [
         text: "Add personal notes to any track in your library",
         description: "Save personal notes on any track in your library to remember the context behind it.",
     },
+    {
+        keys: ["Library Export"],
+        text: "Export your library as CSV or JSON",
+        description: "Download your full library as a CSV spreadsheet or JSON file. Great for backups, sharing your collection, or importing into other tools and services.",
+    },
 ];
 
 const UpgradePrompt = ({ featureName, onClose }: Props) => {
