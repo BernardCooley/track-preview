@@ -22,7 +22,7 @@ export default function SubscriptionCancelPage() {
                 textAlign="center"
                 maxW="320px"
             >
-                No worries — you can subscribe anytime. Your free account is still ready.
+                No worries — you can upgrade anytime. Your free account is still ready.
             </Text>
             <Button
                 variant="primary"

@@ -11,6 +11,7 @@ import {
     resolvePreviewUrl,
     getTrialLikeCount,
     togglePurchased,
+    fetchDiscoveryHistory,
     handleFetchErrors,
     GoneError,
     NotFoundError,
@@ -186,6 +187,47 @@ describe("getTrialLikeCount", () => {
 
         const result = await getTrialLikeCount({ userId: "user-1" });
         expect(result).toBe(0);
+    });
+});
+
+describe("fetchDiscoveryHistory", () => {
+    it("returns empty array from default handler", async () => {
+        const result = await fetchDiscoveryHistory({ userId: "user-1", limit: 50, offset: 0 });
+        expect(result).toEqual([]);
+    });
+
+    it("returns tracks when handler provides them", async () => {
+        const mockTracks = [
+            { id: "t1", title: "Test Track", artist: "Test Artist", currentReviewStep: 4, reviewedAt: "2026-01-01" },
+        ];
+        server.use(
+            http.post("/api/getDiscoveryHistory", () => {
+                return HttpResponse.json(mockTracks);
+            })
+        );
+
+        const result = await fetchDiscoveryHistory({ userId: "user-1", limit: 50, offset: 0 });
+        expect(result).toEqual(mockTracks);
+    });
+
+    it("passes search and status params", async () => {
+        let apiBody: any = null;
+        server.use(
+            http.post("/api/getDiscoveryHistory", async ({ request }) => {
+                apiBody = await request.json();
+                return HttpResponse.json([]);
+            })
+        );
+
+        await fetchDiscoveryHistory({ userId: "user-1", limit: 20, offset: 10, search: "techno", status: 0 });
+
+        expect(apiBody).toEqual({
+            userId: "user-1",
+            limit: 20,
+            offset: 10,
+            search: "techno",
+            status: 0,
+        });
     });
 });
 

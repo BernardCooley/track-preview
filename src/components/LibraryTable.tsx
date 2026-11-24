@@ -441,7 +441,7 @@ const LibraryTable = ({
                             cursor="pointer"
                             transition="opacity 0.15s ease"
                             _hover={{ opacity: 1 }}
-                            onClick={() => requirePro("Pro Library Tools")}
+                            onClick={() => requirePro("Library Tools")}
                             role="button"
                             aria-label="Upgrade to Pro for filters and sorting"
                         >

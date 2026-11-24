@@ -138,14 +138,14 @@ describe("Pro feature gating", () => {
     });
 
     describe("2.1 Curated Mode gate (MenuDrawer)", () => {
-        it("shows Pro badge on curated mode toggle for free users", () => {
+        it("shows Pro badges for free users", () => {
             setSubscription(false);
             render(
                 <MenuDrawer isOpen={true} onClose={vi.fn()} />,
                 { authContext: { user: { uid: "user-1", email: "test@test.com" }, userProfile: freeProfile as any } }
             );
 
-            expect(screen.getByText("PRO")).toBeInTheDocument();
+            expect(screen.getAllByText("PRO").length).toBeGreaterThanOrEqual(1);
         });
 
         it("does not show Pro badge for Pro users", () => {
@@ -191,6 +191,56 @@ describe("Pro feature gating", () => {
                 userId: "user-1",
                 curatedMode: true,
             });
+        });
+    });
+
+    describe("2.1b Discovery History gate (MenuDrawer)", () => {
+        it("shows PRO badge on History item for free users", () => {
+            setSubscription(false);
+            render(
+                <MenuDrawer isOpen={true} onClose={vi.fn()} />,
+                { authContext: { user: { uid: "user-1", email: "test@test.com" }, userProfile: freeProfile as any } }
+            );
+
+            const historyItem = screen.getByText("History").closest("[class]")! as HTMLElement;
+            expect(within(historyItem).getByText("PRO")).toBeInTheDocument();
+        });
+
+        it("does not show PRO badge on History item for Pro users", () => {
+            setSubscription(true);
+            render(
+                <MenuDrawer isOpen={true} onClose={vi.fn()} />,
+                { authContext: { user: { uid: "user-1", email: "test@test.com" }, userProfile: proProfile as any } }
+            );
+
+            const historyItem = screen.getByText("History").closest("[class]")! as HTMLElement;
+            expect(within(historyItem).queryByText("PRO")).not.toBeInTheDocument();
+        });
+
+        it("calls requirePro when free user clicks History", async () => {
+            setSubscription(false);
+            const user = userEvent.setup();
+            render(
+                <MenuDrawer isOpen={true} onClose={vi.fn()} />,
+                { authContext: { user: { uid: "user-1", email: "test@test.com" }, userProfile: freeProfile as any } }
+            );
+
+            await user.click(screen.getByText("History"));
+
+            expect(mockRequirePro).toHaveBeenCalledWith("Discovery History");
+        });
+
+        it("does not call requirePro when Pro user clicks History", async () => {
+            setSubscription(true);
+            const user = userEvent.setup();
+            render(
+                <MenuDrawer isOpen={true} onClose={vi.fn()} />,
+                { authContext: { user: { uid: "user-1", email: "test@test.com" }, userProfile: proProfile as any } }
+            );
+
+            await user.click(screen.getByText("History"));
+
+            expect(mockRequirePro).not.toHaveBeenCalled();
         });
     });
 
@@ -281,7 +331,7 @@ describe("Pro feature gating", () => {
 
             await user.click(screen.getByRole("button", { name: /Upgrade to Pro/i }));
 
-            expect(mockRequirePro).toHaveBeenCalledWith("Pro Library Tools");
+            expect(mockRequirePro).toHaveBeenCalledWith("Library Tools");
         });
     });
 
@@ -293,7 +343,7 @@ describe("Pro feature gating", () => {
 
             await user.click(screen.getByRole("button", { name: /Upgrade to Pro/i }));
 
-            expect(mockRequirePro).toHaveBeenCalledWith("Pro Library Tools");
+            expect(mockRequirePro).toHaveBeenCalledWith("Library Tools");
         });
 
         it("shows PRO badge on filter group for free users", () => {
@@ -317,7 +367,7 @@ describe("Pro feature gating", () => {
 
             await user.click(screen.getByRole("button", { name: /Upgrade to Pro/i }));
 
-            expect(mockRequirePro).toHaveBeenCalledWith("Pro Library Tools");
+            expect(mockRequirePro).toHaveBeenCalledWith("Library Tools");
         });
 
         it("allows Pro user to open sort menu", async () => {
