@@ -82,6 +82,7 @@ function HistoryContent() {
     const sentinelRef = useRef<HTMLDivElement>(null);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const [hasLoadedResults, setHasLoadedResults] = useState(false);
+    const [initialFetchDone, setInitialFetchDone] = useState(false);
 
     const [addingTrackId, setAddingTrackId] = useState<string | null>(null);
 
@@ -157,6 +158,7 @@ function HistoryContent() {
             } finally {
                 setLoading(false);
                 setFilterLoading(false);
+                setInitialFetchDone(true);
             }
         })();
     }, [user?.uid, isPro, debouncedSearch, statusParam, fetchHistory]);
@@ -421,7 +423,7 @@ function HistoryContent() {
                             </Flex>
                         )}
 
-                        {!hasLoadedResults && tracks.length === 0 && !filterLoading && (
+                        {initialFetchDone && !hasLoadedResults && tracks.length === 0 && !filterLoading && (
                             <Center pt={24}>
                                 <Badge
                                     variant="outline"
