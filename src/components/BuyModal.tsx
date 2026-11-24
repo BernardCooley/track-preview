@@ -19,6 +19,7 @@ interface Props {
     reviewTracks: ReviewTracks;
     trackToBuy: number | null;
     releaseTrack?: Track | null;
+    country?: string;
 }
 
 const BuyModal = ({
@@ -28,14 +29,15 @@ const BuyModal = ({
     reviewTracks,
     trackToBuy,
     releaseTrack,
+    country,
 }: Props) => {
     const track = releaseTrack || (trackToBuy !== null ? reviewTracks[4].tracks[trackToBuy] : null);
     const isReleaseBuy = !!releaseTrack;
     const searchTitle = isReleaseBuy ? releaseTrack!.releaseTitle : undefined;
 
     const filteredLinks = useMemo(
-        () => (track ? getRelevantBuyLinks(buyLinks, track.genre) : buyLinks),
-        [buyLinks, track]
+        () => (track ? getRelevantBuyLinks(buyLinks, track.genre, country) : buyLinks),
+        [buyLinks, track, country]
     );
 
     return (

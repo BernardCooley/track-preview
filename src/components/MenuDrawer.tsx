@@ -136,6 +136,13 @@ const MenuDrawer = ({ isOpen, onClose }: Props) => {
                                 linkText="Legal"
                                 href="/legal"
                             />
+                            {user?.uid && (process.env.NEXT_PUBLIC_ADMIN_UID || "nWDEiOWsMVQ7qOFVLzrZvGrEqdN2,v2dWVgS1DxagPDt124tUq8hirxs1").split(",").includes(user.uid) && (
+                                <MenuDrawerItem
+                                    pathname={pathname}
+                                    linkText="Admin"
+                                    href="/admin"
+                                />
+                            )}
                         </Flex>
 
                         <Separator borderColor="brand.divider" my={4} />

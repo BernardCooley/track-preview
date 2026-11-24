@@ -1,6 +1,6 @@
 # Phoniquest
 
-Last updated: 2024-06-10
+version: 0.1.0
 
 A music discovery app where users can find random tracks by genre and year filters, listen to 30-second previews, and like or dislike them. Liked tracks are saved to the user's library.
 

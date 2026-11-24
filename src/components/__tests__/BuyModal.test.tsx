@@ -9,10 +9,11 @@ import { mockTrack, mockTrack2, makeReviewTracks } from "../../../test/mocks/dat
 import type { IBuyLink } from "../../../types";
 
 const buyLinks: IBuyLink[] = [
-    { platform: "beatport", logo: "/logos/beatport.png" },
-    { platform: "discogs", logo: "/logos/discogs.jpeg" },
-    { platform: "bandcamp", logo: "/logos/bandcamp.png" },
-    { platform: "apple music", logo: "/logos/apple_music.jpeg" },
+    { platform: "beatport", logo: "/logos/beatport.png", regions: [] },
+    { platform: "juno", logo: "/logos/juno.jpeg", regions: ["GB"] },
+    { platform: "discogs", logo: "/logos/discogs.jpeg", regions: [] },
+    { platform: "bandcamp", logo: "/logos/bandcamp.png", regions: [] },
+    { platform: "apple music", logo: "/logos/apple_music.jpeg", regions: [] },
 ];
 
 describe("BuyModal", () => {

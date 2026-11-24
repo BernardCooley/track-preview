@@ -9,6 +9,7 @@ import ReleaseHeader from "./ReleaseHeader";
 import InstallPrompt from "./InstallPrompt";
 import { useTrackList } from "@/hooks/useTrackList";
 import { useLibraryParams } from "@/hooks/useLibraryParams";
+import { useCountry } from "@/hooks/useCountry";
 import { useAuthContext } from "../../Contexts/AuthContext";
 import { Track } from "../../types";
 
@@ -52,6 +53,7 @@ const Library = () => {
     } = useTrackList();
 
     const { isAnonymous } = useAuthContext();
+    const country = useCountry();
     const { releaseTrackId, setReleaseTrackId } = useLibraryParams();
     const [releaseBuyTrack, setReleaseBuyTrack] = useState<Track | null>(null);
     const [playAllRequested, setPlayAllRequested] = useState(false);
@@ -149,6 +151,7 @@ const Library = () => {
                 reviewTracks={reviewTracks}
                 trackToBuy={trackToBuy}
                 releaseTrack={releaseBuyTrack}
+                country={country}
             />
             <DeleteTrackDialog
                 isOpen={isOpen}

@@ -64,11 +64,18 @@ export type BuyPlatforms =
     | "discogs"
     | "bandcamp"
     | "apple music"
-    | "bleep";
+    | "bleep"
+    | "rough trade"
+    | "hhv"
+    | "dusty groove"
+    | "turntable lab"
+    | "disk union"
+    | "red eye records";
 
 export interface IBuyLink {
     platform: BuyPlatforms;
     logo: string;
+    regions: string[];
 }
 
 export type SortDirection = "asc" | "desc";
