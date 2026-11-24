@@ -22,7 +22,6 @@ import BouncingDotsLoader from "@/components/BouncingLoaderDots";
 import RecordAnimation from "@/components/RecordAnimation";
 import { useNewTrackReview } from "@/hooks/useNewTrackReview";
 import { useRouter, useSearchParams } from "next/navigation";
-import NotificationsIcon from "@mui/icons-material/Notifications";
 
 function NewTracksContent() {
     const router = useRouter();
@@ -127,8 +126,7 @@ function NewTracksContent() {
                         alignItems="center"
                         gap={2}
                     >
-                        <NotificationsIcon style={{ fontSize: "16px", color: "var(--chakra-colors-brand-primary)" }} />
-                        <Text fontSize="sm" color="brand.textSecondary">
+                                                <Text fontSize="sm" color="brand.textSecondary">
                             Showing new tracks from the past {frequencyLabel === "daily" ? "24 hours" : frequencyLabel === "weekly" ? "week" : "month"} in {genreCount} genre{genreCount !== 1 ? "s" : ""} you follow
                         </Text>
                     </Flex>
