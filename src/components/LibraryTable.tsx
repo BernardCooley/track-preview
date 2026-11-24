@@ -20,11 +20,14 @@ import LibraryAddIcon from "@mui/icons-material/LibraryAdd";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import RemoveShoppingCartIcon from "@mui/icons-material/RemoveShoppingCart";
 import TrackMenuOptions from "./TrackOptionsMenu";
+import TrackNotesDialog from "./TrackNotesDialog";
 import { getFormattedDate } from "../../utils";
-import { resolvePreviewUrl } from "@/bff/bff";
+import { resolvePreviewUrl, updateReviewNotes } from "@/bff/bff";
 import { useTrackContext } from "../../context/TrackContext";
 import { useLibraryParams } from "@/hooks/useLibraryParams";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useAuthContext } from "../../Contexts/AuthContext";
+import NoteIcon from "@mui/icons-material/StickyNote2Outlined";
 import UpgradePrompt from "./UpgradePrompt";
 import StarIcon from "@mui/icons-material/Star";
 import BarChartIcon from "@mui/icons-material/BarChart";
@@ -77,6 +80,7 @@ const LibraryTable = ({
 }: Props) => {
     const { onTrackEndedRef, onSkipRef, onPreviousRef, playingPositionRef, setTrackLoading, setPlayingTrack } = useTrackContext();
     const { isPro, requirePro, upgradeFeature, dismissUpgrade } = useSubscription();
+    const { user } = useAuthContext();
     const {
         selectedGenres, activeSortField, activeSortDirection, hideBought,
         setSelectedGenres, setSort, setReleaseTrackId, setHideBought,
@@ -86,6 +90,38 @@ const LibraryTable = ({
 
     const [showGenreSelector, setShowGenreSelector] = useState(false);
     const [showStats, setShowStats] = useState(false);
+    const [notesTrackIndex, setNotesTrackIndex] = useState<number | null>(null);
+    const [savingNotes, setSavingNotes] = useState(false);
+
+    const notesTrack = notesTrackIndex !== null ? reviewTracks[4].tracks[notesTrackIndex] : null;
+
+    const handleEditNotes = (index: number) => {
+        const track = reviewTracks[4].tracks[index];
+        if (!track?.notes && !requirePro("Track Notes")) return;
+        setNotesTrackIndex(index);
+    };
+
+    const handleSaveNotes = async (notes: string | null) => {
+        if (!user?.uid || notesTrackIndex === null) return;
+        const track = reviewTracks[4].tracks[notesTrackIndex];
+        if (!track) return;
+        setSavingNotes(true);
+        const updatedTracks = reviewTracks[4].tracks.map((t, i) =>
+            i === notesTrackIndex ? { ...t, notes } : t
+        );
+        updateReviewTracks(4, updatedTracks, reviewTracks[4].currentTrack);
+        try {
+            await updateReviewNotes({ trackId: track.id, userId: user.uid, notes });
+            setNotesTrackIndex(null);
+        } catch {
+            const revertedTracks = reviewTracks[4].tracks.map((t, i) =>
+                i === notesTrackIndex ? { ...t, notes: track.notes } : t
+            );
+            updateReviewTracks(4, revertedTracks, reviewTracks[4].currentTrack);
+        } finally {
+            setSavingNotes(false);
+        }
+    };
 
     const availableGenres = useMemo(() => {
         const genreSet = new Set<string>();
@@ -336,7 +372,10 @@ const LibraryTable = ({
                         if (!requirePro("Purchase Tracking")) return;
                         toggleTrackPurchased(origIndex);
                     }}
+                    onEditNotes={() => handleEditNotes(origIndex)}
                     purchased={track.purchased}
+                    hasNotes={!!track.notes}
+                    isPro={isPro}
                     index={origIndex}
                 />
             </Flex>
@@ -667,20 +706,27 @@ const LibraryTable = ({
                                         objectFit="cover"
                                     />
                                     <Flex direction="column" gap={0.5}>
-                                        <Text
-                                            lineClamp={2}
-                                            fontSize="sm"
-                                            color="brand.textPrimary"
-                                            maxW={currentReleaseTrack ? "none" : 36}
-                                            css={{ textWrap: "wrap" }}
-                                            fontWeight={
-                                                playingTrackId === track.id
-                                                    ? "semibold"
-                                                    : "normal"
-                                            }
-                                        >
-                                            {track.title}
-                                        </Text>
+                                        <Flex alignItems="center" gap={1.5}>
+                                            <Text
+                                                lineClamp={2}
+                                                fontSize="sm"
+                                                color="brand.textPrimary"
+                                                maxW={currentReleaseTrack ? "none" : 36}
+                                                css={{ textWrap: "wrap" }}
+                                                fontWeight={
+                                                    playingTrackId === track.id
+                                                        ? "semibold"
+                                                        : "normal"
+                                                }
+                                            >
+                                                {track.title}
+                                            </Text>
+                                            {track.notes && (
+                                                <Box color="brand.primary" flexShrink={0}>
+                                                    <NoteIcon style={{ fontSize: "14px" }} />
+                                                </Box>
+                                            )}
+                                        </Flex>
                                         <Text
                                             fontSize="xs"
                                             color="brand.textMuted"
@@ -754,18 +800,25 @@ const LibraryTable = ({
                                         gap={0.5}
                                         overflow="hidden"
                                     >
-                                        <Text
-                                            truncate
-                                            color="brand.textPrimary"
-                                            fontSize="sm"
-                                            fontWeight={
-                                                playingTrackId === track.id
-                                                    ? "semibold"
-                                                    : "normal"
-                                            }
-                                        >
-                                            {track.title}
-                                        </Text>
+                                        <Flex alignItems="center" gap={1.5} overflow="hidden">
+                                            <Text
+                                                truncate
+                                                color="brand.textPrimary"
+                                                fontSize="sm"
+                                                fontWeight={
+                                                    playingTrackId === track.id
+                                                        ? "semibold"
+                                                        : "normal"
+                                                }
+                                            >
+                                                {track.title}
+                                            </Text>
+                                            {track.notes && (
+                                                <Box color="brand.primary" flexShrink={0}>
+                                                    <NoteIcon style={{ fontSize: "12px" }} />
+                                                </Box>
+                                            )}
+                                        </Flex>
                                         <Text
                                             truncate
                                             fontSize="xs"
@@ -794,6 +847,16 @@ const LibraryTable = ({
                     ))}
                 </Table.Body>
             </Table.Root>
+
+            <TrackNotesDialog
+                isOpen={notesTrackIndex !== null}
+                onClose={() => setNotesTrackIndex(null)}
+                track={notesTrack}
+                onSave={handleSaveNotes}
+                saving={savingNotes}
+                isPro={isPro}
+                requirePro={requirePro}
+            />
 
             <UpgradePrompt featureName={upgradeFeature} onClose={dismissUpgrade} />
         </Box>

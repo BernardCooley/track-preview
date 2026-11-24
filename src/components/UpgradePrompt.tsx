@@ -51,6 +51,11 @@ const features = [
         text: "See insights about your library — top genres, decades, and artists",
         description: "Get a visual breakdown of your music taste. See which genres dominate your library, how your tracks spread across decades, and who your most-saved artists are.",
     },
+    {
+        keys: ["Track Notes"],
+        text: "Add personal notes to any track in your library",
+        description: "Save personal notes on any track in your library to remember the context behind it.",
+    },
 ];
 
 const UpgradePrompt = ({ featureName, onClose }: Props) => {

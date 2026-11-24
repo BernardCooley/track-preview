@@ -22,6 +22,7 @@ export interface Track {
     releaseDate: string;
     deezerTrackId?: string;
     purchased?: boolean;
+    notes?: string | null;
 }
 
 export interface Review {

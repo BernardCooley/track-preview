@@ -40,6 +40,7 @@ vi.mock("@/bff/bff", () => ({
     resolvePreviewUrl: vi.fn(),
     createCheckoutSession: vi.fn(),
     fetchLibraryStats: (...args: unknown[]) => mockFetchLibraryStats(...args),
+    updateReviewNotes: vi.fn().mockResolvedValue({ success: true }),
 }));
 
 function setSubscription(isPro: boolean) {
@@ -450,6 +451,103 @@ describe("Pro feature gating", () => {
             expect(await screen.findByText("Genres")).toBeInTheDocument();
             expect(screen.getByText("Top Artists")).toBeInTheDocument();
             expect(screen.queryByText("See more stats")).not.toBeInTheDocument();
+        });
+    });
+
+    describe("3.10 Track notes gating", () => {
+        it("shows PRO badge on 'Add note' for free users with no note", async () => {
+            setSubscription(false);
+            const user = userEvent.setup();
+            render(<Library />);
+
+            const menuButtons = screen.getAllByRole("button", { name: "" });
+            const optionsButton = menuButtons.find(
+                (btn) => btn.querySelector("[data-testid='MoreHorizIcon']")
+            );
+            await user.click(optionsButton!);
+
+            const noteItem = screen.getByText("Add note").closest("[data-part='item']")!;
+            expect(within(noteItem as HTMLElement).getByText("PRO")).toBeInTheDocument();
+        });
+
+        it("calls requirePro when free user clicks 'Add note'", async () => {
+            setSubscription(false);
+            const user = userEvent.setup();
+            render(<Library />);
+
+            const menuButtons = screen.getAllByRole("button", { name: "" });
+            const optionsButton = menuButtons.find(
+                (btn) => btn.querySelector("[data-testid='MoreHorizIcon']")
+            );
+            await user.click(optionsButton!);
+            await user.click(screen.getByText("Add note"));
+
+            expect(mockRequirePro).toHaveBeenCalledWith("Track Notes");
+        });
+
+        it("shows 'View note' without PRO badge for free users with existing note", async () => {
+            setSubscription(false);
+            const trackWithNote = { ...mockTrack, notes: "Great track" };
+            mockUseTrackList.mockReturnValue({
+                ...baseHookReturn,
+                reviewTracks: {
+                    ...baseHookReturn.reviewTracks,
+                    4: { tracks: [trackWithNote, mockTrack2], currentTrack: 0 },
+                },
+            } as any);
+
+            const user = userEvent.setup();
+            render(<Library />);
+
+            const menuButtons = screen.getAllByRole("button", { name: "" });
+            const optionsButton = menuButtons.find(
+                (btn) => btn.querySelector("[data-testid='MoreHorizIcon']")
+            );
+            await user.click(optionsButton!);
+
+            expect(screen.getByText("View note")).toBeInTheDocument();
+            const noteItem = screen.getByText("View note").closest("[data-part='item']")!;
+            expect(within(noteItem as HTMLElement).queryByText("PRO")).not.toBeInTheDocument();
+        });
+
+        it("free user can view existing note without requirePro", async () => {
+            setSubscription(false);
+            const trackWithNote = { ...mockTrack, notes: "Great track" };
+            mockUseTrackList.mockReturnValue({
+                ...baseHookReturn,
+                reviewTracks: {
+                    ...baseHookReturn.reviewTracks,
+                    4: { tracks: [trackWithNote, mockTrack2], currentTrack: 0 },
+                },
+            } as any);
+
+            const user = userEvent.setup();
+            render(<Library />);
+
+            const menuButtons = screen.getAllByRole("button", { name: "" });
+            const optionsButton = menuButtons.find(
+                (btn) => btn.querySelector("[data-testid='MoreHorizIcon']")
+            );
+            await user.click(optionsButton!);
+            await user.click(screen.getByText("View note"));
+
+            expect(mockRequirePro).not.toHaveBeenCalledWith("Track Notes");
+            expect(screen.getByText("Great track")).toBeInTheDocument();
+        });
+
+        it("does not show PRO badge on 'Add note' for Pro users", async () => {
+            setSubscription(true);
+            const user = userEvent.setup();
+            render(<Library />);
+
+            const menuButtons = screen.getAllByRole("button", { name: "" });
+            const optionsButton = menuButtons.find(
+                (btn) => btn.querySelector("[data-testid='MoreHorizIcon']")
+            );
+            await user.click(optionsButton!);
+
+            const noteItem = screen.getByText("Add note").closest("[data-part='item']")!;
+            expect(within(noteItem as HTMLElement).queryByText("PRO")).not.toBeInTheDocument();
         });
     });
 });
