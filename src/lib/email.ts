@@ -114,7 +114,7 @@ export async function sendGenreAlertEmail(
         heading: "New tracks in your genres",
         body: `New tracks have been added in genres you follow:\n\n${lines}`,
         buttonText: "Start Listening",
-        buttonUrl: `${process.env.NEXT_PUBLIC_APP_URL || "https://phoniquest.com"}/new-tracks`,
+        buttonUrl: `${process.env.NEXT_PUBLIC_APP_URL || "https://phoniquest.com"}/new-tracks?from=email`,
     };
 
     const htmlBody = `New tracks have been added in genres you follow:<ul style="margin:12px 0 0; padding-left:20px;">${htmlLines}</ul>`;

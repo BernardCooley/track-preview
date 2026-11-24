@@ -178,6 +178,7 @@ describe("dailyMaintenance — genre alerts", () => {
                 email: { not: null },
                 genreAlerts: { hasSome: ["Techno"] },
                 genreAlertFrequency: "DAILY",
+                genreEmailsEnabled: true,
                 isAnonymous: false,
                 subscriptionTier: "PRO",
             },

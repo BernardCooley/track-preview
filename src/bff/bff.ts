@@ -237,6 +237,7 @@ interface UpdateUserAutoplayProps {
     genres?: string[];
     genreAlerts?: string[];
     genreAlertFrequency?: string;
+    genreEmailsEnabled?: boolean;
     email?: string;
     yearFrom?: number;
     yearTo?: number;
@@ -251,6 +252,7 @@ export const mutateUserProfile = async ({
     genres,
     genreAlerts,
     genreAlertFrequency,
+    genreEmailsEnabled,
     email,
     yearFrom,
     yearTo,
@@ -268,6 +270,7 @@ export const mutateUserProfile = async ({
                 genres,
                 genreAlerts,
                 genreAlertFrequency,
+                genreEmailsEnabled,
                 email,
                 yearFrom,
                 yearTo,

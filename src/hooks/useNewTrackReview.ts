@@ -14,7 +14,7 @@ const LOOKBACK_HOURS: Record<string, number> = {
     MONTHLY: 24 * 30,
 };
 
-export const useNewTrackReview = () => {
+export const useNewTrackReview = (fromEmail: boolean) => {
     const { user, userProfile, isAnonymous } = useAuthContext();
 
     const [tracks, setTracks] = useState<Track[]>([]);
@@ -127,8 +127,10 @@ export const useNewTrackReview = () => {
             return;
         }
 
-        const freq = userProfile.genreAlertFrequency || "WEEKLY";
-        const lookbackMs = (LOOKBACK_HOURS[freq] || LOOKBACK_HOURS.WEEKLY) * 60 * 60 * 1000;
+        const freq = fromEmail && userProfile.genreEmailsEnabled
+            ? (userProfile.genreAlertFrequency || "WEEKLY")
+            : "DAILY";
+        const lookbackMs = LOOKBACK_HOURS[freq] * 60 * 60 * 1000;
         const since = new Date(Date.now() - lookbackMs).toISOString();
 
         setLoading(true);
@@ -158,7 +160,7 @@ export const useNewTrackReview = () => {
             previewCache.current.forEach((url) => URL.revokeObjectURL(url));
             previewCache.current.clear();
         };
-    }, [user?.uid, userProfile?.genreAlerts, userProfile?.genreAlertFrequency]);
+    }, [user?.uid, userProfile?.genreAlerts, userProfile?.genreAlertFrequency, userProfile?.genreEmailsEnabled]);
 
     const likeOrDislike = async (like: boolean) => {
         if (!currentTrack || !user?.uid) return;

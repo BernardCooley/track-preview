@@ -2,7 +2,7 @@ import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
-    const { userId, autoplay, genres, yearFrom, yearTo, curatedMode, isAnonymous, swipeMode, genreAlerts, genreAlertFrequency, email } = await req.json();
+    const { userId, autoplay, genres, yearFrom, yearTo, curatedMode, isAnonymous, swipeMode, genreAlerts, genreAlertFrequency, genreEmailsEnabled, email } = await req.json();
 
     const data = {
         ...(autoplay !== undefined && { autoplay }),
@@ -12,6 +12,7 @@ export async function POST(req: Request) {
         ...(genres && { genres }),
         ...(genreAlerts !== undefined && { genreAlerts }),
         ...(genreAlertFrequency !== undefined && { genreAlertFrequency }),
+        ...(genreEmailsEnabled !== undefined && { genreEmailsEnabled }),
         ...(email !== undefined && { email }),
         ...(yearFrom && { yearFrom }),
         ...(yearTo && { yearTo }),

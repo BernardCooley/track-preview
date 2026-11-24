@@ -90,6 +90,7 @@ async function sendGenreAlerts(now: Date) {
                 email: { not: null },
                 genreAlerts: { hasSome: genresWithNewTracks },
                 genreAlertFrequency: freq,
+                genreEmailsEnabled: true,
                 isAnonymous: false,
                 subscriptionTier: "PRO",
             },

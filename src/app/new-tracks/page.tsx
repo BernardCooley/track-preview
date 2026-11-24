@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import {
     Badge,
     Box,
@@ -21,11 +21,13 @@ import TrackTransition from "@/components/TrackTransition";
 import BouncingDotsLoader from "@/components/BouncingLoaderDots";
 import RecordAnimation from "@/components/RecordAnimation";
 import { useNewTrackReview } from "@/hooks/useNewTrackReview";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 
 function NewTracksContent() {
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const fromEmail = searchParams?.get("from") === "email";
     const { user, updateUser, updateUserProfile } = useAuthContext();
     const [profileLoaded, setProfileLoaded] = useState(false);
 
@@ -40,7 +42,7 @@ function NewTracksContent() {
         likeOrDislike,
         userProfile,
         isAnonymous,
-    } = useNewTrackReview();
+    } = useNewTrackReview(fromEmail);
 
     const [animate, setAnimate] = useState<"like" | "dislike" | null>(null);
     const [animationImage, setAnimationImage] = useState("");
@@ -89,7 +91,10 @@ function NewTracksContent() {
         );
     }
 
-    const frequencyLabel = (userProfile?.genreAlertFrequency || "WEEKLY").toLowerCase();
+    const emailsEnabled = userProfile?.genreEmailsEnabled ?? false;
+    const frequencyLabel = fromEmail && emailsEnabled
+        ? (userProfile?.genreAlertFrequency || "WEEKLY").toLowerCase()
+        : "daily";
     const genreCount = userProfile?.genreAlerts?.length || 0;
 
     return (
@@ -259,7 +264,9 @@ function NewTracksContent() {
 export default function NewTracks() {
     return (
         <AuthGuard>
-            <NewTracksContent />
+            <Suspense>
+                <NewTracksContent />
+            </Suspense>
         </AuthGuard>
     );
 }

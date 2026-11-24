@@ -7,13 +7,13 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { useAuthContext } from "../../../Contexts/AuthContext";
 import { mutateUserProfile, getUserProfile } from "@/bff/bff";
 import { genres } from "../../../data/genres";
-import { Box, Button, Dialog, Flex, Heading, Text } from "@chakra-ui/react";
+import { Box, Button, Dialog, Flex, Heading, Switch, Text } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../../firebase/firebaseInit";
 import StarIcon from "@mui/icons-material/Star";
-import NotificationsIcon from "@mui/icons-material/Notifications";
-import NotificationsOffIcon from "@mui/icons-material/NotificationsOff";
+import TuneIcon from "@mui/icons-material/Tune";
+import EmailIcon from "@mui/icons-material/Email";
 
 const FREQUENCY_OPTIONS = [
     { value: "DAILY", label: "Daily" },
@@ -31,14 +31,17 @@ const SettingsContent = () => {
 
     const savedGenres = userProfile?.genreAlerts ?? [];
     const savedFrequency = userProfile?.genreAlertFrequency ?? "WEEKLY";
+    const savedEmailsEnabled = userProfile?.genreEmailsEnabled ?? false;
 
     const [localGenres, setLocalGenres] = useState<string[]>(savedGenres);
     const [localFrequency, setLocalFrequency] = useState<string>(savedFrequency);
+    const [localEmailsEnabled, setLocalEmailsEnabled] = useState(savedEmailsEnabled);
 
     useEffect(() => {
         setLocalGenres(savedGenres);
         setLocalFrequency(savedFrequency);
-    }, [userProfile?.genreAlerts, userProfile?.genreAlertFrequency]);
+        setLocalEmailsEnabled(savedEmailsEnabled);
+    }, [userProfile?.genreAlerts, userProfile?.genreAlertFrequency, userProfile?.genreEmailsEnabled]);
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
@@ -61,9 +64,15 @@ const SettingsContent = () => {
 
     const hasLocalGenres = localGenres.length > 0;
 
-    const hasChanges =
-        JSON.stringify(localGenres) !== JSON.stringify(savedGenres) ||
-        localFrequency !== savedFrequency;
+    const hasGenreChanges =
+        JSON.stringify(localGenres) !== JSON.stringify(savedGenres);
+
+    const hasEmailChanges =
+        localFrequency !== savedFrequency ||
+        localEmailsEnabled !== savedEmailsEnabled;
+
+    const editingGenres = hasGenreChanges;
+    const editingEmail = hasEmailChanges;
 
     const handleOpenPicker = () => {
         if (!requirePro("Genre Alerts")) return;
@@ -76,14 +85,28 @@ const SettingsContent = () => {
         setShowGenreSelector(false);
     };
 
-    const handleSave = async () => {
+    const handleSaveGenres = async () => {
         if (!user?.uid) return;
         setSaving(true);
         try {
             const updated = await mutateUserProfile({
                 userId: user.uid,
                 genreAlerts: localGenres,
+            });
+            updateUserProfile(updated);
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const handleSaveEmail = async () => {
+        if (!user?.uid) return;
+        setSaving(true);
+        try {
+            const updated = await mutateUserProfile({
+                userId: user.uid,
                 genreAlertFrequency: localFrequency,
+                genreEmailsEnabled: localEmailsEnabled,
             });
             updateUserProfile(updated);
         } finally {
@@ -98,7 +121,6 @@ const SettingsContent = () => {
             const updated = await mutateUserProfile({
                 userId: user.uid,
                 genreAlerts: [],
-                genreAlertFrequency: "WEEKLY",
             });
             updateUserProfile(updated);
         } finally {
@@ -117,7 +139,9 @@ const SettingsContent = () => {
                 alignItems="center"
                 px={[4, 6]}
                 py={[6, 8]}
+                gap={6}
             >
+                {/* Genre Preferences Card */}
                 <Box
                     w="full"
                     maxW="520px"
@@ -126,16 +150,19 @@ const SettingsContent = () => {
                     borderColor="brand.border"
                     rounded="card"
                     p={[5, 6]}
+                    opacity={editingEmail ? 0.4 : 1}
+                    pointerEvents={editingEmail ? "none" : "auto"}
+                    transition="opacity 0.2s ease"
                 >
                     <Flex alignItems="center" justifyContent="space-between" mb={savedGenres.length > 0 ? 2 : 6}>
                         <Flex alignItems="center" gap={2}>
-                            <NotificationsIcon style={{ fontSize: "20px", color: "var(--chakra-colors-brand-primary)" }} />
+                            <TuneIcon style={{ fontSize: "20px", color: "var(--chakra-colors-brand-primary)" }} />
                             <Text
                                 fontSize="lg"
                                 fontWeight="semibold"
                                 color="brand.textPrimary"
                             >
-                                Genre Alerts
+                                Genre Preferences
                             </Text>
                             {!isPro && (
                                 <Flex
@@ -171,9 +198,8 @@ const SettingsContent = () => {
                             color="brand.textMuted"
                             _hover={{ color: "brand.textSecondary", bg: "brand.surfaceHover" }}
                         >
-                            <NotificationsOffIcon style={{ fontSize: "16px" }} />
                             <Text fontSize="sm" fontWeight="medium">
-                                Turn off all email alerts
+                                Clear all genres
                             </Text>
                         </Flex>
                     )}
@@ -188,14 +214,14 @@ const SettingsContent = () => {
                                 color="brand.textMuted"
                                 mb={2}
                             >
-                                Subscribed genres
+                                Followed genres
                             </Heading>
                             <Text
                                 fontSize="xs"
                                 color="brand.textMuted"
                                 mb={3}
                             >
-                                Get an email when new tracks are added in your chosen genres.
+                                Choose genres to follow. New tracks in these genres will appear on your New Tracks page.
                             </Text>
 
                             {hasLocalGenres ? (
@@ -227,7 +253,7 @@ const SettingsContent = () => {
                                     color="brand.textSecondary"
                                     mb={4}
                                 >
-                                    No genres selected. You won&apos;t receive any alerts.
+                                    No genres selected.
                                 </Text>
                             )}
 
@@ -240,62 +266,7 @@ const SettingsContent = () => {
                             </Button>
                         </Box>
 
-                        {hasLocalGenres && (
-                            <Box
-                                borderTop="1px solid"
-                                borderTopColor="brand.divider"
-                                pt={6}
-                            >
-                                <Heading
-                                    size="xs"
-                                    textTransform="uppercase"
-                                    fontSize="xs"
-                                    letterSpacing="wider"
-                                    color="brand.textMuted"
-                                    mb={2}
-                                >
-                                    Email frequency
-                                </Heading>
-                                <Text
-                                    fontSize="xs"
-                                    color="brand.textMuted"
-                                    mb={3}
-                                >
-                                    How often would you like to receive genre alert emails?
-                                </Text>
-                                <Flex gap={2}>
-                                    {FREQUENCY_OPTIONS.map((option) => (
-                                        <Box
-                                            key={option.value}
-                                            as="button"
-                                            onClick={() => setLocalFrequency(option.value)}
-                                            px={4}
-                                            py={2}
-                                            fontSize="sm"
-                                            fontWeight={localFrequency === option.value ? "semibold" : "normal"}
-                                            rounded="lg"
-                                            cursor="pointer"
-                                            transition="all 0.15s ease"
-                                            color={localFrequency === option.value ? "brand.primary" : "brand.textSecondary"}
-                                            border="1px solid"
-                                            borderColor={localFrequency === option.value ? "brand.primary" : "brand.border"}
-                                            css={{
-                                                background: localFrequency === option.value
-                                                    ? "color-mix(in srgb, var(--chakra-colors-brand-primary) 10%, transparent)"
-                                                    : "transparent",
-                                                "&:hover": {
-                                                    borderColor: "var(--chakra-colors-brand-primary)",
-                                                },
-                                            }}
-                                        >
-                                            {option.label}
-                                        </Box>
-                                    ))}
-                                </Flex>
-                            </Box>
-                        )}
-
-                        {hasChanges && (
+                        {hasGenreChanges && (
                             <Flex
                                 borderTop="1px solid"
                                 borderTopColor="brand.divider"
@@ -305,7 +276,7 @@ const SettingsContent = () => {
                                 <Button
                                     variant="primary"
                                     size="sm"
-                                    onClick={handleSave}
+                                    onClick={handleSaveGenres}
                                     loading={saving}
                                 >
                                     Save
@@ -314,6 +285,139 @@ const SettingsContent = () => {
                         )}
                     </Flex>
                 </Box>
+
+                {/* Email Notifications Card */}
+                {hasLocalGenres && (
+                    <Box
+                        w="full"
+                        maxW="520px"
+                        bg="brand.cardBg"
+                        border="1px solid"
+                        borderColor="brand.border"
+                        rounded="card"
+                        p={[5, 6]}
+                        opacity={editingGenres ? 0.4 : 1}
+                        pointerEvents={editingGenres ? "none" : "auto"}
+                        transition="opacity 0.2s ease"
+                    >
+                        <Flex alignItems="center" gap={2} mb={6}>
+                            <EmailIcon style={{ fontSize: "20px", color: "var(--chakra-colors-brand-primary)" }} />
+                            <Text
+                                fontSize="lg"
+                                fontWeight="semibold"
+                                color="brand.textPrimary"
+                            >
+                                Email Notifications
+                            </Text>
+                        </Flex>
+
+                        <Flex direction="column" gap={6}>
+                            <Flex
+                                alignItems="center"
+                                justifyContent="space-between"
+                                gap={3}
+                            >
+                                <Flex direction="column">
+                                    <Text
+                                        fontSize="sm"
+                                        fontWeight="medium"
+                                        color="brand.textSecondary"
+                                    >
+                                        Email me about new tracks
+                                    </Text>
+                                    <Text
+                                        fontSize="xs"
+                                        color="brand.textMuted"
+                                    >
+                                        Get notified when new tracks are added in your followed genres.
+                                    </Text>
+                                </Flex>
+                                <Switch.Root
+                                    checked={localEmailsEnabled}
+                                    onCheckedChange={(details) => setLocalEmailsEnabled(details.checked)}
+                                >
+                                    <Switch.HiddenInput />
+                                    <Switch.Control>
+                                        <Switch.Thumb />
+                                    </Switch.Control>
+                                </Switch.Root>
+                            </Flex>
+
+                            {localEmailsEnabled && (
+                                <Box
+                                    borderTop="1px solid"
+                                    borderTopColor="brand.divider"
+                                    pt={6}
+                                >
+                                    <Heading
+                                        size="xs"
+                                        textTransform="uppercase"
+                                        fontSize="xs"
+                                        letterSpacing="wider"
+                                        color="brand.textMuted"
+                                        mb={2}
+                                    >
+                                        Email frequency
+                                    </Heading>
+                                    <Text
+                                        fontSize="xs"
+                                        color="brand.textMuted"
+                                        mb={3}
+                                    >
+                                        How often would you like to receive emails?
+                                    </Text>
+                                    <Flex gap={2}>
+                                        {FREQUENCY_OPTIONS.map((option) => (
+                                            <Box
+                                                key={option.value}
+                                                as="button"
+                                                onClick={() => setLocalFrequency(option.value)}
+                                                px={4}
+                                                py={2}
+                                                fontSize="sm"
+                                                fontWeight={localFrequency === option.value ? "semibold" : "normal"}
+                                                rounded="lg"
+                                                cursor="pointer"
+                                                transition="all 0.15s ease"
+                                                color={localFrequency === option.value ? "brand.primary" : "brand.textSecondary"}
+                                                border="1px solid"
+                                                borderColor={localFrequency === option.value ? "brand.primary" : "brand.border"}
+                                                css={{
+                                                    background: localFrequency === option.value
+                                                        ? "color-mix(in srgb, var(--chakra-colors-brand-primary) 10%, transparent)"
+                                                        : "transparent",
+                                                    "&:hover": {
+                                                        borderColor: "var(--chakra-colors-brand-primary)",
+                                                    },
+                                                }}
+                                            >
+                                                {option.label}
+                                            </Box>
+                                        ))}
+                                    </Flex>
+                                </Box>
+                            )}
+
+                            {hasEmailChanges && (
+                                <Flex
+                                    borderTop="1px solid"
+                                    borderTopColor="brand.divider"
+                                    pt={4}
+                                    justifyContent="flex-end"
+                                >
+                                    <Button
+                                        variant="primary"
+                                        size="sm"
+                                        onClick={handleSaveEmail}
+                                        loading={saving}
+                                    >
+                                        Save
+                                    </Button>
+                                </Flex>
+                            )}
+                        </Flex>
+                    </Box>
+                )}
             </Flex>
 
             <GenreModal
@@ -357,7 +461,7 @@ const SettingsContent = () => {
                                     color="brand.textPrimary"
                                     letterSpacing="-0.01em"
                                 >
-                                    Clear genre alerts?
+                                    Clear all genres?
                                 </Text>
                                 <Dialog.CloseTrigger
                                     position="relative"
@@ -372,7 +476,7 @@ const SettingsContent = () => {
 
                             <Box px={[4, 5]} py={5}>
                                 <Text color="brand.textSecondary" fontSize="sm">
-                                    This will remove all your genre subscriptions and you will stop receiving alert emails.
+                                    This will remove all your followed genres. Your New Tracks page will be empty and email notifications will be turned off.
                                 </Text>
                             </Box>
 

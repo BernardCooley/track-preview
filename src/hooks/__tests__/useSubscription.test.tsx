@@ -39,6 +39,7 @@ function makeProfile(
         email: null,
         genreAlerts: [],
         genreAlertFrequency: "WEEKLY",
+        genreEmailsEnabled: false,
         ...overrides,
     };
 }
