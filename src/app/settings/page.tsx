@@ -9,6 +9,7 @@ import { mutateUserProfile, getUserProfile } from "@/bff/bff";
 import { genres } from "../../../data/genres";
 import { Box, Button, Dialog, Flex, Heading, Switch, Text } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
+import { useDelayedLoading } from "@/hooks/useDelayedLoading";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../../firebase/firebaseInit";
 import StarIcon from "@mui/icons-material/Star";
@@ -17,6 +18,7 @@ import EmailIcon from "@mui/icons-material/Email";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import LibraryExportButton from "@/components/LibraryExportButton";
+import SettingsSkeleton from "@/components/skeletons/SettingsSkeleton";
 import { useThemeContext } from "../../../context/ThemeContext";
 import { useTrackContext } from "../../../context/TrackContext";
 
@@ -45,6 +47,7 @@ const SettingsContent = () => {
     const [localFrequency, setLocalFrequency] = useState<string>(savedFrequency);
     const [localEmailsEnabled, setLocalEmailsEnabled] = useState(savedEmailsEnabled);
     const [profileLoaded, setProfileLoaded] = useState(!!userProfile);
+    const showSettingsSkeleton = useDelayedLoading(!profileLoaded);
 
     useEffect(() => {
         setLocalGenres(savedGenres);
@@ -381,9 +384,7 @@ const SettingsContent = () => {
                     </Flex>
 
                     {!profileLoaded ? (
-                        <Text fontSize="sm" color="brand.textMuted">
-                            Loading...
-                        </Text>
+                        showSettingsSkeleton ? <SettingsSkeleton /> : null
                     ) : (
                         <>
                             {savedGenres.length > 0 && (

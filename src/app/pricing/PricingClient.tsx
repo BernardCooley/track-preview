@@ -6,7 +6,8 @@ import { useRouter } from "next/navigation";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../../firebase/firebaseInit";
 import { useSubscription } from "@/hooks/useSubscription";
-import { createCheckoutSession } from "@/bff/bff";
+import { useAuthContext } from "../../../Contexts/AuthContext";
+import { createCheckoutSession, getUserProfile } from "@/bff/bff";
 
 interface Props {
     variant: "free" | "pro";
@@ -14,18 +15,31 @@ interface Props {
 
 const PricingClient = ({ variant }: Props) => {
     const router = useRouter();
+    const { userProfile, updateUserProfile } = useAuthContext();
     const { isPro } = useSubscription();
     const [loading, setLoading] = useState(false);
     const [firebaseUser, setFirebaseUser] = useState(auth.currentUser);
+    const [profileChecked, setProfileChecked] = useState(!!userProfile);
 
     useEffect(() => {
-        return onAuthStateChanged(auth, (user) => setFirebaseUser(user));
+        return onAuthStateChanged(auth, async (user) => {
+            setFirebaseUser(user);
+            if (user?.uid && !userProfile) {
+                const profile = await getUserProfile({ userId: user.uid });
+                if (profile) updateUserProfile(profile);
+            }
+            setProfileChecked(true);
+        });
     }, []);
 
     const isLoggedIn = !!firebaseUser;
 
+    if (isLoggedIn && !profileChecked) return null;
+
     if (variant === "free") {
         if (isPro) return null;
+
+        if (!isLoggedIn) return null;
 
         return (
             <Text

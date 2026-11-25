@@ -196,7 +196,6 @@ describe("Account Settings", () => {
 
         await waitFor(() => {
             expect(mockDeleteUser).toHaveBeenCalled();
-            expect(screen.getByText("Deleting your account...")).toBeInTheDocument();
         });
 
         await waitFor(() => {

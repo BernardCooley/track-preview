@@ -6,13 +6,15 @@ import {
     Flex,
     Heading,
     IconButton,
+    Skeleton,
     Text,
     useDisclosure,
 } from "@chakra-ui/react";
 import { toaster } from "@/components/toaster";
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useDelayedLoading } from "@/hooks/useDelayedLoading";
 import { Center } from "@chakra-ui/react";
-import BouncingDotsLoader from "@/components/BouncingLoaderDots";
+import AccountSkeleton from "@/components/skeletons/AccountSkeleton";
 import {
     DeleteUser,
     LogOut,
@@ -63,6 +65,7 @@ const Settings = () => {
     const [userAccount, setUserAccount] = useState<UserAccount | null>(null);
     const [showPassword, setShowPassword] = useState<boolean>(false);
     const [deleting, setDeleting] = useState<boolean>(false);
+    const showDeletingSkeleton = useDelayedLoading(deleting);
     const [emailUpdated, setEmailUpdated] = useState<boolean>(false);
     const [updatedEmail, setUpdatedEmail] = useState<string>("");
 
@@ -303,22 +306,7 @@ const Settings = () => {
     };
 
     if (deleting) {
-        return (
-            <Center h="100dvh" flexDirection="column" gap={6} bg="brand.bg">
-                <Text
-                    fontSize={["3xl", "4xl", "5xl"]}
-                    fontFamily="brand"
-                    color="brand.textPrimary"
-                    letterSpacing="wider"
-                >
-                    PHONIQUEST
-                </Text>
-                <Text color="brand.textSecondary" fontSize="md">
-                    Deleting your account...
-                </Text>
-                <BouncingDotsLoader />
-            </Center>
-        );
+        return showDeletingSkeleton ? <AccountSkeleton /> : null;
     }
 
     if (emailUpdated) {
@@ -454,6 +442,53 @@ const Settings = () => {
                 px={[4, 6]}
                 py={[6, 8]}
             >
+                {subscriptionsEnabled && !userProfile && (
+                    <Box
+                        w="full"
+                        maxW="520px"
+                        bg="brand.cardBg"
+                        border="1px solid"
+                        borderColor="brand.border"
+                        rounded="card"
+                        p={[5, 6]}
+                        mb={4}
+                    >
+                        <Text
+                            fontSize="lg"
+                            fontWeight="semibold"
+                            color="brand.textPrimary"
+                            mb={6}
+                        >
+                            Subscription
+                        </Text>
+
+                        <Flex direction="column" gap={4}>
+                            <Flex justifyContent="space-between" alignItems="center">
+                                <Box>
+                                    <Heading
+                                        size="xs"
+                                        textTransform="uppercase"
+                                        fontSize="xs"
+                                        letterSpacing="wider"
+                                        color="brand.textMuted"
+                                        mb={1}
+                                    >
+                                        Current plan
+                                    </Heading>
+                                    <Skeleton h="20px" w="40px" />
+                                </Box>
+                            </Flex>
+
+                            <Box borderTop="1px solid" borderTopColor="brand.divider" pt={4}>
+                                <Flex direction="column" gap={3}>
+                                    <Skeleton h="32px" w="130px" rounded="lg" />
+                                    <Skeleton h="20px" w="110px" />
+                                </Flex>
+                            </Box>
+                        </Flex>
+                    </Box>
+                )}
+
                 {subscriptionsEnabled && userProfile && <Box
                     w="full"
                     maxW="520px"

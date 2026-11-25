@@ -2,20 +2,20 @@
 import {
     Box,
     Button,
-    Center,
     Flex,
     Tabs,
     Text,
 } from "@chakra-ui/react";
 import { toaster } from "@/components/toaster";
 import React, { Suspense, useCallback, useEffect, useState } from "react";
+import { useDelayedLoading } from "@/hooks/useDelayedLoading";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import SignIn from "@/components/SignIn";
 import SignUp from "@/components/SignUp";
 import { useReadLocalStorage } from "usehooks-ts";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../../../firebase/firebaseInit";
-import BouncingDotsLoader from "@/components/BouncingLoaderDots";
+import AuthSkeleton from "@/components/skeletons/AuthSkeleton";
 
 const AuthPageContent = () => {
     const router = useRouter();
@@ -29,6 +29,7 @@ const AuthPageContent = () => {
         "has-previously-logged-in"
     );
     const [loading, setLoading] = useState(true);
+    const showSkeleton = useDelayedLoading(loading);
     const [showVerifyBanner, setShowVerifyBanner] = useState(isVerifyEmail === "true");
 
     const showToast = useCallback(
@@ -78,19 +79,7 @@ const AuthPageContent = () => {
     const activeTab = isLogin === "false" ? "register" : "signin";
 
     if (loading) {
-        return (
-            <Center h="100dvh" flexDirection="column" gap={8}>
-                <Text
-                    fontSize={["3xl", "4xl", "5xl"]}
-                    fontFamily="brand"
-                    color="brand.textPrimary"
-                    letterSpacing="wider"
-                >
-                    PHONIQUEST
-                </Text>
-                <BouncingDotsLoader />
-            </Center>
-        );
+        return showSkeleton ? <AuthSkeleton /> : null;
     }
 
     return (

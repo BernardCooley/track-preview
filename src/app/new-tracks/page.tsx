@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useDelayedLoading } from "@/hooks/useDelayedLoading";
 import {
     Box,
     Button,
@@ -16,8 +17,8 @@ import { useAuthContext } from "../../../Contexts/AuthContext";
 import AuthGuard from "@/components/AuthGuard";
 import BackHeader from "@/components/BackHeader";
 import TrackReviewCard from "@/components/TrackReviewCard";
-import TrackTransition from "@/components/TrackTransition";
-import BouncingDotsLoader from "@/components/BouncingLoaderDots";
+import TrackCardSkeleton from "@/components/skeletons/TrackCardSkeleton";
+import NewTracksSkeleton from "@/components/skeletons/NewTracksSkeleton";
 import RecordAnimation from "@/components/RecordAnimation";
 import { useNewTrackReview } from "@/hooks/useNewTrackReview";
 import { useRouter } from "next/navigation";
@@ -26,6 +27,7 @@ function NewTracksContent() {
     const router = useRouter();
     const { user, updateUser, updateUserProfile } = useAuthContext();
     const [profileLoaded, setProfileLoaded] = useState(false);
+    const showPageSkeleton = useDelayedLoading(!profileLoaded);
 
     const {
         tracks,
@@ -39,6 +41,7 @@ function NewTracksContent() {
         userProfile,
     } = useNewTrackReview();
 
+    const showTrackSkeleton = useDelayedLoading(loading || previewLoading);
     const [animate, setAnimate] = useState<"like" | "dislike" | null>(null);
     const [animationImage, setAnimationImage] = useState("");
     const [animationStart, setAnimationStart] = useState<{ x: number; y: number } | null>(null);
@@ -71,19 +74,7 @@ function NewTracksContent() {
     }, [animate]);
 
     if (!profileLoaded) {
-        return (
-            <Center h="100dvh" flexDirection="column" gap={8}>
-                <Text
-                    fontSize={["3xl", "4xl", "5xl"]}
-                    fontFamily="brand"
-                    color="brand.textPrimary"
-                    letterSpacing="wider"
-                >
-                    PHONIQUEST
-                </Text>
-                <BouncingDotsLoader />
-            </Center>
-        );
+        return showPageSkeleton ? <NewTracksSkeleton /> : null;
     }
 
     const genreCount = userProfile?.genreAlerts?.length || 0;
@@ -140,10 +131,8 @@ function NewTracksContent() {
                         />
                     )}
 
-                    {loading && !animate && !currentTrack && (
-                        <Center position="absolute" inset={0} zIndex={150}>
-                            <TrackTransition />
-                        </Center>
+                    {loading && !animate && !currentTrack && showTrackSkeleton && (
+                        <TrackCardSkeleton />
                     )}
 
                     {noTracks && !loading && (
@@ -190,10 +179,8 @@ function NewTracksContent() {
                         </Center>
                     )}
 
-                    {(previewLoading || loading) && !animate && currentTrack && (
-                        <Flex flex={1} h="full">
-                            <TrackTransition />
-                        </Flex>
+                    {(previewLoading || loading) && !animate && currentTrack && showTrackSkeleton && (
+                        <TrackCardSkeleton />
                     )}
 
                     <Flex

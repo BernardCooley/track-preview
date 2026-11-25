@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useDelayedLoading } from "@/hooks/useDelayedLoading";
 import { Badge, Center, Flex } from "@chakra-ui/react";
-import Loading from "./Loading";
+import LibrarySkeleton from "./skeletons/LibrarySkeleton";
 import { buyLinks } from "../../consts";
 import BuyModal from "./BuyModal";
 import DeleteTrackDialog from "./DeleteTrackDialog";
@@ -51,6 +52,7 @@ const Library = () => {
         toggleTrackPurchased,
     } = useTrackList();
 
+    const showSkeleton = useDelayedLoading(loading);
     const country = useCountry();
     const { releaseTrackId, setReleaseTrackId } = useLibraryParams();
     const [releaseBuyTrack, setReleaseBuyTrack] = useState<Track | null>(null);
@@ -129,10 +131,8 @@ const Library = () => {
 
     return (
         <Flex position="relative" direction="column" h="full" overflow="auto">
-            {loading && (
-                <Center position="absolute" inset={0} zIndex={150} pt={24}>
-                    <Loading />
-                </Center>
+            {loading && showSkeleton && (
+                <LibrarySkeleton />
             )}
 
             {!loading && noTracks && (
