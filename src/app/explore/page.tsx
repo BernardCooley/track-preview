@@ -31,7 +31,10 @@ import Looks3Icon from "@mui/icons-material/Looks3";
 import LibraryMusicIcon from "@mui/icons-material/LibraryMusic";
 import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import StarIcon from "@mui/icons-material/Star";
 import Link from "next/link";
+import { useSubscription } from "@/hooks/useSubscription";
+import UpgradePrompt from "@/components/UpgradePrompt";
 
 function ExploreContent() {
     const router = useRouter();
@@ -44,6 +47,7 @@ function ExploreContent() {
     const pageRef = useRef<HTMLDivElement>(null);
     const { open: isMenuOpen, onOpen: onMenuOpenRaw, onClose: onMenuCloseRaw } = useDisclosure();
     const menuOpenRef = useRef(false);
+    const { isPro, subscriptionsEnabled, requirePro, upgradeFeature, dismissUpgrade } = useSubscription();
 
     const onMenuOpen = useCallback(() => {
         onMenuOpenRaw();
@@ -210,20 +214,37 @@ function ExploreContent() {
                 py={1}
                 gap={1}
             >
-                <Link href="">
-                    <Text
-                        userSelect="none"
-                        fontSize="md"
-                        fontFamily="brand"
-                        color="brand.textPrimary"
-                        letterSpacing="wide"
-                        _hover={{ color: "brand.primary" }}
-                        transition="color 0.2s ease"
-                        mr={1}
-                    >
-                        PHONIQUEST
-                    </Text>
-                </Link>
+                <Flex alignItems="center" gap={2}>
+                    <Link href="">
+                        <Text
+                            userSelect="none"
+                            fontSize="md"
+                            fontFamily="brand"
+                            color="brand.textPrimary"
+                            letterSpacing="wide"
+                            _hover={{ color: "brand.primary" }}
+                            transition="color 0.2s ease"
+                        >
+                            PHONIQUEST
+                        </Text>
+                    </Link>
+                    {subscriptionsEnabled && isPro && (
+                        <Flex
+                            alignItems="center"
+                            bg="brand.primarySubtle"
+                            color="brand.primary"
+                            rounded="full"
+                            px={1.5}
+                            py={0.5}
+                            gap={0.5}
+                        >
+                            <StarIcon style={{ fontSize: "10px" }} />
+                            <Text fontSize="2xs" fontWeight="bold" lineHeight="1">
+                                PRO
+                            </Text>
+                        </Flex>
+                    )}
+                </Flex>
 
                 <Flex flex={1} justifyContent="center" gap={1}>
                     {tabButtons.map((button) => (
@@ -258,6 +279,27 @@ function ExploreContent() {
                     ))}
                 </Flex>
 
+                {subscriptionsEnabled && !isPro && !isAnonymous && (
+                    <Flex
+                        as="button"
+                        onClick={() => requirePro("Upgrade")}
+                        alignItems="center"
+                        bg="brand.primarySubtle"
+                        color="brand.primary"
+                        rounded="full"
+                        px={2}
+                        py={0.5}
+                        gap={1}
+                        cursor="pointer"
+                        _hover={{ opacity: 0.8 }}
+                        transition="opacity 0.2s ease"
+                    >
+                        <StarIcon style={{ fontSize: "10px" }} />
+                        <Text fontSize="2xs" fontWeight="bold" lineHeight="1">
+                            UPGRADE
+                        </Text>
+                    </Flex>
+                )}
                 {isAnonymous && (
                     <Button
                         variant="outline"
@@ -333,6 +375,7 @@ function ExploreContent() {
                     </Box>
                 </Box>
             )}
+            <UpgradePrompt featureName={upgradeFeature} onClose={dismissUpgrade} />
         </Flex>
     );
 }

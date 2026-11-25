@@ -58,6 +58,25 @@ const setCountryCookie = (code: string) => {
     }
 };
 
+const subscriptionOptions = [
+    { value: "", label: "No override" },
+    { value: "pro", label: "Force Pro" },
+    { value: "free", label: "Force Free" },
+];
+
+const getSubscriptionCookie = (): string => {
+    const match = document.cookie.match(/(?:^|;\s*)subscription_override=([^;]*)/);
+    return match?.[1] || "";
+};
+
+const setSubscriptionCookie = (value: string) => {
+    if (value) {
+        document.cookie = `subscription_override=${value}; path=/; max-age=86400; SameSite=Lax`;
+    } else {
+        document.cookie = `subscription_override=; path=/; max-age=0; SameSite=Lax`;
+    }
+};
+
 const AdminPage = () => {
     const router = useRouter();
     const [checked, setChecked] = useState(false);
@@ -65,12 +84,16 @@ const AdminPage = () => {
     const [country, setCountry] = useState("");
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
+    const [subscription, setSubscription] = useState("");
+    const [subDropdownOpen, setSubDropdownOpen] = useState(false);
+    const subDropdownRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             if (user && ADMIN_UIDS.includes(user.uid)) {
                 setAuthorized(true);
                 setCountry(getCountryCookie());
+                setSubscription(getSubscriptionCookie());
             } else {
                 router.replace("/");
             }
@@ -84,17 +107,26 @@ const AdminPage = () => {
             if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
                 setDropdownOpen(false);
             }
+            if (subDropdownRef.current && !subDropdownRef.current.contains(e.target as Node)) {
+                setSubDropdownOpen(false);
+            }
         };
-        if (dropdownOpen) {
+        if (dropdownOpen || subDropdownOpen) {
             document.addEventListener("mousedown", handleClickOutside);
         }
         return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, [dropdownOpen]);
+    }, [dropdownOpen, subDropdownOpen]);
 
     const handleCountryChange = (code: string) => {
         setCountry(code);
         setCountryCookie(code);
         setDropdownOpen(false);
+    };
+
+    const handleSubscriptionChange = (value: string) => {
+        setSubscription(value);
+        setSubscriptionCookie(value);
+        setSubDropdownOpen(false);
     };
 
     const selectedLabel = countries.find((c) => c.code === country)?.label || "Auto (from Vercel)";
@@ -246,6 +278,103 @@ const AdminPage = () => {
                                     mt={2}
                                 >
                                     Country override active: {country}
+                                </Text>
+                            )}
+                        </Box>
+
+                        <Box>
+                            <Heading
+                                size="xs"
+                                textTransform="uppercase"
+                                fontSize="xs"
+                                letterSpacing="wider"
+                                color="brand.textMuted"
+                                mb={2}
+                            >
+                                Subscription Override
+                            </Heading>
+                            <Text
+                                fontSize="xs"
+                                color="brand.textMuted"
+                                mb={3}
+                            >
+                                Override subscription status to test Pro/Free gating without changing the database.
+                            </Text>
+
+                            <Box position="relative" ref={subDropdownRef}>
+                                <Flex
+                                    as="button"
+                                    onClick={() => setSubDropdownOpen(!subDropdownOpen)}
+                                    w="full"
+                                    px={4}
+                                    py={3}
+                                    bg="brand.bg"
+                                    border="1px solid"
+                                    borderColor={subDropdownOpen ? "brand.primary" : "brand.border"}
+                                    rounded="lg"
+                                    alignItems="center"
+                                    justifyContent="space-between"
+                                    cursor="pointer"
+                                    transition="border-color 0.2s ease"
+                                >
+                                    <Text fontSize="md" color="brand.textPrimary">
+                                        {subscriptionOptions.find((o) => o.value === subscription)?.label || "No override"}
+                                    </Text>
+                                    <Box
+                                        color="brand.textMuted"
+                                        transition="transform 0.2s ease"
+                                        transform={subDropdownOpen ? "rotate(180deg)" : "none"}
+                                    >
+                                        <KeyboardArrowDownIcon fontSize="small" />
+                                    </Box>
+                                </Flex>
+
+                                {subDropdownOpen && (
+                                    <Box
+                                        position="absolute"
+                                        top="calc(100% + 4px)"
+                                        left={0}
+                                        right={0}
+                                        bg="brand.bg"
+                                        border="1px solid"
+                                        borderColor="brand.border"
+                                        rounded="lg"
+                                        shadow="lg"
+                                        zIndex={10}
+                                        py={1}
+                                    >
+                                        {subscriptionOptions.map((o) => (
+                                            <Flex
+                                                key={o.value}
+                                                as="button"
+                                                onClick={() => handleSubscriptionChange(o.value)}
+                                                w="full"
+                                                px={4}
+                                                py={3}
+                                                alignItems="center"
+                                                cursor="pointer"
+                                                bg={o.value === subscription ? "brand.primarySubtle" : "transparent"}
+                                                color={o.value === subscription ? "brand.primary" : "brand.textPrimary"}
+                                                fontWeight={o.value === subscription ? "semibold" : "normal"}
+                                                _hover={{ bg: o.value === subscription ? "brand.primarySubtle" : "brand.surfaceHover" }}
+                                                transition="background 0.15s ease"
+                                            >
+                                                <Text fontSize="md">
+                                                    {o.label}
+                                                </Text>
+                                            </Flex>
+                                        ))}
+                                    </Box>
+                                )}
+                            </Box>
+
+                            {subscription && (
+                                <Text
+                                    fontSize="xs"
+                                    color="brand.primary"
+                                    mt={2}
+                                >
+                                    Subscription override active: {subscription}
                                 </Text>
                             )}
                         </Box>

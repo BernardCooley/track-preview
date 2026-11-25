@@ -7,6 +7,7 @@ import { mockSearchParams } from "../../../test/mocks/navigation";
 import { render } from "../../../test/test-utils";
 import Library from "../Library";
 import MenuDrawer from "../MenuDrawer";
+import Header from "../Header";
 import Settings from "../../app/settings/page";
 import { mockTrack, mockTrack2 } from "../../../test/mocks/data";
 
@@ -409,6 +410,94 @@ describe("Pro feature gating", () => {
             expect(await screen.findByText("Genres")).toBeInTheDocument();
             expect(screen.getByText("Top Artists")).toBeInTheDocument();
             expect(screen.queryByText("See more stats")).not.toBeInTheDocument();
+        });
+    });
+
+    describe("4.2 Pro badge and upgrade CTA in navigation", () => {
+        it("shows Pro badge in Header for Pro users", () => {
+            setSubscription(true);
+            render(
+                <Header />,
+                { authContext: { user: { uid: "user-1", email: "test@test.com" }, userProfile: proProfile as any } }
+            );
+
+            expect(screen.getByText("PRO")).toBeInTheDocument();
+        });
+
+        it("shows Upgrade button in Header for free users", () => {
+            setSubscription(false);
+            render(
+                <Header />,
+                { authContext: { user: { uid: "user-1", email: "test@test.com" }, userProfile: freeProfile as any } }
+            );
+
+            expect(screen.getByText("UPGRADE")).toBeInTheDocument();
+        });
+
+        it("does not show Upgrade button in Header for Pro users", () => {
+            setSubscription(true);
+            render(
+                <Header />,
+                { authContext: { user: { uid: "user-1", email: "test@test.com" }, userProfile: proProfile as any } }
+            );
+
+            expect(screen.queryByText("UPGRADE")).not.toBeInTheDocument();
+        });
+
+        it("does not show Pro badge in Header for free users", () => {
+            setSubscription(false);
+            render(
+                <Header />,
+                { authContext: { user: { uid: "user-1", email: "test@test.com" }, userProfile: freeProfile as any } }
+            );
+
+            expect(screen.queryByText("PRO")).not.toBeInTheDocument();
+        });
+
+        it("shows Upgrade to Pro link in MenuDrawer for free users", () => {
+            setSubscription(false);
+            render(
+                <MenuDrawer isOpen={true} onClose={vi.fn()} />,
+                { authContext: { user: { uid: "user-1", email: "test@test.com" }, userProfile: freeProfile as any } }
+            );
+
+            expect(screen.getByText("Upgrade to Pro")).toBeInTheDocument();
+        });
+
+        it("does not show Upgrade to Pro link in MenuDrawer for Pro users", () => {
+            setSubscription(true);
+            render(
+                <MenuDrawer isOpen={true} onClose={vi.fn()} />,
+                { authContext: { user: { uid: "user-1", email: "test@test.com" }, userProfile: proProfile as any } }
+            );
+
+            expect(screen.queryByText("Upgrade to Pro")).not.toBeInTheDocument();
+        });
+
+        it("clicking Upgrade in Header calls requirePro", async () => {
+            setSubscription(false);
+            const user = userEvent.setup();
+            render(
+                <Header />,
+                { authContext: { user: { uid: "user-1", email: "test@test.com" }, userProfile: freeProfile as any } }
+            );
+
+            await user.click(screen.getByText("UPGRADE"));
+
+            expect(mockRequirePro).toHaveBeenCalledWith("Upgrade");
+        });
+
+        it("clicking Upgrade to Pro in MenuDrawer calls requirePro", async () => {
+            setSubscription(false);
+            const user = userEvent.setup();
+            render(
+                <MenuDrawer isOpen={true} onClose={vi.fn()} />,
+                { authContext: { user: { uid: "user-1", email: "test@test.com" }, userProfile: freeProfile as any } }
+            );
+
+            await user.click(screen.getByText("Upgrade to Pro"));
+
+            expect(mockRequirePro).toHaveBeenCalledWith("Upgrade");
         });
     });
 
