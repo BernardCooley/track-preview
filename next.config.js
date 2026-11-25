@@ -22,4 +22,7 @@ module.exports = withSentryConfig(nextConfig, {
     silent: !process.env.CI,
     authToken: process.env.SENTRY_AUTH_TOKEN,
     widenClientFileUpload: true,
+    release: {
+        name: process.env.VERCEL_GIT_COMMIT_SHA,
+    },
 });
