@@ -41,6 +41,7 @@ function makeProfile(
         genreAlerts: [],
         genreAlertFrequency: "WEEKLY",
         genreEmailsEnabled: false,
+        upgradePromptDismissedAt: null,
         ...overrides,
     };
 }
