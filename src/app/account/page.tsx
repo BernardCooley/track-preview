@@ -324,7 +324,7 @@ const Settings = () => {
     if (emailUpdated) {
         return (
             <Flex direction="column" minH="100dvh" bg="brand.bg">
-                <BackHeader title="Account" />
+                <BackHeader title="Account" href="/explore" />
                 <Center flex={1} flexDirection="column" gap={6} px={[4, 6]}>
                     <Box
                         w="64px"
@@ -445,7 +445,7 @@ const Settings = () => {
                 </Dialog.Positioner>
             </Dialog.Root>
 
-            <BackHeader title="Account" />
+            <BackHeader title="Account" href="/explore" />
 
             <Flex
                 flex={1}
