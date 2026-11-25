@@ -21,6 +21,7 @@ import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
 import FullTrackLinks from "./FullTrackLinks";
 import ToggleTracklist from "./ToggleTracklist";
 import TrackCardIcon from "./TrackCardIcon";
+import { track as trackEvent } from "@amplitude/unified";
 
 const SWIPE_THRESHOLD = 80;
 
@@ -456,18 +457,32 @@ const TrackReviewCard = ({
                                     showJumpControls={false}
                                     showSkipControls={true}
                                     onClickNext={() => {
-                                        indexOfCurrentTrack < trackList.length - 1
-                                            ? setCurrentTrack(
-                                                  trackList[indexOfCurrentTrack + 1]
-                                              )
-                                            : undefined;
+                                        if (indexOfCurrentTrack < trackList.length - 1) {
+                                            trackEvent("Track Skipped", {
+                                                trackId: currentTrack.id,
+                                                artist: currentTrack.artist,
+                                                title: currentTrack.title,
+                                                genre: currentTrack.genre,
+                                                method: "next",
+                                            });
+                                            setCurrentTrack(
+                                                trackList[indexOfCurrentTrack + 1]
+                                            );
+                                        }
                                     }}
                                     onClickPrevious={() => {
-                                        indexOfCurrentTrack > 0
-                                            ? setCurrentTrack(
-                                                  trackList[indexOfCurrentTrack - 1]
-                                              )
-                                            : undefined;
+                                        if (indexOfCurrentTrack > 0) {
+                                            trackEvent("Track Skipped", {
+                                                trackId: currentTrack.id,
+                                                artist: currentTrack.artist,
+                                                title: currentTrack.title,
+                                                genre: currentTrack.genre,
+                                                method: "previous",
+                                            });
+                                            setCurrentTrack(
+                                                trackList[indexOfCurrentTrack - 1]
+                                            );
+                                        }
                                     }}
                                     onPlay={onAudioPlay}
                                     customIcons={{

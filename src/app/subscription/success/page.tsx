@@ -9,6 +9,7 @@ import { auth } from "../../../../firebase/firebaseInit";
 import { useAuthContext } from "../../../../Contexts/AuthContext";
 import { getUserProfile, verifyCheckout } from "@/bff/bff";
 import SubscriptionSuccessSkeleton from "@/components/skeletons/SubscriptionSuccessSkeleton";
+import { track } from "@amplitude/unified";
 
 export default function SubscriptionSuccessPage() {
     return (
@@ -51,6 +52,7 @@ function SubscriptionSuccess() {
                 if (profile) updateUserProfile(profile);
 
                 setStatus("success");
+                track("Upgrade Completed");
                 setTimeout(() => router.replace("/explore"), 2000);
             };
 

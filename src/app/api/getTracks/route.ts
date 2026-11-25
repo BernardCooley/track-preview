@@ -23,7 +23,26 @@ export async function POST(req: Request) {
         WHERE "releaseYear" BETWEEN ${startYearCondition} AND ${endYearCondition}
         ${genreCondition}
         AND id NOT IN (
-            SELECT "trackId" FROM "Review" WHERE "userId" = '${userId}'
+            SELECT "trackId" FROM "Review"
+            WHERE "userId" = '${userId}'
+            AND NOT (
+                "currentReviewStep" = 0
+                AND "updatedAt" < NOW() - INTERVAL '2 years'
+                AND "trackId" IN (
+                    SELECT t.id FROM "Track" t
+                    INNER JOIN "Review" r2 ON r2."trackId" = t.id
+                    WHERE r2."userId" = '${userId}' AND r2."currentReviewStep" = 4
+                    AND t."genre" IN (
+                        SELECT t2."genre"
+                        FROM "Review" r3
+                        INNER JOIN "Track" t2 ON t2.id = r3."trackId"
+                        WHERE r3."userId" = '${userId}' AND r3."currentReviewStep" = 4
+                        GROUP BY t2."genre"
+                        ORDER BY COUNT(*) DESC
+                        LIMIT 3
+                    )
+                )
+            )
         )
         ORDER BY RANDOM() ASC
         ${limitCondition}

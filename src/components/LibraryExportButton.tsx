@@ -13,6 +13,7 @@ import { exportLibrary } from "@/bff/bff";
 import { useAuthContext } from "../../Contexts/AuthContext";
 import { toaster } from "@/components/toaster";
 import DownloadIcon from "@mui/icons-material/Download";
+import { track } from "@amplitude/unified";
 import StarIcon from "@mui/icons-material/Star";
 
 interface Props {
@@ -40,6 +41,7 @@ const LibraryExportButton = ({ requirePro, isPro, variant = "icon" }: Props) => 
         setExporting(true);
 
         try {
+            track("Export Started", { type: "file", format });
             const blob = await exportLibrary({ userId: user.uid, format });
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");

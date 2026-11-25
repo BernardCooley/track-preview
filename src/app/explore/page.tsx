@@ -11,7 +11,6 @@ import {
 } from "@chakra-ui/react";
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useDelayedLoading } from "@/hooks/useDelayedLoading";
-import { track } from "@amplitude/unified";
 import AudioPlayer from "@/components/AudioPlayer";
 import { useRouter, useSearchParams } from "next/navigation";
 import { onAuthStateChanged } from "firebase/auth";
@@ -66,10 +65,6 @@ function ExploreContent() {
             }
         }
     }, [onMenuCloseRaw]);
-
-    useEffect(() => {
-        track("Page Viewed");
-    }, []);
 
     useEffect(() => {
         const handlePopState = (e: PopStateEvent) => {

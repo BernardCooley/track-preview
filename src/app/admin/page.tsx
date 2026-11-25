@@ -93,6 +93,19 @@ const setThresholdCookie = (on: boolean) => {
     }
 };
 
+const getAnalyticsCookie = (): boolean => {
+    const match = document.cookie.match(/(?:^|;\s*)analytics_override=([^;]*)/);
+    return match?.[1] === "1";
+};
+
+const setAnalyticsCookie = (on: boolean) => {
+    if (on) {
+        document.cookie = `analytics_override=1; path=/; max-age=86400; SameSite=Lax`;
+    } else {
+        document.cookie = `analytics_override=; path=/; max-age=0; SameSite=Lax`;
+    }
+};
+
 const AdminPage = () => {
     const router = useRouter();
     const { userProfile, updateUserProfile } = useAuthContext();
@@ -108,6 +121,7 @@ const AdminPage = () => {
     const [dismissedDropdownOpen, setDismissedDropdownOpen] = useState(false);
     const dismissedDropdownRef = useRef<HTMLDivElement>(null);
     const [thresholdOverride, setThresholdOverride] = useState(false);
+    const [analyticsOverride, setAnalyticsOverride] = useState(false);
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -116,6 +130,7 @@ const AdminPage = () => {
                 setCountry(getCountryCookie());
                 setSubscription(getSubscriptionCookie());
                 setThresholdOverride(getThresholdCookie());
+                setAnalyticsOverride(getAnalyticsCookie());
                 const profile = await getUserProfile({ userId: user.uid });
                 if (profile) updateUserProfile(profile);
             } else {
@@ -554,6 +569,60 @@ const AdminPage = () => {
                                     mt={2}
                                 >
                                     Threshold override active — prompt will trigger with any library size
+                                </Text>
+                            )}
+                        </Box>
+
+                        <Box>
+                            <Heading
+                                size="xs"
+                                textTransform="uppercase"
+                                fontSize="xs"
+                                letterSpacing="wider"
+                                color="brand.textMuted"
+                                mb={2}
+                            >
+                                Analytics
+                            </Heading>
+                            <Text
+                                fontSize="xs"
+                                color="brand.textMuted"
+                                mb={3}
+                            >
+                                Enable Amplitude event tracking in non-production environments. Events are always sent in production.
+                            </Text>
+
+                            <Flex
+                                alignItems="center"
+                                justifyContent="space-between"
+                                px={3}
+                                py={2}
+                                rounded="lg"
+                            >
+                                <Text fontSize="sm" fontWeight="medium" color="brand.textSecondary">
+                                    Send events
+                                </Text>
+                                <Switch.Root
+                                    checked={analyticsOverride}
+                                    onCheckedChange={(details) => {
+                                        setAnalyticsOverride(details.checked);
+                                        setAnalyticsCookie(details.checked);
+                                    }}
+                                >
+                                    <Switch.HiddenInput />
+                                    <Switch.Control>
+                                        <Switch.Thumb />
+                                    </Switch.Control>
+                                </Switch.Root>
+                            </Flex>
+
+                            {analyticsOverride && (
+                                <Text
+                                    fontSize="xs"
+                                    color="brand.primary"
+                                    mt={2}
+                                >
+                                    Analytics active — events will be sent to Amplitude
                                 </Text>
                             )}
                         </Box>
