@@ -28,7 +28,7 @@ export const useSubscription = () => {
         userProfile?.subscriptionExpiresAt != null &&
         new Date(userProfile.subscriptionExpiresAt) > new Date();
 
-    const override = getSubscriptionOverride();
+    const override = subscriptionsEnabled ? getSubscriptionOverride() : null;
 
     const isPro =
         override === "pro" ? true :
