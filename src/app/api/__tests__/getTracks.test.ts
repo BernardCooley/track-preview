@@ -60,4 +60,50 @@ describe("getTracks", () => {
         expect(json).toEqual(tracks);
         expect(res.status).toBe(200);
     });
+
+    describe("disliked track reinstatement", () => {
+        it("explore query allows disliked tracks back after 2 years in top genres", async () => {
+            mockQueryRaw.mockResolvedValue([]);
+
+            await POST(
+                makeRequest({
+                    genres: ["all"],
+                    startYear: 1960,
+                    endYear: 2026,
+                    userId: "user-1",
+                    reviewStep: 1,
+                })
+            );
+
+            const sql = mockQueryRaw.mock.calls[0][0].strings
+                ? mockQueryRaw.mock.calls[0][0].strings.join("")
+                : String(mockQueryRaw.mock.calls[0][0]);
+
+            expect(sql).toContain('"currentReviewStep" = 0');
+            expect(sql).toContain("INTERVAL '2 years'");
+            expect(sql).toContain('"currentReviewStep" = 4');
+            expect(sql).toContain("LIMIT 3");
+        });
+
+        it("non-explore queries do not include reinstatement logic", async () => {
+            mockQueryRaw.mockResolvedValue([]);
+
+            await POST(
+                makeRequest({
+                    genres: ["all"],
+                    startYear: 1960,
+                    endYear: 2026,
+                    userId: "user-1",
+                    reviewStep: 2,
+                })
+            );
+
+            const sql = mockQueryRaw.mock.calls[0][0].strings
+                ? mockQueryRaw.mock.calls[0][0].strings.join("")
+                : String(mockQueryRaw.mock.calls[0][0]);
+
+            expect(sql).not.toContain("INTERVAL '2 years'");
+            expect(sql).toContain('"currentReviewStep" = 2');
+        });
+    });
 });
