@@ -2,7 +2,7 @@
 
 import { Box, Center, Text } from "@chakra-ui/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../../../firebase/firebaseInit";
 import { useAuthContext } from "../../../../Contexts/AuthContext";
@@ -10,6 +10,14 @@ import { getUserProfile, verifyCheckout } from "@/bff/bff";
 import BouncingDotsLoader from "@/components/BouncingLoaderDots";
 
 export default function SubscriptionSuccessPage() {
+    return (
+        <Suspense>
+            <SubscriptionSuccess />
+        </Suspense>
+    );
+}
+
+function SubscriptionSuccess() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const { updateUser, updateUserProfile } = useAuthContext();
