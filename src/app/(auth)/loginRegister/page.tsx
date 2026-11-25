@@ -46,7 +46,7 @@ const AuthPageContent = () => {
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
-            if (user && user.email && user.uid && !user.isAnonymous && user.emailVerified) {
+            if (user && user.email && user.uid && user.emailVerified) {
                 router.push("/explore");
             } else {
                 setLoading(false);

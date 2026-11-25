@@ -52,8 +52,6 @@ function wrapper(userProfile: UserProfile | null) {
                 updateUser: vi.fn(),
                 userProfile,
                 updateUserProfile: vi.fn(),
-                isAnonymous: false,
-                setIsAnonymous: vi.fn(),
                 profileError: false,
                 setProfileError: vi.fn(),
             }}

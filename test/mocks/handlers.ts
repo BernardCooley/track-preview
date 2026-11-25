@@ -2,11 +2,10 @@ import { http, HttpResponse } from "msw";
 
 export const handlers = [
     http.post("/api/createUser", async ({ request }) => {
-        const body = (await request.json()) as { userId: string; isAnonymous?: boolean };
+        const body = (await request.json()) as { userId: string };
         return HttpResponse.json({
             id: body.userId,
             firebaseId: body.userId,
-            isAnonymous: body.isAnonymous ?? false,
             autoplay: false,
             curatedMode: false,
             genres: ["all"],
@@ -21,7 +20,6 @@ export const handlers = [
         return HttpResponse.json({
             id: body.userId,
             firebaseId: body.userId,
-            isAnonymous: false,
             autoplay: false,
             curatedMode: false,
             genres: ["all"],
@@ -57,10 +55,6 @@ export const handlers = [
         return HttpResponse.json({ previewUrl: "" });
     }),
 
-    http.post("/api/getTrialLikeCount", () => {
-        return HttpResponse.json({ count: 0 });
-    }),
-
     http.post("/api/getSpotifyTrack", () => {
         return HttpResponse.json(null);
     }),
@@ -83,5 +77,9 @@ export const handlers = [
 
     http.get("/api/getSpotifyAccessToken", () => {
         return HttpResponse.json({ access_token: "mock-token", expires_in: 3600, token_type: "Bearer" });
+    }),
+
+    http.get("/api/stripe/get-price", () => {
+        return HttpResponse.json({ formatted: "£2.99", interval: "month" });
     }),
 ];

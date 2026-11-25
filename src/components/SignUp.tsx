@@ -20,11 +20,9 @@ import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { UserCredential } from "firebase/auth";
 import {
-    LinkAnonymousAccount,
     RegisterUser,
 } from "../../firebase/utils";
-import { createUser, mutateUserProfile, sendVerificationEmail } from "@/bff/bff";
-import { auth } from "../../firebase/firebaseInit";
+import { createUser, sendVerificationEmail } from "@/bff/bff";
 
 interface FormData {
     email: string;
@@ -85,17 +83,12 @@ const SignUp = () => {
         setEmail(formData.email);
         setSubmitting(true);
         setAuthError(null);
-        const isCurrentlyAnonymous = auth.currentUser?.isAnonymous === true;
         let newUser: UserCredential | null = null;
 
         try {
-            if (isCurrentlyAnonymous) {
-                newUser = await LinkAnonymousAccount(formData.email, formData.password);
-            } else {
-                newUser = await RegisterUser(formData.email, formData.password);
-            }
+            newUser = await RegisterUser(formData.email, formData.password);
         } catch (error: any) {
-            if (error.code === "auth/email-already-in-use" || error.code === "auth/credential-already-in-use") {
+            if (error.code === "auth/email-already-in-use") {
                 setAuthError("This email is already registered. Please sign in instead.");
             } else {
                 setAuthError("Error registering. Please check your email and password and try again.");
@@ -110,30 +103,17 @@ const SignUp = () => {
             return;
         }
 
-        if (isCurrentlyAnonymous) {
+        try {
+            await createUser({
+                userId: newUser.user.uid,
+            });
+        } catch (error) {
             try {
-                await mutateUserProfile({
-                    userId: newUser.user.uid,
-                    isAnonymous: false,
-                });
-            } catch (error) {
-                setAuthError("Account was linked but profile update failed. Please sign in with your new email.");
-                setSubmitting(false);
-                return;
-            }
-        } else {
-            try {
-                await createUser({
-                    userId: newUser.user.uid,
-                });
-            } catch (error) {
-                try {
-                    await newUser.user.delete();
-                } catch {}
-                setAuthError("Error creating your account. Please try again.");
-                setSubmitting(false);
-                return;
-            }
+                await newUser.user.delete();
+            } catch {}
+            setAuthError("Error creating your account. Please try again.");
+            setSubmitting(false);
+            return;
         }
 
         try {

@@ -25,6 +25,10 @@ vi.mock("@/hooks/useSubscription", () => ({
     useSubscription: vi.fn(),
 }));
 
+vi.mock("@/hooks/useProPrice", () => ({
+    useProPrice: () => null,
+}));
+
 import { useSubscription } from "@/hooks/useSubscription";
 const mockUseSubscription = vi.mocked(useSubscription);
 
@@ -46,6 +50,7 @@ vi.mock("@/bff/bff", () => ({
     createCheckoutSession: vi.fn(),
     fetchLibraryStats: (...args: unknown[]) => mockFetchLibraryStats(...args),
     updateReviewNotes: vi.fn().mockResolvedValue({ success: true }),
+    getProPrice: vi.fn().mockResolvedValue(null),
 }));
 
 vi.mock("@/components/AuthGuard", () => ({

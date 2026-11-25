@@ -57,9 +57,6 @@ const TrackReview = memo(
             onYearConfirm,
             resolvedPreviewUrl,
             previewLoading,
-            trialLimitReached,
-            trialLikeCount,
-            isAnonymous,
             profileError,
         } = useTrackReview(reviewStep);
 
@@ -196,38 +193,7 @@ const TrackReview = memo(
                     </Center>
                 )}
 
-                {trialLimitReached && reviewStep === 1 && (
-                    <Center flex={1} px={6}>
-                        <VStack gap={5} maxW="360px">
-                            <VStack gap={2}>
-                                <Text
-                                    textAlign="center"
-                                    color="brand.textPrimary"
-                                    fontSize="md"
-                                    fontWeight="semibold"
-                                >
-                                    You&apos;ve reached the free trial limit
-                                </Text>
-                                <Text
-                                    textAlign="center"
-                                    color="brand.textSecondary"
-                                    fontSize="sm"
-                                >
-                                    You&apos;ve liked {trialLikeCount} tracks. Create a free account to keep discovering music and save your library permanently.
-                                </Text>
-                            </VStack>
-                            <Button
-                                variant="primary"
-                                w="full"
-                                onClick={() => router.push("/loginRegister")}
-                            >
-                                Create account
-                            </Button>
-                        </VStack>
-                    </Center>
-                )}
-
-                {noTracks && !loading && reviewStep === 1 && !trialLimitReached && (
+                {noTracks && !loading && reviewStep === 1 && (
                     <Center flex={1} px={6}>
                         <VStack gap={5} maxW="360px">
                             <VStack gap={2}>

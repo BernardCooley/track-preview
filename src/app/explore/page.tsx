@@ -16,7 +16,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { onAuthStateChanged } from "firebase/auth";
 import Library from "@/components/Library";
 import MenuDrawer from "@/components/MenuDrawer";
-import { getUserProfile, createUser } from "@/bff/bff";
+import { getUserProfile } from "@/bff/bff";
 import { toaster } from "@/components/toaster";
 import { useTrackContext } from "../../../context/TrackContext";
 import { useAuthContext } from "../../../Contexts/AuthContext";
@@ -30,7 +30,6 @@ import LooksTwoIcon from "@mui/icons-material/LooksTwo";
 import Looks3Icon from "@mui/icons-material/Looks3";
 import LibraryMusicIcon from "@mui/icons-material/LibraryMusic";
 import MenuOpenIcon from "@mui/icons-material/MenuOpen";
-import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import StarIcon from "@mui/icons-material/Star";
 import Link from "next/link";
 import { useSubscription } from "@/hooks/useSubscription";
@@ -42,7 +41,7 @@ function ExploreContent() {
     const { currentlyPlaying, updateCurrentlyPlaying, playingTrack, setPlayingTrack } = useTrackContext();
     const audioElement = useRef<HTMLAudioElement>(null);
     const [currentStep, setCurrentStep] = useState<number>(0);
-    const { updateUser, user, updateUserProfile, userProfile, isAnonymous, setIsAnonymous, profileError, setProfileError } = useAuthContext();
+    const { updateUser, user, updateUserProfile, userProfile, profileError, setProfileError } = useAuthContext();
     const reviewStep = searchParams?.get("reviewStep");
     const pageRef = useRef<HTMLDivElement>(null);
     const { open: isMenuOpen, onOpen: onMenuOpenRaw, onClose: onMenuCloseRaw } = useDisclosure();
@@ -85,10 +84,7 @@ function ExploreContent() {
             (async () => {
                 try {
                     setProfileError(false);
-                    let userProf = await getUserProfile({ userId: user.uid });
-                    if (!userProf && isAnonymous) {
-                        userProf = await createUser({ userId: user.uid, isAnonymous: true });
-                    }
+                    const userProf = await getUserProfile({ userId: user.uid });
                     updateUserProfile(userProf);
                 } catch {
                     setProfileError(true);
@@ -108,14 +104,12 @@ function ExploreContent() {
             const user = await GetCurrentUser();
             if (user?.uid) {
                 updateUser({ email: user.email || "", uid: user.uid });
-                setIsAnonymous(user.isAnonymous);
             }
         })();
 
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
-            if (user && user.uid && (user.isAnonymous || user.emailVerified)) {
+            if (user && user.uid && user.emailVerified) {
                 updateUser({ email: user.email || "", uid: user.uid });
-                setIsAnonymous(user.isAnonymous);
                 const params = new URLSearchParams(searchParams?.toString() || "");
                 if (!params.has("reviewStep")) params.set("reviewStep", "1");
                 return router.push(`/explore/?${params.toString()}`);
@@ -279,7 +273,7 @@ function ExploreContent() {
                     ))}
                 </Flex>
 
-                {subscriptionsEnabled && !isPro && !isAnonymous && (
+                {subscriptionsEnabled && !isPro && (
                     <Flex
                         as="button"
                         onClick={() => requirePro("Upgrade")}
@@ -299,20 +293,6 @@ function ExploreContent() {
                             UPGRADE
                         </Text>
                     </Flex>
-                )}
-                {isAnonymous && (
-                    <Button
-                        variant="outline"
-                        size="xs"
-                        onClick={() => router.push("/loginRegister")}
-                        gap={1}
-                        fontSize="xs"
-                        color="brand.primary"
-                        borderColor="brand.primary"
-                    >
-                        <PersonAddIcon style={{ fontSize: "14px" }} />
-                        <Text display={["none", "inline"]}>Sign up</Text>
-                    </Button>
                 )}
                 <IconButton
                     variant="tertiary"

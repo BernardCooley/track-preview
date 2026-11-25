@@ -14,8 +14,6 @@ const defaultAuthContext = {
     updateUser: vi.fn(),
     userProfile: null as UserProfile | null,
     updateUserProfile: vi.fn(),
-    isAnonymous: false,
-    setIsAnonymous: vi.fn(),
     profileError: false,
     setProfileError: vi.fn(),
 };

@@ -37,7 +37,6 @@ function NewTracksContent() {
         resolvedPreviewUrl,
         likeOrDislike,
         userProfile,
-        isAnonymous,
     } = useNewTrackReview();
 
     const [animate, setAnimate] = useState<"like" | "dislike" | null>(null);

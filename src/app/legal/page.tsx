@@ -44,7 +44,7 @@ const sections = [
             },
             {
                 heading: "Your account",
-                body: "You may use Phoniquest anonymously or create a registered account. You are responsible for maintaining the security of your account credentials. We reserve the right to suspend or terminate accounts that violate these terms.",
+                body: "You must create a registered account to use Phoniquest. You are responsible for maintaining the security of your account credentials. We reserve the right to suspend or terminate accounts that violate these terms.",
             },
             {
                 heading: "Acceptable use",

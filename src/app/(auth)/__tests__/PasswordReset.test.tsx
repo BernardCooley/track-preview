@@ -16,8 +16,6 @@ vi.mock("../../../../firebase/utils", () => ({
     LoginUser: vi.fn(),
     LogOut: vi.fn(),
     RegisterUser: vi.fn(),
-    SignInAnonymously: vi.fn(),
-    LinkAnonymousAccount: vi.fn(),
     DeleteUser: vi.fn(),
     GetCurrentUser: vi.fn(() => Promise.resolve(null)),
     UpdateUserEmail: vi.fn(() => Promise.resolve()),

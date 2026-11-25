@@ -128,6 +128,11 @@ const MenuDrawer = ({ isOpen, onClose }: Props) => {
                             />
                             <MenuDrawerItem
                                 pathname={pathname}
+                                linkText="Pricing"
+                                href="/pricing"
+                            />
+                            <MenuDrawerItem
+                                pathname={pathname}
                                 linkText="How it works"
                                 href="/how-it-works"
                             />

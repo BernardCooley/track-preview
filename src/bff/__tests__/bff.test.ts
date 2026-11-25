@@ -9,7 +9,6 @@ import {
     mutateUserProfile,
     updateTrackReviewStep,
     resolvePreviewUrl,
-    getTrialLikeCount,
     togglePurchased,
     fetchDiscoveryHistory,
     handleFetchErrors,
@@ -54,10 +53,6 @@ describe("createUser", () => {
         expect(result).toMatchObject({ id: "user-1", firebaseId: "user-1" });
     });
 
-    it("sends isAnonymous flag", async () => {
-        const result = await createUser({ userId: "user-2", isAnonymous: true });
-        expect(result).toMatchObject({ id: "user-2", isAnonymous: true });
-    });
 });
 
 describe("getUserProfile", () => {
@@ -163,30 +158,6 @@ describe("resolvePreviewUrl", () => {
 
         const result = await resolvePreviewUrl("track-1");
         expect(result).toBe("");
-    });
-});
-
-describe("getTrialLikeCount", () => {
-    it("returns count", async () => {
-        server.use(
-            http.post("/api/getTrialLikeCount", () => {
-                return HttpResponse.json({ count: 15 });
-            })
-        );
-
-        const result = await getTrialLikeCount({ userId: "user-1" });
-        expect(result).toBe(15);
-    });
-
-    it("returns 0 on error", async () => {
-        server.use(
-            http.post("/api/getTrialLikeCount", () => {
-                return HttpResponse.json({ error: "Failed" }, { status: 500 });
-            })
-        );
-
-        const result = await getTrialLikeCount({ userId: "user-1" });
-        expect(result).toBe(0);
     });
 });
 
