@@ -162,6 +162,27 @@ const TrackReview = memo(
                         }}
                     />
                 )}
+                {reviewStep === 1 && !(noTracks && !loading) && !profileError && (
+                    <Box px={[4, 6]} py={3}>
+                        {user?.uid && (
+                            <FilterTags
+                                reviewStep={reviewStep}
+                                onYearClick={() =>
+                                    setShowYearSelector((prev) => !prev)
+                                }
+                                onGenreClick={() =>
+                                    setShowGenreSelector((prev) => !prev)
+                                }
+                                genres={userProfile?.genres}
+                                yearRange={{
+                                    from: userProfile?.yearFrom || 1960,
+                                    to: userProfile?.yearTo || getCurrentYear(),
+                                }}
+                            />
+                        )}
+                    </Box>
+                )}
+
                 {loading && !animate && !currentTrack && showTrackSkeleton && (
                     <TrackCardSkeleton />
                 )}
@@ -272,27 +293,6 @@ const TrackReview = memo(
                     onConfirm={(val) => onYearConfirm(val)}
                     onCancel={() => setShowYearSelector(false)}
                 />
-
-                {reviewStep === 1 && !(noTracks && !loading) && !profileError && (
-                    <Box px={[4, 6]} py={3}>
-                        {user?.uid && (
-                            <FilterTags
-                                reviewStep={reviewStep}
-                                onYearClick={() =>
-                                    setShowYearSelector((prev) => !prev)
-                                }
-                                onGenreClick={() =>
-                                    setShowGenreSelector((prev) => !prev)
-                                }
-                                genres={userProfile?.genres}
-                                yearRange={{
-                                    from: userProfile?.yearFrom || 1960,
-                                    to: userProfile?.yearTo || getCurrentYear(),
-                                }}
-                            />
-                        )}
-                    </Box>
-                )}
 
                 {(previewLoading || loading) && !animate && currentTrack && showTrackSkeleton && (
                     <TrackCardSkeleton />
