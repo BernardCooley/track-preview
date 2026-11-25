@@ -3,21 +3,20 @@ import { NextResponse } from "next/server";
 import { Prisma, Track } from "@prisma/client";
 
 export async function POST(req: Request) {
-    const { genres, userId, since } = await req.json();
+    const { genres, userId, releasedAfter } = await req.json();
 
-    if (!genres || genres.length === 0 || !userId || !since) {
+    if (!genres || genres.length === 0 || !userId || !releasedAfter) {
         return NextResponse.json(
             { error: "Missing required fields" },
             { status: 400 }
         );
     }
 
-    const sinceDate = new Date(since);
     const genreCondition = `AND genre IN (${genres.map((g: string) => `'${g.replace(/'/g, "''")}'`).join(", ")})`;
 
     const query = `
         SELECT * FROM "Track"
-        WHERE "createdAt" >= '${sinceDate.toISOString()}'
+        WHERE "releaseDate" >= '${releasedAfter}'
         ${genreCondition}
         AND id NOT IN (
             SELECT "trackId" FROM "Review" WHERE "userId" = '${userId}'

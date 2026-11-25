@@ -14,6 +14,11 @@ import { auth } from "../../../firebase/firebaseInit";
 import StarIcon from "@mui/icons-material/Star";
 import TuneIcon from "@mui/icons-material/Tune";
 import EmailIcon from "@mui/icons-material/Email";
+import LightModeIcon from "@mui/icons-material/LightMode";
+import DarkModeIcon from "@mui/icons-material/DarkMode";
+import LibraryExportButton from "@/components/LibraryExportButton";
+import { useThemeContext } from "../../../context/ThemeContext";
+import { useTrackContext } from "../../../context/TrackContext";
 
 const FREQUENCY_OPTIONS = [
     { value: "DAILY", label: "Daily" },
@@ -24,8 +29,11 @@ const FREQUENCY_OPTIONS = [
 const SettingsContent = () => {
     const { user, updateUser, userProfile, updateUserProfile } = useAuthContext();
     const { isPro, requirePro, upgradeFeature, dismissUpgrade } = useSubscription();
+    const { appearance, toggleAppearance } = useThemeContext();
+    const { updateChangesMade, updateReviewTracks } = useTrackContext();
     const [showGenreSelector, setShowGenreSelector] = useState(false);
     const [showClearConfirm, setShowClearConfirm] = useState(false);
+    const [showCuratedConfirm, setShowCuratedConfirm] = useState(false);
     const [saving, setSaving] = useState(false);
     const [clearing, setClearing] = useState(false);
 
@@ -36,11 +44,13 @@ const SettingsContent = () => {
     const [localGenres, setLocalGenres] = useState<string[]>(savedGenres);
     const [localFrequency, setLocalFrequency] = useState<string>(savedFrequency);
     const [localEmailsEnabled, setLocalEmailsEnabled] = useState(savedEmailsEnabled);
+    const [profileLoaded, setProfileLoaded] = useState(!!userProfile);
 
     useEffect(() => {
         setLocalGenres(savedGenres);
         setLocalFrequency(savedFrequency);
         setLocalEmailsEnabled(savedEmailsEnabled);
+        if (userProfile) setProfileLoaded(true);
     }, [userProfile?.genreAlerts, userProfile?.genreAlertFrequency, userProfile?.genreEmailsEnabled]);
 
     useEffect(() => {
@@ -78,6 +88,22 @@ const SettingsContent = () => {
 
     const editingGenres = hasGenreChanges;
     const editingEmail = hasEmailChanges;
+
+    const disableCuratedMode = async () => {
+        if (user?.uid) {
+            const newProfile = await mutateUserProfile({
+                userId: user.uid,
+                curatedMode: false,
+            });
+            updateUserProfile(newProfile);
+            updateReviewTracks(2, [], 0);
+            updateReviewTracks(3, [], 0);
+            updateChangesMade(2, true);
+            updateChangesMade(3, true);
+            updateChangesMade(4, true);
+        }
+        setShowCuratedConfirm(false);
+    };
 
     const handleOpenPicker = () => {
         setShowGenreSelector(true);
@@ -143,9 +169,171 @@ const SettingsContent = () => {
                 alignItems="center"
                 px={[4, 6]}
                 py={[6, 8]}
-                gap={6}
+                gap={8}
             >
-                {/* Genre Preferences Card */}
+                <Flex direction="column" alignItems="center" w="full" gap={3}>
+                <Text
+                    w="full"
+                    maxW="520px"
+                    fontSize="xs"
+                    fontWeight="semibold"
+                    color="brand.textMuted"
+                    textTransform="uppercase"
+                    letterSpacing="wider"
+                >
+                    General
+                </Text>
+
+                <Box
+                    w="full"
+                    maxW="520px"
+                    bg="brand.cardBg"
+                    border="1px solid"
+                    borderColor="brand.border"
+                    rounded="card"
+                    p={[5, 6]}
+                >
+                    <Flex direction="column" gap={4}>
+                        <Flex
+                            alignItems="center"
+                            justifyContent="space-between"
+                            gap={3}
+                            px={3}
+                            py={2}
+                            rounded="lg"
+                            cursor="pointer"
+                            transition="all 0.2s ease"
+                            _hover={{ bg: "brand.surfaceHover" }}
+                            onClick={toggleAppearance}
+                        >
+                            <Flex alignItems="center" gap={3}>
+                                <Flex color="brand.primary" fontSize="sm">
+                                    {appearance === "light" ? (
+                                        <DarkModeIcon style={{ fontSize: "20px" }} />
+                                    ) : (
+                                        <LightModeIcon style={{ fontSize: "20px" }} />
+                                    )}
+                                </Flex>
+                                <Text fontSize="sm" fontWeight="medium" color="brand.textSecondary">
+                                    {appearance === "light" ? "Dark mode" : "Light mode"}
+                                </Text>
+                            </Flex>
+                        </Flex>
+
+                        <Flex
+                            alignItems="center"
+                            justifyContent="space-between"
+                            gap={3}
+                            px={3}
+                            py={2}
+                            rounded="lg"
+                        >
+                            <Flex direction="column">
+                                <Flex alignItems="center" gap={1.5}>
+                                    <Text fontSize="sm" fontWeight="medium" color="brand.textSecondary">
+                                        Curated mode
+                                    </Text>
+                                    {!isPro && (
+                                        <Flex
+                                            alignItems="center"
+                                            bg="brand.primarySubtle"
+                                            color="brand.primary"
+                                            rounded="full"
+                                            px={1.5}
+                                            py={0.5}
+                                            gap={0.5}
+                                        >
+                                            <StarIcon style={{ fontSize: "10px" }} />
+                                            <Text fontSize="2xs" fontWeight="bold" lineHeight="1">
+                                                PRO
+                                            </Text>
+                                        </Flex>
+                                    )}
+                                </Flex>
+                                <Text fontSize="xs" color="brand.textMuted">
+                                    Review liked tracks twice before they reach your library
+                                </Text>
+                            </Flex>
+                            <Switch.Root
+                                checked={userProfile?.curatedMode ?? false}
+                                onCheckedChange={async (details) => {
+                                    if (details.checked) {
+                                        if (!requirePro("Curated Mode")) return;
+                                        if (user?.uid) {
+                                            const newProfile = await mutateUserProfile({
+                                                userId: user.uid,
+                                                curatedMode: true,
+                                            });
+                                            updateUserProfile(newProfile);
+                                            updateReviewTracks(2, [], 0);
+                                            updateReviewTracks(3, [], 0);
+                                            updateChangesMade(2, true);
+                                            updateChangesMade(3, true);
+                                            updateChangesMade(4, true);
+                                        }
+                                    } else {
+                                        setShowCuratedConfirm(true);
+                                    }
+                                }}
+                            >
+                                <Switch.HiddenInput />
+                                <Switch.Control>
+                                    <Switch.Thumb />
+                                </Switch.Control>
+                            </Switch.Root>
+                        </Flex>
+
+                        <Flex
+                            alignItems="center"
+                            justifyContent="space-between"
+                            gap={3}
+                            px={3}
+                            py={2}
+                            rounded="lg"
+                        >
+                            <Flex direction="column">
+                                <Text fontSize="sm" fontWeight="medium" color="brand.textSecondary">
+                                    Swipe mode
+                                </Text>
+                                <Text fontSize="xs" color="brand.textMuted">
+                                    Like or skip tracks by swiping
+                                </Text>
+                            </Flex>
+                            <Switch.Root
+                                checked={userProfile?.swipeMode ?? true}
+                                onCheckedChange={async (details) => {
+                                    if (user?.uid) {
+                                        const newProfile = await mutateUserProfile({
+                                            userId: user.uid,
+                                            swipeMode: details.checked,
+                                        });
+                                        updateUserProfile(newProfile);
+                                    }
+                                }}
+                            >
+                                <Switch.HiddenInput />
+                                <Switch.Control>
+                                    <Switch.Thumb />
+                                </Switch.Control>
+                            </Switch.Root>
+                        </Flex>
+                    </Flex>
+                </Box>
+                </Flex>
+
+                <Flex direction="column" alignItems="center" w="full" gap={3}>
+                <Text
+                    w="full"
+                    maxW="520px"
+                    fontSize="xs"
+                    fontWeight="semibold"
+                    color="brand.textMuted"
+                    textTransform="uppercase"
+                    letterSpacing="wider"
+                >
+                    Genre Alerts
+                </Text>
+
                 <Box
                     w="full"
                     maxW="520px"
@@ -163,7 +351,7 @@ const SettingsContent = () => {
                         css: { "& *": { pointerEvents: "none" } },
                     })}
                 >
-                    <Flex alignItems="center" justifyContent="space-between" mb={savedGenres.length > 0 ? 2 : 6}>
+                    <Flex alignItems="center" justifyContent="space-between" mb={profileLoaded && savedGenres.length > 0 ? 2 : 6}>
                         <Flex alignItems="center" gap={2}>
                             <TuneIcon style={{ fontSize: "20px", color: "var(--chakra-colors-brand-primary)" }} />
                             <Text
@@ -192,107 +380,115 @@ const SettingsContent = () => {
                         </Flex>
                     </Flex>
 
-                    {savedGenres.length > 0 && (
-                        <Flex
-                            as="button"
-                            onClick={() => setShowClearConfirm(true)}
-                            alignItems="center"
-                            gap={2}
-                            mb={6}
-                            px={3}
-                            py={2}
-                            rounded="lg"
-                            cursor="pointer"
-                            transition="all 0.15s ease"
-                            color="brand.textMuted"
-                            _hover={{ color: "brand.textSecondary", bg: "brand.surfaceHover" }}
-                        >
-                            <Text fontSize="sm" fontWeight="medium">
-                                Clear all genres
-                            </Text>
-                        </Flex>
-                    )}
-
-                    <Flex direction="column" gap={6}>
-                        <Box>
-                            <Heading
-                                size="xs"
-                                textTransform="uppercase"
-                                fontSize="xs"
-                                letterSpacing="wider"
-                                color="brand.textMuted"
-                                mb={2}
-                            >
-                                Followed genres
-                            </Heading>
-                            <Text
-                                fontSize="xs"
-                                color="brand.textMuted"
-                                mb={3}
-                            >
-                                Choose genres to follow. New tracks in these genres will appear on your New Tracks page.
-                            </Text>
-
-                            {hasLocalGenres ? (
-                                <Flex flexWrap="wrap" gap={1.5} mb={4}>
-                                    {localGenres.map((genre) => (
-                                        <Box
-                                            key={genre}
-                                            px={3}
-                                            py={1.5}
-                                            fontSize="xs"
-                                            fontWeight="medium"
-                                            rounded="md"
-                                            color="brand.primary"
-                                            borderLeft="2px solid"
-                                            borderLeftColor="brand.primary"
-                                            css={{
-                                                backdropFilter: "blur(8px)",
-                                                WebkitBackdropFilter: "blur(8px)",
-                                                background: "color-mix(in srgb, var(--chakra-colors-brand-primary) 10%, transparent)",
-                                            }}
-                                        >
-                                            {genre}
-                                        </Box>
-                                    ))}
-                                </Flex>
-                            ) : (
-                                <Text
-                                    fontSize="sm"
-                                    color="brand.textSecondary"
-                                    mb={4}
+                    {!profileLoaded ? (
+                        <Text fontSize="sm" color="brand.textMuted">
+                            Loading...
+                        </Text>
+                    ) : (
+                        <>
+                            {savedGenres.length > 0 && (
+                                <Flex
+                                    as="button"
+                                    onClick={() => setShowClearConfirm(true)}
+                                    alignItems="center"
+                                    gap={2}
+                                    mb={6}
+                                    px={3}
+                                    py={2}
+                                    rounded="lg"
+                                    cursor="pointer"
+                                    transition="all 0.15s ease"
+                                    color="brand.textMuted"
+                                    _hover={{ color: "brand.textSecondary", bg: "brand.surfaceHover" }}
                                 >
-                                    No genres selected.
-                                </Text>
+                                    <Text fontSize="sm" fontWeight="medium">
+                                        Clear all genres
+                                    </Text>
+                                </Flex>
                             )}
 
-                            <Button
-                                variant={hasLocalGenres ? "outline" : "primary"}
-                                size="sm"
-                                onClick={handleOpenPicker}
-                            >
-                                {hasLocalGenres ? "Edit genres" : "Choose genres"}
-                            </Button>
-                        </Box>
+                            <Flex direction="column" gap={6}>
+                                <Box>
+                                    <Heading
+                                        size="xs"
+                                        textTransform="uppercase"
+                                        fontSize="xs"
+                                        letterSpacing="wider"
+                                        color="brand.textMuted"
+                                        mb={2}
+                                    >
+                                        Followed genres
+                                    </Heading>
+                                    <Text
+                                        fontSize="xs"
+                                        color="brand.textMuted"
+                                        mb={3}
+                                    >
+                                        Choose genres to follow. New tracks in these genres will appear on your New Tracks page.
+                                    </Text>
 
-                        {hasGenreChanges && (
-                            <Flex
-                                borderTop="1px solid"
-                                borderTopColor="brand.divider"
-                                pt={4}
-                                justifyContent="flex-end"
-                            >
-                                <Button
-                                    variant="primary"
-                                    size="sm"
-                                    onClick={handleSaveGenres}
-                                    loading={saving}
-                                >
-                                    Save
-                                </Button>
+                                    {hasLocalGenres ? (
+                                        <Flex flexWrap="wrap" gap={1.5} mb={4}>
+                                            {localGenres.map((genre) => (
+                                                <Box
+                                                    key={genre}
+                                                    px={3}
+                                                    py={1.5}
+                                                    fontSize="xs"
+                                                    fontWeight="medium"
+                                                    rounded="md"
+                                                    color="brand.primary"
+                                                    borderLeft="2px solid"
+                                                    borderLeftColor="brand.primary"
+                                                    css={{
+                                                        backdropFilter: "blur(8px)",
+                                                        WebkitBackdropFilter: "blur(8px)",
+                                                        background: "color-mix(in srgb, var(--chakra-colors-brand-primary) 10%, transparent)",
+                                                    }}
+                                                >
+                                                    {genre}
+                                                </Box>
+                                            ))}
+                                        </Flex>
+                                    ) : (
+                                        <Text
+                                            fontSize="sm"
+                                            color="brand.textSecondary"
+                                            mb={4}
+                                        >
+                                            No genres selected.
+                                        </Text>
+                                    )}
+
+                                    <Button
+                                        variant={hasLocalGenres ? "outline" : "primary"}
+                                        size="sm"
+                                        onClick={handleOpenPicker}
+                                    >
+                                        {hasLocalGenres ? "Edit genres" : "Choose genres"}
+                                    </Button>
+                                </Box>
+
+                                {hasGenreChanges && (
+                                    <Flex
+                                        borderTop="1px solid"
+                                        borderTopColor="brand.divider"
+                                        pt={4}
+                                        justifyContent="flex-end"
+                                    >
+                                        <Button
+                                            variant="primary"
+                                            size="sm"
+                                            onClick={handleSaveGenres}
+                                            loading={saving}
+                                        >
+                                            Save
+                                        </Button>
+                                    </Flex>
+                                )}
                             </Flex>
-                        )}
-                    </Flex>
+                        </>
+                    )}
                 </Box>
 
                 {/* Email Notifications Card */}
@@ -427,6 +623,23 @@ const SettingsContent = () => {
                         </Flex>
                     </Box>
                 )}
+                </Flex>
+
+                <Flex direction="column" alignItems="center" w="full" gap={3}>
+                <Text
+                    w="full"
+                    maxW="520px"
+                    fontSize="xs"
+                    fontWeight="semibold"
+                    color="brand.textMuted"
+                    textTransform="uppercase"
+                    letterSpacing="wider"
+                >
+                    Library
+                </Text>
+
+                <LibraryExportButton requirePro={requirePro} isPro={isPro} variant="card" />
+                </Flex>
             </Flex>
 
             <GenreModal
@@ -439,6 +652,84 @@ const SettingsContent = () => {
             />
 
             <UpgradePrompt featureName={upgradeFeature} onClose={dismissUpgrade} />
+
+            <Dialog.Root
+                open={showCuratedConfirm}
+                onOpenChange={(details) => { if (!details.open) setShowCuratedConfirm(false); }}
+            >
+                <Dialog.Backdrop />
+                <Dialog.Positioner>
+                    <Dialog.Content
+                        m={[3, 6]}
+                        bg="brand.bg"
+                        shadow="2xl"
+                        border="1px solid"
+                        borderColor="brand.border"
+                        rounded="modal"
+                        overflow="hidden"
+                    >
+                        <Flex direction="column">
+                            <Flex
+                                px={[4, 5]}
+                                pt={[4, 5]}
+                                pb={3}
+                                alignItems="center"
+                                justifyContent="space-between"
+                            >
+                                <Text
+                                    fontSize="lg"
+                                    fontWeight="semibold"
+                                    color="brand.textPrimary"
+                                    letterSpacing="-0.01em"
+                                >
+                                    Turn off curated mode?
+                                </Text>
+                                <Dialog.CloseTrigger
+                                    position="relative"
+                                    top="auto"
+                                    right="auto"
+                                    color="brand.textMuted"
+                                    _hover={{ color: "brand.textPrimary" }}
+                                />
+                            </Flex>
+
+                            <Box h="1px" bg="brand.divider" mx={[4, 5]} />
+
+                            <Box px={[4, 5]} py={5}>
+                                <Text color="brand.textSecondary" fontSize="sm">
+                                    Any tracks currently in review will be moved to your library.
+                                </Text>
+                            </Box>
+
+                            <Flex
+                                gap={3}
+                                px={[4, 5]}
+                                py={4}
+                                justifyContent="flex-end"
+                                css={{
+                                    backdropFilter: "blur(16px)",
+                                    WebkitBackdropFilter: "blur(16px)",
+                                    background: "color-mix(in srgb, var(--chakra-colors-brand-bg) 80%, transparent)",
+                                    borderTop: "1px solid var(--chakra-colors-brand-divider)",
+                                }}
+                            >
+                                <Button
+                                    variant="outline"
+                                    onClick={() => setShowCuratedConfirm(false)}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    variant="primary"
+                                    onClick={disableCuratedMode}
+                                >
+                                    Turn off
+                                </Button>
+                            </Flex>
+                        </Flex>
+                    </Dialog.Content>
+                </Dialog.Positioner>
+            </Dialog.Root>
 
             <Dialog.Root
                 role="alertdialog"

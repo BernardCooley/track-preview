@@ -6,6 +6,8 @@ import type { AlertFrequency } from "@prisma/client";
 
 const STALE_DAYS = 60;
 
+const RELEASE_WINDOW_DAYS = 90;
+
 const LOOKBACK_HOURS: Record<AlertFrequency, number> = {
     DAILY: 24,
     WEEKLY: 24 * 7,
@@ -65,11 +67,15 @@ async function sendGenreAlerts(now: Date) {
         const lookbackMs = LOOKBACK_HOURS[freq] * 60 * 60 * 1000;
         const since = new Date(now.getTime() - lookbackMs);
 
+        const releaseCutoff = new Date(now.getTime() - RELEASE_WINDOW_DAYS * 24 * 60 * 60 * 1000);
+        const releasedAfter = releaseCutoff.toISOString().split("T")[0];
+
         const newTracks = await prisma.track.groupBy({
             by: ["genre"],
             _count: { id: true },
             where: {
                 createdAt: { gte: since },
+                releaseDate: { gte: releasedAfter },
             },
         });
 

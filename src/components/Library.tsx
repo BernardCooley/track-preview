@@ -60,6 +60,14 @@ const Library = () => {
     const releaseRestoredRef = useRef(false);
 
     useEffect(() => {
+        if (currentReleaseTrack) {
+            releaseRestoredRef.current = true;
+        } else if (!releaseTrackId) {
+            releaseRestoredRef.current = false;
+        }
+    }, [currentReleaseTrack, releaseTrackId]);
+
+    useEffect(() => {
         if (
             releaseRestoredRef.current ||
             !releaseTrackId ||
