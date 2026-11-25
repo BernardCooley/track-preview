@@ -48,10 +48,11 @@ model User {
   subscriptionStatus    SubscriptionStatus?
   subscriptionExpiresAt DateTime?
   subscriptionStartedAt DateTime?
-  spotifyAccessToken    String?
-  spotifyRefreshToken   String?
-  spotifyTokenExpiresAt DateTime?
-  Review                Review[]
+  spotifyAccessToken         String?
+  spotifyRefreshToken        String?
+  spotifyTokenExpiresAt      DateTime?
+  upgradePromptDismissedAt   DateTime?
+  Review                     Review[]
 }
 
 model Review {

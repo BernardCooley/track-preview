@@ -8,6 +8,7 @@ import DeleteTrackDialog from "./DeleteTrackDialog";
 import LibraryTable from "./LibraryTable";
 import ReleaseHeader from "./ReleaseHeader";
 import InstallPrompt from "./InstallPrompt";
+import ProUpgradePrompt from "./ProUpgradePrompt";
 import { useTrackList } from "@/hooks/useTrackList";
 import { useLibraryParams } from "@/hooks/useLibraryParams";
 import { useCountry } from "@/hooks/useCountry";
@@ -182,6 +183,12 @@ const Library = () => {
 
             {!loading && !noTracks && (
                 <InstallPrompt
+                    libraryCount={reviewTracks[4].tracks.length}
+                />
+            )}
+
+            {!loading && !noTracks && (
+                <ProUpgradePrompt
                     libraryCount={reviewTracks[4].tracks.length}
                 />
             )}
