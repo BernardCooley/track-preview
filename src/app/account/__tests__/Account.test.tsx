@@ -576,7 +576,7 @@ describe("Account Settings", () => {
                 authContext: {
                     userProfile: {
                         subscriptionExpiresAt: new Date("2027-01-15"),
-                    },
+                    } as any,
                 },
             });
 
@@ -597,7 +597,7 @@ describe("Account Settings", () => {
                 authContext: {
                     userProfile: {
                         subscriptionExpiresAt: new Date("2027-01-15"),
-                    },
+                    } as any,
                 },
             });
 
