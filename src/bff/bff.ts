@@ -468,6 +468,30 @@ export const createPortalSession = async ({
     );
 };
 
+export const verifyCheckout = async ({
+    sessionId,
+}: {
+    sessionId: string;
+}): Promise<{ status: string; tier: string } | null> => {
+    return await fetchWithErrorHandling(
+        "/api/stripe/verify-checkout",
+        "POST",
+        { sessionId }
+    );
+};
+
+export const syncSubscription = async ({
+    userId,
+}: {
+    userId: string;
+}): Promise<{ status: string; tier: string } | null> => {
+    return await fetchWithErrorHandling(
+        "/api/stripe/sync-subscription",
+        "POST",
+        { userId }
+    );
+};
+
 export const spotifyAuthorize = async ({
     userId,
 }: {

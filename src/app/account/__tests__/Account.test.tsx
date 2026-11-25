@@ -5,10 +5,11 @@ import "../../../../test/mocks/navigation";
 import { render } from "../../../../test/test-utils";
 import Settings from "../page";
 import { DeleteUser, LogOut, UpdateUserEmail, UpdateUserPassword } from "../../../../firebase/utils";
-import { sendVerificationEmail } from "@/bff/bff";
+import { sendVerificationEmail, createPortalSession, createCheckoutSession } from "@/bff/bff";
 import { onAuthStateChanged, getAuth } from "firebase/auth";
 import { mockRouter } from "../../../../test/mocks/navigation";
 import type { User as FirebaseUser } from "firebase/auth";
+import { useSubscription } from "@/hooks/useSubscription";
 
 vi.mock("../../../../firebase/firebaseInit", () => ({
     auth: {
@@ -42,7 +43,37 @@ vi.mock("@/bff/bff", () => ({
     sendVerificationEmail: vi.fn(() => Promise.resolve()),
     getUserProfile: vi.fn(() => Promise.resolve(null)),
     spotifyDisconnect: vi.fn(() => Promise.resolve({ success: true })),
+    createPortalSession: vi.fn(() => Promise.resolve({ url: "https://billing.stripe.com/session/test" })),
+    createCheckoutSession: vi.fn(() => Promise.resolve({ url: "https://checkout.stripe.com/session/test" })),
+    syncSubscription: vi.fn(() => Promise.resolve({ status: "ACTIVE", tier: "PRO" })),
 }));
+
+vi.mock("@/hooks/useSubscription", () => ({
+    useSubscription: vi.fn(),
+}));
+
+const mockUseSubscription = vi.mocked(useSubscription);
+
+const defaultSubscription = {
+    isPro: false,
+    isInGracePeriod: false,
+    subscriptionsEnabled: false,
+    subscriptionTier: "FREE" as const,
+    subscriptionStatus: null,
+    upgradeFeature: null,
+    requirePro: vi.fn(() => false),
+    dismissUpgrade: vi.fn(),
+};
+
+const enabledSubscription = {
+    ...defaultSubscription,
+    subscriptionsEnabled: true,
+};
+
+const minimalUserProfile = {
+    subscriptionTier: "FREE",
+    subscriptionStatus: null,
+} as any;
 
 vi.mock("firebase/auth", () => ({
     getAuth: vi.fn(() => ({ currentUser: mockCurrentUser })),
@@ -73,6 +104,7 @@ const mockGetAuth = vi.mocked(getAuth);
 describe("Account Settings", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        mockUseSubscription.mockReturnValue(defaultSubscription);
         vi.mocked(onAuthStateChanged).mockImplementation((_auth: unknown, callback: any) => {
             callback({
                 uid: "test-123",
@@ -463,6 +495,168 @@ describe("Account Settings", () => {
             await waitFor(() => {
                 expect(screen.getByRole("button", { name: /log out/i })).not.toBeDisabled();
                 expect(screen.getByRole("button", { name: /delete account/i })).not.toBeDisabled();
+            });
+        });
+    });
+
+    describe("subscription section", () => {
+        it("hides subscription section when feature flag is off", async () => {
+            render(<Settings />);
+
+            await waitFor(() => {
+                expect(screen.getByText("Account Settings")).toBeInTheDocument();
+            });
+            expect(screen.queryByText("Subscription")).not.toBeInTheDocument();
+        });
+
+        it("renders subscription heading when flag is on", async () => {
+            mockUseSubscription.mockReturnValue(enabledSubscription);
+            render(<Settings />, { authContext: { userProfile: minimalUserProfile } });
+
+            await waitFor(() => {
+                expect(screen.getByText("Subscription")).toBeInTheDocument();
+            });
+        });
+
+        it("shows Free plan for non-Pro users", async () => {
+            mockUseSubscription.mockReturnValue(enabledSubscription);
+            render(<Settings />, { authContext: { userProfile: minimalUserProfile } });
+
+            await waitFor(() => {
+                expect(screen.getByText("Free")).toBeInTheDocument();
+            });
+        });
+
+        it("shows Upgrade to Pro button for free users", async () => {
+            mockUseSubscription.mockReturnValue(enabledSubscription);
+            render(<Settings />, { authContext: { userProfile: minimalUserProfile } });
+
+            await waitFor(() => {
+                expect(screen.getByRole("button", { name: /upgrade to pro/i })).toBeInTheDocument();
+            });
+        });
+
+        it("shows Pro plan with Active status for Pro users", async () => {
+            mockUseSubscription.mockReturnValue({
+                ...enabledSubscription,
+                isPro: true,
+                subscriptionTier: "PRO",
+                subscriptionStatus: "ACTIVE",
+            });
+            render(<Settings />, { authContext: { userProfile: minimalUserProfile } });
+
+            await waitFor(() => {
+                expect(screen.getByText("Pro")).toBeInTheDocument();
+                expect(screen.getByText("Active")).toBeInTheDocument();
+            });
+        });
+
+        it("shows Manage subscription button for Pro users", async () => {
+            mockUseSubscription.mockReturnValue({
+                ...enabledSubscription,
+                isPro: true,
+                subscriptionTier: "PRO",
+                subscriptionStatus: "ACTIVE",
+            });
+            render(<Settings />, { authContext: { userProfile: minimalUserProfile } });
+
+            await waitFor(() => {
+                expect(screen.getByRole("button", { name: /manage subscription/i })).toBeInTheDocument();
+            });
+        });
+
+        it("shows renewal date for active Pro users", async () => {
+            mockUseSubscription.mockReturnValue({
+                ...enabledSubscription,
+                isPro: true,
+                subscriptionTier: "PRO",
+                subscriptionStatus: "ACTIVE",
+            });
+            render(<Settings />, {
+                authContext: {
+                    userProfile: {
+                        subscriptionExpiresAt: new Date("2027-01-15"),
+                    } as any,
+                },
+            });
+
+            await waitFor(() => {
+                expect(screen.getByText("Renews")).toBeInTheDocument();
+                expect(screen.getByText("15 January 2027")).toBeInTheDocument();
+            });
+        });
+
+        it("shows 'Access until' label for cancelled subscriptions", async () => {
+            mockUseSubscription.mockReturnValue({
+                ...enabledSubscription,
+                isPro: true,
+                subscriptionTier: "PRO",
+                subscriptionStatus: "CANCELED",
+            });
+            render(<Settings />, {
+                authContext: {
+                    userProfile: {
+                        subscriptionExpiresAt: new Date("2027-01-15"),
+                    } as any,
+                },
+            });
+
+            await waitFor(() => {
+                expect(screen.getByText("Access until")).toBeInTheDocument();
+                expect(screen.getByText("Cancelled")).toBeInTheDocument();
+            });
+        });
+
+        it("shows Past due status", async () => {
+            mockUseSubscription.mockReturnValue({
+                ...enabledSubscription,
+                isPro: true,
+                subscriptionTier: "PRO",
+                subscriptionStatus: "PAST_DUE",
+            });
+            render(<Settings />, { authContext: { userProfile: minimalUserProfile } });
+
+            await waitFor(() => {
+                expect(screen.getByText("Past due")).toBeInTheDocument();
+            });
+        });
+
+        it("calls createCheckoutSession when Upgrade to Pro is clicked", async () => {
+            mockUseSubscription.mockReturnValue(enabledSubscription);
+            const mockCreateCheckout = vi.mocked(createCheckoutSession);
+            const user = userEvent.setup();
+            render(<Settings />, { authContext: { userProfile: minimalUserProfile } });
+
+            await waitFor(() => {
+                expect(screen.getByRole("button", { name: /upgrade to pro/i })).toBeInTheDocument();
+            });
+
+            await user.click(screen.getByRole("button", { name: /upgrade to pro/i }));
+
+            await waitFor(() => {
+                expect(mockCreateCheckout).toHaveBeenCalledWith({ userId: "test-123" });
+            });
+        });
+
+        it("calls createPortalSession when Manage subscription is clicked", async () => {
+            mockUseSubscription.mockReturnValue({
+                ...enabledSubscription,
+                isPro: true,
+                subscriptionTier: "PRO",
+                subscriptionStatus: "ACTIVE",
+            });
+            const mockCreatePortal = vi.mocked(createPortalSession);
+            const user = userEvent.setup();
+            render(<Settings />, { authContext: { userProfile: minimalUserProfile } });
+
+            await waitFor(() => {
+                expect(screen.getByRole("button", { name: /manage subscription/i })).toBeInTheDocument();
+            });
+
+            await user.click(screen.getByRole("button", { name: /manage subscription/i }));
+
+            await waitFor(() => {
+                expect(mockCreatePortal).toHaveBeenCalledWith({ userId: "test-123" });
             });
         });
     });
