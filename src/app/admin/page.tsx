@@ -6,6 +6,7 @@ import {
     Box,
     Flex,
     Heading,
+    Switch,
     Text,
 } from "@chakra-ui/react";
 import { onAuthStateChanged } from "firebase/auth";
@@ -14,6 +15,8 @@ import BackHeader from "@/components/BackHeader";
 import { useRouter } from "next/navigation";
 import ExploreSkeleton from "@/components/skeletons/ExploreSkeleton";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import { useAuthContext } from "../../../Contexts/AuthContext";
+import { dismissUpgradePrompt, getUserProfile } from "@/bff/bff";
 
 const ADMIN_UIDS = (process.env.NEXT_PUBLIC_ADMIN_UID || "nWDEiOWsMVQ7qOFVLzrZvGrEqdN2,v2dWVgS1DxagPDt124tUq8hirxs1").split(",").filter(Boolean);
 
@@ -77,8 +80,22 @@ const setSubscriptionCookie = (value: string) => {
     }
 };
 
+const getThresholdCookie = (): boolean => {
+    const match = document.cookie.match(/(?:^|;\s*)upgrade_threshold_override=([^;]*)/);
+    return match?.[1] === "1";
+};
+
+const setThresholdCookie = (on: boolean) => {
+    if (on) {
+        document.cookie = `upgrade_threshold_override=1; path=/; max-age=86400; SameSite=Lax`;
+    } else {
+        document.cookie = `upgrade_threshold_override=; path=/; max-age=0; SameSite=Lax`;
+    }
+};
+
 const AdminPage = () => {
     const router = useRouter();
+    const { userProfile, updateUserProfile } = useAuthContext();
     const [checked, setChecked] = useState(false);
     const [authorized, setAuthorized] = useState(false);
     const showSkeleton = useDelayedLoading(!checked || !authorized);
@@ -88,13 +105,19 @@ const AdminPage = () => {
     const [subscription, setSubscription] = useState("");
     const [subDropdownOpen, setSubDropdownOpen] = useState(false);
     const subDropdownRef = useRef<HTMLDivElement>(null);
+    const [dismissedDropdownOpen, setDismissedDropdownOpen] = useState(false);
+    const dismissedDropdownRef = useRef<HTMLDivElement>(null);
+    const [thresholdOverride, setThresholdOverride] = useState(false);
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
             if (user && ADMIN_UIDS.includes(user.uid)) {
                 setAuthorized(true);
                 setCountry(getCountryCookie());
                 setSubscription(getSubscriptionCookie());
+                setThresholdOverride(getThresholdCookie());
+                const profile = await getUserProfile({ userId: user.uid });
+                if (profile) updateUserProfile(profile);
             } else {
                 router.replace("/");
             }
@@ -111,12 +134,15 @@ const AdminPage = () => {
             if (subDropdownRef.current && !subDropdownRef.current.contains(e.target as Node)) {
                 setSubDropdownOpen(false);
             }
+            if (dismissedDropdownRef.current && !dismissedDropdownRef.current.contains(e.target as Node)) {
+                setDismissedDropdownOpen(false);
+            }
         };
-        if (dropdownOpen || subDropdownOpen) {
+        if (dropdownOpen || subDropdownOpen || dismissedDropdownOpen) {
             document.addEventListener("mousedown", handleClickOutside);
         }
         return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, [dropdownOpen, subDropdownOpen]);
+    }, [dropdownOpen, subDropdownOpen, dismissedDropdownOpen]);
 
     const handleCountryChange = (code: string) => {
         setCountry(code);
@@ -364,6 +390,170 @@ const AdminPage = () => {
                                     mt={2}
                                 >
                                     Subscription override active: {subscription}
+                                </Text>
+                            )}
+                        </Box>
+
+                        <Box>
+                            <Heading
+                                size="xs"
+                                textTransform="uppercase"
+                                fontSize="xs"
+                                letterSpacing="wider"
+                                color="brand.textMuted"
+                                mb={2}
+                            >
+                                Upgrade Prompt Dismissed Date
+                            </Heading>
+                            <Text
+                                fontSize="xs"
+                                color="brand.textMuted"
+                                mb={3}
+                            >
+                                Override the dismissed date to test the upgrade prompt. The prompt re-appears after 6 months.
+                            </Text>
+
+                            <Box position="relative" ref={dismissedDropdownRef}>
+                                <Flex
+                                    as="button"
+                                    onClick={() => setDismissedDropdownOpen(!dismissedDropdownOpen)}
+                                    w="full"
+                                    px={4}
+                                    py={3}
+                                    bg="brand.bg"
+                                    border="1px solid"
+                                    borderColor={dismissedDropdownOpen ? "brand.primary" : "brand.border"}
+                                    rounded="lg"
+                                    alignItems="center"
+                                    justifyContent="space-between"
+                                    cursor="pointer"
+                                    transition="border-color 0.2s ease"
+                                >
+                                    <Text fontSize="md" color="brand.textPrimary">
+                                        {userProfile?.upgradePromptDismissedAt
+                                            ? `Dismissed ${new Date(userProfile.upgradePromptDismissedAt).toLocaleDateString()}`
+                                            : "Not dismissed"}
+                                    </Text>
+                                    <Box
+                                        color="brand.textMuted"
+                                        transition="transform 0.2s ease"
+                                        transform={dismissedDropdownOpen ? "rotate(180deg)" : "none"}
+                                    >
+                                        <KeyboardArrowDownIcon fontSize="small" />
+                                    </Box>
+                                </Flex>
+
+                                {dismissedDropdownOpen && (
+                                    <Box
+                                        position="absolute"
+                                        top="calc(100% + 4px)"
+                                        left={0}
+                                        right={0}
+                                        bg="brand.bg"
+                                        border="1px solid"
+                                        borderColor="brand.border"
+                                        rounded="lg"
+                                        shadow="lg"
+                                        zIndex={10}
+                                        py={1}
+                                    >
+                                        {[
+                                            { label: "Not dismissed", value: "clear" },
+                                            { label: "7 months ago", value: "7months" },
+                                            { label: "Now", value: "now" },
+                                        ].map((option) => (
+                                            <Flex
+                                                key={option.value}
+                                                as="button"
+                                                onClick={async () => {
+                                                    if (!userProfile?.id) return;
+                                                    let newDate: Date | null = null;
+                                                    if (option.value === "clear") {
+                                                        await dismissUpgradePrompt({ userId: userProfile.id, reset: true });
+                                                    } else if (option.value === "7months") {
+                                                        newDate = new Date();
+                                                        newDate.setMonth(newDate.getMonth() - 7);
+                                                        await dismissUpgradePrompt({ userId: userProfile.id, date: newDate.toISOString() });
+                                                    } else {
+                                                        newDate = new Date();
+                                                        await dismissUpgradePrompt({ userId: userProfile.id });
+                                                    }
+                                                    updateUserProfile({
+                                                        ...userProfile,
+                                                        upgradePromptDismissedAt: newDate,
+                                                    });
+                                                    setDismissedDropdownOpen(false);
+                                                }}
+                                                w="full"
+                                                px={4}
+                                                py={3}
+                                                alignItems="center"
+                                                cursor="pointer"
+                                                bg="transparent"
+                                                color="brand.textPrimary"
+                                                _hover={{ bg: "brand.surfaceHover" }}
+                                                transition="background 0.15s ease"
+                                            >
+                                                <Text fontSize="md">
+                                                    {option.label}
+                                                </Text>
+                                            </Flex>
+                                        ))}
+                                    </Box>
+                                )}
+                            </Box>
+                        </Box>
+
+                        <Box>
+                            <Heading
+                                size="xs"
+                                textTransform="uppercase"
+                                fontSize="xs"
+                                letterSpacing="wider"
+                                color="brand.textMuted"
+                                mb={2}
+                            >
+                                Upgrade Prompt Threshold
+                            </Heading>
+                            <Text
+                                fontSize="xs"
+                                color="brand.textMuted"
+                                mb={3}
+                            >
+                                Skip the 40-track library requirement so the upgrade prompt triggers with any number of tracks.
+                            </Text>
+
+                            <Flex
+                                alignItems="center"
+                                justifyContent="space-between"
+                                px={3}
+                                py={2}
+                                rounded="lg"
+                            >
+                                <Text fontSize="sm" fontWeight="medium" color="brand.textSecondary">
+                                    Skip threshold
+                                </Text>
+                                <Switch.Root
+                                    checked={thresholdOverride}
+                                    onCheckedChange={(details) => {
+                                        setThresholdOverride(details.checked);
+                                        setThresholdCookie(details.checked);
+                                    }}
+                                >
+                                    <Switch.HiddenInput />
+                                    <Switch.Control>
+                                        <Switch.Thumb />
+                                    </Switch.Control>
+                                </Switch.Root>
+                            </Flex>
+
+                            {thresholdOverride && (
+                                <Text
+                                    fontSize="xs"
+                                    color="brand.primary"
+                                    mt={2}
+                                >
+                                    Threshold override active — prompt will trigger with any library size
                                 </Text>
                             )}
                         </Box>

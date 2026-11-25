@@ -573,6 +573,22 @@ export const fetchDiscoveryHistory = async ({
     });
 };
 
+export const dismissUpgradePrompt = async ({
+    userId,
+    reset,
+    date,
+}: {
+    userId: string;
+    reset?: boolean;
+    date?: string;
+}): Promise<{ success: boolean } | null> => {
+    return await fetchWithErrorHandling(
+        "/api/dismissUpgradePrompt",
+        "POST",
+        { userId, reset, date }
+    );
+};
+
 export const spotifyDisconnect = async ({
     userId,
 }: {
