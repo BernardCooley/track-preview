@@ -47,6 +47,7 @@ function ExploreContent() {
     const { open: isMenuOpen, onOpen: onMenuOpenRaw, onClose: onMenuCloseRaw } = useDisclosure();
     const menuOpenRef = useRef(false);
     const { isPro, subscriptionsEnabled, requirePro, upgradeFeature, dismissUpgrade } = useSubscription();
+    const effectiveCuratedMode = userProfile?.curatedMode && isPro;
 
     const onMenuOpen = useCallback(() => {
         onMenuOpenRaw();
@@ -138,7 +139,7 @@ function ExploreContent() {
         const reviewStep = searchParams?.get("reviewStep");
         if (reviewStep) {
             const step = parseInt(reviewStep);
-            if (!userProfile?.curatedMode && (step === 2 || step === 3)) {
+            if (!effectiveCuratedMode && (step === 2 || step === 3)) {
                 const p = new URLSearchParams(searchParams?.toString() || "");
                 p.set("reviewStep", "1");
                 router.replace(`/explore?${p.toString()}`);
@@ -146,7 +147,7 @@ function ExploreContent() {
             }
             setCurrentStep(step);
         }
-    }, [searchParams, userProfile?.curatedMode]);
+    }, [searchParams, effectiveCuratedMode]);
 
     useEffect(() => {
         if (currentlyPlaying !== undefined) {
@@ -163,7 +164,7 @@ function ExploreContent() {
         { name: "Step 4", label: "Library", icon: <LibraryMusicIcon style={{ fontSize: "24px" }} />, step: 4 },
     ];
 
-    const tabButtons = userProfile?.curatedMode
+    const tabButtons = effectiveCuratedMode
         ? allTabs
         : allTabs.filter(t => t.step === 1 || t.step === 4);
 
@@ -224,6 +225,7 @@ function ExploreContent() {
                     </Link>
                     {subscriptionsEnabled && isPro && (
                         <Flex
+                            display={["none", "flex"]}
                             alignItems="center"
                             bg="brand.primarySubtle"
                             color="brand.primary"
