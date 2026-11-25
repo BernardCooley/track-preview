@@ -90,25 +90,34 @@ const UpgradePrompt = ({ featureName, onClose }: Props) => {
 
                         <Box px={[4, 5]} py={5}>
                             <Flex direction="column" gap={3}>
-                                <Text
-                                    color="brand.textSecondary"
-                                    fontSize="sm"
-                                >
-                                    <Text
-                                        as="span"
-                                        fontWeight="semibold"
-                                        color="brand.textPrimary"
-                                    >
-                                        {featureName}
-                                    </Text>{" "}
-                                    is a Pro feature.
-                                </Text>
-                                {matchedFeature && (
+                                {matchedFeature ? (
+                                    <>
+                                        <Text
+                                            color="brand.textSecondary"
+                                            fontSize="sm"
+                                        >
+                                            <Text
+                                                as="span"
+                                                fontWeight="semibold"
+                                                color="brand.textPrimary"
+                                            >
+                                                {featureName}
+                                            </Text>{" "}
+                                            is a Pro feature.
+                                        </Text>
+                                        <Text
+                                            color="brand.textSecondary"
+                                            fontSize="sm"
+                                        >
+                                            {matchedFeature.description}
+                                        </Text>
+                                    </>
+                                ) : (
                                     <Text
                                         color="brand.textSecondary"
                                         fontSize="sm"
                                     >
-                                        {matchedFeature.description}
+                                        Unlock the full Phoniquest experience with Pro.
                                     </Text>
                                 )}
                                 <Text
@@ -118,7 +127,7 @@ const UpgradePrompt = ({ featureName, onClose }: Props) => {
                                     textTransform="uppercase"
                                     letterSpacing="wider"
                                 >
-                                    Pro also includes
+                                    {matchedFeature ? "Pro also includes" : "Pro includes"}
                                 </Text>
                                 <VStack
                                     gap={2}

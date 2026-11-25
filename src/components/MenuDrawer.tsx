@@ -22,7 +22,7 @@ interface Props {
 const MenuDrawer = ({ isOpen, onClose }: Props) => {
     const pathname = usePathname();
     const { user } = useAuthContext();
-    const { isPro, requirePro, upgradeFeature, dismissUpgrade } = useSubscription();
+    const { isPro, subscriptionsEnabled, requirePro, upgradeFeature, dismissUpgrade } = useSubscription();
 
     return (
         <Drawer.Root
@@ -144,6 +144,30 @@ const MenuDrawer = ({ isOpen, onClose }: Props) => {
                                 />
                             )}
                         </Flex>
+
+                        {subscriptionsEnabled && !isPro && (
+                            <>
+                                <Box h="1px" bg="brand.divider" mt={4} mb={3} />
+                                <Flex
+                                    alignItems="center"
+                                    gap={2}
+                                    px={3}
+                                    py={2.5}
+                                    rounded="lg"
+                                    cursor="pointer"
+                                    bg="brand.primarySubtle"
+                                    color="brand.primary"
+                                    fontWeight="semibold"
+                                    fontSize="md"
+                                    transition="all 0.2s ease"
+                                    _hover={{ opacity: 0.85 }}
+                                    onClick={() => requirePro("Upgrade")}
+                                >
+                                    <StarIcon style={{ fontSize: "16px" }} />
+                                    <Text>Upgrade to Pro</Text>
+                                </Flex>
+                            </>
+                        )}
                     </Drawer.Body>
 
                     <Separator borderColor="brand.divider" />

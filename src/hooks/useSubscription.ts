@@ -3,6 +3,14 @@ import { useAuthContext } from "../../Contexts/AuthContext";
 import { useFeatureFlag } from "@/context/ExperimentContext";
 import { getSubscriptionsFlagKey } from "@/config/amplitude";
 
+const getSubscriptionOverride = (): "pro" | "free" | null => {
+    if (typeof document === "undefined") return null;
+    const match = document.cookie.match(/(?:^|;\s*)subscription_override=([^;]*)/);
+    const val = match?.[1];
+    if (val === "pro" || val === "free") return val;
+    return null;
+};
+
 export const useSubscription = () => {
     const { userProfile } = useAuthContext();
     const [upgradeFeature, setUpgradeFeature] = useState<string | null>(null);
@@ -20,7 +28,11 @@ export const useSubscription = () => {
         userProfile?.subscriptionExpiresAt != null &&
         new Date(userProfile.subscriptionExpiresAt) > new Date();
 
+    const override = subscriptionsEnabled ? getSubscriptionOverride() : null;
+
     const isPro =
+        override === "pro" ? true :
+        override === "free" ? false :
         !subscriptionsEnabled ||
         (userProfile?.subscriptionTier === "PRO" &&
         (userProfile?.subscriptionStatus !== "CANCELED" || isCanceledWithTimeLeft));
