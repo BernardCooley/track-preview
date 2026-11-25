@@ -34,6 +34,29 @@ const sections = [
         ],
     },
     {
+        id: "refunds",
+        title: "Refund Policy",
+        lastUpdated: "25 November 2026",
+        content: [
+            {
+                heading: "14-day money-back guarantee",
+                body: "If you subscribe to Phoniquest Pro and are not satisfied, you can request a full refund within 14 days of your subscription start date. This applies to your initial subscription payment only.",
+            },
+            {
+                heading: "How to request a refund",
+                body: "You can request a refund directly from the Subscription section of your Account page. Alternatively, you can email us at info@phoniquest.com with the email address associated with your account.",
+            },
+            {
+                heading: "What happens after a refund",
+                body: "Once a refund is processed, your Pro subscription will be cancelled immediately and your account will revert to the Free plan. Pro features will no longer be accessible. Refunds typically take 5-10 business days to appear on your statement.",
+            },
+            {
+                heading: "After the 14-day window",
+                body: "After 14 days, refunds are not available. You can still cancel your subscription at any time from your Account page — you will retain access to Pro features until the end of your current billing period.",
+            },
+        ],
+    },
+    {
         id: "terms",
         title: "Terms of Service",
         lastUpdated: "18 November 2026",
@@ -87,7 +110,7 @@ const Legal = () => {
                 py={[6, 8]}
             >
                 <Box w="full" maxW="520px">
-                    <Flex gap={3} mb={6}>
+                    <Flex gap={2} mb={6} flexWrap="wrap">
                         {sections.map((section) => (
                             <Link
                                 key={section.id}
@@ -97,9 +120,10 @@ const Legal = () => {
                                 rounded="full"
                                 bg="brand.primarySubtle"
                                 color="brand.primary"
-                                fontSize="sm"
+                                fontSize="xs"
                                 fontWeight="medium"
                                 cursor="pointer"
+                                whiteSpace="nowrap"
                                 transition="all 0.2s ease"
                                 _hover={{
                                     bg: "brand.primary",

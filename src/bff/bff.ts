@@ -457,6 +457,18 @@ export const verifyCheckout = async ({
     );
 };
 
+export const requestRefund = async ({
+    userId,
+}: {
+    userId: string;
+}): Promise<{ success: boolean } | null> => {
+    return await fetchWithErrorHandling(
+        "/api/stripe/request-refund",
+        "POST",
+        { userId }
+    );
+};
+
 export const syncSubscription = async ({
     userId,
 }: {

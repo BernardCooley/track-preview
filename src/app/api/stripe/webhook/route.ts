@@ -94,6 +94,7 @@ export async function POST(req: Request) {
                             stripeCustomerId: customerId,
                             stripeSubscriptionId: subscriptionId,
                             subscriptionExpiresAt: getPeriodEnd(subscription),
+                            subscriptionStartedAt: new Date(),
                         },
                     });
                 }
@@ -107,6 +108,18 @@ export async function POST(req: Request) {
                 const firebaseId = subscription.metadata.firebaseId;
 
                 if (firebaseId) {
+                    const user = await prisma?.user.findFirst({
+                        where: { firebaseId },
+                        select: { stripeSubscriptionId: true },
+                    });
+
+                    if (
+                        user?.stripeSubscriptionId &&
+                        user.stripeSubscriptionId !== subscription.id
+                    ) {
+                        break;
+                    }
+
                     const mappedStatus =
                         status === "active"
                             ? "ACTIVE"
@@ -141,16 +154,27 @@ export async function POST(req: Request) {
                 const firebaseId = subscription.metadata.firebaseId;
 
                 if (firebaseId) {
-                    await prisma?.user.updateMany({
+                    const user = await prisma?.user.findFirst({
                         where: { firebaseId },
-                        data: {
-                            subscriptionTier: "FREE",
-                            subscriptionStatus: "CANCELED",
-                            stripeSubscriptionId: null,
-                        },
+                        select: { stripeSubscriptionId: true },
                     });
 
-                    await disableCuratedModeForUser(firebaseId);
+                    if (
+                        !user?.stripeSubscriptionId ||
+                        user.stripeSubscriptionId === subscription.id
+                    ) {
+                        await prisma?.user.updateMany({
+                            where: { firebaseId },
+                            data: {
+                                subscriptionTier: "FREE",
+                                subscriptionStatus: "CANCELED",
+                                stripeSubscriptionId: null,
+                                subscriptionStartedAt: null,
+                            },
+                        });
+
+                        await disableCuratedModeForUser(firebaseId);
+                    }
                 }
                 break;
             }

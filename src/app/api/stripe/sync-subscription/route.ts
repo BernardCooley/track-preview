@@ -23,20 +23,20 @@ export async function POST(req: Request) {
 
         let subscription;
 
-        if (user.stripeSubscriptionId) {
-            try {
-                subscription = await getStripe().subscriptions.retrieve(
-                    user.stripeSubscriptionId
-                );
-            } catch {}
-        }
-
-        if (!subscription && user.stripeCustomerId) {
+        if (user.stripeCustomerId) {
             const subscriptions = await getStripe().subscriptions.list({
                 customer: user.stripeCustomerId,
                 limit: 1,
             });
             subscription = subscriptions.data[0] ?? null;
+        }
+
+        if (!subscription && user.stripeSubscriptionId) {
+            try {
+                subscription = await getStripe().subscriptions.retrieve(
+                    user.stripeSubscriptionId
+                );
+            } catch {}
         }
 
         if (!subscription) {
@@ -65,13 +65,12 @@ export async function POST(req: Request) {
             : null;
 
         const status = subscription.status;
-        const isCanceling =
-            subscription.cancel_at_period_end ||
-            subscription.cancel_at != null ||
-            subscription.cancellation_details?.reason != null;
+        const isCancelingAtPeriodEnd =
+            status === "active" &&
+            (subscription.cancel_at_period_end || subscription.cancel_at != null);
 
         const mappedStatus =
-            isCanceling || status === "canceled"
+            status === "canceled" || isCancelingAtPeriodEnd
                 ? "CANCELED"
                 : status === "past_due"
                   ? "PAST_DUE"
@@ -80,16 +79,27 @@ export async function POST(req: Request) {
                     : null;
 
         if (mappedStatus) {
+            const updateData: Record<string, any> = {
+                subscriptionStatus: mappedStatus,
+                subscriptionTier:
+                    status === "canceled" && !periodEnd
+                        ? "FREE"
+                        : "PRO",
+                subscriptionExpiresAt: periodEnd,
+                stripeSubscriptionId: subscription.id,
+            };
+
+            if (mappedStatus === "ACTIVE" && !user.subscriptionStartedAt) {
+                updateData.subscriptionStartedAt = new Date(subscription.created * 1000);
+            }
+
+            if (status === "canceled" && !periodEnd) {
+                updateData.subscriptionStartedAt = null;
+            }
+
             await prisma?.user.updateMany({
                 where: { firebaseId: userId },
-                data: {
-                    subscriptionStatus: mappedStatus,
-                    subscriptionTier:
-                        status === "canceled" && !periodEnd
-                            ? "FREE"
-                            : "PRO",
-                    subscriptionExpiresAt: periodEnd,
-                },
+                data: updateData,
             });
         }
 
