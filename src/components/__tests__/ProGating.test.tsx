@@ -46,6 +46,7 @@ vi.mock("@/bff/bff", () => ({
     createCheckoutSession: vi.fn(),
     fetchLibraryStats: (...args: unknown[]) => mockFetchLibraryStats(...args),
     updateReviewNotes: vi.fn().mockResolvedValue({ success: true }),
+    getProPrice: vi.fn().mockResolvedValue(null),
 }));
 
 vi.mock("@/components/AuthGuard", () => ({

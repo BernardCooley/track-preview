@@ -5,6 +5,7 @@ import { Box, Button, Dialog, Flex, Image, Text, VStack } from "@chakra-ui/react
 import { useAuthContext } from "../../Contexts/AuthContext";
 import { createCheckoutSession } from "@/bff/bff";
 import { proFeatures } from "@/config/proFeatures";
+import { useProPrice } from "@/hooks/useProPrice";
 
 interface Props {
     featureName: string | null;
@@ -14,6 +15,7 @@ interface Props {
 const UpgradePrompt = ({ featureName, onClose }: Props) => {
     const { user } = useAuthContext();
     const [loading, setLoading] = useState(false);
+    const proPrice = useProPrice();
 
     const matchedFeature = featureName
         ? proFeatures.find((b) => b.keys.includes(featureName))
@@ -144,6 +146,15 @@ const UpgradePrompt = ({ featureName, onClose }: Props) => {
                                         </Text>
                                     ))}
                                 </VStack>
+                                {proPrice && (
+                                    <Text
+                                        color="brand.textPrimary"
+                                        fontSize="sm"
+                                        fontWeight="semibold"
+                                    >
+                                        {proPrice.formatted} / {proPrice.interval}
+                                    </Text>
+                                )}
                             </Flex>
                         </Box>
 

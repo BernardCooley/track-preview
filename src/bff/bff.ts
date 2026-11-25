@@ -492,6 +492,16 @@ export const syncSubscription = async ({
     );
 };
 
+export const getProPrice = async (): Promise<{
+    formatted: string;
+    interval: string;
+} | null> => {
+    return await fetchWithErrorHandling(
+        "/api/stripe/get-price",
+        "GET"
+    );
+};
+
 export const spotifyAuthorize = async ({
     userId,
 }: {
