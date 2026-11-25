@@ -6,6 +6,7 @@ import { useAuthContext } from "../../Contexts/AuthContext";
 import { createCheckoutSession } from "@/bff/bff";
 import { proFeatures } from "@/config/proFeatures";
 import { useProPrice } from "@/hooks/useProPrice";
+import { track } from "@amplitude/unified";
 
 interface Props {
     featureName: string | null;
@@ -28,6 +29,7 @@ const UpgradePrompt = ({ featureName, onClose }: Props) => {
         if (!user?.uid) return;
         setLoading(true);
         try {
+            track("Upgrade Started", { source: "prompt", feature: featureName });
             const result = await createCheckoutSession({ userId: user.uid });
             if (result?.url) {
                 window.location.href = result.url;

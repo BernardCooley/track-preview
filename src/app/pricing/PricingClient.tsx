@@ -8,6 +8,7 @@ import { auth } from "../../../firebase/firebaseInit";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useAuthContext } from "../../../Contexts/AuthContext";
 import { createCheckoutSession, getUserProfile } from "@/bff/bff";
+import { track } from "@amplitude/unified";
 
 interface Props {
     variant: "free" | "pro";
@@ -76,6 +77,7 @@ const PricingClient = ({ variant }: Props) => {
         if (!firebaseUser?.uid) return;
         setLoading(true);
         try {
+            track("Upgrade Started", { source: "pricing" });
             const result = await createCheckoutSession({ userId: firebaseUser.uid });
             if (result?.url) {
                 window.location.href = result.url;

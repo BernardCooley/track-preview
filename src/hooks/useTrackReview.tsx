@@ -8,6 +8,7 @@ import {
     resolvePreviewUrl,
     updateTrackReviewStep,
 } from "@/bff/bff";
+import { track as trackEvent } from "@amplitude/unified";
 import { useLocalStorage } from "usehooks-ts";
 import { toaster } from "@/components/toaster";
 import { Track, YearRange } from "../../types";
@@ -325,6 +326,15 @@ export const useTrackReview = (reviewStep: number) => {
                 }
                 const nextStep = (!userProfile?.curatedMode && reviewStep === 1) ? 4 : reviewStep + 1;
                 updateChangesMade(nextStep, true);
+                trackEvent(like ? "Track Liked" : "Track Disliked", {
+                    trackId: currentTrack.id,
+                    artist: currentTrack.artist,
+                    title: currentTrack.title,
+                    genre: currentTrack.genre,
+                    releaseYear: currentTrack.releaseYear,
+                    reviewStep,
+                    listened,
+                });
             }
         } catch (error) {
             showToast({
@@ -345,6 +355,11 @@ export const useTrackReview = (reviewStep: number) => {
                     userId: user.uid,
                     genres: selectedGenres,
                 });
+                trackEvent("Filter Applied", {
+                    filterType: "genre",
+                    genres: selectedGenres,
+                    genreCount: selectedGenres.filter((g) => g !== "all").length,
+                });
                 setRecentGenres((prev) =>
                     Array.from(new Set([...prev, ...selectedGenres.filter((g) => g !== "all")]))
                 );
@@ -360,6 +375,11 @@ export const useTrackReview = (reviewStep: number) => {
     const onYearConfirm = async (val: YearRange) => {
         const newProfile = await mutateUserProfile({
             userId: user?.uid || "",
+            yearFrom: Number(val.from),
+            yearTo: Number(val.to),
+        });
+        trackEvent("Filter Applied", {
+            filterType: "year",
             yearFrom: Number(val.from),
             yearTo: Number(val.to),
         });

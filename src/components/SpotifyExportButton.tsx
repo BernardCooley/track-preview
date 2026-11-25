@@ -20,6 +20,7 @@ import { toaster } from "@/components/toaster";
 import IosShareIcon from "@mui/icons-material/IosShare";
 import AddIcon from "@mui/icons-material/Add";
 import StarIcon from "@mui/icons-material/Star";
+import { track } from "@amplitude/unified";
 
 interface Props {
     requirePro: (featureName: string) => boolean;
@@ -92,6 +93,12 @@ const SpotifyExportButton = ({ requirePro, isPro }: Props) => {
             const result = await spotifyExportPlaylist(params);
 
             if (result) {
+                track("Export Started", {
+                    type: "spotify",
+                    mode,
+                    matchedTracks: result.matchedTracks,
+                    totalLibraryTracks: result.totalLibraryTracks,
+                });
                 setOpen(false);
                 toaster.create({
                     title: "Playlist exported!",

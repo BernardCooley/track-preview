@@ -23,6 +23,7 @@ import { useTrackContext } from "../../context/TrackContext";
 import RecordAnimation from "./RecordAnimation";
 import TracklistTable from "./TracklistTable";
 import { useRouter } from "next/navigation";
+import { track } from "@amplitude/unified";
 
 interface Props {
     reviewStep: number;
@@ -371,6 +372,14 @@ const TrackReview = memo(
                                     trackId: currentTrack.id,
                                     userId: user.uid,
                                 });
+                                track("Sent to Library", {
+                                    trackId: currentTrack.id,
+                                    artist: currentTrack.artist,
+                                    title: currentTrack.title,
+                                    genre: currentTrack.genre,
+                                    releaseYear: currentTrack.releaseYear,
+                                    reviewStep,
+                                });
                                 const remaining = reviewTracks[reviewStep].tracks.filter(
                                     (t) => t.id !== currentTrack.id
                                 );
@@ -384,6 +393,13 @@ const TrackReview = memo(
                             onAudioPlay={() => {
                                 setIsPlaying(true);
                                 setPlayOnLoad(false);
+                                track("Track Preview Played", {
+                                    trackId: currentTrack?.id,
+                                    artist: currentTrack?.artist,
+                                    title: currentTrack?.title,
+                                    genre: currentTrack?.genre,
+                                    releaseYear: currentTrack?.releaseYear,
+                                });
                             }}
                         />
                     )}
