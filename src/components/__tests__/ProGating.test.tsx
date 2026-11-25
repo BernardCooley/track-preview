@@ -64,6 +64,8 @@ function setSubscription(isPro: boolean) {
     mockUseSubscription.mockReturnValue({
         isPro,
         isInGracePeriod: false,
+        isCanceledWithTimeLeft: false,
+        isLapsed: false,
         subscriptionsEnabled: true,
         subscriptionTier: isPro ? "PRO" : "FREE",
         subscriptionStatus: isPro ? "ACTIVE" : null,

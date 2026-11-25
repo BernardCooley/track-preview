@@ -35,7 +35,14 @@ export const useSubscription = () => {
         override === "free" ? false :
         !subscriptionsEnabled ||
         (userProfile?.subscriptionTier === "PRO" &&
-        (userProfile?.subscriptionStatus !== "CANCELED" || isCanceledWithTimeLeft));
+        (userProfile?.subscriptionStatus === "ACTIVE" ||
+         isInGracePeriod ||
+         isCanceledWithTimeLeft));
+
+    const isLapsed =
+        subscriptionsEnabled &&
+        userProfile?.subscriptionTier === "PRO" &&
+        !isPro;
 
     const requirePro = (featureName: string): boolean => {
         if (isPro) return true;
@@ -48,6 +55,8 @@ export const useSubscription = () => {
     return {
         isPro,
         isInGracePeriod,
+        isCanceledWithTimeLeft,
+        isLapsed,
         subscriptionsEnabled,
         subscriptionTier: userProfile?.subscriptionTier ?? "FREE",
         subscriptionStatus: userProfile?.subscriptionStatus ?? null,

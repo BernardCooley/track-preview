@@ -3,6 +3,31 @@ import getStripe from "@/lib/stripe";
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 
+async function disableCuratedModeForUser(firebaseId: string) {
+    const user = await prisma?.user.findFirst({
+        where: { firebaseId },
+        select: { id: true, curatedMode: true },
+    });
+
+    if (user?.curatedMode) {
+        await prisma?.user.update({
+            where: { id: user.id },
+            data: { curatedMode: false },
+        });
+
+        await prisma?.review.updateMany({
+            where: {
+                userId: user.id,
+                currentReviewStep: { in: [2, 3] },
+            },
+            data: {
+                currentReviewStep: 4,
+                furthestReviewStep: 4,
+            },
+        });
+    }
+}
+
 function getPeriodEnd(subscription: Stripe.Subscription): Date | null {
     const item = subscription.items?.data?.[0];
     if (item?.current_period_end) {
@@ -101,6 +126,10 @@ export async function POST(req: Request) {
                                     getPeriodEnd(subscription),
                             },
                         });
+
+                        if (mappedStatus === "PAST_DUE" || mappedStatus === "CANCELED") {
+                            await disableCuratedModeForUser(firebaseId);
+                        }
                     }
                 }
                 break;
@@ -120,6 +149,8 @@ export async function POST(req: Request) {
                             stripeSubscriptionId: null,
                         },
                     });
+
+                    await disableCuratedModeForUser(firebaseId);
                 }
                 break;
             }

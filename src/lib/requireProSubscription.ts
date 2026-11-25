@@ -29,7 +29,7 @@ export async function requireProSubscription(
         if (user.subscriptionStatus === "ACTIVE") return null;
 
         if (
-            user.subscriptionStatus === "PAST_DUE" &&
+            (user.subscriptionStatus === "PAST_DUE" || user.subscriptionStatus === "CANCELED") &&
             user.subscriptionExpiresAt &&
             user.subscriptionExpiresAt > new Date()
         ) {

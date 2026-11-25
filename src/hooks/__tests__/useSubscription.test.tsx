@@ -121,7 +121,7 @@ describe("useSubscription", () => {
         expect(result.current.isInGracePeriod).toBe(true);
     });
 
-    it("isPro is true for PRO/PAST_DUE after grace period expired", () => {
+    it("isPro is false for PRO/PAST_DUE after grace period expired", () => {
         const past = new Date();
         past.setDate(past.getDate() - 1);
 
@@ -134,11 +134,12 @@ describe("useSubscription", () => {
                 })
             ),
         });
-        expect(result.current.isPro).toBe(true);
+        expect(result.current.isPro).toBe(false);
         expect(result.current.isInGracePeriod).toBe(false);
+        expect(result.current.isLapsed).toBe(true);
     });
 
-    it("isPro is true for PRO tier with null status", () => {
+    it("isPro is false for PRO tier with null status (lapsed)", () => {
         const { result } = renderHook(() => useSubscription(), {
             wrapper: wrapper(
                 makeProfile({
@@ -147,7 +148,8 @@ describe("useSubscription", () => {
                 })
             ),
         });
-        expect(result.current.isPro).toBe(true);
+        expect(result.current.isPro).toBe(false);
+        expect(result.current.isLapsed).toBe(true);
     });
 
     it("isPro is false when userProfile is null", () => {
