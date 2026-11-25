@@ -13,14 +13,6 @@ export const mockUserCredential: Partial<UserCredential> = {
     user: mockFirebaseUser as User,
 };
 
-export const mockAnonymousUser: Partial<User> = {
-    uid: "anon-user-456",
-    email: null,
-    emailVerified: false,
-    isAnonymous: true,
-    delete: vi.fn(() => Promise.resolve()),
-};
-
 export const mockUnverifiedUser: Partial<User> = {
     uid: "unverified-user-789",
     email: "unverified@example.com",
@@ -35,7 +27,6 @@ vi.mock("firebase/auth", () => ({
     })),
     signInWithEmailAndPassword: vi.fn(),
     createUserWithEmailAndPassword: vi.fn(),
-    signInAnonymously: vi.fn(),
     signOut: vi.fn(() => Promise.resolve()),
     onAuthStateChanged: vi.fn((_auth: unknown, callback: (user: User | null) => void) => {
         callback(null);
@@ -43,7 +34,6 @@ vi.mock("firebase/auth", () => ({
     }),
     sendPasswordResetEmail: vi.fn(() => Promise.resolve()),
     sendEmailVerification: vi.fn(() => Promise.resolve()),
-    linkWithCredential: vi.fn(),
     EmailAuthProvider: {
         credential: vi.fn(),
     },
@@ -73,8 +63,6 @@ vi.mock("../../firebase/utils", async () => {
         LoginUser: vi.fn(),
         LogOut: vi.fn(),
         RegisterUser: vi.fn(),
-        SignInAnonymously: vi.fn(),
-        LinkAnonymousAccount: vi.fn(),
         DeleteUser: vi.fn(),
         SendVerificationEmail: vi.fn(() => Promise.resolve()),
         ResetPassword: vi.fn(() => Promise.resolve()),
@@ -91,8 +79,6 @@ vi.mock("../../../firebase/utils", async () => {
         LoginUser: vi.fn(),
         LogOut: vi.fn(),
         RegisterUser: vi.fn(),
-        SignInAnonymously: vi.fn(),
-        LinkAnonymousAccount: vi.fn(),
         DeleteUser: vi.fn(),
         SendVerificationEmail: vi.fn(() => Promise.resolve()),
         ResetPassword: vi.fn(() => Promise.resolve()),
@@ -109,8 +95,6 @@ vi.mock("../../../../firebase/utils", async () => {
         LoginUser: vi.fn(),
         LogOut: vi.fn(),
         RegisterUser: vi.fn(),
-        SignInAnonymously: vi.fn(),
-        LinkAnonymousAccount: vi.fn(),
         DeleteUser: vi.fn(),
         SendVerificationEmail: vi.fn(() => Promise.resolve()),
         ResetPassword: vi.fn(() => Promise.resolve()),

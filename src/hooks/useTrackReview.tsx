@@ -4,7 +4,6 @@ import { getCurrentYear } from "../../utils";
 import { useTrackContext } from "../../context/TrackContext";
 import {
     fetchTracks,
-    getTrialLikeCount,
     mutateUserProfile,
     resolvePreviewUrl,
     updateTrackReviewStep,
@@ -21,7 +20,7 @@ export const useTrackReview = (reviewStep: number) => {
         "recentGenres",
         []
     );
-    const { user, userProfile, updateUserProfile, isAnonymous, profileError } = useAuthContext();
+    const { user, userProfile, updateUserProfile, profileError } = useAuthContext();
     const [prevUserProfile, setPrevUserProfile] = useState<UserProfile | null>(
         userProfile
     );
@@ -39,9 +38,6 @@ export const useTrackReview = (reviewStep: number) => {
     const [indexOfTrack, setIndexOfTrack] = useState(0);
     const [resolvedPreviewUrl, setResolvedPreviewUrl] = useState<string>("");
     const [previewLoading, setPreviewLoading] = useState<boolean>(true);
-    const [trialLimitReached, setTrialLimitReached] = useState<boolean>(false);
-    const [trialLikeCount, setTrialLikeCount] = useState<number>(0);
-
     const previewCache = useRef<Map<string, string>>(new Map());
     const unplayableTracks = useRef<Set<string>>(new Set());
     const prefetchingTracks = useRef<Set<string>>(new Set());
@@ -49,7 +45,7 @@ export const useTrackReview = (reviewStep: number) => {
     const comparisonUserProfile = (profile: UserProfile | null) => {
         if (profile === null) return;
 
-        const { autoplay, curatedMode, isAnonymous, lastActiveAt, swipeMode, ...rest } = profile;
+        const { autoplay, curatedMode, lastActiveAt, swipeMode, ...rest } = profile;
         return JSON.stringify(rest);
     };
 
@@ -274,20 +270,9 @@ export const useTrackReview = (reviewStep: number) => {
         []
     );
 
-    const TRIAL_LIKE_LIMIT = 30;
-
     const likeOrDislike = async (like: boolean) => {
         try {
             if (currentTrack && user?.uid) {
-                if (isAnonymous && like && reviewStep === 1) {
-                    const count = await getTrialLikeCount({ userId: user.uid });
-                    if (count >= TRIAL_LIKE_LIMIT) {
-                        setTrialLikeCount(count);
-                        setTrialLimitReached(true);
-                        return;
-                    }
-                    setTrialLikeCount(count + 1);
-                }
                 setIndexOfTrack(
                     reviewTracks[reviewStep].tracks.findIndex(
                         (t) => t.id === currentTrack.id
@@ -423,9 +408,6 @@ export const useTrackReview = (reviewStep: number) => {
         updateReviewTracks,
         resolvedPreviewUrl,
         previewLoading,
-        trialLimitReached,
-        trialLikeCount,
-        isAnonymous,
         profileError,
     };
 };

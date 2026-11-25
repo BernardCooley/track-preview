@@ -10,7 +10,6 @@ import InstallPrompt from "./InstallPrompt";
 import { useTrackList } from "@/hooks/useTrackList";
 import { useLibraryParams } from "@/hooks/useLibraryParams";
 import { useCountry } from "@/hooks/useCountry";
-import { useAuthContext } from "../../Contexts/AuthContext";
 import { Track } from "../../types";
 
 const Library = () => {
@@ -52,7 +51,6 @@ const Library = () => {
         toggleTrackPurchased,
     } = useTrackList();
 
-    const { isAnonymous } = useAuthContext();
     const country = useCountry();
     const { releaseTrackId, setReleaseTrackId } = useLibraryParams();
     const [releaseBuyTrack, setReleaseBuyTrack] = useState<Track | null>(null);
@@ -185,7 +183,6 @@ const Library = () => {
             {!loading && !noTracks && (
                 <InstallPrompt
                     libraryCount={reviewTracks[4].tracks.length}
-                    isAnonymous={isAnonymous}
                 />
             )}
 

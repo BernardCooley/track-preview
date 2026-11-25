@@ -13,11 +13,11 @@ interface Props {
 
 const PricingClient = ({ variant }: Props) => {
     const router = useRouter();
-    const { user, isAnonymous } = useAuthContext();
+    const { user } = useAuthContext();
     const { isPro } = useSubscription();
     const [loading, setLoading] = useState(false);
 
-    const isLoggedIn = !!user && !isAnonymous;
+    const isLoggedIn = !!user;
 
     if (variant === "free") {
         if (isPro) return null;

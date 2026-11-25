@@ -17,10 +17,8 @@ interface BeforeInstallPromptEvent extends Event {
 
 export default function InstallPrompt({
     libraryCount,
-    isAnonymous,
 }: {
     libraryCount: number;
-    isAnonymous: boolean;
 }) {
     const [show, setShow] = useState(false);
     const [isIOS, setIsIOS] = useState(false);
@@ -28,7 +26,7 @@ export default function InstallPrompt({
 
     useEffect(() => {
         if (!isMobile) return;
-        if (isAnonymous || libraryCount < LIBRARY_THRESHOLD) return;
+        if (libraryCount < LIBRARY_THRESHOLD) return;
         if (localStorage.getItem(DISMISSED_KEY)) return;
         if (window.matchMedia("(display-mode: standalone)").matches) return;
 
@@ -50,7 +48,7 @@ export default function InstallPrompt({
 
         window.addEventListener("beforeinstallprompt", handler);
         return () => window.removeEventListener("beforeinstallprompt", handler);
-    }, [isAnonymous, libraryCount]);
+    }, [libraryCount]);
 
     const dismiss = () => {
         setShow(false);

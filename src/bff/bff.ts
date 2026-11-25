@@ -234,13 +234,11 @@ export const updateReviewNotes = async ({
 
 interface CreateUserProps {
     userId: string;
-    isAnonymous?: boolean;
 }
 
-export const createUser = async ({ userId, isAnonymous }: CreateUserProps): Promise<any> => {
+export const createUser = async ({ userId }: CreateUserProps): Promise<any> => {
     const user: any = await fetchWithErrorHandling("/api/createUser", "POST", {
         userId,
-        isAnonymous,
     });
 
     return user;
@@ -250,7 +248,6 @@ interface UpdateUserAutoplayProps {
     userId: string;
     autoplay?: boolean;
     curatedMode?: boolean;
-    isAnonymous?: boolean;
     swipeMode?: boolean;
     genres?: string[];
     genreAlerts?: string[];
@@ -265,7 +262,6 @@ export const mutateUserProfile = async ({
     userId,
     autoplay,
     curatedMode,
-    isAnonymous,
     swipeMode,
     genres,
     genreAlerts,
@@ -283,7 +279,6 @@ export const mutateUserProfile = async ({
                 userId,
                 autoplay,
                 curatedMode,
-                isAnonymous,
                 swipeMode,
                 genres,
                 genreAlerts,
@@ -372,24 +367,6 @@ export const sendPasswordResetEmail = async (email: string): Promise<void> => {
     await fetchWithErrorHandling("/api/sendPasswordResetEmail", "POST", {
         email,
     });
-};
-
-export const getTrialLikeCount = async ({
-    userId,
-}: {
-    userId: string;
-}): Promise<number> => {
-    try {
-        const result = await fetchWithErrorHandling<{ count: number }>(
-            "/api/getTrialLikeCount",
-            "POST",
-            { userId }
-        );
-        return result?.count ?? 0;
-    } catch (error) {
-        console.error(error);
-        return 0;
-    }
 };
 
 interface GetTracksProps {

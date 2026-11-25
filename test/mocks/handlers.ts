@@ -2,11 +2,10 @@ import { http, HttpResponse } from "msw";
 
 export const handlers = [
     http.post("/api/createUser", async ({ request }) => {
-        const body = (await request.json()) as { userId: string; isAnonymous?: boolean };
+        const body = (await request.json()) as { userId: string };
         return HttpResponse.json({
             id: body.userId,
             firebaseId: body.userId,
-            isAnonymous: body.isAnonymous ?? false,
             autoplay: false,
             curatedMode: false,
             genres: ["all"],
@@ -21,7 +20,6 @@ export const handlers = [
         return HttpResponse.json({
             id: body.userId,
             firebaseId: body.userId,
-            isAnonymous: false,
             autoplay: false,
             curatedMode: false,
             genres: ["all"],
@@ -55,10 +53,6 @@ export const handlers = [
 
     http.post("/api/resolvePreviewUrl", () => {
         return HttpResponse.json({ previewUrl: "" });
-    }),
-
-    http.post("/api/getTrialLikeCount", () => {
-        return HttpResponse.json({ count: 0 });
     }),
 
     http.post("/api/getSpotifyTrack", () => {

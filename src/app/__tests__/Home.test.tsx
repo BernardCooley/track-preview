@@ -13,11 +13,9 @@ vi.mock("../../../firebase/firebaseInit", () => ({
 }));
 
 vi.mock("../../../firebase/utils", () => ({
-    SignInAnonymously: vi.fn(),
     LoginUser: vi.fn(),
     LogOut: vi.fn(),
     RegisterUser: vi.fn(),
-    LinkAnonymousAccount: vi.fn(),
     DeleteUser: vi.fn(),
     SendVerificationEmail: vi.fn(() => Promise.resolve()),
     ResetPassword: vi.fn(() => Promise.resolve()),
@@ -37,7 +35,6 @@ vi.mock("firebase/auth", () => ({
     sendEmailVerification: vi.fn(() => Promise.resolve()),
     createUserWithEmailAndPassword: vi.fn(),
     signInWithEmailAndPassword: vi.fn(),
-    signInAnonymously: vi.fn(),
 }));
 
 const mockOnAuthStateChanged = vi.mocked(onAuthStateChanged);
@@ -61,7 +58,7 @@ describe("Home (Splash)", () => {
         render(<Home />);
 
         await waitFor(() => {
-            expect(screen.getByText("Continue as guest")).toBeInTheDocument();
+            expect(screen.getByRole("button", { name: /sign in/i })).toBeInTheDocument();
         });
     });
 
@@ -90,7 +87,7 @@ describe("Home (Splash)", () => {
         const { unmount } = render(<Home />);
 
         await waitFor(() => {
-            expect(screen.getByText("Continue as guest")).toBeInTheDocument();
+            expect(screen.getByRole("button", { name: /sign in/i })).toBeInTheDocument();
         });
 
         unmount();
@@ -121,46 +118,12 @@ describe("Home (Splash)", () => {
         expect(mockRouter.push).toHaveBeenCalledWith("/loginRegister?login=true");
     });
 
-    it("opens trial dialog when Continue as guest is clicked and no user in context", async () => {
-        const Home = await loadPage();
-        const user = userEvent.setup();
-        render(<Home />);
-
-        await waitFor(() => {
-            expect(screen.getByText("Continue as guest")).toBeInTheDocument();
-        });
-
-        await user.click(screen.getByText("Continue as guest"));
-
-        await waitFor(() => {
-            expect(screen.getByText("Try without an account")).toBeInTheDocument();
-        });
-    });
-
-    it("navigates to /explore when Continue as guest is clicked and user exists in context", async () => {
-        const Home = await loadPage();
-        const user = userEvent.setup();
-        render(<Home />, {
-            authContext: {
-                user: { uid: "ctx-user", email: "ctx@example.com" },
-            },
-        });
-
-        await waitFor(() => {
-            expect(screen.getByText("Continue as guest")).toBeInTheDocument();
-        });
-
-        await user.click(screen.getByText("Continue as guest"));
-
-        expect(mockRouter.push).toHaveBeenCalledWith("/explore");
-    });
-
     it("renders JSON-LD structured data", async () => {
         const Home = await loadPage();
         const { container } = render(<Home />);
 
         await waitFor(() => {
-            expect(screen.getByText("Continue as guest")).toBeInTheDocument();
+            expect(screen.getByRole("button", { name: /sign in/i })).toBeInTheDocument();
         });
 
         const script = container.querySelector('script[type="application/ld+json"]');
@@ -178,7 +141,7 @@ describe("Home (Splash)", () => {
         const { container } = render(<Home />);
 
         await waitFor(() => {
-            expect(screen.getByText("Continue as guest")).toBeInTheDocument();
+            expect(screen.getByRole("button", { name: /sign in/i })).toBeInTheDocument();
         });
 
         expect(container.querySelector("main")).toBeInTheDocument();
@@ -195,7 +158,7 @@ describe("Home (Splash)", () => {
         render(<Home />);
 
         await waitFor(() => {
-            expect(screen.getByText("Continue as guest")).toBeInTheDocument();
+            expect(screen.getByRole("button", { name: /sign in/i })).toBeInTheDocument();
         });
 
         const h1 = screen.getByRole("heading", { level: 1 });

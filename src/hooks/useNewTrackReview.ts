@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useAuthContext } from "../../Contexts/AuthContext";
 import {
     fetchNewTracks,
-    getTrialLikeCount,
     resolvePreviewUrl,
     updateTrackReviewStep,
 } from "@/bff/bff";
@@ -11,7 +10,7 @@ import { Track } from "../../types";
 const RELEASE_WINDOW_DAYS = 90;
 
 export const useNewTrackReview = () => {
-    const { user, userProfile, isAnonymous } = useAuthContext();
+    const { user, userProfile } = useAuthContext();
 
     const [tracks, setTracks] = useState<Track[]>([]);
     const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
@@ -201,6 +200,5 @@ export const useNewTrackReview = () => {
         resolvedPreviewUrl,
         likeOrDislike,
         userProfile,
-        isAnonymous,
     };
 };

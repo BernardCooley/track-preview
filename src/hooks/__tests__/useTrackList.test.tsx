@@ -54,8 +54,6 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
                     updateUser: vi.fn(),
                     userProfile: null,
                     updateUserProfile: vi.fn(),
-                    isAnonymous: false,
-                    setIsAnonymous: vi.fn(),
                     profileError: false,
                     setProfileError: vi.fn(),
                 }}
@@ -342,8 +340,6 @@ describe("useTrackList", () => {
                                 updateUser: vi.fn(),
                                 userProfile: null,
                                 updateUserProfile: vi.fn(),
-                                isAnonymous: false,
-                                setIsAnonymous: vi.fn(),
                                 profileError: false,
                                 setProfileError: vi.fn(),
                             }}
@@ -434,8 +430,6 @@ describe("useTrackList", () => {
                                 updateUser: vi.fn(),
                                 userProfile: null,
                                 updateUserProfile: vi.fn(),
-                                isAnonymous: false,
-                                setIsAnonymous: vi.fn(),
                                 profileError: false,
                                 setProfileError: vi.fn(),
                             }}

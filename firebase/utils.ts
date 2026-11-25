@@ -3,8 +3,6 @@ import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.share
 import {
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
-    signInAnonymously,
-    linkWithCredential,
     EmailAuthProvider,
     signOut,
     sendPasswordResetEmail,
@@ -17,7 +15,7 @@ import {
     reauthenticateWithCredential,
 } from "firebase/auth";
 import { auth } from "./firebaseInit";
-import { createUser, deleteUserProfile } from "@/bff/bff";
+import { deleteUserProfile } from "@/bff/bff";
 
 export const LoginUser = async (
     email: string,
@@ -57,32 +55,6 @@ export const RegisterUser = async (
         );
 
         return user;
-    } catch (error) {
-        console.error(error);
-        throw error;
-    }
-};
-
-export const SignInAnonymously = async (): Promise<UserCredential | null> => {
-    try {
-        const user = await signInAnonymously(auth);
-        return user;
-    } catch (error) {
-        console.error(error);
-        throw error;
-    }
-};
-
-export const LinkAnonymousAccount = async (
-    email: string,
-    password: string
-): Promise<UserCredential | null> => {
-    try {
-        const currentUser = auth.currentUser;
-        if (!currentUser) throw new Error("No current user");
-        const credential = EmailAuthProvider.credential(email, password);
-        const result = await linkWithCredential(currentUser, credential);
-        return result;
     } catch (error) {
         console.error(error);
         throw error;
