@@ -19,7 +19,7 @@ import {
     UpdateUserEmail,
     UpdateUserPassword,
 } from "../../../firebase/utils";
-import { sendVerificationEmail, spotifyDisconnect, getUserProfile } from "@/bff/bff";
+import { sendVerificationEmail, spotifyDisconnect, getUserProfile, createPortalSession, createCheckoutSession, syncSubscription } from "@/bff/bff";
 import { useRouter } from "next/navigation";
 import BackHeader from "@/components/BackHeader";
 import EditIcon from "@mui/icons-material/Edit";
@@ -34,12 +34,17 @@ import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import AuthGuard from "@/components/AuthGuard";
 import { useAuthContext } from "../../../Contexts/AuthContext";
+import { useSubscription } from "@/hooks/useSubscription";
+import { proFeatures } from "@/config/proFeatures";
 
 const Settings = () => {
     const { open: isOpen, onOpen, onClose } = useDisclosure();
     const cancelRef = useRef<HTMLButtonElement>(null);
     const router = useRouter();
     const { userProfile, updateUserProfile } = useAuthContext();
+    const { subscriptionsEnabled, subscriptionTier, subscriptionStatus } = useSubscription();
+    const [managingSubscription, setManagingSubscription] = useState(false);
+    const [showProFeatures, setShowProFeatures] = useState(false);
     const [disconnectingSpotify, setDisconnectingSpotify] = useState(false);
     const [editingEmail, setEditingEmail] = useState<boolean>(false);
     const [editingPassword, setEditingPassword] = useState<boolean>(false);
@@ -93,9 +98,12 @@ const Settings = () => {
 
     useEffect(() => {
         if (!user?.uid) return;
-        getUserProfile({ userId: user.uid }).then((profile) => {
+        const load = async () => {
+            await syncSubscription({ userId: user.uid }).catch(() => {});
+            const profile = await getUserProfile({ userId: user.uid });
             if (profile) updateUserProfile(profile);
-        });
+        };
+        load();
     }, [user?.uid]);
 
     const logout = async () => {
@@ -233,6 +241,65 @@ const Settings = () => {
         } finally {
             setDisconnectingSpotify(false);
         }
+    };
+
+    const handleManageSubscription = async () => {
+        if (!user?.uid) return;
+        setManagingSubscription(true);
+        try {
+            const result = await createPortalSession({ userId: user.uid });
+            if (result?.url) {
+                window.location.href = result.url;
+            }
+        } catch {
+            showToast({
+                title: "Failed to open billing portal",
+                description: "Please try again later.",
+                type: "error",
+            });
+            setManagingSubscription(false);
+        }
+    };
+
+    const handleUpgrade = async () => {
+        if (!user?.uid) return;
+        setManagingSubscription(true);
+        try {
+            const result = await createCheckoutSession({ userId: user.uid });
+            if (result?.url) {
+                window.location.href = result.url;
+            }
+        } catch {
+            showToast({
+                title: "Failed to start checkout",
+                description: "Please try again later.",
+                type: "error",
+            });
+            setManagingSubscription(false);
+        }
+    };
+
+    const formatDate = (date: string | Date) => {
+        return new Date(date).toLocaleDateString("en-GB", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+        });
+    };
+
+    const isActuallyPro = subscriptionTier === "PRO";
+
+    const getStatusLabel = () => {
+        if (!isActuallyPro) return null;
+        if (subscriptionStatus === "PAST_DUE") return "Past due";
+        if (subscriptionStatus === "CANCELED") return "Cancelled";
+        return "Active";
+    };
+
+    const getStatusColor = () => {
+        if (subscriptionStatus === "PAST_DUE") return "orange.400";
+        if (subscriptionStatus === "CANCELED") return "red.400";
+        return "green.400";
     };
 
     if (deleting) {
@@ -387,6 +454,130 @@ const Settings = () => {
                 px={[4, 6]}
                 py={[6, 8]}
             >
+                {subscriptionsEnabled && userProfile && <Box
+                    w="full"
+                    maxW="520px"
+                    bg="brand.cardBg"
+                    border="1px solid"
+                    borderColor="brand.border"
+                    rounded="card"
+                    p={[5, 6]}
+                    mb={4}
+                >
+                    <Text
+                        fontSize="lg"
+                        fontWeight="semibold"
+                        color="brand.textPrimary"
+                        mb={6}
+                    >
+                        Subscription
+                    </Text>
+
+                    <Flex direction="column" gap={4}>
+                        <Flex justifyContent="space-between" alignItems="center">
+                            <Box>
+                                <Heading
+                                    size="xs"
+                                    textTransform="uppercase"
+                                    fontSize="xs"
+                                    letterSpacing="wider"
+                                    color="brand.textMuted"
+                                    mb={1}
+                                >
+                                    Current plan
+                                </Heading>
+                                <Flex alignItems="center" gap={2}>
+                                    <Text color="brand.textPrimary" fontSize="md" fontWeight="medium">
+                                        {isActuallyPro ? "Pro" : "Free"}
+                                    </Text>
+                                    {isActuallyPro && getStatusLabel() && (
+                                        <Text
+                                            fontSize="xs"
+                                            fontWeight="semibold"
+                                            color={getStatusColor()}
+                                        >
+                                            {getStatusLabel()}
+                                        </Text>
+                                    )}
+                                </Flex>
+                            </Box>
+                        </Flex>
+
+                        {isActuallyPro && userProfile?.subscriptionExpiresAt && (
+                            <Box>
+                                <Heading
+                                    size="xs"
+                                    textTransform="uppercase"
+                                    fontSize="xs"
+                                    letterSpacing="wider"
+                                    color="brand.textMuted"
+                                    mb={1}
+                                >
+                                    {subscriptionStatus === "CANCELED" ? "Access until" : "Renews"}
+                                </Heading>
+                                <Text color="brand.textPrimary" fontSize="md">
+                                    {formatDate(userProfile.subscriptionExpiresAt)}
+                                </Text>
+                                {subscriptionStatus === "CANCELED" && (
+                                    <Text color="brand.textSecondary" fontSize="sm" mt={2}>
+                                        Your subscription has been cancelled but you can continue using Pro features until {formatDate(userProfile.subscriptionExpiresAt)}. You can resubscribe anytime.
+                                    </Text>
+                                )}
+                            </Box>
+                        )}
+
+                        <Box borderTop="1px solid" borderTopColor="brand.divider" pt={4}>
+                            {isActuallyPro ? (
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    loading={managingSubscription}
+                                    onClick={handleManageSubscription}
+                                >
+                                    Manage subscription
+                                </Button>
+                            ) : (
+                                <Flex direction="column" gap={3}>
+                                    <Button
+                                        variant="primary"
+                                        size="sm"
+                                        loading={managingSubscription}
+                                        onClick={handleUpgrade}
+                                    >
+                                        Upgrade to Pro
+                                    </Button>
+                                    <Box>
+                                        <Text
+                                            as="button"
+                                            fontSize="sm"
+                                            color="brand.textMuted"
+                                            cursor="pointer"
+                                            _hover={{ color: "brand.textSecondary" }}
+                                            transition="color 0.15s ease"
+                                            onClick={() => setShowProFeatures((v) => !v)}
+                                        >
+                                            {showProFeatures ? "Hide details" : "What's included?"}
+                                        </Text>
+                                        {showProFeatures && (
+                                            <Flex direction="column" gap={1.5} mt={3}>
+                                                {proFeatures.map((f) => (
+                                                    <Text
+                                                        key={f.text}
+                                                        color="brand.textSecondary"
+                                                        fontSize="sm"
+                                                    >
+                                                        • {f.text}
+                                                    </Text>
+                                                ))}
+                                            </Flex>
+                                        )}
+                                    </Box>
+                                </Flex>
+                            )}
+                        </Box>
+                    </Flex>
+                </Box>}
+
                 <Box
                     w="full"
                     maxW="520px"

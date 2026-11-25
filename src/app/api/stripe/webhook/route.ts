@@ -96,10 +96,7 @@ export async function POST(req: Request) {
                             where: { firebaseId },
                             data: {
                                 subscriptionStatus: mappedStatus,
-                                subscriptionTier:
-                                    mappedStatus === "CANCELED"
-                                        ? "FREE"
-                                        : "PRO",
+                                subscriptionTier: "PRO",
                                 subscriptionExpiresAt:
                                     getPeriodEnd(subscription),
                             },

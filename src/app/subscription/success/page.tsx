@@ -1,21 +1,24 @@
 "use client";
 
 import { Box, Center, Text } from "@chakra-ui/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../../../firebase/firebaseInit";
 import { useAuthContext } from "../../../../Contexts/AuthContext";
-import { getUserProfile } from "@/bff/bff";
+import { getUserProfile, verifyCheckout } from "@/bff/bff";
 import BouncingDotsLoader from "@/components/BouncingLoaderDots";
 
 export default function SubscriptionSuccessPage() {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const { updateUser, updateUserProfile } = useAuthContext();
     const [status, setStatus] = useState<"polling" | "success">("polling");
     const started = useRef(false);
 
     useEffect(() => {
+        const sessionId = searchParams.get("session_id");
+
         const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
             if (!firebaseUser || started.current) return;
             started.current = true;
@@ -25,33 +28,27 @@ export default function SubscriptionSuccessPage() {
                 uid: firebaseUser.uid,
             });
 
-            let attempts = 0;
-            const maxAttempts = 10;
+            const activate = async () => {
+                if (sessionId) {
+                    try {
+                        await verifyCheckout({ sessionId });
+                    } catch {}
+                }
 
-            const poll = async () => {
-                attempts++;
                 const profile = await getUserProfile({
                     userId: firebaseUser.uid,
                 });
-                if (profile?.subscriptionTier === "PRO") {
-                    updateUserProfile(profile);
-                    setStatus("success");
-                    setTimeout(() => router.replace("/explore"), 2000);
-                    return;
-                }
-                if (attempts < maxAttempts) {
-                    setTimeout(poll, 2000);
-                } else {
-                    setStatus("success");
-                    setTimeout(() => router.replace("/explore"), 2000);
-                }
+                if (profile) updateUserProfile(profile);
+
+                setStatus("success");
+                setTimeout(() => router.replace("/explore"), 2000);
             };
 
-            poll();
+            activate();
         });
 
         return unsubscribe;
-    }, [router, updateUser, updateUserProfile]);
+    }, [router, searchParams, updateUser, updateUserProfile]);
 
     return (
         <Center

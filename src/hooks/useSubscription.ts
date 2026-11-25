@@ -15,10 +15,15 @@ export const useSubscription = () => {
         userProfile?.subscriptionExpiresAt != null &&
         new Date(userProfile.subscriptionExpiresAt) > new Date();
 
+    const isCanceledWithTimeLeft =
+        userProfile?.subscriptionStatus === "CANCELED" &&
+        userProfile?.subscriptionExpiresAt != null &&
+        new Date(userProfile.subscriptionExpiresAt) > new Date();
+
     const isPro =
         !subscriptionsEnabled ||
         (userProfile?.subscriptionTier === "PRO" &&
-        userProfile?.subscriptionStatus !== "CANCELED");
+        (userProfile?.subscriptionStatus !== "CANCELED" || isCanceledWithTimeLeft));
 
     const requirePro = (featureName: string): boolean => {
         if (isPro) return true;
@@ -31,6 +36,7 @@ export const useSubscription = () => {
     return {
         isPro,
         isInGracePeriod,
+        subscriptionsEnabled,
         subscriptionTier: userProfile?.subscriptionTier ?? "FREE",
         subscriptionStatus: userProfile?.subscriptionStatus ?? null,
         upgradeFeature,

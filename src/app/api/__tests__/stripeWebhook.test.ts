@@ -119,7 +119,7 @@ describe("stripe webhook", () => {
         });
     });
 
-    it("handles customer.subscription.updated with canceled status and downgrades to FREE", async () => {
+    it("handles customer.subscription.updated with canceled status and keeps PRO until period end", async () => {
         vi.resetModules();
         mockConstructEvent.mockReturnValue({
             type: "customer.subscription.updated",
@@ -141,7 +141,7 @@ describe("stripe webhook", () => {
             where: { firebaseId: "fb_123" },
             data: expect.objectContaining({
                 subscriptionStatus: "CANCELED",
-                subscriptionTier: "FREE",
+                subscriptionTier: "PRO",
             }),
         });
     });
