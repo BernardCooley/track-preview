@@ -1,3 +1,4 @@
+import React from "react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -6,6 +7,7 @@ import { mockSearchParams } from "../../../test/mocks/navigation";
 import { render } from "../../../test/test-utils";
 import Library from "../Library";
 import MenuDrawer from "../MenuDrawer";
+import Settings from "../../app/settings/page";
 import { mockTrack, mockTrack2 } from "../../../test/mocks/data";
 
 vi.mock("@/hooks/useTrackList", () => ({
@@ -35,12 +37,22 @@ const mockFetchLibraryStats = vi.fn().mockResolvedValue({
     topArtists: [{ artist: "Artist A", count: 3 }],
     topReleases: [],
 });
+const mockGetUserProfile = vi.fn().mockResolvedValue(null);
 vi.mock("@/bff/bff", () => ({
     mutateUserProfile: (...args: unknown[]) => mockMutateUserProfile(...args),
+    getUserProfile: (...args: unknown[]) => mockGetUserProfile(...args),
     resolvePreviewUrl: vi.fn(),
     createCheckoutSession: vi.fn(),
     fetchLibraryStats: (...args: unknown[]) => mockFetchLibraryStats(...args),
     updateReviewNotes: vi.fn().mockResolvedValue({ success: true }),
+}));
+
+vi.mock("@/components/AuthGuard", () => ({
+    default: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
+
+vi.mock("../../../context/ThemeContext", () => ({
+    useThemeContext: () => ({ appearance: "light", toggleAppearance: vi.fn() }),
 }));
 
 function setSubscription(isPro: boolean) {
@@ -169,16 +181,18 @@ describe("Pro feature gating", () => {
             expect(screen.queryByText("PRO")).not.toBeInTheDocument();
         });
 
+    });
+
+    describe("2.1a Curated Mode gate (Settings)", () => {
         it("calls requirePro when free user enables curated mode", async () => {
             setSubscription(false);
             const user = userEvent.setup();
             render(
-                <MenuDrawer isOpen={true} onClose={vi.fn()} />,
+                <Settings />,
                 { authContext: { user: { uid: "user-1", email: "test@test.com" }, userProfile: freeProfile as any } }
             );
 
-            const checkboxes = screen.getAllByRole("checkbox");
-            const curatedSwitch = checkboxes[0];
+            const curatedSwitch = screen.getAllByRole("checkbox")[0];
             await user.click(curatedSwitch);
 
             expect(mockRequirePro).toHaveBeenCalledWith("Curated Mode");
@@ -189,12 +203,11 @@ describe("Pro feature gating", () => {
             setSubscription(true);
             const user = userEvent.setup();
             render(
-                <MenuDrawer isOpen={true} onClose={vi.fn()} />,
+                <Settings />,
                 { authContext: { user: { uid: "user-1", email: "test@test.com" }, userProfile: proProfile as any } }
             );
 
-            const checkboxes = screen.getAllByRole("checkbox");
-            const curatedSwitch = checkboxes[0];
+            const curatedSwitch = screen.getAllByRole("checkbox")[0];
             await user.click(curatedSwitch);
 
             expect(mockRequirePro).toHaveBeenCalledWith("Curated Mode");
