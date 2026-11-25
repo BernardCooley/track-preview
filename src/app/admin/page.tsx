@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
+import { useDelayedLoading } from "@/hooks/useDelayedLoading";
 import {
     Box,
     Flex,
@@ -11,8 +12,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../../firebase/firebaseInit";
 import BackHeader from "@/components/BackHeader";
 import { useRouter } from "next/navigation";
-import { Center } from "@chakra-ui/react";
-import BouncingDotsLoader from "@/components/BouncingLoaderDots";
+import ExploreSkeleton from "@/components/skeletons/ExploreSkeleton";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 
 const ADMIN_UIDS = (process.env.NEXT_PUBLIC_ADMIN_UID || "nWDEiOWsMVQ7qOFVLzrZvGrEqdN2,v2dWVgS1DxagPDt124tUq8hirxs1").split(",").filter(Boolean);
@@ -81,6 +81,7 @@ const AdminPage = () => {
     const router = useRouter();
     const [checked, setChecked] = useState(false);
     const [authorized, setAuthorized] = useState(false);
+    const showSkeleton = useDelayedLoading(!checked || !authorized);
     const [country, setCountry] = useState("");
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -132,19 +133,7 @@ const AdminPage = () => {
     const selectedLabel = countries.find((c) => c.code === country)?.label || "Auto (from Vercel)";
 
     if (!checked || !authorized) {
-        return (
-            <Center h="100dvh" flexDirection="column" gap={8}>
-                <Text
-                    fontSize={["3xl", "4xl", "5xl"]}
-                    fontFamily="brand"
-                    color="brand.textPrimary"
-                    letterSpacing="wider"
-                >
-                    PHONIQUEST
-                </Text>
-                <BouncingDotsLoader />
-            </Center>
-        );
+        return showSkeleton ? <ExploreSkeleton /> : null;
     }
 
     return (

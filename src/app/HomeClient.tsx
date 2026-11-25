@@ -3,9 +3,10 @@
 import { Box, Button, Center, Flex, Link, Text, VStack } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useDelayedLoading } from "@/hooks/useDelayedLoading";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../firebase/firebaseInit";
-import BouncingDotsLoader from "@/components/BouncingLoaderDots";
+import HomeSkeleton from "@/components/skeletons/HomeSkeleton";
 import HeadphonesIcon from "@mui/icons-material/Headphones";
 import ThumbUpAltIcon from "@mui/icons-material/ThumbUpAlt";
 import LibraryMusicIcon from "@mui/icons-material/LibraryMusic";
@@ -13,6 +14,7 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 
 export default function HomeClient() {
     const [loading, setLoading] = useState(true);
+    const showSkeleton = useDelayedLoading(loading);
     const router = useRouter();
 
     const features = [
@@ -47,25 +49,15 @@ export default function HomeClient() {
 
     return (
         <>
-            {loading && (
+            {showSkeleton && (
                 <Center
                     position="fixed"
                     inset={0}
                     zIndex={50}
                     bg="brand.bg"
                     h="100dvh"
-                    flexDirection="column"
-                    gap={8}
                 >
-                    <Text
-                        fontSize={["3xl", "4xl", "5xl"]}
-                        fontFamily="brand"
-                        color="brand.textPrimary"
-                        letterSpacing="wider"
-                    >
-                        PHONIQUEST
-                    </Text>
-                    <BouncingDotsLoader />
+                    <HomeSkeleton />
                 </Center>
             )}
 

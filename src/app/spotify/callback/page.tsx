@@ -3,9 +3,10 @@
 import { Center, Text } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { useDelayedLoading } from "@/hooks/useDelayedLoading";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../../../firebase/firebaseInit";
-import BouncingDotsLoader from "@/components/BouncingLoaderDots";
+import SubscriptionSuccessSkeleton from "@/components/skeletons/SubscriptionSuccessSkeleton";
 
 export default function SpotifyCallbackPage() {
     const router = useRouter();
@@ -15,6 +16,7 @@ export default function SpotifyCallbackPage() {
     const [errorMessage, setErrorMessage] = useState("");
     const started = useRef(false);
     const [authReady, setAuthReady] = useState(false);
+    const showSkeleton = useDelayedLoading(status === "processing");
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -81,21 +83,8 @@ export default function SpotifyCallbackPage() {
             gap={6}
             px={[4, 6]}
         >
-            {status === "processing" && (
-                <>
-                    <Text
-                        fontSize={["3xl", "4xl"]}
-                        fontFamily="brand"
-                        color="brand.textPrimary"
-                        letterSpacing="wider"
-                    >
-                        PHONIQUEST
-                    </Text>
-                    <Text color="brand.textSecondary" fontSize="md">
-                        Connecting your Spotify account...
-                    </Text>
-                    <BouncingDotsLoader />
-                </>
+            {status === "processing" && showSkeleton && (
+                <SubscriptionSuccessSkeleton />
             )}
             {status === "success" && (
                 <>

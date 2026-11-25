@@ -10,6 +10,7 @@ import {
     useDisclosure,
 } from "@chakra-ui/react";
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { useDelayedLoading } from "@/hooks/useDelayedLoading";
 import { track } from "@amplitude/unified";
 import AudioPlayer from "@/components/AudioPlayer";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -22,8 +23,8 @@ import { useTrackContext } from "../../../context/TrackContext";
 import { useAuthContext } from "../../../Contexts/AuthContext";
 import { GetCurrentUser } from "../../../firebase/utils";
 import AuthGuard from "@/components/AuthGuard";
-import BouncingDotsLoader from "@/components/BouncingLoaderDots";
 import { auth } from "../../../firebase/firebaseInit";
+import ExploreSkeleton from "@/components/skeletons/ExploreSkeleton";
 import TrackReview from "@/components/TrackReview";
 import LooksOneIcon from "@mui/icons-material/LooksOne";
 import LooksTwoIcon from "@mui/icons-material/LooksTwo";
@@ -47,6 +48,7 @@ function ExploreContent() {
     const { open: isMenuOpen, onOpen: onMenuOpenRaw, onClose: onMenuCloseRaw } = useDisclosure();
     const menuOpenRef = useRef(false);
     const { isPro, subscriptionsEnabled, requirePro, upgradeFeature, dismissUpgrade } = useSubscription();
+    const showSkeleton = useDelayedLoading(!userProfile);
     const effectiveCuratedMode = userProfile?.curatedMode && isPro;
 
     const onMenuOpen = useCallback(() => {
@@ -174,19 +176,7 @@ function ExploreContent() {
             (currentlyPlaying !== undefined && currentlyPlaying.length > 0));
 
     if (!userProfile) {
-        return (
-            <Center h="100dvh" flexDirection="column" gap={8}>
-                <Text
-                    fontSize={["3xl", "4xl", "5xl"]}
-                    fontFamily="brand"
-                    color="brand.textPrimary"
-                    letterSpacing="wider"
-                >
-                    PHONIQUEST
-                </Text>
-                <BouncingDotsLoader />
-            </Center>
-        );
+        return showSkeleton ? <ExploreSkeleton /> : null;
     }
 
     return (

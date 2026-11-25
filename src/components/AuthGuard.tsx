@@ -1,16 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useDelayedLoading } from "@/hooks/useDelayedLoading";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../firebase/firebaseInit";
 import { useRouter } from "next/navigation";
-import { Center, Text } from "@chakra-ui/react";
-import BouncingDotsLoader from "./BouncingLoaderDots";
+import AuthGuardSkeleton from "./skeletons/AuthGuardSkeleton";
 
 const AuthGuard = ({ children }: { children: React.ReactNode }) => {
     const router = useRouter();
     const [checked, setChecked] = useState(false);
     const [authenticated, setAuthenticated] = useState(false);
+    const showSkeleton = useDelayedLoading(!checked || !authenticated);
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -25,19 +26,7 @@ const AuthGuard = ({ children }: { children: React.ReactNode }) => {
     }, [router]);
 
     if (!checked || !authenticated) {
-        return (
-            <Center h="100dvh" flexDirection="column" gap={8}>
-                <Text
-                    fontSize={["3xl", "4xl", "5xl"]}
-                    fontFamily="brand"
-                    color="brand.textPrimary"
-                    letterSpacing="wider"
-                >
-                    PHONIQUEST
-                </Text>
-                <BouncingDotsLoader />
-            </Center>
-        );
+        return showSkeleton ? <AuthGuardSkeleton /> : null;
     }
 
     return <>{children}</>;

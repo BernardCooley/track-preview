@@ -6,12 +6,12 @@ import {
     Collapsible,
     Flex,
     Separator,
+    Skeleton,
     Spinner,
     Text,
 } from "@chakra-ui/react";
 import { Track } from "../../types";
 import ThumbDownAltTwoToneIcon from "@mui/icons-material/ThumbDownAltTwoTone";
-import BouncingDotsLoader from "./BouncingLoaderDots";
 import ThumbUpAltTwoToneIcon from "@mui/icons-material/ThumbUpAltTwoTone";
 import SwipeOutlinedIcon from "@mui/icons-material/SwipeOutlined";
 import AudioPlayer, { RHAP_UI } from "react-h5-audio-player";
@@ -252,7 +252,11 @@ const TrackReviewCard = ({
                             <Text fontSize="md" color="brand.textPrimary">
                                 {loadingMessage}
                             </Text>
-                            <BouncingDotsLoader />
+                            <Flex gap={1.5}>
+                                <Skeleton h="8px" w="8px" rounded="full" />
+                                <Skeleton h="8px" w="8px" rounded="full" />
+                                <Skeleton h="8px" w="8px" rounded="full" />
+                            </Flex>
                         </Flex>
                     )}
 

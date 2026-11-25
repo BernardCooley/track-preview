@@ -1,4 +1,5 @@
 import React, { memo, useCallback, useEffect, useState } from "react";
+import { useDelayedLoading } from "@/hooks/useDelayedLoading";
 import { getCurrentYear } from "../../utils";
 import {
     Badge,
@@ -10,7 +11,7 @@ import {
     VStack,
     useDisclosure,
 } from "@chakra-ui/react";
-import Loading from "./Loading";
+import TrackCardSkeleton from "./skeletons/TrackCardSkeleton";
 import YearModal from "./YearModal";
 import GenreModal from "./GenreModal";
 import FilterTags from "./FilterTags";
@@ -21,7 +22,6 @@ import { useTrackReview } from "@/hooks/useTrackReview";
 import { useTrackContext } from "../../context/TrackContext";
 import RecordAnimation from "./RecordAnimation";
 import TracklistTable from "./TracklistTable";
-import TrackTransition from "./TrackTransition";
 import { useRouter } from "next/navigation";
 
 interface Props {
@@ -93,6 +93,7 @@ const TrackReview = memo(
         const [animate, setAnimate] = useState<"like" | "dislike" | null>(null);
         const [animationTargetStep, setAnimationTargetStep] = useState<number | null>(null);
         const [playOnLoad, setPlayOnLoad] = useState(false);
+        const showTrackSkeleton = useDelayedLoading(loading || previewLoading);
 
         useEffect(() => {
             if (currentTrack) {
@@ -161,10 +162,8 @@ const TrackReview = memo(
                         }}
                     />
                 )}
-                {loading && !animate && !currentTrack && (
-                    <Center position="absolute" inset={0} zIndex={150}>
-                        <TrackTransition />
-                    </Center>
+                {loading && !animate && !currentTrack && showTrackSkeleton && (
+                    <TrackCardSkeleton />
                 )}
 
                 {fetchAttempted && !noTracks && !loading && loadMoreTracks && (
@@ -295,10 +294,8 @@ const TrackReview = memo(
                     </Box>
                 )}
 
-                {(previewLoading || loading) && !animate && currentTrack && (
-                    <Flex flex={1}>
-                        <TrackTransition />
-                    </Flex>
+                {(previewLoading || loading) && !animate && currentTrack && showTrackSkeleton && (
+                    <TrackCardSkeleton />
                 )}
 
                 <Flex

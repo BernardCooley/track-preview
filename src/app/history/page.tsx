@@ -9,6 +9,7 @@ import {
     IconButton,
     Image,
     Input,
+    Skeleton,
     Table,
     Text,
 } from "@chakra-ui/react";
@@ -21,7 +22,8 @@ import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../../firebase/firebaseInit";
 import AuthGuard from "@/components/AuthGuard";
 import BackHeader from "@/components/BackHeader";
-import Loading from "@/components/Loading";
+import HistorySkeleton from "@/components/skeletons/HistorySkeleton";
+import { useDelayedLoading } from "@/hooks/useDelayedLoading";
 import AudioPlayer from "@/components/AudioPlayer";
 import { useAuthContext } from "../../../Contexts/AuthContext";
 import { useTrackContext } from "../../../context/TrackContext";
@@ -83,6 +85,7 @@ function HistoryContent() {
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const [hasLoadedResults, setHasLoadedResults] = useState(false);
     const [initialFetchDone, setInitialFetchDone] = useState(false);
+    const showSkeleton = useDelayedLoading(!initialFetchDone);
 
     const [addingTrackId, setAddingTrackId] = useState<string | null>(null);
 
@@ -323,10 +326,8 @@ function HistoryContent() {
                     borderRadius: "4px",
                 },
             }}>
-                {!initialFetchDone && (
-                    <Center pt={24}>
-                        <Loading />
-                    </Center>
+                {!initialFetchDone && showSkeleton && (
+                    <HistorySkeleton />
                 )}
 
                 {initialFetchDone && (
@@ -641,9 +642,28 @@ function HistoryContent() {
                         </Table.Root>
 
                         {hasMore && (
-                            <Center py={6} ref={sentinelRef}>
-                                {loadingMore && <Loading />}
-                            </Center>
+                            <Flex direction="column" px={[3, 4]} ref={sentinelRef}>
+                                {loadingMore && Array.from({ length: 3 }).map((_, i) => (
+                                    <Flex
+                                        key={i}
+                                        py={2.5}
+                                        gap={3}
+                                        alignItems="center"
+                                        borderBottom="1px solid"
+                                        borderBottomColor="brand.divider"
+                                    >
+                                        <Skeleton h="44px" w="44px" rounded="lg" flexShrink={0} />
+                                        <Flex direction="column" gap={1.5} flex={1}>
+                                            <Skeleton h="14px" w={`${55 + i * 15}%`} />
+                                            <Skeleton h="12px" w={`${35 + i * 10}%`} />
+                                            <Flex gap={2}>
+                                                <Skeleton h="16px" w="55px" rounded="full" />
+                                                <Skeleton h="12px" w="80px" />
+                                            </Flex>
+                                        </Flex>
+                                    </Flex>
+                                ))}
+                            </Flex>
                         )}
                     </Box>
                 )}
