@@ -57,6 +57,8 @@ const mockUseSubscription = vi.mocked(useSubscription);
 const defaultSubscription = {
     isPro: false,
     isInGracePeriod: false,
+    isCanceledWithTimeLeft: false,
+    isLapsed: false,
     subscriptionsEnabled: false,
     subscriptionTier: "FREE" as const,
     subscriptionStatus: null,

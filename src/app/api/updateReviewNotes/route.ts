@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { requireProSubscription } from "@/lib/requireProSubscription";
 
 export async function POST(req: Request) {
     const { trackId, userId, notes } = await req.json();
@@ -17,6 +18,9 @@ export async function POST(req: Request) {
             { status: 400 }
         );
     }
+
+    const proError = await requireProSubscription(userId);
+    if (proError) return proError;
 
     try {
         await prisma?.review.update({
