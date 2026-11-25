@@ -25,6 +25,10 @@ vi.mock("@/hooks/useSubscription", () => ({
     useSubscription: vi.fn(),
 }));
 
+vi.mock("@/hooks/useProPrice", () => ({
+    useProPrice: () => null,
+}));
+
 import { useSubscription } from "@/hooks/useSubscription";
 const mockUseSubscription = vi.mocked(useSubscription);
 
