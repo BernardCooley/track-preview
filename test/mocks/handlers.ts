@@ -78,4 +78,8 @@ export const handlers = [
     http.get("/api/getSpotifyAccessToken", () => {
         return HttpResponse.json({ access_token: "mock-token", expires_in: 3600, token_type: "Bearer" });
     }),
+
+    http.get("/api/stripe/get-price", () => {
+        return HttpResponse.json({ formatted: "£2.99", interval: "month" });
+    }),
 ];
