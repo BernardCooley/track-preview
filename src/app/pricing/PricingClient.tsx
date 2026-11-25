@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, Text } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
-import { useAuthContext } from "../../../Contexts/AuthContext";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../../../firebase/firebaseInit";
 import { useSubscription } from "@/hooks/useSubscription";
 import { createCheckoutSession } from "@/bff/bff";
 
@@ -13,11 +14,15 @@ interface Props {
 
 const PricingClient = ({ variant }: Props) => {
     const router = useRouter();
-    const { user } = useAuthContext();
     const { isPro } = useSubscription();
     const [loading, setLoading] = useState(false);
+    const [firebaseUser, setFirebaseUser] = useState(auth.currentUser);
 
-    const isLoggedIn = !!user;
+    useEffect(() => {
+        return onAuthStateChanged(auth, (user) => setFirebaseUser(user));
+    }, []);
+
+    const isLoggedIn = !!firebaseUser;
 
     if (variant === "free") {
         if (isPro) return null;
@@ -54,10 +59,10 @@ const PricingClient = ({ variant }: Props) => {
             router.push("/loginRegister");
             return;
         }
-        if (!user?.uid) return;
+        if (!firebaseUser?.uid) return;
         setLoading(true);
         try {
-            const result = await createCheckoutSession({ userId: user.uid });
+            const result = await createCheckoutSession({ userId: firebaseUser.uid });
             if (result?.url) {
                 window.location.href = result.url;
                 return;
