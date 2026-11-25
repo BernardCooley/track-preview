@@ -6,6 +6,31 @@ import getStripe from "@/lib/stripe";
 import { proFeatures } from "@/config/proFeatures";
 import PricingClient from "./PricingClient";
 
+const pricingJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    name: "Phoniquest",
+    url: "https://www.phoniquest.com",
+    applicationCategory: "MusicApplication",
+    offers: [
+        {
+            "@type": "Offer",
+            name: "Free",
+            price: "0",
+            priceCurrency: "USD",
+            description:
+                "Discover random tracks across 89 genres, build a personal music library, and find purchase links.",
+        },
+        {
+            "@type": "Offer",
+            name: "Pro",
+            priceCurrency: "USD",
+            description:
+                "Everything in Free, plus genre alerts, Spotify export, library stats, and more.",
+        },
+    ],
+};
+
 const freeFeatures = [
     "Discover random tracks across 89 genres",
     "Build a personal music library",
@@ -35,6 +60,10 @@ export default async function PricingPage() {
 
     return (
         <Flex direction="column" minH="100dvh" bg="brand.bg">
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(pricingJsonLd) }}
+            />
             <BackHeader title="Pricing" />
 
             <Flex

@@ -7,6 +7,37 @@ import LibraryMusicIcon from "@mui/icons-material/LibraryMusic";
 import TuneIcon from "@mui/icons-material/Tune";
 import QueueMusicIcon from "@mui/icons-material/QueueMusic";
 
+const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+        {
+            "@type": "Question",
+            name: "How does Phoniquest work?",
+            acceptedAnswer: {
+                "@type": "Answer",
+                text: "Phoniquest picks tracks completely at random from 89 genres. You listen to previews, like the ones you enjoy, and skip the rest. Liked tracks go to your personal library where you can re-listen and find purchase links.",
+            },
+        },
+        {
+            "@type": "Question",
+            name: "What is Curated mode?",
+            acceptedAnswer: {
+                "@type": "Answer",
+                text: "Curated mode adds two extra review steps before a track reaches your library. It helps you filter out impulse likes so only your genuine favourites make it through. It's off by default and can be toggled in the menu.",
+            },
+        },
+        {
+            "@type": "Question",
+            name: "How do new track alerts work?",
+            acceptedAnswer: {
+                "@type": "Answer",
+                text: "Follow genres you love in settings to see recently released tracks on the new tracks page. You can also enable email alerts to get notified when new releases drop in your favourite genres.",
+            },
+        },
+    ],
+};
+
 const steps = [
     {
         icon: <LooksOneIcon style={{ fontSize: "24px" }} />,
@@ -39,6 +70,10 @@ const steps = [
 const HowItWorks = () => {
     return (
         <Flex direction="column" minH="100dvh" bg="brand.bg">
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+            />
             <BackHeader title="How it works" />
 
                 <Flex
