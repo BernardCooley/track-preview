@@ -204,6 +204,7 @@ describe("stripe webhook", () => {
                 subscriptionTier: "FREE",
                 subscriptionStatus: "CANCELED",
                 stripeSubscriptionId: null,
+                subscriptionStartedAt: null,
             },
         });
     });

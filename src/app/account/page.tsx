@@ -21,7 +21,7 @@ import {
     UpdateUserEmail,
     UpdateUserPassword,
 } from "../../../firebase/utils";
-import { sendVerificationEmail, spotifyDisconnect, getUserProfile, createPortalSession, createCheckoutSession, syncSubscription } from "@/bff/bff";
+import { sendVerificationEmail, spotifyDisconnect, getUserProfile, createPortalSession, createCheckoutSession, syncSubscription, requestRefund } from "@/bff/bff";
 import { useRouter } from "next/navigation";
 import BackHeader from "@/components/BackHeader";
 import EditIcon from "@mui/icons-material/Edit";
@@ -46,6 +46,8 @@ const Settings = () => {
     const { userProfile, updateUserProfile } = useAuthContext();
     const { subscriptionsEnabled, subscriptionTier, subscriptionStatus } = useSubscription();
     const [managingSubscription, setManagingSubscription] = useState(false);
+    const [requestingRefund, setRequestingRefund] = useState(false);
+    const [showRefundConfirm, setShowRefundConfirm] = useState(false);
     const [showProFeatures, setShowProFeatures] = useState(false);
     const [disconnectingSpotify, setDisconnectingSpotify] = useState(false);
     const [editingEmail, setEditingEmail] = useState<boolean>(false);
@@ -282,6 +284,49 @@ const Settings = () => {
         }
     };
 
+    const handleRefund = async () => {
+        if (!user?.uid) return;
+        setRequestingRefund(true);
+        try {
+            await requestRefund({ userId: user.uid });
+            showToast({
+                title: "Refund processed",
+                description: "Your refund has been issued. It may take 5-10 business days to appear.",
+                type: "success",
+                duration: 8000,
+            });
+            const profile = await getUserProfile({ userId: user.uid });
+            if (profile) updateUserProfile(profile);
+        } catch {
+            showToast({
+                title: "Failed to process refund",
+                description: "Please try again or contact info@phoniquest.com.",
+                type: "error",
+            });
+        } finally {
+            setRequestingRefund(false);
+            setShowRefundConfirm(false);
+        }
+    };
+
+    const isWithinRefundWindow = () => {
+        if (!userProfile?.subscriptionStartedAt) return false;
+        const daysSince = Math.floor(
+            (Date.now() - new Date(userProfile.subscriptionStartedAt).getTime()) /
+                (1000 * 60 * 60 * 24)
+        );
+        return daysSince <= 14;
+    };
+
+    const getRefundDaysLeft = () => {
+        if (!userProfile?.subscriptionStartedAt) return 0;
+        const daysSince = Math.floor(
+            (Date.now() - new Date(userProfile.subscriptionStartedAt).getTime()) /
+                (1000 * 60 * 60 * 24)
+        );
+        return Math.max(0, 14 - daysSince);
+    };
+
     const formatDate = (date: string | Date) => {
         return new Date(date).toLocaleDateString("en-GB", {
             day: "numeric",
@@ -433,6 +478,92 @@ const Settings = () => {
                 </Dialog.Positioner>
             </Dialog.Root>
 
+            <Dialog.Root
+                role="alertdialog"
+                open={showRefundConfirm}
+                onOpenChange={(details) => { if (!details.open) setShowRefundConfirm(false); }}
+            >
+                <Dialog.Backdrop />
+                <Dialog.Positioner>
+                    <Dialog.Content
+                        m={[3, 6]}
+                        bg="brand.bg"
+                        shadow="2xl"
+                        border="1px solid"
+                        borderColor="brand.border"
+                        rounded="modal"
+                        overflow="hidden"
+                    >
+                        <Flex direction="column">
+                            <Flex
+                                px={[4, 5]}
+                                pt={[4, 5]}
+                                pb={3}
+                                alignItems="center"
+                                justifyContent="space-between"
+                            >
+                                <Text
+                                    fontSize="lg"
+                                    fontWeight="semibold"
+                                    color="brand.textPrimary"
+                                    letterSpacing="-0.01em"
+                                >
+                                    Request Refund
+                                </Text>
+                                <Dialog.CloseTrigger
+                                    position="relative"
+                                    top="auto"
+                                    right="auto"
+                                    color="brand.textMuted"
+                                    _hover={{ color: "brand.textPrimary" }}
+                                />
+                            </Flex>
+
+                            <Box
+                                h="1px"
+                                bg="brand.divider"
+                                mx={[4, 5]}
+                            />
+
+                            <Box px={[4, 5]} py={5}>
+                                <Flex direction="column" gap={3}>
+                                    <Text color="brand.textSecondary" fontSize="sm">
+                                        Your Pro subscription will be cancelled immediately and a full refund will be issued. It may take 5-10 business days to appear on your statement.
+                                    </Text>
+                                </Flex>
+                            </Box>
+
+                            <Flex
+                                gap={3}
+                                px={[4, 5]}
+                                py={4}
+                                justifyContent="flex-end"
+                                css={{
+                                    backdropFilter: "blur(16px)",
+                                    WebkitBackdropFilter: "blur(16px)",
+                                    background: "color-mix(in srgb, var(--chakra-colors-brand-bg) 80%, transparent)",
+                                    borderTop: "1px solid var(--chakra-colors-brand-divider)",
+                                }}
+                            >
+                                <Button
+                                    variant="outline"
+                                    onClick={() => setShowRefundConfirm(false)}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    variant="warning"
+                                    loading={requestingRefund}
+                                    onClick={handleRefund}
+                                >
+                                    Confirm refund
+                                </Button>
+                            </Flex>
+                        </Flex>
+                    </Dialog.Content>
+                </Dialog.Positioner>
+            </Dialog.Root>
+
             <BackHeader title="Account" href="/explore" />
 
             <Flex
@@ -563,14 +694,29 @@ const Settings = () => {
 
                         <Box borderTop="1px solid" borderTopColor="brand.divider" pt={4}>
                             {isActuallyPro ? (
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    loading={managingSubscription}
-                                    onClick={handleManageSubscription}
-                                >
-                                    Manage subscription
-                                </Button>
+                                <Flex direction="column" gap={3}>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        loading={managingSubscription}
+                                        onClick={handleManageSubscription}
+                                    >
+                                        Manage subscription
+                                    </Button>
+                                    {subscriptionStatus === "ACTIVE" && isWithinRefundWindow() && (
+                                        <Text
+                                            as="button"
+                                            fontSize="sm"
+                                            color="brand.textMuted"
+                                            cursor="pointer"
+                                            _hover={{ color: "brand.textSecondary" }}
+                                            transition="color 0.15s ease"
+                                            onClick={() => setShowRefundConfirm(true)}
+                                        >
+                                            Request refund ({getRefundDaysLeft()} days left)
+                                        </Text>
+                                    )}
+                                </Flex>
                             ) : (
                                 <Flex direction="column" gap={3}>
                                     <Button

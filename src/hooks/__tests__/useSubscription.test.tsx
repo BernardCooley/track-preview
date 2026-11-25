@@ -33,6 +33,7 @@ function makeProfile(
         stripeSubscriptionId: null,
         subscriptionStatus: null,
         subscriptionExpiresAt: null,
+        subscriptionStartedAt: null,
         spotifyAccessToken: null,
         spotifyRefreshToken: null,
         spotifyTokenExpiresAt: null,

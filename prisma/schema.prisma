@@ -47,6 +47,7 @@ model User {
   stripeSubscriptionId  String?
   subscriptionStatus    SubscriptionStatus?
   subscriptionExpiresAt DateTime?
+  subscriptionStartedAt DateTime?
   spotifyAccessToken    String?
   spotifyRefreshToken   String?
   spotifyTokenExpiresAt DateTime?
