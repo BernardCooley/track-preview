@@ -30,7 +30,7 @@ const FREQUENCY_OPTIONS = [
 
 const SettingsContent = () => {
     const { user, updateUser, userProfile, updateUserProfile } = useAuthContext();
-    const { isPro, requirePro, upgradeFeature, dismissUpgrade } = useSubscription();
+    const { isPro, subscriptionLoading, requirePro, upgradeFeature, dismissUpgrade } = useSubscription();
     const { appearance, toggleAppearance } = useThemeContext();
     const { updateChangesMade, updateReviewTracks } = useTrackContext();
     const [showGenreSelector, setShowGenreSelector] = useState(false);
@@ -47,7 +47,8 @@ const SettingsContent = () => {
     const [localFrequency, setLocalFrequency] = useState<string>(savedFrequency);
     const [localEmailsEnabled, setLocalEmailsEnabled] = useState(savedEmailsEnabled);
     const [profileLoaded, setProfileLoaded] = useState(!!userProfile);
-    const showSettingsSkeleton = useDelayedLoading(!profileLoaded);
+    const settingsReady = profileLoaded && !subscriptionLoading;
+    const showSettingsSkeleton = useDelayedLoading(!settingsReady);
 
     useEffect(() => {
         setLocalGenres(savedGenres);
@@ -149,6 +150,17 @@ const SettingsContent = () => {
             setShowClearConfirm(false);
         }
     };
+
+    if (!settingsReady) {
+        return (
+            <Flex direction="column" minH="100dvh" bg="brand.bg">
+                <BackHeader title="Settings" />
+                <Flex flex={1} direction="column" alignItems="center" px={[4, 6]} py={[6, 8]}>
+                    {showSettingsSkeleton ? <SettingsSkeleton /> : null}
+                </Flex>
+            </Flex>
+        );
+    }
 
     return (
         <Flex direction="column" minH="100dvh" bg="brand.bg">
@@ -339,7 +351,7 @@ const SettingsContent = () => {
                         css: { "& *": { pointerEvents: "none" } },
                     })}
                 >
-                    <Flex alignItems="center" justifyContent="space-between" mb={profileLoaded && savedGenres.length > 0 ? 2 : 6}>
+                    <Flex alignItems="center" justifyContent="space-between" mb={savedGenres.length > 0 ? 2 : 6}>
                         <Flex alignItems="center" gap={2}>
                             <TuneIcon style={{ fontSize: "20px", color: "var(--chakra-colors-brand-primary)" }} />
                             <Text
@@ -368,11 +380,7 @@ const SettingsContent = () => {
                         </Flex>
                     </Flex>
 
-                    {!profileLoaded ? (
-                        showSettingsSkeleton ? <SettingsSkeleton /> : null
-                    ) : (
-                        <>
-                            {savedGenres.length > 0 && (
+                    {savedGenres.length > 0 && (
                                 <Flex
                                     as="button"
                                     onClick={() => setShowClearConfirm(true)}
@@ -446,8 +454,6 @@ const SettingsContent = () => {
                                 </Box>
 
                             </Flex>
-                        </>
-                    )}
                 </Box>
 
                 {/* Email Notifications Card */}

@@ -71,6 +71,7 @@ function setSubscription(isPro: boolean) {
         isInGracePeriod: false,
         isCanceledWithTimeLeft: false,
         isLapsed: false,
+        subscriptionLoading: false,
         subscriptionsEnabled: true,
         subscriptionTier: isPro ? "PRO" : "FREE",
         subscriptionStatus: isPro ? "ACTIVE" : null,
