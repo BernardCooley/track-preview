@@ -1,6 +1,7 @@
 "use client";
 
 import { Flex, Link, Text } from "@chakra-ui/react";
+import NextLink from "next/link";
 import React from "react";
 
 interface Props {
@@ -11,6 +12,9 @@ interface Props {
     badge?: React.ReactNode | null;
     onClick?: () => void;
 }
+
+const isExternalHref = (href: string) =>
+    href.startsWith("http") || href.startsWith("mailto:");
 
 const MenuDrawerItem = ({ pathname, linkText, href, icon, badge, onClick }: Props) => {
     const isActive = pathname === href;
@@ -55,9 +59,23 @@ const MenuDrawerItem = ({ pathname, linkText, href, icon, badge, onClick }: Prop
         );
     }
 
+    if (isExternalHref(href)) {
+        return (
+            <Link href={!isActive ? href : undefined} {...sharedProps}>
+                {content}
+            </Link>
+        );
+    }
+
     return (
-        <Link href={!isActive ? href : undefined} {...sharedProps}>
-            {content}
+        <Link asChild {...sharedProps}>
+            {!isActive ? (
+                <NextLink href={href}>
+                    {content}
+                </NextLink>
+            ) : (
+                <span>{content}</span>
+            )}
         </Link>
     );
 };
