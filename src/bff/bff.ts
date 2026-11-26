@@ -1,6 +1,32 @@
 import { User } from "@prisma/client";
 import { AccessToken, DiscoveryHistoryTrack, Review, SearchedTrack, Track } from "../../types";
 import { getCurrentYear } from "../../utils";
+import { auth } from "../../firebase/firebaseInit";
+import { onAuthStateChanged } from "firebase/auth";
+
+function waitForAuth(): Promise<import("firebase/auth").User | null> {
+    if (auth.currentUser) return Promise.resolve(auth.currentUser);
+    return new Promise((resolve) => {
+        let resolved = false;
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            if (resolved) return;
+            resolved = true;
+            resolve(user);
+            queueMicrotask(() => unsubscribe());
+        });
+    });
+}
+
+async function getAuthHeaders(): Promise<Record<string, string>> {
+    const user = await waitForAuth();
+    if (!user) return {};
+    try {
+        const token = await user.getIdToken();
+        return { Authorization: `Bearer ${token}` };
+    } catch {
+        return {};
+    }
+}
 
 export class GoneError extends Error {
     statusCode = 410;
@@ -39,10 +65,12 @@ export const fetchWithErrorHandling = async <T>(
     body?: any
 ) => {
     try {
+        const authHeaders = await getAuthHeaders();
         const res = await fetch(endpoint, {
             method: method,
             headers: {
                 "Content-Type": "application/json",
+                ...authHeaders,
             },
             body: JSON.stringify(body),
         });
@@ -653,9 +681,10 @@ export const exportLibrary = async ({
     userId: string;
     format: "csv" | "json";
 }): Promise<Blob> => {
+    const authHeaders = await getAuthHeaders();
     const res = await fetch("/api/exportLibrary", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...authHeaders },
         body: JSON.stringify({ userId, format }),
     });
     if (!res.ok) {

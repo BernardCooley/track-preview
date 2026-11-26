@@ -1,8 +1,13 @@
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { verifyAuth, isAuthError } from "@/lib/auth";
 
 export async function POST(req: Request) {
-    const { trackId, userId, purchased } = await req.json();
+    const authResult = await verifyAuth(req);
+    if (isAuthError(authResult)) return authResult;
+    const userId = authResult.uid;
+
+    const { trackId, purchased } = await req.json();
 
     try {
         await prisma?.review.update({

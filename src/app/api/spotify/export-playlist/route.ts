@@ -2,17 +2,15 @@ import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import { getValidSpotifyToken } from "@/lib/spotifyUserAuth";
+import { verifyAuth, isAuthError } from "@/lib/auth";
 
 export async function POST(req: Request) {
-    try {
-        const { userId, playlistId, playlistName } = await req.json();
+    const authResult = await verifyAuth(req);
+    if (isAuthError(authResult)) return authResult;
+    const userId = authResult.uid;
 
-        if (!userId) {
-            return NextResponse.json(
-                { error: "userId is required" },
-                { status: 400 }
-            );
-        }
+    try {
+        const { playlistId, playlistName } = await req.json();
 
         const tokens = await getValidSpotifyToken(userId);
         if (!tokens) {

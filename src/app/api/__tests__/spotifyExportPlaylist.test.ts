@@ -14,13 +14,21 @@ vi.mock("@/lib/prisma", () => ({
     },
 }));
 
+vi.mock("@/lib/auth", () => ({
+    verifyAuth: vi.fn().mockResolvedValue({ uid: "fb-1" }),
+    isAuthError: vi.fn().mockReturnValue(false),
+}));
+
 const mockFetch = vi.fn();
 vi.stubGlobal("fetch", mockFetch);
 
 function makeRequest(body: object) {
     return new Request("http://localhost/api/spotify/export-playlist", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer test-token",
+        },
         body: JSON.stringify(body),
     });
 }
@@ -56,13 +64,6 @@ describe("spotify/export-playlist", () => {
         vi.clearAllMocks();
         process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID = "test-client-id";
         process.env.NEXT_PUBLIC_SPOTIFY_SECRET = "test-secret";
-    });
-
-    it("returns 400 when userId is missing", async () => {
-        vi.resetModules();
-        const { POST } = await import("../spotify/export-playlist/route");
-        const res = await POST(makeRequest({}));
-        expect(res.status).toBe(400);
     });
 
     it("returns 401 when Spotify is not connected", async () => {

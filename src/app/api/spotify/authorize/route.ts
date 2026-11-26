@@ -1,16 +1,13 @@
 import { NextResponse } from "next/server";
 import crypto from "crypto";
+import { verifyAuth, isAuthError } from "@/lib/auth";
 
 export async function POST(req: Request) {
-    try {
-        const { userId } = await req.json();
+    const authResult = await verifyAuth(req);
+    if (isAuthError(authResult)) return authResult;
+    const userId = authResult.uid;
 
-        if (!userId) {
-            return NextResponse.json(
-                { error: "userId is required" },
-                { status: 400 }
-            );
-        }
+    try {
 
         const clientId = process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID;
         const redirectUri = `${process.env.NEXT_PUBLIC_APP_URL}/spotify/callback`;

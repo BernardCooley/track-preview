@@ -33,10 +33,18 @@ vi.mock("@/lib/stripe", () => ({
     }),
 }));
 
+vi.mock("@/lib/auth", () => ({
+    verifyAuth: vi.fn().mockResolvedValue({ uid: "fb-1" }),
+    isAuthError: vi.fn().mockReturnValue(false),
+}));
+
 function makeRequest(body: object) {
     return new Request("http://localhost/api/stripe/create-checkout-session", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer test-token",
+        },
         body: JSON.stringify(body),
     });
 }
@@ -44,7 +52,10 @@ function makeRequest(body: object) {
 function makePortalRequest(body: object) {
     return new Request("http://localhost/api/stripe/create-portal-session", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer test-token",
+        },
         body: JSON.stringify(body),
     });
 }
@@ -52,15 +63,6 @@ function makePortalRequest(body: object) {
 describe("create-checkout-session", () => {
     beforeEach(() => {
         vi.clearAllMocks();
-    });
-
-    it("returns 400 when userId is missing", async () => {
-        vi.resetModules();
-        const { POST } = await import(
-            "../stripe/create-checkout-session/route"
-        );
-        const res = await POST(makeRequest({}));
-        expect(res.status).toBe(400);
     });
 
     it("returns 404 when user not found", async () => {
@@ -130,15 +132,6 @@ describe("create-checkout-session", () => {
 describe("create-portal-session", () => {
     beforeEach(() => {
         vi.clearAllMocks();
-    });
-
-    it("returns 400 when userId is missing", async () => {
-        vi.resetModules();
-        const { POST } = await import(
-            "../stripe/create-portal-session/route"
-        );
-        const res = await POST(makePortalRequest({}));
-        expect(res.status).toBe(400);
     });
 
     it("returns 404 when user has no Stripe customer", async () => {

@@ -12,13 +12,21 @@ vi.mock("@/lib/prisma", () => ({
     },
 }));
 
+vi.mock("@/lib/auth", () => ({
+    verifyAuth: vi.fn().mockResolvedValue({ uid: "fb-1" }),
+    isAuthError: vi.fn().mockReturnValue(false),
+}));
+
 const mockFetch = vi.fn();
 vi.stubGlobal("fetch", mockFetch);
 
 function makeAuthorizeRequest(body: object) {
     return new Request("http://localhost/api/spotify/authorize", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer test-token",
+        },
         body: JSON.stringify(body),
     });
 }
@@ -26,7 +34,10 @@ function makeAuthorizeRequest(body: object) {
 function makeCallbackRequest(body: object) {
     return new Request("http://localhost/api/spotify/callback", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer test-token",
+        },
         body: JSON.stringify(body),
     });
 }
@@ -36,13 +47,6 @@ describe("spotify/authorize", () => {
         vi.clearAllMocks();
         process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID = "test-client-id";
         process.env.NEXT_PUBLIC_APP_URL = "http://localhost:3000";
-    });
-
-    it("returns 400 when userId is missing", async () => {
-        vi.resetModules();
-        const { POST } = await import("../spotify/authorize/route");
-        const res = await POST(makeAuthorizeRequest({}));
-        expect(res.status).toBe(400);
     });
 
     it("returns authorize URL with correct scopes", async () => {
@@ -95,15 +99,6 @@ describe("spotify/callback", () => {
         vi.resetModules();
         const { POST } = await import("../spotify/callback/route");
         const res = await POST(makeCallbackRequest({ code: "auth-code" }));
-        expect(res.status).toBe(400);
-    });
-
-    it("returns 400 when state has no userId", async () => {
-        vi.resetModules();
-        const { POST } = await import("../spotify/callback/route");
-        const res = await POST(
-            makeCallbackRequest({ code: "auth-code", state: "abc" })
-        );
         expect(res.status).toBe(400);
     });
 

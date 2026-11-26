@@ -1,16 +1,12 @@
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
+import { verifyAuth, isAuthError } from "@/lib/auth";
 
 export async function POST(req: Request) {
-    const { userId } = await req.json();
-
-    if (!userId) {
-        return NextResponse.json(
-            { error: "userId is required" },
-            { status: 400 }
-        );
-    }
+    const authResult = await verifyAuth(req);
+    if (isAuthError(authResult)) return authResult;
+    const userId = authResult.uid;
 
     try {
         const totalTracks: { count: bigint }[] =

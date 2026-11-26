@@ -1,21 +1,18 @@
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { verifyAuth, isAuthError } from "@/lib/auth";
 
 export async function POST(req: Request) {
+    const authResult = await verifyAuth(req);
+    if (isAuthError(authResult)) return authResult;
+    const userId = authResult.uid;
+
     try {
         const { code, state } = await req.json();
 
         if (!code || !state) {
             return NextResponse.json(
                 { error: "code and state are required" },
-                { status: 400 }
-            );
-        }
-
-        const userId = state.split(":")[1];
-        if (!userId) {
-            return NextResponse.json(
-                { error: "Invalid state parameter" },
                 { status: 400 }
             );
         }

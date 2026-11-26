@@ -9,10 +9,18 @@ vi.mock("@/lib/prisma", () => ({
     },
 }));
 
+vi.mock("@/lib/auth", () => ({
+    verifyAuth: vi.fn().mockResolvedValue({ uid: "user-1" }),
+    isAuthError: vi.fn().mockReturnValue(false),
+}));
+
 function makeRequest(body: object) {
     return new Request("http://localhost/api/getLibraryStats", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer test-token",
+        },
         body: JSON.stringify(body),
     });
 }
@@ -20,13 +28,6 @@ function makeRequest(body: object) {
 describe("getLibraryStats", () => {
     beforeEach(() => {
         vi.clearAllMocks();
-    });
-
-    it("returns 400 when userId is missing", async () => {
-        const res = await POST(makeRequest({}));
-        expect(res.status).toBe(400);
-        const json = await res.json();
-        expect(json.error).toBe("userId is required");
     });
 
     it("returns stats", async () => {

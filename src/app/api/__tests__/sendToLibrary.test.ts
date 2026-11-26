@@ -11,10 +11,18 @@ vi.mock("@/lib/prisma", () => ({
     },
 }));
 
+vi.mock("@/lib/auth", () => ({
+    verifyAuth: vi.fn().mockResolvedValue({ uid: "user-1" }),
+    isAuthError: vi.fn().mockReturnValue(false),
+}));
+
 function makeRequest(body: object) {
     return new Request("http://localhost/api/sendToLibrary", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer test-token",
+        },
         body: JSON.stringify(body),
     });
 }
