@@ -110,7 +110,7 @@ function NewTracksContent() {
                         gap={2}
                     >
                                                 <Text fontSize="sm" color="brand.textSecondary">
-                            Showing recently released tracks in {genreCount} genre{genreCount !== 1 ? "s" : ""} you follow
+                            Showing new releases in {genreCount} of your favourite genre{genreCount !== 1 ? "s" : ""}
                         </Text>
                     </Flex>
                 </Box>
@@ -145,7 +145,7 @@ function NewTracksContent() {
                                         fontSize="md"
                                         fontWeight="semibold"
                                     >
-                                        {genreCount === 0 ? "No genre alerts set up" : "No new tracks"}
+                                        {genreCount === 0 ? "No favourite genres yet" : "No new tracks"}
                                     </Text>
                                     <Text
                                         textAlign="center"
@@ -153,8 +153,8 @@ function NewTracksContent() {
                                         fontSize="sm"
                                     >
                                         {genreCount === 0
-                                            ? "Follow genres in Settings to see new releases here."
-                                            : "No recent releases in your followed genres right now. Check back later!"}
+                                            ? "Add your favourite genres in Settings to see new releases here."
+                                            : "No recent releases in your favourite genres right now. Check back later!"}
                                     </Text>
                                 </VStack>
                                 <VStack gap={2} w="full">

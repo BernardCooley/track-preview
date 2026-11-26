@@ -29,11 +29,13 @@ import LooksOneIcon from "@mui/icons-material/LooksOne";
 import LooksTwoIcon from "@mui/icons-material/LooksTwo";
 import Looks3Icon from "@mui/icons-material/Looks3";
 import LibraryMusicIcon from "@mui/icons-material/LibraryMusic";
+import FiberNewIcon from "@mui/icons-material/FiberNew";
 import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import StarIcon from "@mui/icons-material/Star";
 import Link from "next/link";
 import { useSubscription } from "@/hooks/useSubscription";
 import UpgradePrompt from "@/components/UpgradePrompt";
+import NewTracksTab from "@/components/NewTracksTab";
 
 function ExploreContent() {
     const router = useRouter();
@@ -142,9 +144,15 @@ function ExploreContent() {
                 router.replace(`/explore?${p.toString()}`);
                 return;
             }
+            if (step === 5 && !isPro) {
+                const p = new URLSearchParams(searchParams?.toString() || "");
+                p.set("reviewStep", "1");
+                router.replace(`/explore?${p.toString()}`);
+                return;
+            }
             setCurrentStep(step);
         }
-    }, [searchParams, effectiveCuratedMode]);
+    }, [searchParams, effectiveCuratedMode, isPro]);
 
     useEffect(() => {
         if (currentlyPlaying !== undefined) {
@@ -155,15 +163,16 @@ function ExploreContent() {
     }, [currentlyPlaying]);
 
     const allTabs = [
-        { name: "Step 1", label: "Discover", icon: <LooksOneIcon style={{ fontSize: "24px" }} />, step: 1 },
-        { name: "Step 2", label: "Review", icon: <LooksTwoIcon style={{ fontSize: "24px" }} />, step: 2 },
-        { name: "Step 3", label: "Final", icon: <Looks3Icon style={{ fontSize: "24px" }} />, step: 3 },
-        { name: "Step 4", label: "Library", icon: <LibraryMusicIcon style={{ fontSize: "24px" }} />, step: 4 },
+        { name: "Step 1", label: "Discover", icon: <LooksOneIcon style={{ fontSize: "24px" }} />, step: 1, pro: false },
+        { name: "Step 2", label: "Review", icon: <LooksTwoIcon style={{ fontSize: "24px" }} />, step: 2, pro: false },
+        { name: "Step 3", label: "Final", icon: <Looks3Icon style={{ fontSize: "24px" }} />, step: 3, pro: false },
+        { name: "Step 4", label: "Library", icon: <LibraryMusicIcon style={{ fontSize: "24px" }} />, step: 4, pro: false },
+        { name: "New", label: "New", icon: <FiberNewIcon style={{ fontSize: "24px" }} />, step: 5, pro: true },
     ];
 
     const tabButtons = effectiveCuratedMode
         ? allTabs
-        : allTabs.filter(t => t.step === 1 || t.step === 4);
+        : allTabs.filter(t => t.step === 1 || t.step === 4 || t.step === 5);
 
     const showAudioPlayer =
         currentStep === 4 &&
@@ -234,9 +243,13 @@ function ExploreContent() {
                             data-tab-step={button.step}
                             variant={currentStep === button.step ? "tabSelected" : "tabDeselected"}
                             onClick={() => {
+                                if (button.pro && !isPro) {
+                                    requirePro("New Tracks");
+                                    return;
+                                }
                                 const p = new URLSearchParams(searchParams?.toString() || "");
                                 p.set("reviewStep", String(button.step));
-                                if (button.step !== 4) {
+                                if (button.step !== 4 && button.step !== 5) {
                                     p.delete("genres");
                                     p.delete("sort");
                                     p.delete("sortDir");
@@ -245,11 +258,23 @@ function ExploreContent() {
                                 router.push(`/explore?${p.toString()}`);
                             }}
                             gap={1}
-                            px={[3, 4]}
+                            px={[2, 4]}
                             h="44px"
                             minW={0}
                         >
-                            {button.icon}
+                            <Box position="relative" display="inline-flex">
+                                {button.icon}
+                                {button.pro && !isPro && (
+                                    <Box
+                                        position="absolute"
+                                        top="-6px"
+                                        right="-4px"
+                                        color="brand.primary"
+                                    >
+                                        <StarIcon style={{ fontSize: "10px" }} />
+                                    </Box>
+                                )}
+                            </Box>
                             <Text
                                 display={["none", "inline"]}
                                 fontSize="sm"
@@ -323,6 +348,7 @@ function ExploreContent() {
                         <TrackReview reviewStep={Number(reviewStep)} />
                     )}
                 {reviewStep && Number(reviewStep) === 4 && <Library />}
+                {reviewStep && Number(reviewStep) === 5 && <NewTracksTab />}
             </Box>
             </Box>
 
