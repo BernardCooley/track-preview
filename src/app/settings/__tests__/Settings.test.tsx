@@ -172,7 +172,7 @@ describe("Settings page", () => {
                 authContext: { ...authContext, userProfile: freeProfile as any },
             });
 
-            const genreCard = screen.getByText("Genre Preferences").closest("[class]")!;
+            const genreCard = screen.getByText("Favourite Genres").closest("[class]")!;
             await user.click(genreCard);
 
             expect(mockRequirePro).toHaveBeenCalledWith("Genre Alerts");

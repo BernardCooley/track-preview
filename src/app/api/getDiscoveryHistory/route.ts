@@ -14,7 +14,7 @@ export async function POST(req: Request) {
 
     const limitVal = limit ?? 50;
     const offsetVal = offset ?? 0;
-    const searchTerm = search ? search.replace(/'/g, "''").toLowerCase() : null;
+    const searchTerm = search ? search.trim().replace(/'/g, "''").toLowerCase() : null;
     const searchCondition = searchTerm
         ? `AND (LOWER(t."title") LIKE '%${searchTerm}%' OR LOWER(t."artist") LIKE '%${searchTerm}%')`
         : "";

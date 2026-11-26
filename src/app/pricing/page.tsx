@@ -26,7 +26,7 @@ const pricingJsonLd = {
             name: "Pro",
             priceCurrency: "USD",
             description:
-                "Everything in Free, plus genre alerts, Spotify export, library stats, and more.",
+                "Everything in Free, plus new track releases, Spotify export, library stats, and more.",
         },
     ],
 };

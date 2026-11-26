@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
     title: "Pricing",
     description:
-        "Compare Phoniquest Free and Pro plans. See what's included and subscribe to unlock genre alerts, Spotify export, library stats, and more.",
+        "Compare Phoniquest Free and Pro plans. See what's included and subscribe to unlock new track releases, Spotify export, library stats, and more.",
     alternates: {
         canonical: "/pricing",
     },

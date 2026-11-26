@@ -347,7 +347,7 @@ const SettingsContent = () => {
                                 fontWeight="semibold"
                                 color="brand.textPrimary"
                             >
-                                Genre Preferences
+                                Favourite Genres
                             </Text>
                             {!isPro && (
                                 <Flex
@@ -395,22 +395,12 @@ const SettingsContent = () => {
 
                             <Flex direction="column" gap={6}>
                                 <Box>
-                                    <Heading
-                                        size="xs"
-                                        textTransform="uppercase"
-                                        fontSize="xs"
-                                        letterSpacing="wider"
-                                        color="brand.textMuted"
-                                        mb={2}
-                                    >
-                                        Followed genres
-                                    </Heading>
                                     <Text
                                         fontSize="xs"
                                         color="brand.textMuted"
                                         mb={3}
                                     >
-                                        Choose genres to follow. New tracks in these genres will appear on your New Tracks page.
+                                        Choose your favourite genres. New tracks in these genres will appear on your New Tracks tab.
                                     </Text>
 
                                     {hasLocalGenres ? (
@@ -500,7 +490,7 @@ const SettingsContent = () => {
                                         fontSize="xs"
                                         color="brand.textMuted"
                                     >
-                                        Get notified when new tracks are added in your followed genres.
+                                        Get notified when new tracks are added in your favourite genres.
                                     </Text>
                                 </Flex>
                                 <Switch.Root
@@ -725,7 +715,7 @@ const SettingsContent = () => {
 
                             <Box px={[4, 5]} py={5}>
                                 <Text color="brand.textSecondary" fontSize="sm">
-                                    This will remove all your followed genres. Your New Tracks page will be empty and email notifications will be turned off.
+                                    This will remove all your favourite genres. Your New Tracks tab will be empty and email notifications will be turned off.
                                 </Text>
                             </Box>
 

@@ -74,28 +74,6 @@ const MenuDrawer = ({ isOpen, onClose }: Props) => {
                             />
                             <MenuDrawerItem
                                 pathname={pathname}
-                                linkText="New Tracks"
-                                href="/new-tracks"
-                                onClick={!isPro ? () => { requirePro("New Tracks"); } : undefined}
-                                badge={!isPro ? (
-                                    <Flex
-                                        alignItems="center"
-                                        bg="brand.primarySubtle"
-                                        color="brand.primary"
-                                        rounded="full"
-                                        px={1.5}
-                                        py={0.5}
-                                        gap={0.5}
-                                    >
-                                        <StarIcon style={{ fontSize: "10px" }} />
-                                        <Text fontSize="2xs" fontWeight="bold" lineHeight="1">
-                                            PRO
-                                        </Text>
-                                    </Flex>
-                                ) : null}
-                            />
-                            <MenuDrawerItem
-                                pathname={pathname}
                                 linkText="History"
                                 href="/history"
                                 onClick={!isPro ? () => { requirePro("Discovery History"); } : undefined}
