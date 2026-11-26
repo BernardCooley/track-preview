@@ -2,9 +2,14 @@ import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { getCurrentYear } from "../../../../utils";
 import { Prisma, Track } from "@prisma/client";
+import { verifyAuth, isAuthError } from "@/lib/auth";
 
 export async function POST(req: Request) {
-    const { genres, startYear, endYear, userId, limit, reviewStep } =
+    const authResult = await verifyAuth(req);
+    if (isAuthError(authResult)) return authResult;
+    const userId = authResult.uid;
+
+    const { genres, startYear, endYear, limit, reviewStep } =
         await req.json();
 
     const isAllGenres =

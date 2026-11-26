@@ -1,8 +1,13 @@
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { verifyAuth, isAuthError } from "@/lib/auth";
 
 export async function POST(req: Request) {
-    const { userId, reset, date } = await req.json();
+    const authResult = await verifyAuth(req);
+    if (isAuthError(authResult)) return authResult;
+    const userId = authResult.uid;
+
+    const { reset, date } = await req.json();
 
     try {
         const value = reset ? null : date ? new Date(date) : new Date();

@@ -1,16 +1,13 @@
 import { NextResponse } from "next/server";
 import { getValidSpotifyToken } from "@/lib/spotifyUserAuth";
+import { verifyAuth, isAuthError } from "@/lib/auth";
 
 export async function POST(req: Request) {
-    try {
-        const { userId } = await req.json();
+    const authResult = await verifyAuth(req);
+    if (isAuthError(authResult)) return authResult;
+    const userId = authResult.uid;
 
-        if (!userId) {
-            return NextResponse.json(
-                { error: "userId is required" },
-                { status: 400 }
-            );
-        }
+    try {
 
         const tokens = await getValidSpotifyToken(userId);
         if (!tokens) {

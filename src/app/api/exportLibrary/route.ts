@@ -1,6 +1,7 @@
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
+import { verifyAuth, isAuthError } from "@/lib/auth";
 
 interface LibraryTrackRow {
     title: string;
@@ -28,15 +29,12 @@ function formatDate(dateString: string | Date): string {
 }
 
 export async function POST(req: Request) {
-    try {
-        const { userId, format } = await req.json();
+    const authResult = await verifyAuth(req);
+    if (isAuthError(authResult)) return authResult;
+    const userId = authResult.uid;
 
-        if (!userId) {
-            return NextResponse.json(
-                { error: "userId is required" },
-                { status: 400 }
-            );
-        }
+    try {
+        const { format } = await req.json();
 
         if (format && format !== "csv" && format !== "json") {
             return NextResponse.json(

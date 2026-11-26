@@ -1,19 +1,16 @@
 import prisma from "@/lib/prisma";
 import getStripe from "@/lib/stripe";
 import { NextResponse } from "next/server";
+import { verifyAuth, isAuthError } from "@/lib/auth";
 
 const REFUND_WINDOW_DAYS = 14;
 
 export async function POST(req: Request) {
-    try {
-        const { userId } = await req.json();
+    const authResult = await verifyAuth(req);
+    if (isAuthError(authResult)) return authResult;
+    const userId = authResult.uid;
 
-        if (!userId) {
-            return NextResponse.json(
-                { error: "userId is required" },
-                { status: 400 }
-            );
-        }
+    try {
 
         const user = await prisma?.user.findFirst({
             where: { firebaseId: userId },

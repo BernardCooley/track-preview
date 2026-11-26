@@ -1,8 +1,13 @@
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { verifyAuth, isAuthError } from "@/lib/auth";
 
 export async function POST(req: Request) {
-    const { userId, autoplay, genres, yearFrom, yearTo, curatedMode, swipeMode, genreAlerts, genreAlertFrequency, genreEmailsEnabled, email } = await req.json();
+    const authResult = await verifyAuth(req);
+    if (isAuthError(authResult)) return authResult;
+    const userId = authResult.uid;
+
+    const { autoplay, genres, yearFrom, yearTo, curatedMode, swipeMode, genreAlerts, genreAlertFrequency, genreEmailsEnabled, email } = await req.json();
 
     const data = {
         ...(autoplay !== undefined && { autoplay }),

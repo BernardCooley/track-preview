@@ -1,13 +1,18 @@
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { requireProSubscription } from "@/lib/requireProSubscription";
+import { verifyAuth, isAuthError } from "@/lib/auth";
 
 export async function POST(req: Request) {
-    const { trackId, userId, notes } = await req.json();
+    const authResult = await verifyAuth(req);
+    if (isAuthError(authResult)) return authResult;
+    const userId = authResult.uid;
 
-    if (!trackId || !userId) {
+    const { trackId, notes } = await req.json();
+
+    if (!trackId) {
         return NextResponse.json(
-            { error: "trackId and userId are required" },
+            { error: "trackId is required" },
             { status: 400 }
         );
     }

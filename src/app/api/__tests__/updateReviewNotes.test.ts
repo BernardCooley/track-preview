@@ -11,10 +11,18 @@ vi.mock("@/lib/prisma", () => ({
     },
 }));
 
+vi.mock("@/lib/auth", () => ({
+    verifyAuth: vi.fn().mockResolvedValue({ uid: "user-1" }),
+    isAuthError: vi.fn().mockReturnValue(false),
+}));
+
 function makeRequest(body: object) {
     return new Request("http://localhost/api/updateReviewNotes", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer test-token",
+        },
         body: JSON.stringify(body),
     });
 }
@@ -62,15 +70,6 @@ describe("updateReviewNotes", () => {
     it("returns 400 when trackId is missing", async () => {
         const res = await POST(
             makeRequest({ userId: "user-1", notes: "test" })
-        );
-
-        expect(res.status).toBe(400);
-        expect(mockUpdate).not.toHaveBeenCalled();
-    });
-
-    it("returns 400 when userId is missing", async () => {
-        const res = await POST(
-            makeRequest({ trackId: "track-1", notes: "test" })
         );
 
         expect(res.status).toBe(400);

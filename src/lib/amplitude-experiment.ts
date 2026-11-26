@@ -6,7 +6,7 @@ let client: ExperimentClient | null = null;
 export function getExperimentClient(): ExperimentClient {
     if (client) return client;
 
-    client = Experiment.initializeWithAmplitudeAnalytics(getExperimentDeploymentKey(), {
+    client = Experiment.initialize(getExperimentDeploymentKey(), {
         serverZone: "eu",
     });
     return client;

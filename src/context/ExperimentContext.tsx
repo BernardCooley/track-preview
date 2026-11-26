@@ -2,6 +2,8 @@
 
 import React, { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { getExperimentClient } from "@/lib/amplitude-experiment";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../../firebase/firebaseInit";
 
 interface ExperimentContextValue {
     isLoaded: boolean;
@@ -23,7 +25,10 @@ export const ExperimentProvider = ({ children }: { children: ReactNode }) => {
 
     useEffect(() => {
         const client = getExperimentClient();
-        client.fetch().then(() => setIsLoaded(true)).catch(() => setIsLoaded(true));
+        return onAuthStateChanged(auth, (firebaseUser) => {
+            const experimentUser = firebaseUser?.uid ? { user_id: firebaseUser.uid } : undefined;
+            client.fetch(experimentUser).then(() => setIsLoaded(true)).catch(() => setIsLoaded(true));
+        });
     }, []);
 
     const getFlag = (flagKey: string, fallback = "off"): string => {

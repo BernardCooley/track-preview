@@ -1,11 +1,16 @@
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { Prisma, Track } from "@prisma/client";
+import { verifyAuth, isAuthError } from "@/lib/auth";
 
 export async function POST(req: Request) {
-    const { genres, userId, releasedAfter } = await req.json();
+    const authResult = await verifyAuth(req);
+    if (isAuthError(authResult)) return authResult;
+    const userId = authResult.uid;
 
-    if (!genres || genres.length === 0 || !userId || !releasedAfter) {
+    const { genres, releasedAfter } = await req.json();
+
+    if (!genres || genres.length === 0 || !releasedAfter) {
         return NextResponse.json(
             { error: "Missing required fields" },
             { status: 400 }

@@ -104,9 +104,11 @@ const Settings = () => {
     useEffect(() => {
         if (!user?.uid) return;
         const load = async () => {
-            await syncSubscription({ userId: user.uid }).catch(() => {});
-            const profile = await getUserProfile({ userId: user.uid });
-            if (profile) updateUserProfile(profile);
+            try {
+                await syncSubscription({ userId: user.uid }).catch(() => {});
+                const profile = await getUserProfile({ userId: user.uid });
+                if (profile) updateUserProfile(profile);
+            } catch {}
         };
         load();
     }, [user?.uid]);
