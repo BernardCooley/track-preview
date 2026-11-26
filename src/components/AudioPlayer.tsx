@@ -7,67 +7,97 @@ import PauseIcon from "@mui/icons-material/Pause";
 import { useTrackContext } from "../../context/TrackContext";
 
 function ProgressBar({ currentTime, duration, onSeek }: { currentTime: number; duration: number; onSeek: (time: number) => void }) {
-    const barRef = useRef<HTMLDivElement>(null);
-    const dragging = useRef(false);
+    const inputRef = useRef<HTMLInputElement>(null);
+    const interacting = useRef(false);
 
-    const seek = useCallback(
-        (clientX: number) => {
-            const bar = barRef.current;
-            if (!bar || !duration) return;
-            const rect = bar.getBoundingClientRect();
-            const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
-            onSeek(ratio * duration);
-        },
-        [duration, onSeek]
-    );
+    useEffect(() => {
+        if (!interacting.current && inputRef.current) {
+            inputRef.current.value = String(currentTime);
+        }
+    }, [currentTime]);
 
-    const onPointerDown = useCallback(
-        (e: React.PointerEvent) => {
-            dragging.current = true;
-            (e.target as HTMLElement).setPointerCapture(e.pointerId);
-            seek(e.clientX);
-        },
-        [seek]
-    );
-
-    const onPointerMove = useCallback(
-        (e: React.PointerEvent) => {
-            if (dragging.current) seek(e.clientX);
-        },
-        [seek]
-    );
-
-    const onPointerUp = useCallback(() => {
-        dragging.current = false;
-    }, []);
+    useEffect(() => {
+        if (inputRef.current) {
+            inputRef.current.max = String(duration || 1);
+        }
+    }, [duration]);
 
     const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
 
     return (
-        <Box
-            position="absolute"
-            bottom={0}
-            left={0}
-            right={0}
-            h="4px"
-            bg="brand.surface"
-            cursor="pointer"
-            ref={barRef}
-            onPointerDown={onPointerDown}
-            onPointerMove={onPointerMove}
-            onPointerUp={onPointerUp}
-            role="slider"
-            aria-label="Track progress"
-            aria-valuenow={currentTime}
-            aria-valuemax={duration}
-        >
-            <Box
-                h="full"
-                bg="brand.primary"
-                w={`${progress}%`}
-                transition={dragging.current ? "none" : "width 0.25s linear"}
-                borderRadius="0 1px 1px 0"
+        <Box position="absolute" bottom={0} left={0} right={0} h="4px">
+            <input
+                ref={inputRef}
+                className="library-progress"
+                type="range"
+                min={0}
+                max={duration || 1}
+                step="any"
+                defaultValue={0}
+                onPointerDown={() => { interacting.current = true; }}
+                onTouchStart={() => { interacting.current = true; }}
+                onInput={(e) => onSeek(parseFloat((e.target as HTMLInputElement).value))}
+                onPointerUp={() => { interacting.current = false; }}
+                onTouchEnd={() => { interacting.current = false; }}
+                onChange={() => {}}
+                aria-label="Track progress"
+                style={{
+                    display: "block",
+                    width: "100%",
+                    height: "32px",
+                    margin: 0,
+                    padding: 0,
+                    position: "absolute",
+                    top: "-14px",
+                    left: 0,
+                    border: "none",
+                    outline: "none",
+                    cursor: "pointer",
+                    WebkitAppearance: "none",
+                    appearance: "none",
+                    background: "transparent",
+                    touchAction: "none",
+                    zIndex: 1,
+                }}
             />
+            <Box h="full" bg="brand.surface" w="full" borderRadius="2px" overflow="hidden">
+                <Box
+                    h="full"
+                    bg="brand.primary"
+                    w={`${progress}%`}
+                    borderRadius="2px"
+                    pointerEvents="none"
+                />
+            </Box>
+            <style>{`
+                .library-progress::-webkit-slider-runnable-track {
+                    height: 4px;
+                    border-radius: 2px;
+                    background: transparent;
+                }
+                .library-progress::-webkit-slider-thumb {
+                    -webkit-appearance: none;
+                    width: 14px;
+                    height: 14px;
+                    border-radius: 50%;
+                    background: var(--chakra-colors-brand-primary);
+                    margin-top: -5px;
+                    border: none;
+                }
+                .library-progress::-moz-range-track {
+                    height: 4px;
+                    border-radius: 2px;
+                    background: transparent;
+                    border: none;
+                }
+                .library-progress::-moz-range-thumb {
+                    width: 14px;
+                    height: 14px;
+                    border-radius: 50%;
+                    background: var(--chakra-colors-brand-primary);
+                    border: none;
+                }
+            `}</style>
         </Box>
     );
 }
