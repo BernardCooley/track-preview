@@ -94,16 +94,19 @@ a {
 
 .rhap_progress-filled {
     background-color: #11999e !important;
-    transition: width 0.1s linear;
 }
 
 .rhap_progress-indicator {
-    transition: left 0.1s linear;
 }
 
 .rhap_progress-bar {
     background-color: var(--audio-progress-bar-bg) !important;
+}
+
+.rhap_progress-container {
     touch-action: none;
+    position: relative;
+    z-index: 10;
 }
 
 .rhap_download-progress {

@@ -401,9 +401,21 @@ const TrackReviewCard = ({
                                 w="full"
                                 position="relative"
                                 zIndex={1}
-                                onTouchStart={(e) => e.stopPropagation()}
-                                onTouchMove={(e) => e.stopPropagation()}
-                                onTouchEnd={(e) => e.stopPropagation()}
+                                onTouchStart={(e) => {
+                                    if (!(e.target as HTMLElement).closest(".rhap_progress-container")) {
+                                        e.stopPropagation();
+                                    }
+                                }}
+                                onTouchMove={(e) => {
+                                    if (!(e.target as HTMLElement).closest(".rhap_progress-container")) {
+                                        e.stopPropagation();
+                                    }
+                                }}
+                                onTouchEnd={(e) => {
+                                    if (!(e.target as HTMLElement).closest(".rhap_progress-container")) {
+                                        e.stopPropagation();
+                                    }
+                                }}
                                 onMouseDown={(e) => e.stopPropagation()}
                             >
                                 <AudioPlayer
