@@ -39,7 +39,7 @@ const GenreModal = ({
     const [genres, setGenres] = useState<string[]>([]);
     const [localSelection, setLocalSelection] = useState<string[]>(selectedGenres);
 
-    const isSearchActive = searchValue.length > 0;
+    const isSearchActive = searchValue.trim().length > 0;
 
     useEffect(() => {
         if (showGenreSelector) {
@@ -57,7 +57,7 @@ const GenreModal = ({
 
     useEffect(() => {
         if (searchValue.length > 0) {
-            const searchValueLower = searchValue.toLowerCase();
+            const searchValueLower = searchValue.trim().toLowerCase();
             setFilteredGenres(
                 availableGenres.filter((gen) =>
                     gen.toLowerCase().includes(searchValueLower)
