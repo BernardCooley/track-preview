@@ -63,15 +63,15 @@ describe("syncDeezer", () => {
                 callOrder.push("chart-106-start");
                 await new Promise((r) => setTimeout(r, 50));
                 callOrder.push("chart-106-end");
-                return { json: () => Promise.resolve({ data: [] }) };
+                return { ok: true, json: () => Promise.resolve({ data: [] }) };
             }
             if (url.includes("api.deezer.com/chart/113")) {
                 callOrder.push("chart-113-start");
                 await new Promise((r) => setTimeout(r, 50));
                 callOrder.push("chart-113-end");
-                return { json: () => Promise.resolve({ data: [] }) };
+                return { ok: true, json: () => Promise.resolve({ data: [] }) };
             }
-            return { json: () => Promise.resolve({ data: [] }) };
+            return { ok: true, json: () => Promise.resolve({ data: [] }) };
         });
 
         mockSearchTrack.mockResolvedValue({ data: [] });
@@ -116,6 +116,7 @@ describe("syncDeezer", () => {
             }
             if (url.includes("api.deezer.com/chart/113")) {
                 return {
+                    ok: true,
                     json: () =>
                         Promise.resolve({
                             data: [
@@ -130,7 +131,7 @@ describe("syncDeezer", () => {
                         }),
                 };
             }
-            return { json: () => Promise.resolve({ data: [] }) };
+            return { ok: true, json: () => Promise.resolve({ data: [] }) };
         });
 
         mockSearchTrack.mockResolvedValue({ data: [] });

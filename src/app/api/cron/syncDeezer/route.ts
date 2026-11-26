@@ -5,28 +5,37 @@ import { NextResponse } from "next/server";
 import { genres } from "../../../../../data/genres";
 import { deezerGenreMap, appGenreToDeezerIds } from "../../../../../data/deezerGenreMap";
 
-const GENRES_PER_RUN = 20;
+const CONCURRENCY = 5;
 
 const genreSearchTerms: Record<string, string[]> = {
-    "Punk/Hardcore": ["punk rock", "hardcore punk"],
-    "Psych/Garage Rock": ["psychedelic rock", "garage rock"],
-    "Experimental/Electronic": ["experimental electronic"],
-    "50s/60s": ["60s hits", "50s rock and roll"],
-    "Coldwave/Synth": ["coldwave", "synthwave"],
-    "Industrial/Noise": ["industrial music", "noise rock"],
-    "Ambient/Drone": ["ambient music", "drone ambient"],
-    "Progressive Rock": ["progressive rock"],
-    "Disco/Nu-Disco": ["nu disco", "disco funk"],
-    "Reggae Classics/Ska": ["reggae classics", "ska"],
+    "Rock": ["rock music", "classic rock", "rock band"],
+    "Metal": ["metal music", "thrash metal", "death metal"],
+    "Heavy Metal": ["heavy metal", "iron maiden", "metal band"],
+    "Hip Hop/R&B": ["hip hop", "r&b", "rap music"],
+    "Soul": ["soul music", "northern soul", "neo soul"],
+    "Funk": ["funk music", "funk band", "funky"],
+    "Soundtracks": ["movie soundtrack", "film score", "original soundtrack"],
+    "Techno": ["techno music", "detroit techno", "techno DJ"],
+    "Punk/Hardcore": ["punk rock", "hardcore punk", "punk band"],
+    "Psych/Garage Rock": ["psychedelic rock", "garage rock", "psych rock"],
+    "Experimental/Electronic": ["experimental electronic", "avant-garde electronic"],
+    "50s/60s": ["60s hits", "50s rock and roll", "60s pop"],
+    "Coldwave/Synth": ["coldwave", "synthwave", "synth pop"],
+    "Industrial/Noise": ["industrial music", "noise rock", "industrial band"],
+    "Ambient/Drone": ["ambient music", "drone ambient", "ambient electronic"],
+    "Progressive Rock": ["progressive rock", "prog rock"],
+    "Disco/Nu-Disco": ["nu disco", "disco funk", "disco music"],
+    "Reggae Classics/Ska": ["reggae classics", "ska music", "reggae"],
     "Broken Beat/Nu Jazz": ["broken beat", "nu jazz"],
     "Minimal/Tech House": ["minimal techno", "tech house"],
     "Electro House": ["electro house"],
-    "Post Rock/Experimental": ["post rock"],
-    "Balearic/Downtempo": ["downtempo", "balearic"],
+    "Post Rock/Experimental": ["post rock", "post rock band"],
+    "International": ["world music", "international music"],
+    "Balearic/Downtempo": ["downtempo", "balearic", "chill out music"],
     "Roots/Lovers Rock": ["lovers rock", "roots reggae"],
-    "Modern Classical": ["modern classical", "contemporary classical"],
+    "Modern Classical": ["modern classical", "contemporary classical", "neo classical"],
     "Uplifting Trance": ["uplifting trance"],
-    "Drum & Bass / Jungle": ["drum and bass", "jungle music"],
+    "Drum & Bass / Jungle": ["drum and bass", "jungle music", "dnb"],
     "Dub": ["dub music", "dub reggae"],
     "Library/Archive": ["library music"],
     "Funky/Club House": ["funky house"],
@@ -48,38 +57,45 @@ const genreSearchTerms: Record<string, string[]> = {
     "UK Hardcore": ["uk hardcore rave"],
     "Bassline": ["bassline"],
     "Pop Trance": ["vocal trance"],
-    "Acoustic": ["acoustic"],
+    "Acoustic": ["acoustic music", "acoustic guitar"],
     "Christian": ["christian music"],
     "Christmas": ["christmas songs"],
     "Contemporary Christian": ["contemporary christian"],
     "Easy Listening": ["easy listening"],
-    "Gospel": ["gospel"],
+    "Gospel": ["gospel music", "gospel choir"],
     "Holiday": ["holiday music"],
-    "Instrumental": ["instrumental"],
+    "Instrumental": ["instrumental music", "instrumental"],
     "Inspirational": ["inspirational music"],
     "Karaoke": ["karaoke"],
-    "Modern Rock": ["modern rock"],
+    "Modern Rock": ["modern rock", "alternative rock"],
     "New Age": ["new age music"],
     "Pakistan": ["pakistani music"],
     "Spiritual": ["spiritual music"],
     "Spoken Word": ["spoken word"],
     "House": ["house music", "deep house"],
     "Dance": ["dance music", "edm"],
-    "Techno": ["techno music", "detroit techno"],
     "Deep House": ["deep house", "deep house music"],
     "Dubstep": ["dubstep"],
     "Trance": ["trance music"],
     "Electro": ["electro music", "electro funk", "electro bass"],
     "Electronica": ["electronica"],
-    "International": ["world music"],
+    "Pop": ["pop music", "pop hits"],
+    "Jazz": ["jazz music", "modern jazz", "jazz fusion"],
+    "Blues": ["blues music", "blues guitar", "blues rock"],
+    "Folk/Americana": ["folk music", "americana", "folk singer"],
+    "Indie/Alternative": ["indie music", "alternative music", "indie rock"],
+    "Classical": ["classical music", "orchestra", "symphony"],
+    "Country": ["country music", "country songs"],
+    "African": ["african music", "afrobeats"],
+    "Brazilian": ["brazilian music", "bossa nova", "samba"],
+    "Latin": ["latin music", "salsa", "bachata"],
+    "Reggae": ["reggae music", "reggae"],
+    "Reggaeton": ["reggaeton"],
+    "World": ["world music"],
+    "Children": ["children music", "kids songs"],
+    "Indie Rock": ["indie rock", "indie rock band"],
+    "Indie Pop": ["indie pop", "indie pop music"],
 };
-
-function getDayOfYear(): number {
-    const now = new Date();
-    const start = new Date(now.getFullYear(), 0, 0);
-    const diff = now.getTime() - start.getTime();
-    return Math.floor(diff / (1000 * 60 * 60 * 24));
-}
 
 function mapDeezerGenre(deezerGenreName: string | undefined): string {
     if (!deezerGenreName) return "Electronica";
@@ -115,77 +131,126 @@ function mapTrack(track: any, genre: string) {
     };
 }
 
+async function deezerFetch(url: string): Promise<any> {
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (data?.error) return null;
+    return data;
+}
+
+async function searchWithPagination(term: string, limit: number): Promise<any[]> {
+    const tracks: any[] = [];
+    for (let index = 0; index < limit; index += 25) {
+        const data = await deezerFetch(
+            `https://api.deezer.com/search/track?q=${encodeURIComponent(term)}&limit=25&index=${index}`
+        );
+        if (!data?.data?.length) break;
+        tracks.push(...data.data);
+        if (data.data.length < 25) break;
+    }
+    return tracks;
+}
+
+async function fetchGenreTracks(genre: string): Promise<any[]> {
+    const tracks: any[] = [];
+    const seen = new Set<string>();
+
+    const addTrack = (track: any, g: string) => {
+        const id = String(track.id);
+        if (seen.has(id)) return;
+        seen.add(id);
+        tracks.push(mapTrack(track, g));
+    };
+
+    const deezerIds = appGenreToDeezerIds[genre];
+    if (deezerIds) {
+        const chartResults = await Promise.allSettled(
+            deezerIds.map(async (deezerGenreId) => {
+                const data = await deezerFetch(
+                    `https://api.deezer.com/chart/${deezerGenreId}/tracks?limit=50`
+                );
+                return data;
+            })
+        );
+        for (const result of chartResults) {
+            if (result.status === "fulfilled" && result.value?.data) {
+                for (const track of result.value.data) {
+                    addTrack(track, genre);
+                }
+            }
+        }
+    }
+
+    const searchTerms = genreSearchTerms[genre] || [genre];
+    const searchResults = await Promise.allSettled(
+        searchTerms.map((term) => searchWithPagination(term, 50))
+    );
+    for (const result of searchResults) {
+        if (result.status === "fulfilled") {
+            for (const track of result.value) {
+                addTrack(track, genre);
+            }
+        }
+    }
+
+    return tracks;
+}
+
+async function processInBatches<T, R>(
+    items: T[],
+    concurrency: number,
+    fn: (item: T) => Promise<R>
+): Promise<R[]> {
+    const results: R[] = [];
+    for (let i = 0; i < items.length; i += concurrency) {
+        const batch = items.slice(i, i + concurrency);
+        const batchResults = await Promise.allSettled(batch.map(fn));
+        for (const result of batchResults) {
+            if (result.status === "fulfilled") {
+                results.push(result.value);
+            }
+        }
+    }
+    return results;
+}
+
 export async function GET(req: Request) {
     const authHeader = req.headers.get("authorization");
     if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { searchParams } = new URL(req.url);
-    const syncAll = searchParams.get("all") === "true";
-
     try {
         const allTracks: any[] = [];
+        const seen = new Set<string>();
+
+        const addTracks = (tracks: any[]) => {
+            for (const track of tracks) {
+                if (!seen.has(track.platformId)) {
+                    seen.add(track.platformId);
+                    allTracks.push(track);
+                }
+            }
+        };
 
         const chartResponse = await deezer.chart.tracks(100);
         if (chartResponse?.data) {
-            for (const track of chartResponse.data) {
-                allTracks.push(mapTrack(track, mapDeezerGenre(track.genre?.name)));
-            }
-        }
-
-        let todaysGenres: string[];
-
-        if (syncAll) {
-            todaysGenres = [...genres];
-        } else {
-            const dayOfYear = getDayOfYear();
-            const startIndex = (dayOfYear * GENRES_PER_RUN) % genres.length;
-            todaysGenres = [];
-            for (let i = 0; i < GENRES_PER_RUN; i++) {
-                todaysGenres.push(genres[(startIndex + i) % genres.length]);
-            }
-        }
-
-        const genreResults = await Promise.all(todaysGenres.map(async (genre) => {
-            const tracks: any[] = [];
-            const deezerIds = appGenreToDeezerIds[genre];
-
-            if (deezerIds) {
-                const chartResults = await Promise.allSettled(
-                    deezerIds.map(async (deezerGenreId) => {
-                        const chartRes = await fetch(
-                            `https://api.deezer.com/chart/${deezerGenreId}/tracks?limit=25`
-                        );
-                        return chartRes.json();
-                    })
-                );
-                for (const result of chartResults) {
-                    if (result.status === "fulfilled" && result.value?.data) {
-                        for (const track of result.value.data) {
-                            tracks.push(mapTrack(track, genre));
-                        }
-                    }
-                }
-            }
-
-            const searchTerms = genreSearchTerms[genre] || [genre];
-            const searchResults = await Promise.allSettled(
-                searchTerms.map((term) => deezer.search.track(term))
+            addTracks(
+                chartResponse.data.map((track: any) =>
+                    mapTrack(track, mapDeezerGenre(track.genre?.name))
+                )
             );
-            for (const result of searchResults) {
-                if (result.status === "fulfilled" && result.value?.data) {
-                    for (const track of result.value.data.slice(0, 25)) {
-                        tracks.push(mapTrack(track, genre));
-                    }
-                }
-            }
+        }
 
-            return tracks;
-        }));
+        const genreResults = await processInBatches(
+            [...genres],
+            CONCURRENCY,
+            fetchGenreTracks
+        );
 
         for (const tracks of genreResults) {
-            allTracks.push(...tracks);
+            addTracks(tracks);
         }
 
         if (!prisma) {
@@ -200,14 +265,24 @@ export async function GET(req: Request) {
             skipDuplicates: true,
         });
 
+        const genreCounts: Record<string, number> = {};
+        for (const t of allTracks) {
+            genreCounts[t.genre] = (genreCounts[t.genre] || 0) + 1;
+        }
+        const topGenres = Object.entries(genreCounts)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 15)
+            .map(([g, c]) => `${g}: ${c}`)
+            .join(", ");
+
         await notifyDiscord(
-            `**Deezer cron sync complete**\nInserted: ${result.count}/${allTracks.length} tracks\nGenres: ${todaysGenres.join(", ")}`
+            `**Deezer cron sync complete**\nInserted: ${result.count}/${allTracks.length} tracks\nGenres processed: ${genres.length}\nTop: ${topGenres}`
         );
 
         return NextResponse.json({
             inserted: result.count,
             total: allTracks.length,
-            genres: todaysGenres,
+            genres: genres.length,
         });
     } catch (error: any) {
         console.error("Deezer sync error:", error);
