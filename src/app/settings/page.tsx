@@ -36,7 +36,7 @@ const SettingsContent = () => {
     const [showGenreSelector, setShowGenreSelector] = useState(false);
     const [showClearConfirm, setShowClearConfirm] = useState(false);
     const [showCuratedConfirm, setShowCuratedConfirm] = useState(false);
-    const [saving, setSaving] = useState(false);
+
     const [clearing, setClearing] = useState(false);
 
     const savedGenres = userProfile?.genreAlerts ?? [];
@@ -64,13 +64,11 @@ const SettingsContent = () => {
                 if (profile) {
                     updateUserProfile(profile);
                     const needsEmailSync = profile.email !== firebaseUser.email;
-                    const needsGenreClear = !isPro && profile.genreAlerts.length > 0;
 
-                    if (needsEmailSync || needsGenreClear) {
+                    if (needsEmailSync) {
                         const updated = await mutateUserProfile({
                             userId: firebaseUser.uid,
-                            ...(needsEmailSync && { email: firebaseUser.email }),
-                            ...(needsGenreClear && { genreAlerts: [], genreEmailsEnabled: false }),
+                            email: firebaseUser.email,
                         });
                         updateUserProfile(updated);
                     }
@@ -78,19 +76,9 @@ const SettingsContent = () => {
             }
         });
         return unsubscribe;
-    }, [isPro]);
+    }, []);
 
     const hasLocalGenres = localGenres.length > 0;
-
-    const hasGenreChanges =
-        JSON.stringify(localGenres) !== JSON.stringify(savedGenres);
-
-    const hasEmailChanges =
-        localFrequency !== savedFrequency ||
-        localEmailsEnabled !== savedEmailsEnabled;
-
-    const editingGenres = hasGenreChanges;
-    const editingEmail = hasEmailChanges;
 
     const disableCuratedMode = async () => {
         if (user?.uid) {
@@ -112,39 +100,38 @@ const SettingsContent = () => {
         setShowGenreSelector(true);
     };
 
-    const handleGenreApply = (selected: string[]) => {
+    const handleGenreApply = async (selected: string[]) => {
+        if (!user?.uid) return;
         const alertGenres = selected.some((g) => g.toLowerCase() === "all") ? [] : selected;
         setLocalGenres(alertGenres);
         setShowGenreSelector(false);
+        const clearingGenres = alertGenres.length === 0;
+        const updated = await mutateUserProfile({
+            userId: user.uid,
+            genreAlerts: alertGenres,
+            ...(clearingGenres && { genreEmailsEnabled: false }),
+        });
+        updateUserProfile(updated);
     };
 
-    const handleSaveGenres = async () => {
+    const handleToggleEmails = async (enabled: boolean) => {
         if (!user?.uid) return;
-        setSaving(true);
-        try {
-            const updated = await mutateUserProfile({
-                userId: user.uid,
-                genreAlerts: localGenres,
-            });
-            updateUserProfile(updated);
-        } finally {
-            setSaving(false);
-        }
+        setLocalEmailsEnabled(enabled);
+        const updated = await mutateUserProfile({
+            userId: user.uid,
+            genreEmailsEnabled: enabled,
+        });
+        updateUserProfile(updated);
     };
 
-    const handleSaveEmail = async () => {
+    const handleFrequencyChange = async (frequency: string) => {
         if (!user?.uid) return;
-        setSaving(true);
-        try {
-            const updated = await mutateUserProfile({
-                userId: user.uid,
-                genreAlertFrequency: localFrequency,
-                genreEmailsEnabled: localEmailsEnabled,
-            });
-            updateUserProfile(updated);
-        } finally {
-            setSaving(false);
-        }
+        setLocalFrequency(frequency);
+        const updated = await mutateUserProfile({
+            userId: user.uid,
+            genreAlertFrequency: frequency,
+        });
+        updateUserProfile(updated);
     };
 
     const handleClear = async () => {
@@ -154,6 +141,7 @@ const SettingsContent = () => {
             const updated = await mutateUserProfile({
                 userId: user.uid,
                 genreAlerts: [],
+                genreEmailsEnabled: false,
             });
             updateUserProfile(updated);
         } finally {
@@ -345,9 +333,6 @@ const SettingsContent = () => {
                     borderColor="brand.border"
                     rounded="card"
                     p={[5, 6]}
-                    opacity={editingEmail ? 0.4 : 1}
-                    pointerEvents={editingEmail ? "none" : "auto"}
-                    transition="opacity 0.2s ease"
                     {...(!isPro && {
                         cursor: "pointer",
                         onClick: () => requirePro("Genre Alerts"),
@@ -470,23 +455,6 @@ const SettingsContent = () => {
                                     </Button>
                                 </Box>
 
-                                {hasGenreChanges && (
-                                    <Flex
-                                        borderTop="1px solid"
-                                        borderTopColor="brand.divider"
-                                        pt={4}
-                                        justifyContent="flex-end"
-                                    >
-                                        <Button
-                                            variant="primary"
-                                            size="sm"
-                                            onClick={handleSaveGenres}
-                                            loading={saving}
-                                        >
-                                            Save
-                                        </Button>
-                                    </Flex>
-                                )}
                             </Flex>
                         </>
                     )}
@@ -502,9 +470,6 @@ const SettingsContent = () => {
                         borderColor="brand.border"
                         rounded="card"
                         p={[5, 6]}
-                        opacity={editingGenres ? 0.4 : 1}
-                        pointerEvents={editingGenres ? "none" : "auto"}
-                        transition="opacity 0.2s ease"
                     >
                         <Flex alignItems="center" gap={2} mb={6}>
                             <EmailIcon style={{ fontSize: "20px", color: "var(--chakra-colors-brand-primary)" }} />
@@ -540,7 +505,7 @@ const SettingsContent = () => {
                                 </Flex>
                                 <Switch.Root
                                     checked={localEmailsEnabled}
-                                    onCheckedChange={(details) => setLocalEmailsEnabled(details.checked)}
+                                    onCheckedChange={(details) => handleToggleEmails(details.checked)}
                                 >
                                     <Switch.HiddenInput />
                                     <Switch.Control>
@@ -577,7 +542,7 @@ const SettingsContent = () => {
                                             <Box
                                                 key={option.value}
                                                 as="button"
-                                                onClick={() => setLocalFrequency(option.value)}
+                                                onClick={() => handleFrequencyChange(option.value)}
                                                 px={4}
                                                 py={2}
                                                 fontSize="sm"
@@ -604,23 +569,6 @@ const SettingsContent = () => {
                                 </Box>
                             )}
 
-                            {hasEmailChanges && (
-                                <Flex
-                                    borderTop="1px solid"
-                                    borderTopColor="brand.divider"
-                                    pt={4}
-                                    justifyContent="flex-end"
-                                >
-                                    <Button
-                                        variant="primary"
-                                        size="sm"
-                                        onClick={handleSaveEmail}
-                                        loading={saving}
-                                    >
-                                        Save
-                                    </Button>
-                                </Flex>
-                            )}
                         </Flex>
                     </Box>
                 )}
