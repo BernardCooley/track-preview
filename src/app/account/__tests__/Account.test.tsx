@@ -59,6 +59,7 @@ const defaultSubscription = {
     isInGracePeriod: false,
     isCanceledWithTimeLeft: false,
     isLapsed: false,
+    subscriptionLoading: false,
     subscriptionsEnabled: false,
     subscriptionTier: "FREE" as const,
     subscriptionStatus: null,

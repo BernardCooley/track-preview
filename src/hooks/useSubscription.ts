@@ -16,6 +16,7 @@ export const useSubscription = () => {
     const [upgradeFeature, setUpgradeFeature] = useState<string | null>(null);
     const { value: subscriptionsFlag, isLoaded: flagLoaded } = useFeatureFlag(getSubscriptionsFlagKey(), "off");
 
+    const subscriptionLoading = !flagLoaded;
     const subscriptionsEnabled = flagLoaded && subscriptionsFlag === "on";
 
     const isInGracePeriod =
@@ -57,6 +58,7 @@ export const useSubscription = () => {
         isInGracePeriod,
         isCanceledWithTimeLeft,
         isLapsed,
+        subscriptionLoading,
         subscriptionsEnabled,
         subscriptionTier: userProfile?.subscriptionTier ?? "FREE",
         subscriptionStatus: userProfile?.subscriptionStatus ?? null,
