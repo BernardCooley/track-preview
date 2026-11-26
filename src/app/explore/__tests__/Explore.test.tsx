@@ -42,9 +42,12 @@ vi.mock("@/components/NewTracksTab", () => ({
     default: () => <div data-testid="new-tracks-tab" />,
 }));
 
-vi.mock("@/components/AudioPlayer", () => ({
-    default: React.forwardRef(() => <div data-testid="audio-player" />),
-}));
+vi.mock("@/components/AudioPlayer", () => {
+    const MockAudioPlayer = require("react").forwardRef(function MockAudioPlayer() {
+        return require("react").createElement("div", { "data-testid": "audio-player" });
+    });
+    return { default: MockAudioPlayer };
+});
 
 vi.mock("../../../../context/ThemeContext", () => ({
     useThemeContext: () => ({ appearance: "light", toggleAppearance: vi.fn() }),
