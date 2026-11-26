@@ -14,6 +14,11 @@ import "../../../test/mocks/navigation";
 import type { TrackContextProps } from "../../../test/types";
 import type { User as UserProfile } from "@prisma/client";
 
+vi.mock("../../../firebase/firebaseInit", () => ({
+    auth: { currentUser: null },
+    provider: {},
+}));
+
 const mockUpdateReviewTracks = vi.fn();
 const mockUpdateCurrentlyPlaying = vi.fn();
 const mockUpdateChangesMade = vi.fn();

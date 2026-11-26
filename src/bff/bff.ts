@@ -2,23 +2,9 @@ import { User } from "@prisma/client";
 import { AccessToken, DiscoveryHistoryTrack, Review, SearchedTrack, Track } from "../../types";
 import { getCurrentYear } from "../../utils";
 import { auth } from "../../firebase/firebaseInit";
-import { onAuthStateChanged } from "firebase/auth";
-
-function waitForAuth(): Promise<import("firebase/auth").User | null> {
-    if (auth.currentUser) return Promise.resolve(auth.currentUser);
-    return new Promise((resolve) => {
-        let resolved = false;
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            if (resolved) return;
-            resolved = true;
-            resolve(user);
-            queueMicrotask(() => unsubscribe());
-        });
-    });
-}
 
 async function getAuthHeaders(): Promise<Record<string, string>> {
-    const user = await waitForAuth();
+    const user = auth.currentUser;
     if (!user) return {};
     try {
         const token = await user.getIdToken();
